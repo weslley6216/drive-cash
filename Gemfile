@@ -7,11 +7,11 @@ gem "pg", "~> 1.5"
 gem "puma", ">= 6.0"
 
 # Assets
-gem "propshaft"
 gem "importmap-rails"
-gem "turbo-rails"
+gem "propshaft"
 gem "stimulus-rails"
 gem "tailwindcss-rails"
+gem "turbo-rails"
 
 # Phlex for components
 gem "phlex-rails"
@@ -20,11 +20,11 @@ gem "bootsnap", require: false
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
-  gem "rspec-rails"
   gem "factory_bot_rails"
   gem "faker"
-  gem "rubocop", require: false
+  gem "rspec-rails"
   gem "rubocop-rails", require: false
+  gem "rubocop", require: false
 end
 
 group :development do
@@ -32,6 +32,7 @@ group :development do
 end
 
 group :test do
-  gem "shoulda-matchers"
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record'
+  gem 'shoulda-matchers'
+  gem 'simplecov'
 end
