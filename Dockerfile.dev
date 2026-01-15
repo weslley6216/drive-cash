@@ -1,0 +1,23 @@
+FROM ruby:4.0.1
+
+RUN apt-get update -qq && apt-get install -y curl build-essential libpq-dev watchman
+
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g $GID appuser && useradd -m -u $UID -g appuser appuser
+
+WORKDIR /app
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY . .
+
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+
+CMD ["bin/setup", "-b", "0.0.0.0", "-p", "3000"]
