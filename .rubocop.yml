@@ -3,7 +3,7 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.4.5
+  TargetRubyVersion: 4.0.1
   SuggestExtensions: false
   Exclude:
    - 'bin/**/*'
@@ -13,13 +13,24 @@ AllCops:
    - 'script/**/*'
    - 'spec/rails_helper.rb'
    - 'vendor/**/*'
+
 Style/FrozenStringLiteralComment:
   Enabled: false
+
 Metrics/BlockLength:
   AllowedMethods: ['describe', 'context', 'feature', 'scenario', 'let', 'it']
+
 Style/Documentation:
   Enabled: false
+
 Style/ClassAndModuleChildren:
   EnforcedStyle: 'compact'
+
 Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: no_space
+
+Style/StringLiteralsInInterpolation:
   EnforcedStyle: single_quotes

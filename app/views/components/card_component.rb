@@ -16,8 +16,8 @@ class CardComponent < ApplicationComponent
   def merged_attributes
     {
       class: class_names(
-        "bg-white rounded-lg",
-        @padding ? "p-6" : nil,
+        'bg-white rounded-lg',
+        @padding ? 'p-6' : nil,
         shadow_class,
         @attributes[:class]
       )
@@ -29,15 +29,15 @@ class CardComponent < ApplicationComponent
 
     case @shadow
     when true
-      "shadow-md"
+      'shadow-md'
     when :sm
-      "shadow-sm"
+      'shadow-sm'
     when :md
-      "shadow-md"
+      'shadow-md'
     when :lg
-      "shadow-lg"
+      'shadow-lg'
     when :xl
-      "shadow-xl"
+      'shadow-xl'
     else
       nil
     end
