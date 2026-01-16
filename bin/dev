@@ -1,2 +1,5 @@
 #!/usr/bin/env ruby
+
+spawn("bin/rails tailwindcss:watch --poll")
+
 exec "./bin/rails", "server", *ARGV

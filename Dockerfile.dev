@@ -1,6 +1,6 @@
 FROM ruby:4.0.1
 
-RUN apt-get update -qq && apt-get install -y curl build-essential libpq-dev watchman
+RUN apt-get update -qq && apt-get install -y curl build-essential libpq-dev
 
 ARG UID=1000
 ARG GID=1000

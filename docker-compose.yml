@@ -12,6 +12,7 @@ services:
       - ruby_gems:/usr/local/bundle
     depends_on:
       - db
+
   db:
     image: postgres:16-alpine
     env_file:
@@ -20,6 +21,7 @@ services:
       - '5432:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
+
 volumes:
   postgres:
   ruby_gems:
