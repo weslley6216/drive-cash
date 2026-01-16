@@ -1,34 +1,33 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-ruby "4.0.1"
+ruby '4.0.1'
 
-gem "rails", "~> 8.1.2"
-gem "pg", "~> 1.5"
-gem "puma", ">= 6.0"
+gem 'rails', '~> 8.1.2'
+gem 'pg', '~> 1.5'
+gem 'puma', '>= 6.0'
 
 # Assets
-gem "importmap-rails"
-gem "propshaft"
-gem "stimulus-rails"
-gem "tailwindcss-rails"
-gem "turbo-rails"
+gem 'importmap-rails'
+gem 'propshaft'
+gem 'stimulus-rails'
+gem 'tailwindcss-rails'
+gem 'turbo-rails'
 
 # Phlex for components
-gem "phlex-rails"
+gem 'phlex-rails'
 
-gem "bootsnap", require: false
+gem 'bootsnap', require: false
 
 group :development, :test do
-  gem "debug", platforms: %i[ mri windows ]
-  gem "factory_bot_rails"
-  gem "faker"
-  gem "rspec-rails"
-  gem "rubocop-rails", require: false
-  gem "rubocop", require: false
+  gem 'debug', platforms: %i[ mri windows ]
+  gem 'factory_bot_rails'
+  gem 'faker'
+  gem 'rspec-rails'
+  gem 'rubocop-rails-omakase', require: false
 end
 
 group :development do
-  gem "web-console"
+  gem 'web-console'
 end
 
 group :test do
