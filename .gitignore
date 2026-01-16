@@ -39,3 +39,6 @@
 
 # Ignore SimpleCov coverage report
 /coverage
+
+# Ignore VSCode configs
+/.vscode
