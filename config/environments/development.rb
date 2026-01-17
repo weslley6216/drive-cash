@@ -56,8 +56,8 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
 # --- Hotwire Livereload Configuration ---
-config.hotwire_livereload.listen_paths << Rails.root.join("app/views/components")
-config.hotwire_livereload.force_reload_paths << Rails.root.join("app/views/components")
+config.hotwire_livereload.listen_paths << Rails.root.join("app/components")
+config.hotwire_livereload.force_reload_paths << Rails.root.join("app/views")
 config.hotwire_livereload.debounce_delay_ms = 100
 
 # Listening configurations (Polling for Docker)
