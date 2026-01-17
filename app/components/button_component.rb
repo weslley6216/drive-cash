@@ -24,9 +24,13 @@ class ButtonComponent < ApplicationComponent
     }.merge(@attributes.except(:class))
   end
 
-  def base_classes
-    'inline-flex items-center justify-center font-medium transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-  end
+def base_classes
+  <<~HTML.squish
+    inline-flex items-center justify-center font-medium transition-colors#{' '}
+    rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2#{' '}
+    disabled:opacity-50 disabled:cursor-not-allowed
+  HTML
+end
 
   def variant_classes
     case @variant
@@ -45,14 +49,10 @@ class ButtonComponent < ApplicationComponent
 
   def size_classes
     case @size
-    when :small
-      'px-3 py-1.5 text-sm'
-    when :medium
-      'px-4 py-2 text-base'
-    when :large
-      'px-6 py-3 text-lg'
-    else
-      'px-4 py-2'
+    when :small then 'px-3 py-1.5 text-sm'
+    when :medium then 'px-4 py-2 text-base'
+    when :large then 'px-6 py-3 text-lg'
+    else 'px-4 py-2'
     end
   end
 end
