@@ -28,18 +28,12 @@ class CardComponent < ApplicationComponent
     return nil unless @shadow
 
     case @shadow
-    when true
-      'shadow-md'
-    when :sm
-      'shadow-sm'
-    when :md
-      'shadow-md'
-    when :lg
-      'shadow-lg'
-    when :xl
-      'shadow-xl'
-    else
-      nil
+    when true then 'shadow-md'
+    when :sm then 'shadow-sm'
+    when :md then 'shadow-md'
+    when :lg then 'shadow-lg'
+    when :xl then 'shadow-xl'
+    else nil
     end
   end
 end
