@@ -181,12 +181,11 @@ GEM
     pg (1.6.3-aarch64-linux-musl)
     pg (1.6.3-x86_64-linux)
     pg (1.6.3-x86_64-linux-musl)
-    phlex (2.3.1)
+    phlex (2.2.1)
       zeitwerk (~> 2.7)
-    phlex-rails (2.3.1)
-      phlex (~> 2.3.0)
+    phlex-rails (2.2.0)
+      phlex (~> 2.2.1)
       railties (>= 7.1, < 9)
-      zeitwerk (~> 2.7)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -360,7 +359,7 @@ DEPENDENCIES
   hotwire-livereload
   importmap-rails
   pg (~> 1.5)
-  phlex-rails
+  phlex-rails (~> 2.2.0)
   propshaft
   puma (>= 6.0)
   rails (~> 8.1.2)
@@ -448,8 +447,8 @@ CHECKSUMS
   pg (1.6.3-aarch64-linux-musl) sha256=06a75f4ea04b05140146f2a10550b8e0d9f006a79cdaf8b5b130cde40e3ecc2c
   pg (1.6.3-x86_64-linux) sha256=5d9e188c8f7a0295d162b7b88a768d8452a899977d44f3274d1946d67920ae8d
   pg (1.6.3-x86_64-linux-musl) sha256=9c9c90d98c72f78eb04c0f55e9618fe55d1512128e411035fe229ff427864009
-  phlex (2.3.1) sha256=8c0b2d6774f1e5cdb806bd19a9dc9338acd573e61fe8310a89785d5b25756b66
-  phlex-rails (2.3.1) sha256=7ca0e5cb4344b756e566f4ef8a0d29e7ae8987fa2f459734a7f729ec41abfddd
+  phlex (2.2.1) sha256=1ae5033b9afb7698caa69646baf973e56912d3f7d8b40a76deb4d2004b50dcf7
+  phlex-rails (2.2.0) sha256=09deab4cd2d6818e0bc7a8e96945c19b9b7cbd2eb7a965a52c157fd444801b65
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.8.0) sha256=84453a16ef5530ea62c5f03ec16b52a459575ad4e7b9c2b360fd8ce2c39c1254
@@ -511,7 +510,7 @@ CHECKSUMS
   zeitwerk (2.7.4) sha256=2bef90f356bdafe9a6c2bd32bcd804f83a4f9b8bc27f3600fff051eb3edcec8b
 
 RUBY VERSION
-  ruby 4.0.1
+  ruby 3.3.5
 
 BUNDLED WITH
   4.0.3

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '4.0.1'
+ruby '3.3.5'
 
 gem 'rails', '~> 8.1.2'
 gem 'pg', '~> 1.5'
@@ -14,7 +14,7 @@ gem 'tailwindcss-rails'
 gem 'turbo-rails'
 
 # Phlex for components
-gem 'phlex-rails'
+gem 'phlex-rails', '~> 2.2.0'
 
 gem 'bootsnap', require: false
 
