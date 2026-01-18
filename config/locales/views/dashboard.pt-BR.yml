@@ -1,0 +1,18 @@
+pt-BR:
+  dashboard:
+    index_view:
+      title: "Dashboard Shopee"
+      subtitle: "Acompanhamento completo de entregas e finanças"
+      stats:
+        earnings:
+          title: "Total de Ganhos"
+          subtitle: "Média: %{value}/mês"
+        expenses:
+          title: "Total de Gastos"
+          subtitle: "%{percent}% dos ganhos"
+        profit:
+          title: "Lucro Líquido"
+          subtitle: "%{value}/dia trabalhado"
+        days:
+          title: "Dias Trabalhados"
+          subtitle: "%{value} dias/mês em média"
