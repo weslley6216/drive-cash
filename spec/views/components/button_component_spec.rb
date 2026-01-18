@@ -41,6 +41,15 @@ RSpec.describe ButtonComponent, type: :component do
       expect(html).to include("Save")
     end
 
+    it "falls back to default styles for unknown variant" do
+      component = ButtonComponent.new(variant: :unknown)
+
+      html = component.call { "Unknown" }
+
+      expect(html).to include("bg-gray-100")
+      expect(html).to include("hover:bg-gray-200")
+    end
+
     it "renders small size" do
       component = ButtonComponent.new(size: :small)
 
@@ -75,6 +84,14 @@ RSpec.describe ButtonComponent, type: :component do
 
       expect(html).to include("custom-class")
       expect(html).to include("bg-blue-600")
+    end
+
+    it "falls back to default size for unknown size" do
+      component = ButtonComponent.new(size: :unknown)
+
+      html = component.call { "Unknown size" }
+
+      expect(html).to include("px-4 py-2")
     end
 
     it "passes custom attributes" do

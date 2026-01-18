@@ -41,6 +41,14 @@ RSpec.describe CardComponent, type: :component do
       expect(html).to include("shadow-sm")
     end
 
+    it "renders with medium shadow" do
+      component = CardComponent.new(shadow: :md)
+
+      html = component.call { "Content" }
+
+      expect(html).to include("shadow-md")
+    end
+
     it "renders with large shadow" do
       component = CardComponent.new(shadow: :lg)
 
