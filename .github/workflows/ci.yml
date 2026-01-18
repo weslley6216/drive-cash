@@ -7,27 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
+  ci:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '4.0.1' 
-          bundler-cache: true
-
-      - name: Rubocop (Backend Lint)
-        run: bundle exec rubocop -f github
-
-  test:
-    runs-on: ubuntu-latest
-    needs: lint
     env:
+      CI: 'true'
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/drive_cash_test
+      DATABASE_URL: "postgres://postgres:postgres@localhost:5432/drive_cash_test"
 
     services:
       postgres:
@@ -38,25 +23,25 @@ jobs:
           POSTGRES_DB: drive_cash_test
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '4.0.1'
-          bundler-cache: false
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Lint code
+        run: bundle exec rubocop -f github
+
       - name: Set up database
         run: |
           cp config/database.yml.ci config/database.yml || true
-          bundle exec rails db:create db:prepare
+          bundle exec rails db:create db:migrate
 
-      - name: Run RSpec
+      - name: Run tests
         run: bundle exec rspec
