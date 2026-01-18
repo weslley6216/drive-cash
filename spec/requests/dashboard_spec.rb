@@ -12,7 +12,7 @@ RSpec.describe "Dashboards", type: :request do
       get root_path, params: { year: 2024 }
 
       expect(response).to have_http_status(:success)
-      
+
       normalized_body = response.body.squish
 
       expect(normalized_body).to include(I18n.t('dashboard.index_view.title'))
