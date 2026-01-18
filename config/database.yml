@@ -16,4 +16,4 @@ test:
 
 production:
   <<: *default
-  database: drive_cash_production
+  url: <%= ENV['DATABASE_URL'] %>
