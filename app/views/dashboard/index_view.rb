@@ -2,12 +2,13 @@
 
 module Dashboard
   class IndexView < ApplicationComponent
-    def initialize(totals:)
+    def initialize(totals:, filters: {})
       @totals = totals
+      @filters = filters
     end
 
     def view_template
-      render LayoutComponent.new(title: 'Dashboard Shopee') do
+      render LayoutComponent.new(title: t('.title')) do
         header
         stats_grid
       end
@@ -17,8 +18,8 @@ module Dashboard
 
     def header
       div(class: 'mb-8') do
-        h1(class: 'text-4xl font-bold text-slate-800 mb-2') { 'Dashboard Shopee' }
-        p(class: 'text-slate-600') { 'Acompanhamento completo de entregas e finanças' }
+        h1(class: 'text-4xl font-bold text-slate-800 mb-2') { t('.title') }
+        p(class: 'text-slate-600') { t('.subtitle') }
       end
     end
 
@@ -33,9 +34,9 @@ module Dashboard
 
     def earnings_card
       render StatCardComponent.new(
-        title: 'Total de Ganhos',
+        title: t('.stats.earnings.title'),
         value: format_currency(@totals[:earnings]),
-        subtitle: "Média: #{format_currency(@totals[:earnings_avg_month])}/mês",
+        subtitle: t('.stats.earnings.subtitle', value: format_currency(@totals[:earnings_avg_month])),
         color: :green,
         icon: :dollar_sign
       )
@@ -43,9 +44,9 @@ module Dashboard
 
     def expenses_card
       render StatCardComponent.new(
-        title: 'Total de Gastos',
+        title: t('.stats.expenses.title'),
         value: format_currency(@totals[:expenses]),
-        subtitle: "#{format_percentage(@totals[:expenses_percent])}% dos ganhos",
+        subtitle: t('.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent])),
         color: :red,
         icon: :alert_triangle
       )
@@ -53,9 +54,9 @@ module Dashboard
 
     def profit_card
       render StatCardComponent.new(
-        title: 'Lucro Líquido',
+        title: t('.stats.profit.title'),
         value: format_currency(@totals[:profit]),
-        subtitle: "#{format_currency(@totals[:profit_per_day])}/dia trabalhado",
+        subtitle: t('.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day])),
         color: :blue,
         icon: :trending_up
       )
@@ -63,9 +64,9 @@ module Dashboard
 
     def days_card
       render StatCardComponent.new(
-        title: 'Dias Trabalhados',
+        title: t('.stats.days.title'),
         value: @totals[:days].to_s,
-        subtitle: "#{format_decimal(@totals[:days_avg_month])} dias/mês em média",
+        subtitle: t('.stats.days.subtitle', value: format_decimal(@totals[:days_avg_month])),
         color: :yellow,
         icon: :calendar
       )
