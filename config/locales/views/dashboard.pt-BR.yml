@@ -1,8 +1,8 @@
 pt-BR:
   dashboard:
     index_view:
-      title: "Dashboard Shopee"
-      subtitle: "Acompanhamento completo de entregas e finanças"
+      title: "DriveCash"
+      subtitle: "Gestão financeira para motoristas de aplicativo"
       stats:
         earnings:
           title: "Total de Ganhos"
