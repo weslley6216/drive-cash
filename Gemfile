@@ -4,6 +4,8 @@ ruby '3.3.5'
 
 gem 'rails', '~> 8.1.2'
 gem 'pg', '~> 1.5'
+gem 'solid_queue'
+gem 'solid_cache'
 gem 'puma', '>= 6.0'
 
 # Assets
