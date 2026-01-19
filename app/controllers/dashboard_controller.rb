@@ -11,7 +11,7 @@ class DashboardController < ApplicationController
   private
 
   def set_filters
-    @year = params[:year].presence&.to_i
+    @year = params[:year].presence&.to_i || Date.current.year
     @month = params[:month].presence&.to_i
     @available_years = Delivery.available_years
     @filters = { year: @year, month: @month, available_years: @available_years }
