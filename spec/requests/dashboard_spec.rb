@@ -19,13 +19,21 @@ RSpec.describe "Dashboards", type: :request do
       expect(normalized_body).to include(format_currency(500.0))
     end
 
-    it "filter data correctly by changing the year" do
+    it "filters data correctly by changing the year" do
       get root_path, params: { year: 2025 }
 
       normalized_body = response.body.squish
 
       expect(normalized_body).to include(format_currency(0))
       expect(normalized_body).not_to include(format_currency(500.0))
+    end
+
+    it "loads available years for the filter" do
+      create(:delivery, date: '2023-01-01')
+
+      get root_path
+
+      expect(response.body).to include('<option value="2023"')
     end
   end
 

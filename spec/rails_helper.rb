@@ -26,8 +26,8 @@ end
 RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.filter_rails_from_backtrace!
-
-  config.before(:each, type: :request) do
-    host! "www.example.com" 
+  
+  config.before(:each, type: :component) do
+    Rails.application.routes.default_url_options[:host] = 'test.host'
   end
 end
