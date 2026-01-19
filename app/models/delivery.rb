@@ -24,6 +24,11 @@ class Delivery < ApplicationRecord
     count("DISTINCT TO_CHAR(date, 'YYYY-MM')").clamp(1, Float::INFINITY)
   end
 
+  def self.available_years
+    years = pluck(Arel.sql('DISTINCT EXTRACT(YEAR FROM date)')).map(&:to_i).sort.reverse
+    years.any? ? years : [Date.current.year]
+  end
+
   def total_costs = fuel_cost + maintenance_cost + other_costs
   def net_profit = route_value - total_costs
 end
