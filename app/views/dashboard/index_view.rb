@@ -10,6 +10,7 @@ module Dashboard
     def view_template
       render LayoutComponent.new(title: t('.title')) do
         header
+        filters_section
         stats_grid
       end
     end
@@ -21,6 +22,14 @@ module Dashboard
         h1(class: 'text-4xl font-bold text-slate-800 mb-2') { t('.title') }
         p(class: 'text-slate-600') { t('.subtitle') }
       end
+    end
+
+    def filters_section
+      render FilterComponent.new(
+        selected_year: @filters[:year],
+        selected_month: @filters[:month],
+        available_years: @filters[:available_years]
+      )
     end
 
     def stats_grid
