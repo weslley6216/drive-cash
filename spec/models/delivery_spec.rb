@@ -1,4 +1,5 @@
-# spec/models/delivery_spec.rb
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Delivery, type: :model do
@@ -29,6 +30,25 @@ RSpec.describe Delivery, type: :model do
 
     it '.total_profit calculates net profit directly from database' do
       expect(Delivery.total_profit).to eq(260)
+    end
+  end
+
+  describe '.available_years' do
+    context 'when there are deliveries' do
+      before do
+        create(:delivery, date: '2023-01-01')
+        create(:delivery, date: '2025-01-01')
+      end
+
+      it 'returns distinct years sorted descending' do
+        expect(Delivery.available_years).to eq([2025, 2023])
+      end
+    end
+
+    context 'when there are no deliveries' do
+      it 'returns the current year as default' do
+        expect(Delivery.available_years).to eq([Date.current.year])
+      end
     end
   end
 
