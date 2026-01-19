@@ -15,5 +15,11 @@ test:
   database: drive_cash_test
 
 production:
-  <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
+  primary: &primary_production
+    <<: *default
+    url: <%= ENV['DATABASE_URL'] %>
+    prepared_statements: false
+  cache:
+    <<: *primary_production
+  queue:
+    <<: *primary_production
