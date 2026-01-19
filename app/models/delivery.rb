@@ -26,6 +26,7 @@ class Delivery < ApplicationRecord
 
   def self.available_years
     years = pluck(Arel.sql('DISTINCT EXTRACT(YEAR FROM date)')).map(&:to_i).sort.reverse
+    puts "==================#{years}==================="
     years.any? ? years : [Date.current.year]
   end
 
