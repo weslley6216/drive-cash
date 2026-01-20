@@ -2,7 +2,6 @@
 
 class DashboardService
   def initialize(deliveries)
-    # Recebe a relação já filtrada pelo Controller (Year/Month/Platform)
     @deliveries = deliveries
   end
 
