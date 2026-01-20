@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   root "dashboard#index"
+
+  resources :deliveries, only: [:new, :create]
   
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

@@ -9,9 +9,15 @@ module Dashboard
 
     def view_template
       render LayoutComponent.new(title: t('.title')) do
+        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
+
         header
         filters_section
-        stats_grid
+        div(id: 'stats_grid') do
+          render StatsGridComponent.new(totals: @totals)
+        end
+        fab_button
+        modal_container
       end
     end
 
@@ -32,53 +38,20 @@ module Dashboard
       )
     end
 
-    def stats_grid
-      div(class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8') do
-        earnings_card
-        expenses_card
-        profit_card
-        days_card
+    def fab_button
+      a(
+        href: '/deliveries/new',
+        data_turbo_frame: 'modal',
+        class: 'fixed bottom-6 right-6 z-40 flex items-center justify-center gap-2 bg-blue-600 text-white rounded-full w-14 h-14 sm:w-auto sm:h-auto sm:rounded-lg sm:px-5 sm:py-3 shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 active:scale-95'
+      ) do
+        render IconComponent.new(name: :plus, class: 'w-6 h-6 sm:w-5 sm:h-5')
+
+        span(class: 'hidden sm:inline font-medium') { 'Nova Receita' }
       end
     end
 
-    def earnings_card
-      render StatCardComponent.new(
-        title: t('.stats.earnings.title'),
-        value: format_currency(@totals[:earnings]),
-        subtitle: t('.stats.earnings.subtitle', value: format_currency(@totals[:earnings_avg_month])),
-        color: :green,
-        icon: :dollar_sign
-      )
-    end
-
-    def expenses_card
-      render StatCardComponent.new(
-        title: t('.stats.expenses.title'),
-        value: format_currency(@totals[:expenses]),
-        subtitle: t('.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent])),
-        color: :red,
-        icon: :alert_triangle
-      )
-    end
-
-    def profit_card
-      render StatCardComponent.new(
-        title: t('.stats.profit.title'),
-        value: format_currency(@totals[:profit]),
-        subtitle: t('.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day])),
-        color: :blue,
-        icon: :trending_up
-      )
-    end
-
-    def days_card
-      render StatCardComponent.new(
-        title: t('.stats.days.title'),
-        value: @totals[:days].to_s,
-        subtitle: t('.stats.days.subtitle', value: format_decimal(@totals[:days_avg_month])),
-        color: :yellow,
-        icon: :calendar
-      )
+    def modal_container
+      turbo_frame_tag 'modal'
     end
   end
 end

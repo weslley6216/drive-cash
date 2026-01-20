@@ -47,6 +47,27 @@ class IconComponent < ApplicationComponent
       svg.path(d: 'M16 2v4', stroke: 'currentColor', stroke_width: '2', stroke_linecap: 'round')
       svg.path(d: 'M8 2v4', stroke: 'currentColor', stroke_width: '2', stroke_linecap: 'round')
       svg.path(d: 'M3 10h18', stroke: 'currentColor', stroke_width: '2', stroke_linecap: 'round')
+    },
+    plus: ->(svg) {
+      svg.path(
+        d: 'M12 5v14M5 12h14',
+        stroke: 'currentColor',
+        stroke_width: '2',
+        stroke_linecap: 'round',
+        stroke_linejoin: 'round'
+      )
+    },
+    x: ->(svg) {
+      svg.path(d: 'M18 6L6 18M6 6l12 12', stroke: 'currentColor', stroke_width: '2', stroke_linecap: 'round', stroke_linejoin: 'round')
+    },
+    save: ->(svg) {
+      svg.path(d: 'M15.2 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.8L15.2 3z',
+               stroke: 'currentColor', fill: 'none', stroke_width: '2',
+               stroke_linecap: 'round', stroke_linejoin: 'round')
+      svg.path(d: 'M7 21V13h10v8', stroke: 'currentColor', fill: 'none',
+               stroke_width: '2', stroke_linecap: 'round', stroke_linejoin: 'round')
+      svg.path(d: 'M7 3v5h8', stroke: 'currentColor', fill: 'none',
+               stroke_width: '2', stroke_linecap: 'round', stroke_linejoin: 'round')
     }
   }.freeze
 
