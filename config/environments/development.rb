@@ -56,11 +56,25 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
 # --- Hotwire Livereload Configuration ---
-config.hotwire_livereload.listen_paths << Rails.root.join("app/components")
-config.hotwire_livereload.force_reload_paths << Rails.root.join("app/views")
-config.hotwire_livereload.debounce_delay_ms = 100
+  # --- CONFIGURAÇÕES PARA DOCKER E LIVERELOAD ---
 
-# Listening configurations (Polling for Docker)
-config.hotwire_livereload.listen_options[:force_polling] = true
-config.hotwire_livereload.listen_options[:latency] = 0.2
+  config.web_console.permissions = '172.16.0.0/12'
+
+  config.action_cable.allowed_request_origins = [
+    /http:\/\/localhost.*/,
+    /http:\/\/127\.0\.0\.1.*/,
+    /http:\/\/0\.0\.0\.0.*/
+  ]
+
+  config.hotwire_livereload.listen_paths << Rails.root.join("app/components")
+
+  config.hotwire_livereload.force_reload_paths += [
+    Rails.root.join("app/views"),
+    Rails.root.join("app/components")
+  ]
+
+  # Listening configurations (Polling for Docker)
+  config.hotwire_livereload.debounce_delay_ms = 100
+  config.hotwire_livereload.listen_options[:force_polling] = true
+  config.hotwire_livereload.listen_options[:latency] = 0.2
 end
