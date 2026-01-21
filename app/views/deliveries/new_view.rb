@@ -50,7 +50,7 @@ module Deliveries
         data_action: 'modal#close',
         class: modal_close_button_classes
       ) do
-        render IconComponent.new(name: :x, class: 'w-6 h-6')
+        render PhlexIcons::Lucide::X.new(class: 'w-6 h-6')
       end
     end
 
@@ -106,7 +106,7 @@ module Deliveries
         type: 'submit',
         class: "#{button_classes(variant: :primary, full_width: true)} flex items-center justify-center gap-2 shadow-md active:scale-95"
       ) do
-        render IconComponent.new(name: :save, class: 'w-5 h-5 text-white opacity-100')
+        render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')
         span { t('.buttons.save') }
       end
     end
