@@ -1,0 +1,40 @@
+# config/locales/models/expense.pt-BR.yml
+pt-BR:
+  activerecord:
+    models:
+      expense:
+        one: "Despesa"
+        other: "Despesas"
+    attributes:
+      expense:
+        date: "Data"
+        amount: "Valor"
+        category: "Categoria"
+        vendor: "Fornecedor"
+        description: "Descrição"
+        notes: "Observações"
+    errors:
+      models:
+        expense:
+          attributes:
+            date:
+              blank: "não pode ficar em branco"
+            amount:
+              blank: "não pode ficar em branco"
+              greater_than: "deve ser maior que %{count}"
+            category:
+              blank: "não pode ficar em branco"
+
+  enums:
+    expense:
+      category:
+        maintenance: "Manutenção"
+        fuel: "Combustível"
+        insurance: "Seguro"
+        parking: "Estacionamento"
+        toll: "Pedágio"
+        phone: "Telefone"
+        fine: "Multa"
+        car_wash: "Lavagem"
+        documentation: "Documentação"
+        other: "Outros"

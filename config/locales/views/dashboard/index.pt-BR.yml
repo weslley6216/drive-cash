@@ -1,3 +1,4 @@
+# config/locales/views/dashboard/index.pt-BR.yml
 pt-BR:
   dashboard:
     index_view:
@@ -5,11 +6,11 @@ pt-BR:
       subtitle: "Gestão financeira para motoristas de aplicativo"
       stats:
         earnings:
-          title: "Total de Ganhos"
+          title: "Total de Receitas"
           subtitle: "Média: %{value}/mês"
         expenses:
-          title: "Total de Gastos"
-          subtitle: "%{percent}% dos ganhos"
+          title: "Total de Despesas"
+          subtitle: "%{percent}% das receitas"
         profit:
           title: "Lucro Líquido"
           subtitle: "%{value}/dia trabalhado"

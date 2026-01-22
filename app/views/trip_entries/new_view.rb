@@ -1,6 +1,5 @@
-# frozen_string_literal: true
-
-module Deliveries
+# app/views/trip_entries/new_view.rb
+module TripEntries
   class NewView < ApplicationComponent
     include Phlex::Rails::Helpers::TurboFrameTag
     include Phlex::Rails::Helpers::FormWith
@@ -8,8 +7,8 @@ module Deliveries
     include ModalStyles
     include ButtonStyles
 
-    def initialize(delivery:)
-      @delivery = delivery
+    def initialize(trip_entry:)
+      @trip_entry = trip_entry
     end
 
     def view_template
@@ -55,7 +54,12 @@ module Deliveries
     end
 
     def modal_form
-      form_with(model: @delivery, class: 'p-6 space-y-4', data: { controller: 'calculator' }) do |f|
+      form_with(
+        model: @trip_entry,
+        url: trip_entries_path,
+        class: 'p-6 space-y-4',
+        data: { controller: 'calculator' }
+      ) do |f|
         render_form_fields(f)
       end
     end
@@ -72,7 +76,7 @@ module Deliveries
 
     def date_field(f)
       field_wrapper(t('.labels.date')) do
-        render f.date_field(:date, value: Date.current, class: input_classes)
+        render f.date_field(:date, value: @trip_entry.date, class: input_classes)
       end
     end
 
