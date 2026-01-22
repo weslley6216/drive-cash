@@ -60,7 +60,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def icon_section
-    render IconComponent.new(name: @icon, class: 'w-8 h-8')
+    render @icon.new(class: 'w-8 h-8 opacity-50')
   end
 
   def card_classes

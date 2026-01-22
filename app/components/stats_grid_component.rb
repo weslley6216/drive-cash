@@ -1,4 +1,13 @@
+# frozen_string_literal: true
+
 class StatsGridComponent < ApplicationComponent
+  Icons = {
+    dollar_sign: PhlexIcons::Lucide::DollarSign,
+    triangle_alert: PhlexIcons::Lucide::TriangleAlert,
+    trending_up: PhlexIcons::Lucide::TrendingUp,
+    calendar: PhlexIcons::Lucide::Calendar
+  }.freeze
+
   def initialize(totals:)
     @totals = totals
   end
@@ -19,7 +28,8 @@ class StatsGridComponent < ApplicationComponent
       title: t('dashboard.index_view.stats.earnings.title'),
       value: format_currency(@totals[:earnings]),
       subtitle: t('dashboard.index_view.stats.earnings.subtitle', value: format_currency(@totals[:earnings_avg_month])),
-      color: :green, icon: :dollar_sign
+      color: :green,
+      icon: Icons[:dollar_sign]
     )
   end
 
@@ -28,7 +38,8 @@ class StatsGridComponent < ApplicationComponent
       title: t('dashboard.index_view.stats.expenses.title'),
       value: format_currency(@totals[:expenses]),
       subtitle: t('dashboard.index_view.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent])),
-      color: :red, icon: :alert_triangle
+      color: :red,
+      icon: Icons[:triangle_alert]
     )
   end
 
@@ -37,7 +48,8 @@ class StatsGridComponent < ApplicationComponent
       title: t('dashboard.index_view.stats.profit.title'),
       value: format_currency(@totals[:profit]),
       subtitle: t('dashboard.index_view.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day])),
-      color: :blue, icon: :trending_up
+      color: :blue,
+      icon: Icons[:trending_up]
     )
   end
 
@@ -46,7 +58,8 @@ class StatsGridComponent < ApplicationComponent
       title: t('dashboard.index_view.stats.days.title'),
       value: @totals[:days].to_s,
       subtitle: t('dashboard.index_view.stats.days.subtitle', value: format_decimal(@totals[:days_avg_month])),
-      color: :yellow, icon: :calendar
+      color: :yellow,
+      icon: Icons[:calendar]
     )
   end
 end

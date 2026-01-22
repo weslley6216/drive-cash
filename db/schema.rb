@@ -10,17 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_15_204655) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_22_131302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "deliveries", force: :cascade do |t|
+  create_table "earnings", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
     t.date "date", null: false
-    t.decimal "fuel_cost", precision: 10, scale: 2, default: "0.0"
-    t.decimal "maintenance_cost", precision: 10, scale: 2, default: "0.0"
-    t.decimal "other_costs", precision: 10, scale: 2, default: "0.0"
-    t.decimal "route_value", precision: 10, scale: 2, null: false
+    t.text "notes"
+    t.string "platform"
+    t.bigint "trip_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_earnings_on_date"
+    t.index ["platform"], name: "index_earnings_on_platform"
+    t.index ["trip_id"], name: "index_earnings_on_trip_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "description"
+    t.text "notes"
+    t.bigint "trip_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "vendor"
+    t.index ["category"], name: "index_expenses_on_category"
+    t.index ["date"], name: "index_expenses_on_date"
+    t.index ["trip_id"], name: "index_expenses_on_trip_id"
+  end
+
+  create_table "trips", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date"
+    t.text "notes"
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "earnings", "trips"
+  add_foreign_key "expenses", "trips"
 end

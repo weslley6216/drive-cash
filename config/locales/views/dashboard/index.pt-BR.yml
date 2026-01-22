@@ -1,0 +1,19 @@
+pt-BR:
+  dashboard:
+    index_view:
+      title: "DriveCash"
+      subtitle: "Gestão financeira para motoristas de aplicativo"
+      new_earning: Nova Entrada
+      stats:
+        earnings:
+          title: "Total de Receitas"
+          subtitle: "Média: %{value}/mês"
+        expenses:
+          title: "Total de Despesas"
+          subtitle: "%{percent}% das receitas"
+        profit:
+          title: "Lucro Líquido"
+          subtitle: "%{value}/dia trabalhado"
+        days:
+          title: "Dias Trabalhados"
+          subtitle: "%{value} dias/mês em média"

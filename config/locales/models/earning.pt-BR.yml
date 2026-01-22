@@ -1,0 +1,21 @@
+pt-BR:
+  activerecord:
+    models:
+      earning:
+        one: "Receita"
+        other: "Receitas"
+    attributes:
+      earning:
+        date: "Data"
+        amount: "Valor"
+        platform: "Plataforma"
+        trip_id: "ID da Corrida"
+        notes: "Observações"
+    enums:
+      earning:
+        platform:
+          shopee: "Shopee"
+          ifood: "iFood"
+          uber: "Uber"
+          nine_nine: "99"
+          other: "Outros"
