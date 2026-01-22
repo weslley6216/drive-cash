@@ -1,4 +1,3 @@
-# app/services/dashboard/stats_service.rb
 module Dashboard
   class StatsService
     def initialize(year: Date.current.year, month: nil)
@@ -11,20 +10,17 @@ module Dashboard
       expenses_data = expenses_calculator.call
 
       {
-        # Totais
         earnings: earnings_data[:total],
         expenses: expenses_data[:total],
         profit: profit,
         days: earnings_data[:days_count],
 
-        # Médias
         earnings_avg_month: earnings_data[:avg_per_month],
         earnings_avg_day: earnings_data[:avg_per_day],
         expenses_percent: expenses_percent(earnings_data[:total], expenses_data[:total]),
         profit_per_day: profit_per_day(earnings_data[:days_count]),
         days_avg_month: days_avg_month(earnings_data[:days_count]),
 
-        # Detalhes (para drill-down futuro)
         earnings_by_platform: earnings_data[:by_platform],
         expenses_by_category: expenses_data[:by_category],
         top_expense_vendors: expenses_data[:top_vendors]
@@ -80,10 +76,17 @@ module Dashboard
     end
 
     def distinct_months_count
-      # Usa o mesmo cálculo de earnings (assumindo que earnings sempre tem dados)
-      earnings_calculator.call[:total] > 0 ? 
+      earnings_calculator.call[:total] > 0 ?
         earnings_scope.pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')")).count.clamp(1, Float::INFINITY) :
         1
+    end
+
+    def self.available_years
+      Rails.cache.fetch('dashboard/available_years', expires_in: 1.hour) do
+        years = (Earning.pluck(Arel.sql('EXTRACT(YEAR FROM date)')) +
+                 Expense.pluck(Arel.sql('EXTRACT(YEAR FROM date)')))
+        years.map(&:to_i).uniq.sort.reverse.presence || [Date.current.year]
+      end
     end
   end
 end

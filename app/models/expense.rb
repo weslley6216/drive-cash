@@ -1,4 +1,3 @@
-# app/models/expense.rb
 class Expense < ApplicationRecord
   enum :category, {
     maintenance: 'maintenance',

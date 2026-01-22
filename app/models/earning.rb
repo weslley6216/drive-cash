@@ -1,4 +1,3 @@
-# app/models/earning.rb
 class Earning < ApplicationRecord
   enum :platform, {
     shopee: 'shopee',

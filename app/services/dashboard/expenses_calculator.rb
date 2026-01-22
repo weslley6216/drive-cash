@@ -1,4 +1,3 @@
-# app/services/dashboard/expenses_calculator.rb
 module Dashboard
   class ExpensesCalculator
     def initialize(scope)

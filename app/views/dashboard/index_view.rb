@@ -38,7 +38,7 @@ module Dashboard
 
     def fab_button
       a(
-        href: new_trip_entry_path,
+        href: new_trip_entry_path(context: { year: @filters[:year], month: @filters[:month] }),
         data_turbo_frame: 'modal',
         class: 'fixed bottom-6 right-6 z-40 flex items-center justify-center gap-2 bg-blue-600 text-white rounded-full w-14 h-14 sm:w-auto sm:h-auto sm:rounded-lg sm:px-5 sm:py-3 shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 active:scale-95'
       ) do

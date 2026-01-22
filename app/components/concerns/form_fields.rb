@@ -6,7 +6,7 @@ module FormFields
       render form.number_field(
         attribute,
         step: '0.01',
-        required: true,
+        required: required,
         placeholder: t('.placeholders.money'),
         value: form.object.send(attribute) || 0.00,
         class: input_classes,
@@ -28,17 +28,5 @@ module FormFields
 
   def input_classes
     'w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-  end
-
-  private
-
-  def calculator_data(type)
-    return {} unless type
-
-    {
-      calculator_target: 'input',
-      action: 'input->calculator#calculate',
-      type: type
-    }
   end
 end
