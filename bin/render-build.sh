@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# exit on error
 set -o errexit
 
+echo "=== Installing dependencies ==="
 bundle install
-bundle exec rake assets:precompile
-bundle exec rake assets:clean
-bundle exec rake db:migrate
-bundle exec rake db:seed
+
+echo "=== Building Tailwind CSS ==="
+bin/rails tailwindcss:build
+
+echo "=== Precompiling assets ==="
+RAILS_ENV=production bundle exec rails assets:precompile
+
+echo "=== Running migrations ==="
+bin/rails db:migrate
