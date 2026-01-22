@@ -1,4 +1,3 @@
-# config/locales/models/earning.pt-BR.yml
 pt-BR:
   activerecord:
     models:
@@ -12,12 +11,11 @@ pt-BR:
         platform: "Plataforma"
         trip_id: "ID da Corrida"
         notes: "Observações"
-    errors:
-      models:
-        earning:
-          attributes:
-            date:
-              blank: "não pode ficar em branco"
-            amount:
-              blank: "não pode ficar em branco"
-              greater_than: "deve ser maior que %{count}"
+    enums:
+      earning:
+        platform:
+          shopee: "Shopee"
+          ifood: "iFood"
+          uber: "Uber"
+          nine_nine: "99"
+          other: "Outros"

@@ -1,6 +1,5 @@
-# config/locales/views/trip_entries/create.pt-BR.yml
 pt-BR:
-  trip_entries:
+  trips:
     create:
       success: "Entrada registrada com sucesso!"
       error: "Erro ao registrar entrada: %{errors}"
