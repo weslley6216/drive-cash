@@ -2,13 +2,16 @@ class Earning < ApplicationRecord
   belongs_to :trip
 
   enum :platform, {
-    shopee: 'shopee',
+    amazon: 'amazon',
     ifood: 'ifood',
-    uber: 'uber',
+    mercado_livre: 'mercado_livre',
     nine_nine: '99',
+    shopee: 'shopee',
+    rappi: 'rappi',
+    uber: 'uber',
     other: 'other'
   }, prefix: true
-  
+
   validates :date, :amount, presence: true
   validates :amount, numericality: { greater_than_or_equal_to: 0 }
 

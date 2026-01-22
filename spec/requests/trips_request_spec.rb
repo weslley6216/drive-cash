@@ -47,8 +47,8 @@ RSpec.describe "Trips", type: :request do
     end
 
     it "handles validation errors" do
-      invalid_params = { trip: { route_value: nil } } 
-      
+      invalid_params = { trip: { route_value: nil } }
+
       post trips_path, params: invalid_params, as: :turbo_stream
 
       expect(response.body).to include('Nova Entrada')

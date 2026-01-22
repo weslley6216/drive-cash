@@ -8,7 +8,7 @@ RSpec.describe Trip, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:date) }
-    
+
     it 'validates numericality of route_value' do
       trip = build(:trip, route_value: -10)
 

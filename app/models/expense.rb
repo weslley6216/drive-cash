@@ -2,10 +2,16 @@ class Expense < ApplicationRecord
   belongs_to :trip
 
   enum :category, {
-    maintenance: 'maintenance',
+    car_wash: 'car_wash',
+    documentation: 'documentation',
+    fine: 'fine',
+    food: 'food',
     fuel: 'fuel',
     insurance: 'insurance',
+    maintenance: 'maintenance',
     parking: 'parking',
+    phone: 'phone',
+    toll: 'toll',
     other: 'other'
   }, prefix: true
 

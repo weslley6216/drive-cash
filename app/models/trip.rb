@@ -29,7 +29,7 @@ class Trip < ApplicationRecord
 
   def add_expense(category, amount)
     return unless amount.to_f > 0
-    
+
     expenses.build(
       date: date,
       category: category,

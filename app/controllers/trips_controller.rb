@@ -9,7 +9,7 @@ class TripsController < ApplicationController
     )
 
     render Trips::NewView.new(
-      trip: @trip, 
+      trip: @trip,
       context: params[:context]
     )
   end
@@ -21,8 +21,8 @@ class TripsController < ApplicationController
       context_year = params.dig(:context, :year).presence&.to_i || Date.current.year
       @totals = Dashboard::StatsService.new(year: context_year).call
 
-      flash.now[:notice] = "Lançamento salvo com sucesso!"
-      
+      flash.now[:notice] = 'Lançamento salvo com sucesso!'
+
       respond_to do |format|
         format.turbo_stream do
           render Trips::CreateView.new(trip: @trip, totals: @totals)
@@ -30,7 +30,7 @@ class TripsController < ApplicationController
       end
     else
       flash.now[:alert] = "Erro ao salvar: #{@trip.errors.full_messages.to_sentence}"
-      
+
       respond_to do |format|
         format.turbo_stream do
           render Trips::CreateView.new(trip: @trip, totals: nil)
@@ -43,12 +43,12 @@ class TripsController < ApplicationController
 
   def trip_params
     params.require(:trip).permit(
-      :date, 
-      :route_value, 
-      :fuel_cost, 
-      :maintenance_cost, 
-      :other_costs, 
-      :platform, 
+      :date,
+      :route_value,
+      :fuel_cost,
+      :maintenance_cost,
+      :other_costs,
+      :platform,
       :notes
     )
   end
