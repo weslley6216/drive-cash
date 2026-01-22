@@ -1,4 +1,6 @@
 class Earning < ApplicationRecord
+  belongs_to :trip
+
   enum :platform, {
     shopee: 'shopee',
     ifood: 'ifood',
@@ -6,7 +8,7 @@ class Earning < ApplicationRecord
     nine_nine: '99',
     other: 'other'
   }, prefix: true
-
+  
   validates :date, :amount, presence: true
   validates :amount, numericality: { greater_than_or_equal_to: 0 }
 

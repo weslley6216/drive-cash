@@ -1,4 +1,3 @@
-# config/locales/models/expense.pt-BR.yml
 pt-BR:
   activerecord:
     models:
@@ -13,18 +12,6 @@ pt-BR:
         vendor: "Fornecedor"
         description: "Descrição"
         notes: "Observações"
-    errors:
-      models:
-        expense:
-          attributes:
-            date:
-              blank: "não pode ficar em branco"
-            amount:
-              blank: "não pode ficar em branco"
-              greater_than: "deve ser maior que %{count}"
-            category:
-              blank: "não pode ficar em branco"
-
   enums:
     expense:
       category:

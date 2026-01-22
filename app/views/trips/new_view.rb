@@ -1,4 +1,4 @@
-module TripEntries
+module Trips
   class NewView < ApplicationComponent
     include Phlex::Rails::Helpers::TurboFrameTag
     include Phlex::Rails::Helpers::FormWith
@@ -6,8 +6,8 @@ module TripEntries
     include ModalStyles
     include ButtonStyles
 
-    def initialize(trip_entry:, context: {})
-      @trip_entry = trip_entry
+    def initialize(trip:, context: {})
+      @trip = trip
       @context = context || {}
     end
 
@@ -55,8 +55,8 @@ module TripEntries
 
     def modal_form
       form_with(
-        model: @trip_entry,
-        url: trip_entries_path,
+        model: @trip,
+        url: trips_path,
         class: 'p-6 space-y-4',
         data: { controller: 'calculator' }
       ) do |f|
@@ -79,7 +79,7 @@ module TripEntries
 
     def date_field(f)
       field_wrapper(t('.labels.date')) do
-        render f.date_field(:date, value: @trip_entry.date, class: input_classes)
+        render f.date_field(:date, value: @trip.date, class: input_classes)
       end
     end
 

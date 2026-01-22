@@ -1,9 +1,9 @@
-# config/locales/views/dashboard/index.pt-BR.yml
 pt-BR:
   dashboard:
     index_view:
       title: "DriveCash"
       subtitle: "Gestão financeira para motoristas de aplicativo"
+      new_earning: Nova Entrada
       stats:
         earnings:
           title: "Total de Receitas"

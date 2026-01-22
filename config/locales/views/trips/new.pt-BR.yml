@@ -1,6 +1,5 @@
-# config/locales/views/trip_entries/new.pt-BR.yml
 pt-BR:
-  trip_entries:
+  trips:
     new_view:
       title: "Nova Entrada"
       labels:

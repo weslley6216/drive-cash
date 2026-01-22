@@ -1,4 +1,6 @@
 class Expense < ApplicationRecord
+  belongs_to :trip
+
   enum :category, {
     maintenance: 'maintenance',
     fuel: 'fuel',
