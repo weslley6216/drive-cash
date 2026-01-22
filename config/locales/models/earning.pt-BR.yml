@@ -1,0 +1,23 @@
+# config/locales/models/earning.pt-BR.yml
+pt-BR:
+  activerecord:
+    models:
+      earning:
+        one: "Receita"
+        other: "Receitas"
+    attributes:
+      earning:
+        date: "Data"
+        amount: "Valor"
+        platform: "Plataforma"
+        trip_id: "ID da Corrida"
+        notes: "Observações"
+    errors:
+      models:
+        earning:
+          attributes:
+            date:
+              blank: "não pode ficar em branco"
+            amount:
+              blank: "não pode ficar em branco"
+              greater_than: "deve ser maior que %{count}"

@@ -1,0 +1,21 @@
+# config/locales/views/trip_entries/new.pt-BR.yml
+pt-BR:
+  trip_entries:
+    new_view:
+      title: "Nova Entrada"
+      labels:
+        date: "Data"
+        route_value: "Valor da Rota (R$)"
+        fuel_cost: "Combustível (R$)"
+        maintenance_cost: "Manutenção (R$)"
+        other_costs: "Outros Custos (R$)"
+      placeholders:
+        money: "0,00"
+        route_value: "240,00"
+        fuel_cost: "40,00"
+        maintenance_cost: "0,00"
+        other_costs: "0,00"
+      profit_preview: "Lucro Estimado:"
+      buttons:
+        cancel: "Cancelar"
+        save: "Salvar"

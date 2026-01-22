@@ -1,0 +1,15 @@
+# config/locales/views/shared/stats_grid.pt-BR.yml
+pt-BR:
+  stats_grid_component:
+    earnings:
+      title: "Total de Receitas"
+      subtitle: "Média: %{value}/mês"
+    expenses:
+      title: "Total de Despesas"
+      subtitle: "%{percent}% das receitas"
+    profit:
+      title: "Lucro Líquido"
+      subtitle: "%{value}/dia trabalhado"
+    days:
+      title: "Dias Trabalhados"
+      subtitle: "%{value} dias/mês em média"
