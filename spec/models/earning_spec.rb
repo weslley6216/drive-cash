@@ -7,10 +7,13 @@ RSpec.describe Earning, type: :model do
     it { is_expected.to validate_presence_of(:amount) }
     it { is_expected.to validate_numericality_of(:amount).is_greater_than_or_equal_to(0) }
     it { is_expected.to define_enum_for(:platform).with_values(
-      shopee: 'shopee',
+      amazon: 'amazon',
       ifood: 'ifood',
-      uber: 'uber',
+      mercado_livre: 'mercado_livre',
       nine_nine: '99',
+      shopee: 'shopee',
+      rappi: 'rappi',
+      uber: 'uber',
       other: 'other'
     ).with_prefix.backed_by_column_of_type(:string) }
   end
