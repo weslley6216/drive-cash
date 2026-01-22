@@ -1,0 +1,5 @@
+pt-BR:
+  trips:
+    create:
+      success: "Entrada registrada com sucesso!"
+      error: "Erro ao registrar entrada: %{errors}"

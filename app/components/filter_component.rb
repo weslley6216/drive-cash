@@ -30,7 +30,7 @@ class FilterComponent < ApplicationComponent
 
   def filter_header
     div(class: 'flex items-center gap-2 whitespace-nowrap') do
-      render_filter_icon
+      render PhlexIcons::Lucide::Funnel.new(class: 'w-5 h-5 text-slate-600')
       span(class: 'text-sm font-medium text-slate-700') { t('.title') }
     end
   end
@@ -63,17 +63,6 @@ class FilterComponent < ApplicationComponent
       ) do
         month_options
       end
-    end
-  end
-
-  def render_filter_icon
-    svg(
-      xmlns: 'http://www.w3.org/2000/svg', width: '20', height: '20',
-      viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor',
-      stroke_width: '2', stroke_linecap: 'round', stroke_linejoin: 'round',
-      class: 'w-5 h-5 text-slate-600'
-    ) do |s|
-      s.polygon(points: '22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3')
     end
   end
 

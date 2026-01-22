@@ -1,0 +1,15 @@
+pt-BR:
+  activerecord:
+    models:
+      trip:
+        one: "Dia de Trabalho"
+        other: "Dias de Trabalho"
+    attributes:
+      trip:
+        date: "Data"
+        route_value: "Valor da Rota"
+        fuel_cost: "Combustível"
+        maintenance_cost: "Manutenção"
+        other_costs: "Outros Custos"
+        platform: "Plataforma Principal"
+        notes: "Observações"
