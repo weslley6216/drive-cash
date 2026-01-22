@@ -23,4 +23,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_15_204655) do
     t.decimal "route_value", precision: 10, scale: 2, null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "earnings", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "notes"
+    t.string "platform"
+    t.string "trip_id"
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_earnings_on_date"
+    t.index ["platform"], name: "index_earnings_on_platform"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "description"
+    t.text "notes"
+    t.datetime "updated_at", null: false
+    t.string "vendor"
+    t.index ["category"], name: "index_expenses_on_category"
+    t.index ["date"], name: "index_expenses_on_date"
+  end
 end
