@@ -1,4 +1,3 @@
-# app/services/dashboard/earnings_calculator.rb
 module Dashboard
   class EarningsCalculator
     def initialize(scope)

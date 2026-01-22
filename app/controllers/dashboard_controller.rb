@@ -1,4 +1,3 @@
-# app/controllers/dashboard_controller.rb
 class DashboardController < ApplicationController
   before_action :set_filters, only: :index
 
@@ -17,11 +16,5 @@ class DashboardController < ApplicationController
     @filters = { year: @year, month: @month, available_years: @available_years }
   end
 
-  def available_years
-    earning_years = Earning.pluck(Arel.sql('DISTINCT EXTRACT(YEAR FROM date)')).map(&:to_i)
-    expense_years = Expense.pluck(Arel.sql('DISTINCT EXTRACT(YEAR FROM date)')).map(&:to_i)
-    
-    years = (earning_years + expense_years).uniq.sort.reverse
-    years.any? ? years : [Date.current.year]
-  end
+  def available_years = Dashboard::StatsService.available_years
 end

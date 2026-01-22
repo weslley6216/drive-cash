@@ -1,4 +1,3 @@
-# app/models/trip_entry.rb
 class TripEntry
   include ActiveModel::Model
   include ActiveModel::Attributes
@@ -36,7 +35,7 @@ class TripEntry
   end
 
   def model_name
-    ActiveModel::Name.new(self, nil, "TripEntry")
+    ActiveModel::Name.new(self, nil, 'TripEntry')
   end
 
   private
@@ -53,9 +52,9 @@ class TripEntry
   def create_expenses!
     expenses_to_create = []
 
-    expenses_to_create << { category: :fuel, amount: fuel_cost } if fuel_cost > 0
-    expenses_to_create << { category: :maintenance, amount: maintenance_cost } if maintenance_cost > 0
-    expenses_to_create << { category: :other, amount: other_costs } if other_costs > 0
+    expenses_to_create << { category: 'fuel', amount: fuel_cost } if fuel_cost > 0
+    expenses_to_create << { category: 'maintenance', amount: maintenance_cost } if maintenance_cost > 0
+    expenses_to_create << { category: 'other', amount: other_costs } if other_costs > 0
 
     expenses_to_create.each do |expense_data|
       Expense.create!(

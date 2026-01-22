@@ -1,8 +1,6 @@
 Rails.application.routes.draw do
   root "dashboard#index"
 
-  resources :earnings, only: [:index, :new, :create]
-  resources :expenses, only: [:index, :new, :create]
   resources :trip_entries, only: [:new, :create]
   
   # PWA routes

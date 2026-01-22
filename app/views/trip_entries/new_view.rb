@@ -1,4 +1,3 @@
-# app/views/trip_entries/new_view.rb
 module TripEntries
   class NewView < ApplicationComponent
     include Phlex::Rails::Helpers::TurboFrameTag
@@ -7,8 +6,9 @@ module TripEntries
     include ModalStyles
     include ButtonStyles
 
-    def initialize(trip_entry:)
+    def initialize(trip_entry:, context: {})
       @trip_entry = trip_entry
+      @context = context || {}
     end
 
     def view_template
@@ -60,6 +60,9 @@ module TripEntries
         class: 'p-6 space-y-4',
         data: { controller: 'calculator' }
       ) do |f|
+        input(type: 'hidden', name: 'context[year]', value: @context[:year] || Date.current.year)
+        input(type: 'hidden', name: 'context[month]', value: @context[:month])
+
         render_form_fields(f)
       end
     end
