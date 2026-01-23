@@ -1,4 +1,6 @@
 class Expense < ApplicationRecord
+  after_commit :clear_available_years_cache
+
   CATEGORIES_BY_GROUP = {
     vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],
     personal_operations: %w[meals phone other]
@@ -40,4 +42,6 @@ class Expense < ApplicationRecord
       ]
     end
   end
+
+  def clear_available_years_cache = Rails.cache.delete('dashboard/available_years')
 end
