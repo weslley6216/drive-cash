@@ -1,5 +1,5 @@
 module Trips
-  class CreateView < ApplicationComponent
+  class CreateView < ApplicationView
     def initialize(trip:, totals:, context: {})
       @trip = trip
       @totals = totals
@@ -9,8 +9,17 @@ module Trips
     def view_template
       if @trip.persisted? && @totals
         raw turbo_stream.update('modal', '')
+        
         raw turbo_stream.replace('stats_grid') {
           render StatsGridComponent.new(totals: @totals)
+        }
+
+        raw turbo_stream.replace('dashboard_filters') {
+          render FilterComponent.new(
+            selected_year: @trip.date.year,
+            selected_month: @trip.date.month,
+            available_years: Dashboard::StatsService.available_years
+          )
         }
       else
         raw turbo_stream.replace('modal') {
