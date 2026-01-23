@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   resources :trips, only: [:new, :create]
+  resources :expenses, only: [:new, :create]
   
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
