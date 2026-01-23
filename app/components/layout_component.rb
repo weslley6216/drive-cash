@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::CSRFMetaTags
   include Phlex::Rails::Helpers::CSPMetaTag

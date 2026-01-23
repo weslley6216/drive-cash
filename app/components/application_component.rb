@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ApplicationComponent < Phlex::HTML
   # Rails View Helpers
   include Phlex::Rails::Helpers::Routes

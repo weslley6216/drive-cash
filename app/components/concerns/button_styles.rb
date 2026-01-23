@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ButtonStyles
   BUTTON_VARIANTS = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
