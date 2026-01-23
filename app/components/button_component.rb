@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ButtonComponent < ApplicationComponent
   def initialize(variant: :primary, size: :medium, **attributes)
     @variant = variant

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 Rails.autoloaders.main.push_dir(Rails.root.join("app/components"))
 Rails.autoloaders.main.push_dir(Rails.root.join("app/views"))
 

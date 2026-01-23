@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module PhlexComponentHelpers
   def view_context
     @view_context ||= begin

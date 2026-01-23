@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class CardComponent < ApplicationComponent
   def initialize(padding: true, shadow: true, **attributes)
     @padding = padding

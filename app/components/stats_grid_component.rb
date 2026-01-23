@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class StatsGridComponent < ApplicationComponent
   Icons = {
     dollar_sign: PhlexIcons::Lucide::DollarSign,
