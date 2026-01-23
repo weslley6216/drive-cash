@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class FilterComponent < ApplicationComponent
   def initialize(selected_year:, selected_month:, available_years: [])
     @selected_year = selected_year
@@ -8,7 +6,17 @@ class FilterComponent < ApplicationComponent
   end
 
   def view_template
-    div(class: 'bg-white rounded-lg shadow-md p-4 mb-8 inline-block w-full') do
+    current_params = { year: @selected_year, month: @selected_month }.compact
+    target_url = helpers.url_for(controller: 'dashboard', action: 'index', **current_params)
+
+    div(
+      id: 'dashboard_filters', 
+      class: 'bg-white rounded-lg shadow-md p-4 mb-8 inline-block w-full',
+      data: { 
+        controller: 'url-sync',
+        url_sync_url_value: target_url
+      }
+    ) do
       form(
         action: root_path,
         method: 'get',
@@ -77,7 +85,6 @@ class FilterComponent < ApplicationComponent
 
     (1..12).each do |month_index|
       label = I18n.t('date.abbr_month_names')[month_index].upcase
-
       option(value: month_index, selected: month_index.to_s == @selected_month.to_s) { label }
     end
   end

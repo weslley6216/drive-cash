@@ -1,4 +1,3 @@
-# app/views/expenses/create_view.rb
 module Expenses
   class CreateView < ApplicationView
     def initialize(expense:, totals:, context: {})
@@ -10,8 +9,17 @@ module Expenses
     def view_template
       if @expense.persisted? && @totals
         raw turbo_stream.update('modal', '')
+        
         raw turbo_stream.replace('stats_grid') {
           render StatsGridComponent.new(totals: @totals)
+        }
+
+        raw turbo_stream.replace('dashboard_filters') {
+          render FilterComponent.new(
+            selected_year: @expense.date.year,
+            selected_month: @expense.date.month,
+            available_years: Dashboard::StatsService.available_years
+          )
         }
       else
         raw turbo_stream.replace('modal') {

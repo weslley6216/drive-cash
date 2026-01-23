@@ -56,7 +56,7 @@ RSpec.describe "Expenses", type: :request do
     end
 
     it "updates the stats using the correct context year" do
-      expect(Dashboard::StatsService).to receive(:new).with(year: 2026).and_call_original
+      expect(Dashboard::StatsService).to receive(:new).with(year: 2026, month: 1).and_call_original
 
       post expenses_path, params: valid_params, as: :turbo_stream
     end

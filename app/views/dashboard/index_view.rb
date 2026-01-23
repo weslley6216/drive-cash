@@ -29,11 +29,13 @@ module Dashboard
     end
 
     def filters_section
-      render FilterComponent.new(
-        selected_year: @filters[:year],
-        selected_month: @filters[:month],
-        available_years: @filters[:available_years]
-      )
+      div(id: 'dashboard_filters') do
+        render FilterComponent.new(
+          selected_year: @filters[:year],
+          selected_month: @filters[:month],
+          available_years: @filters[:available_years]
+        )
+      end
     end
 
     def fab_button

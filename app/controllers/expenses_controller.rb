@@ -10,7 +10,9 @@ class ExpensesController < ApplicationController
     @expense.trip = Trip.find_or_create_by(date: @expense.date) if @expense.date.present?
 
     if @expense.save
-      @totals = Dashboard::StatsService.new(year: context_year).call
+      @view_context = dashboard_context(@expense)
+      @totals = Dashboard::StatsService.new(**@view_context).call
+      
       flash.now[:notice] = t('.success')
 
       respond_to do |format|
@@ -18,11 +20,12 @@ class ExpensesController < ApplicationController
           render Expenses::CreateView.new(
             expense: @expense,
             totals: @totals,
-            context: params[:context] || {}
+            context: @view_context
           )
         end
       end
     else
+      @view_context = dashboard_context(@expense)
       flash.now[:alert] = @expense.errors.full_messages.to_sentence
 
       respond_to do |format|
@@ -30,7 +33,7 @@ class ExpensesController < ApplicationController
           render Expenses::CreateView.new(
             expense: @expense,
             totals: nil,
-            context: params[:context] || {}
+            context: @view_context
           ), status: :unprocessable_entity
         end
       end
