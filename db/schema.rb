@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_22_201715) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_23_041710) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,9 +19,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_22_201715) do
     t.datetime "created_at", null: false
     t.date "date", null: false
     t.text "notes"
-    t.string "platform"
+    t.integer "platform", default: 7, null: false
     t.bigint "trip_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["date", "platform"], name: "index_earnings_on_date_and_platform"
     t.index ["date"], name: "index_earnings_on_date"
     t.index ["platform"], name: "index_earnings_on_platform"
     t.index ["trip_id"], name: "index_earnings_on_trip_id"
@@ -29,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_22_201715) do
 
   create_table "expenses", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
-    t.string "category", null: false
+    t.integer "category", default: 10, null: false
     t.datetime "created_at", null: false
     t.date "date", null: false
     t.text "description"
@@ -38,6 +39,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_22_201715) do
     t.datetime "updated_at", null: false
     t.string "vendor"
     t.index ["category"], name: "index_expenses_on_category"
+    t.index ["date", "category"], name: "index_expenses_on_date_and_category"
     t.index ["date"], name: "index_expenses_on_date"
     t.index ["trip_id"], name: "index_expenses_on_trip_id"
   end

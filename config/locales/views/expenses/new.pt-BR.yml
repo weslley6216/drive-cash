@@ -1,0 +1,21 @@
+pt-BR:
+  expenses:
+    new_view:
+      title: "Nova Despesa"
+      subtitle: "Manutenção, seguros ou gastos extras"
+      labels:
+        date: "Data"
+        amount: "Valor da Despesa"
+        category: "Categoria"
+        vendor: "Estabelecimento"
+        description: "Descrição (Opcional)"
+      placeholders:
+        money: "R$ 0,00"
+        select: "Selecione..."
+        vendor: "Ex: Posto, Oficina..."
+        description: "Detalhes adicionais..."
+      buttons:
+        cancel: "Cancelar"
+        save: "Salvar"
+    create:
+      success: "Despesa registrada com sucesso!"

@@ -1,20 +1,21 @@
-module Trips
-  class CreateView < ApplicationComponent
-    def initialize(trip:, totals:, context: {})
-      @trip = trip
+# app/views/expenses/create_view.rb
+module Expenses
+  class CreateView < ApplicationView
+    def initialize(expense:, totals:, context: {})
+      @expense = expense
       @totals = totals
-      @context = context
+      @context = context || {}
     end
 
     def view_template
-      if @trip.persisted? && @totals
+      if @expense.persisted? && @totals
         raw turbo_stream.update('modal', '')
         raw turbo_stream.replace('stats_grid') {
           render StatsGridComponent.new(totals: @totals)
         }
       else
         raw turbo_stream.replace('modal') {
-          render Trips::NewView.new(trip: @trip, context: @context)
+          render Expenses::NewView.new(expense: @expense, context: @context)
         }
       end
 
