@@ -25,7 +25,7 @@ class FabComponent < ApplicationComponent
         data_turbo_frame: 'modal',
         class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105'
       ) do
-        span(class: 'text-sm font-medium whitespace-nowrap') { 'Despesa Avulsa' }
+        span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_expense') }
         render PhlexIcons::Lucide::Receipt.new(class: 'w-4 h-4')
       end
 
@@ -34,7 +34,7 @@ class FabComponent < ApplicationComponent
         data_turbo_frame: 'modal',
         class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105'
       ) do
-        span(class: 'text-sm font-medium whitespace-nowrap') { 'Fechar o Dia' }
+        span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_earning') }
         render PhlexIcons::Lucide::Truck.new(class: 'w-4 h-4')
       end
     end

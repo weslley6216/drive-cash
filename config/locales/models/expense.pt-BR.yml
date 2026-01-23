@@ -6,22 +6,19 @@ pt-BR:
         other: "Despesas"
     attributes:
       expense:
-        date: "Data"
-        amount: "Valor"
-        category: "Categoria"
-        vendor: "Fornecedor"
-        description: "Descrição"
-        notes: "Observações"
-  enums:
-    expense:
-      category:
-        maintenance: "Manutenção"
-        fuel: "Combustível"
-        insurance: "Seguro"
-        parking: "Estacionamento"
-        toll: "Pedágio"
-        phone: "Telefone"
-        fine: "Multa"
-        car_wash: "Lavagem"
-        documentation: "Documentação"
-        other: "Outros"
+        categories:
+          car_wash: "Lavagem"
+          documentation: "Documentação"
+          fine: "Multa"
+          fuel: "Combustível"
+          insurance: "Seguro"
+          maintenance: "Manutenção"
+          meals: "Alimentação"
+          parking: "Estacionamento"
+          phone: "Telefone"
+          toll: "Pedágio"
+          other: "Outros"
+  expenses:
+    category_groups:
+      vehicle: "Veículo"
+      personal_operations: "Pessoal / Operacional"

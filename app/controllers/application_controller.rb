@@ -6,4 +6,6 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   layout false
+
+  def context_year = params.dig(:context, :year).presence&.to_i || Date.current.year
 end

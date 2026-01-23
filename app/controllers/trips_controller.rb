@@ -18,14 +18,16 @@ class TripsController < ApplicationController
     @trip = Trip.new(trip_params)
 
     if @trip.save
-      context_year = params.dig(:context, :year).presence&.to_i || Date.current.year
       @totals = Dashboard::StatsService.new(year: context_year).call
-
       flash.now[:notice] = 'Lançamento salvo com sucesso!'
 
       respond_to do |format|
         format.turbo_stream do
-          render Trips::CreateView.new(trip: @trip, totals: @totals)
+          render Trips::CreateView.new(
+            trip: @trip,
+            totals: @totals,
+            context: params[:context] || {}
+          )
         end
       end
     else
@@ -33,7 +35,11 @@ class TripsController < ApplicationController
 
       respond_to do |format|
         format.turbo_stream do
-          render Trips::CreateView.new(trip: @trip, totals: nil)
+          render Trips::CreateView.new(
+            trip: @trip,
+            totals: nil,
+            context: params[:context] || {}
+          )
         end
       end
     end

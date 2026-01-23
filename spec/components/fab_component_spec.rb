@@ -35,7 +35,8 @@ RSpec.describe FabComponent, type: :component do
       component = FabComponent.new(filters: filters)
       html = view_context.render(component)
 
-      expect(html).to include('Despesa Avulsa')
+      expect(html).to include(I18n.t('fab_component.new_expense'))
+      expect(html).to include('bg-red-600')
       expect(html).to include('bg-red-600')
       expect(html).to include('hover:bg-red-700')
     end
@@ -44,7 +45,7 @@ RSpec.describe FabComponent, type: :component do
       component = FabComponent.new(filters: filters)
       html = view_context.render(component)
 
-      expect(html).to include('Fechar o Dia')
+      expect(html).to include(I18n.t('fab_component.new_earning'))
       expect(html).to include('bg-emerald-600')
       expect(html).to include('hover:bg-emerald-700')
     end
@@ -53,7 +54,6 @@ RSpec.describe FabComponent, type: :component do
       component = FabComponent.new(filters: filters)
       html = view_context.render(component)
 
-      # Verifica se os parâmetros foram codificados na URL
       expect(html).to include('context%5Byear%5D=2025')
       expect(html).to include('context%5Bmonth%5D=12')
       expect(html).to include('/trips/new')
