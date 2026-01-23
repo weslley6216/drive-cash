@@ -1,4 +1,3 @@
-# app/models/trip.rb
 class Trip < ApplicationRecord
   has_many :earnings, dependent: :destroy
   has_many :expenses, dependent: :destroy

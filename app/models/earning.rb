@@ -1,4 +1,6 @@
 class Earning < ApplicationRecord
+  after_commit :clear_available_years_cache
+
   belongs_to :trip
 
   enum :platform, {
@@ -20,7 +22,6 @@ class Earning < ApplicationRecord
   scope :for_month, ->(month) { where('EXTRACT(MONTH FROM date) = ?', month) if month.present? }
   scope :by_platform, ->(platform) { where(platform: platform) if platform.present? }
 
-  def self.total_by_platform
-    group(:platform).sum(:amount)
-  end
+  def self.total_by_platform = group(:platform).sum(:amount)
+  def clear_available_years_cache = Rails.cache.delete('dashboard/available_years')
 end
