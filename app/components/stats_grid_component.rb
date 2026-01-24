@@ -6,8 +6,10 @@ class StatsGridComponent < ApplicationComponent
     calendar: PhlexIcons::Lucide::Calendar
   }.freeze
 
-  def initialize(totals:)
+  def initialize(totals:, month: nil, year: Date.current.year)
     @totals = totals
+    @month = month
+    @year = year
   end
 
   def view_template
@@ -21,11 +23,13 @@ class StatsGridComponent < ApplicationComponent
 
   private
 
+  def annual_view? = @month.blank?
+
   def earnings_card
     render StatCardComponent.new(
       title: t('dashboard.index_view.stats.earnings.title'),
       value: format_currency(@totals[:earnings]),
-      subtitle: t('dashboard.index_view.stats.earnings.subtitle', value: format_currency(@totals[:earnings_avg_month])),
+      subtitle: earnings_subtitle,
       color: :green,
       icon: Icons[:dollar_sign]
     )
@@ -35,7 +39,7 @@ class StatsGridComponent < ApplicationComponent
     render StatCardComponent.new(
       title: t('dashboard.index_view.stats.expenses.title'),
       value: format_currency(@totals[:expenses]),
-      subtitle: t('dashboard.index_view.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent])),
+      subtitle: expenses_subtitle,
       color: :red,
       icon: Icons[:triangle_alert]
     )
@@ -45,7 +49,7 @@ class StatsGridComponent < ApplicationComponent
     render StatCardComponent.new(
       title: t('dashboard.index_view.stats.profit.title'),
       value: format_currency(@totals[:profit]),
-      subtitle: t('dashboard.index_view.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day])),
+      subtitle: profit_subtitle,
       color: :blue,
       icon: Icons[:trending_up]
     )
@@ -55,9 +59,33 @@ class StatsGridComponent < ApplicationComponent
     render StatCardComponent.new(
       title: t('dashboard.index_view.stats.days.title'),
       value: @totals[:days].to_s,
-      subtitle: t('dashboard.index_view.stats.days.subtitle', value: format_decimal(@totals[:days_avg_month])),
+      subtitle: days_subtitle,
       color: :yellow,
       icon: Icons[:calendar]
     )
+  end
+
+  def earnings_subtitle
+    key = annual_view? ? 'subtitle_annual' : 'subtitle_monthly'
+    value = annual_view? ? @totals[:earnings_avg_month] : @totals[:earnings_avg_day]
+
+    t("dashboard.index_view.stats.earnings.#{key}", value: format_currency(value))
+  end
+
+  def expenses_subtitle
+    t('dashboard.index_view.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent]))
+  end
+
+  def profit_subtitle
+    t('dashboard.index_view.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day]))
+  end
+
+  def days_subtitle
+    if annual_view?
+      formatted_avg = number_with_precision(@totals[:days_avg_month], precision: 0)
+      t('dashboard.index_view.stats.days.subtitle_annual', value: formatted_avg)
+    else
+      t('dashboard.index_view.stats.days.subtitle_monthly', value: @totals[:days_avg_week])
+    end
   end
 end

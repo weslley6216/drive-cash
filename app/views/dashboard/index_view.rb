@@ -11,9 +11,7 @@ module Dashboard
 
         header
         filters_section
-        div(id: 'stats_grid') do
-          render StatsGridComponent.new(totals: @totals)
-        end
+        stats_grid
         fab_button
         modal_container
       end
@@ -36,6 +34,14 @@ module Dashboard
           available_years: @filters[:available_years]
         )
       end
+    end
+
+    def stats_grid
+      render StatsGridComponent.new(
+        totals: @totals,
+        month: @filters[:month],
+        year: @filters[:year]
+      )
     end
 
     def fab_button

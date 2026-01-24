@@ -20,7 +20,7 @@ class TripsController < ApplicationController
     if @trip.save
       @view_context = dashboard_context(@trip)
       @totals = Dashboard::StatsService.new(**@view_context).call
-      
+
       flash.now[:notice] = t('.success')
 
       respond_to do |format|

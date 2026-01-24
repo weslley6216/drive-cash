@@ -31,5 +31,17 @@ RSpec.describe Dashboard::StatsService do
     it 'calculates expenses percentage' do
       expect(result[:expenses_percent]).to eq(20.0)
     end
+
+    context 'with sufficient working days for weekly average' do
+      before do
+        (1..9).each do |day|
+          create(:earning, date: Date.new(2025, 1, day), amount: 100)
+        end
+      end
+
+      it 'calculates average days per week' do
+        expect(result[:days_avg_week]).to eq(2)
+      end
+    end
   end
 end

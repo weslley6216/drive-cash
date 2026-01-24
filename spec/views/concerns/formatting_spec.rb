@@ -1,4 +1,3 @@
-# spec/components/concerns/formatting_spec.rb
 require 'rails_helper'
 
 RSpec.describe Formatting do

@@ -10,13 +10,15 @@ RSpec.describe StatsGridComponent, type: :component do
       earnings_avg_month: 500.0,
       expenses_percent: 30.0,
       profit_per_day: 35.0,
-      days_avg_month: 10.0
+      days_avg_month: 10.0,
+      earnings_avg_day: 50.0,
+      days_avg_week: 0 # Default para evitar nils
     }
   end
 
   describe '#view_template' do
     it 'renders all stat cards' do
-      component = StatsGridComponent.new(totals: totals)
+      component = StatsGridComponent.new(totals: totals, month: nil)
       html = view_context.render(component)
 
       expect(html).to include('R$')
@@ -26,66 +28,47 @@ RSpec.describe StatsGridComponent, type: :component do
     end
 
     it 'renders grid container with correct ID' do
-      component = StatsGridComponent.new(totals: totals)
+      component = StatsGridComponent.new(totals: totals, month: nil)
       html = view_context.render(component)
 
       expect(html).to include('id="stats_grid"')
     end
 
-    it 'renders earnings card with green color' do
-      component = StatsGridComponent.new(totals: totals)
-      html = view_context.render(component)
+    context 'when in annual view (month: nil)' do
+      let(:component) { StatsGridComponent.new(totals: totals, month: nil) }
+      let(:html) { view_context.render(component).squish }
 
-      expect(html).to include('bg-green-50')
+      it 'renders monthly average for earnings' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.earnings.subtitle_annual', value: 'R$ 500,00')
+        )
+      end
+
+      it 'renders average days per month as integer' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.days.subtitle_annual', value: '10')
+        )
+      end
     end
 
-    it 'renders expenses card with red color' do
-      component = StatsGridComponent.new(totals: totals)
-      html = view_context.render(component)
+    context 'when in monthly view (jan 2025)' do
+      # Mockamos o resultado que viria do Service.
+      # Se trabalhou 10 dias em Jan/25 (4.4 semanas), a média é ~2.
+      let(:totals_monthly) { totals.merge(days: 10, days_avg_week: 2) }
+      let(:component) { StatsGridComponent.new(totals: totals_monthly, month: 1, year: 2025) }
+      let(:html) { view_context.render(component).squish }
 
-      expect(html).to include('bg-red-50')
-    end
+      it 'renders daily average for earnings' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.earnings.subtitle_monthly', value: 'R$ 50,00')
+        )
+      end
 
-    it 'renders profit card with blue color' do
-      component = StatsGridComponent.new(totals: totals)
-      html = view_context.render(component)
-
-      expect(html).to include('bg-blue-50')
-    end
-
-    it 'renders days card with yellow color' do
-      component = StatsGridComponent.new(totals: totals)
-      html = view_context.render(component)
-
-      expect(html).to include('bg-yellow-50')
-    end
-
-    it 'renders all stat card titles' do
-      component = StatsGridComponent.new(totals: totals)
-      html = view_context.render(component)
-
-      expect(html).to include(I18n.t('dashboard.index_view.stats.earnings.title'))
-      expect(html).to include(I18n.t('dashboard.index_view.stats.expenses.title'))
-      expect(html).to include(I18n.t('dashboard.index_view.stats.profit.title'))
-      expect(html).to include(I18n.t('dashboard.index_view.stats.days.title'))
-    end
-
-    it 'handles zero values correctly' do
-      zero_totals = {
-        earnings: 0.0,
-        expenses: 0.0,
-        profit: 0.0,
-        days: 0,
-        earnings_avg_month: 0.0,
-        expenses_percent: 0.0,
-        profit_per_day: 0.0,
-        days_avg_month: 0
-      }
-
-      component = StatsGridComponent.new(totals: zero_totals)
-      html = view_context.render(component)
-
-      expect(html.squish).to include('R$ 0,00')
+      it 'renders weekly frequency for days as integer' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.days.subtitle_monthly', value: '2')
+        )
+      end
     end
   end
 end

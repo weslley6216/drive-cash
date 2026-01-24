@@ -8,8 +8,4 @@ module Formatting
   def format_percentage(value)
     number_with_precision(value, precision: 1)
   end
-
-  def format_decimal(value)
-    number_with_precision(value, precision: 1)
-  end
 end

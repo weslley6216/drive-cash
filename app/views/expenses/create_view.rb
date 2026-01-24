@@ -9,9 +9,13 @@ module Expenses
     def view_template
       if @expense.persisted? && @totals
         raw turbo_stream.update('modal', '')
-        
+
         raw turbo_stream.replace('stats_grid') {
-          render StatsGridComponent.new(totals: @totals)
+          render StatsGridComponent.new(
+            totals: @totals,
+            month: @context[:month],
+            year: @context[:year]
+          )
         }
 
         raw turbo_stream.replace('dashboard_filters') {

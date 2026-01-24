@@ -10,9 +10,9 @@ class FilterComponent < ApplicationComponent
     target_url = helpers.url_for(controller: 'dashboard', action: 'index', **current_params)
 
     div(
-      id: 'dashboard_filters', 
+      id: 'dashboard_filters',
       class: 'bg-white rounded-lg shadow-md p-4 mb-8 inline-block w-full',
-      data: { 
+      data: {
         controller: 'url-sync',
         url_sync_url_value: target_url
       }
