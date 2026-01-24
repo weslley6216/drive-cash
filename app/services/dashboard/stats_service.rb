@@ -20,6 +20,7 @@ module Dashboard
         expenses_percent: expenses_percent(earnings_data[:total], expenses_data[:total]),
         profit_per_day: profit_per_day(earnings_data[:days_count]),
         days_avg_month: days_avg_month(earnings_data[:days_count]),
+        days_avg_week: days_avg_week(earnings_data[:days_count]),
 
         earnings_by_platform: earnings_data[:by_platform],
         expenses_by_category: expenses_data[:by_category],
@@ -75,6 +76,20 @@ module Dashboard
       (days.to_f / months).round(1)
     end
 
+    def days_avg_week(days_worked)
+      return 0 if month.blank? || days_worked.zero?
+
+      year_int = year.to_i
+      month_int = month.to_i
+
+      return 0 if year_int.zero? || month_int.zero?
+
+      days_in_month = Time.days_in_month(month_int, year_int)
+      weeks_count = days_in_month / 7.0
+
+      (days_worked / weeks_count).round
+    end
+
     def distinct_months_count
       earnings_calculator.call[:total] > 0 ?
         earnings_scope.pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')")).count.clamp(1, Float::INFINITY) :
@@ -83,9 +98,9 @@ module Dashboard
 
     def self.available_years
       Rails.cache.fetch('dashboard/available_years', expires_in: 1.hour) do
-        earning_years = Earning.distinct.pluck(Arel.sql("EXTRACT(YEAR FROM date)::int"))
-        expense_years = Expense.distinct.pluck(Arel.sql("EXTRACT(YEAR FROM date)::int"))
-        
+        earning_years = Earning.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::int'))
+        expense_years = Expense.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::int'))
+
         years = (earning_years + expense_years).uniq.sort.reverse
 
         (years + [Date.current.year]).uniq.sort.reverse

@@ -3,11 +3,12 @@ pt-BR:
     index_view:
       title: "DriveCash"
       subtitle: "Gestão financeira para motoristas de aplicativo"
-      new_earning: Nova Entrada
       stats:
         earnings:
           title: "Total de Receitas"
           subtitle: "Média: %{value}/mês"
+          subtitle_annual: "Média: %{value}/mês"
+          subtitle_monthly: "Média: %{value}/dia"
         expenses:
           title: "Total de Despesas"
           subtitle: "%{percent}% das receitas"
@@ -17,3 +18,5 @@ pt-BR:
         days:
           title: "Dias Trabalhados"
           subtitle: "%{value} dias/mês em média"
+          subtitle_annual: "%{value} dias/mês em média"
+          subtitle_monthly: "Média: %{value} dias/semana"

@@ -12,7 +12,7 @@ class ExpensesController < ApplicationController
     if @expense.save
       @view_context = dashboard_context(@expense)
       @totals = Dashboard::StatsService.new(**@view_context).call
-      
+
       flash.now[:notice] = t('.success')
 
       respond_to do |format|
