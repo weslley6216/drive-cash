@@ -56,8 +56,10 @@ RSpec.describe Expense, type: :model do
   end
 
   describe 'scopes' do
-    let!(:fuel) { create(:expense, category: 'fuel') }
-    let!(:maintenance) { create(:expense, category: 'maintenance') }
+    let(:fuel) { create(:expense, category: 'fuel') }
+    let(:maintenance) { create(:expense, category: 'maintenance') }
+
+    before { fuel; maintenance }
 
     it '.by_category filters correctly' do
       expect(described_class.by_category('fuel')).to include(fuel)

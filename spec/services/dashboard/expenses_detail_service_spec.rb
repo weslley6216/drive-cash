@@ -4,10 +4,12 @@ RSpec.describe Dashboard::ExpensesDetailService do
   describe '#call' do
     context 'with month filter (monthly detail)' do
       let(:trip) { create(:trip) }
-      let!(:exp1) { create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel') }
-      let!(:exp2) { create(:expense, trip: trip, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance') }
+      let(:exp1) { create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel') }
+      let(:exp2) { create(:expense, trip: trip, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance') }
 
       subject(:service) { described_class.new(year: 2025, month: 1) }
+
+      before { trip; exp1; exp2 }
 
       it 'returns expenses list and total' do
         result = service.call
@@ -21,11 +23,13 @@ RSpec.describe Dashboard::ExpensesDetailService do
 
     context 'without month filter (annual detail)' do
       let(:trip) { create(:trip) }
-      let!(:jan) { create(:expense, trip: trip, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel') }
-      let!(:feb1) { create(:expense, trip: trip, date: Date.new(2025, 2, 5), amount: 50, category: 'meals') }
-      let!(:feb2) { create(:expense, trip: trip, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance') }
+      let(:jan) { create(:expense, trip: trip, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel') }
+      let(:feb1) { create(:expense, trip: trip, date: Date.new(2025, 2, 5), amount: 50, category: 'meals') }
+      let(:feb2) { create(:expense, trip: trip, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance') }
 
       subject(:service) { described_class.new(year: 2025, month: nil) }
+
+      before { trip; jan; feb1; feb2 }
 
       it 'returns expenses by month and total' do
         result = service.call

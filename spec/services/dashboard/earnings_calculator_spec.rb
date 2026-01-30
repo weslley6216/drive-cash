@@ -2,12 +2,13 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::EarningsCalculator do
-  # Cria dados no DB para o escopo
-  let!(:earning1) { create(:earning, date: '2025-01-01', amount: 200, platform: 'shopee') }
-  let!(:earning2) { create(:earning, date: '2025-01-01', amount: 300, platform: 'uber') } # Mesmo dia
-  let!(:earning3) { create(:earning, date: '2025-02-01', amount: 500, platform: 'shopee') } # Outro mês
+  let(:earning1) { create(:earning, date: '2025-01-01', amount: 200, platform: 'shopee') }
+  let(:earning2) { create(:earning, date: '2025-01-01', amount: 300, platform: 'uber') } # Mesmo dia
+  let(:earning3) { create(:earning, date: '2025-02-01', amount: 500, platform: 'shopee') } # Outro mês
 
   subject(:calculator) { described_class.new(Earning.all) }
+
+  before { earning1; earning2; earning3 }
 
   describe '#call' do
     let(:result) { calculator.call }
