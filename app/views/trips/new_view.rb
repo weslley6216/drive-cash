@@ -37,9 +37,18 @@ module Trips
 
     def money_fields(form)
       money_field(form, :route_value, label: t('.labels.route_value'), theme: @theme, required: true, calculator: 'earning')
-      money_field(form, :fuel_cost, label: t('.labels.fuel_cost'), theme: @theme, calculator: 'cost')
+      fuel_row(form)
       money_field(form, :maintenance_cost, label: t('.labels.maintenance_cost'), theme: @theme, calculator: 'cost')
       money_field(form, :other_costs, label: t('.labels.other_costs'), theme: @theme, calculator: 'cost')
+    end
+
+    def fuel_row(form)
+      div(class: 'space-y-1') do
+        div(class: 'flex gap-3 items-end') do
+          div(class: 'flex-1') { money_field(form, :fuel_cost, label: t('.labels.fuel_cost'), theme: @theme, calculator: 'cost') }
+          div(class: 'flex-1') { text_field(form, :fuel_vendor, label: t('.labels.fuel_vendor'), theme: @theme, placeholder: t('.placeholders.fuel_vendor')) }
+        end
+      end
     end
 
     def render_profit_preview

@@ -30,7 +30,7 @@ module Dashboard
       by_month = Earning.for_year(year).group(Arel.sql('EXTRACT(MONTH FROM date)::int')).sum(:amount)
       month_names = I18n.t('date.month_names')
       earnings_by_month = by_month.sort_by { |month, _| month }.map do |month, total|
-        { month_name: month_names[month], total: total }
+        { month: month, month_name: month_names[month], total: total }
       end
 
       {

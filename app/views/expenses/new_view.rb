@@ -27,7 +27,7 @@ module Expenses
         money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true, calculator: 'cost')
         category_select(f)
         text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
-        text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'))
+        text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
 
         render_actions
       end
