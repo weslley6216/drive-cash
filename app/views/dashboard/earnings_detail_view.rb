@@ -37,6 +37,7 @@ module Dashboard
 
     def list_section
       div(class: 'p-6 pt-4') do
+        back_link if !@annual
         if @annual ? @earnings_by_month&.any? : @earnings.any?
           table(class: 'w-full text-left border-collapse') do
             thead do
@@ -49,8 +50,16 @@ module Dashboard
               if @annual
                 @earnings_by_month.each do |row|
                   tr(class: 'border-b border-slate-100') do
-                    td(class: 'py-2.5 text-slate-800 capitalize') { row[:month_name].to_s }
-                    td(class: 'py-2.5 text-right font-medium text-green-700') { format_currency(row[:total]) }
+                    td(colspan: 2, class: 'p-0') do
+                      link_to(
+                        dashboard_earnings_detail_path(year: @filters[:year], month: row[:month]),
+                        data: { turbo_frame: 'modal' },
+                        class: 'flex justify-between items-center w-full py-2.5 px-0 text-left text-slate-800 capitalize hover:bg-slate-50 transition-colors'
+                      ) do
+                        span { row[:month_name].to_s }
+                        span(class: 'font-medium text-green-700') { format_currency(row[:total]) }
+                      end
+                    end
                   end
                 end
               else
@@ -72,6 +81,18 @@ module Dashboard
         else
           p(class: 'text-slate-500 text-center py-8') { t('.empty') }
         end
+      end
+    end
+
+    def back_link
+      link_to(
+        dashboard_earnings_detail_path(year: @filters[:year]),
+        data: { turbo_frame: 'modal' },
+        class: 'inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 mb-3',
+        aria_label: t('.back')
+      ) do
+        render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-4 h-4 flex-shrink-0')
+        span { t('.back') }
       end
     end
 

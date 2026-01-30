@@ -37,6 +37,7 @@ module Dashboard
 
     def list_section
       div(class: 'p-4 sm:p-6 pt-4') do
+        back_link if !@annual
         if @annual ? @expenses_by_month&.any? : @expenses.any?
           expense_list
           total_bar
@@ -46,24 +47,40 @@ module Dashboard
       end
     end
 
+    def back_link
+      link_to(
+        dashboard_expenses_detail_path(year: @filters[:year]),
+        data: { turbo_frame: 'modal' },
+        class: 'inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 mb-3',
+        aria_label: t('.back')
+      ) do
+        render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-4 h-4 flex-shrink-0')
+        span { t('.back') }
+      end
+    end
+
     def expense_list
       div(class: 'space-y-4') do
         if @annual
           @expenses_by_month.each do |row|
-            div(class: 'flex justify-between items-center py-3 border-b border-slate-100') do
-              span(class: 'text-slate-800 capitalize') { row[:month_name].to_s }
+            link_to(
+              dashboard_expenses_detail_path(year: @filters[:year], month: row[:month]),
+              data: { turbo_frame: 'modal' },
+              class: 'flex justify-between items-center py-3 border-b border-slate-100 text-slate-800 capitalize hover:bg-slate-50 transition-colors active:bg-slate-100'
+            ) do
+              span { row[:month_name].to_s }
               span(class: 'font-medium text-red-700') { format_currency(row[:total]) }
             end
           end
         else
-          expenses_grouped_by_date.each do |date, list|
+          expenses_grouped_by_date.reverse_each do |date, list|
             div(class: 'space-y-1') do
               p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wide pt-2 first:pt-0') { format_date(date) }
               list.each do |expense|
                 div(class: 'flex justify-between items-start gap-3 py-2 pl-3 border-l-2 border-slate-200') do
                   div(class: 'min-w-0 flex-1') do
-                    p(class: 'text-slate-800 font-medium break-words') { expense.vendor.presence || '—' }
-                    p(class: 'text-sm text-slate-500') { category_label(expense) }
+                    p(class: 'text-slate-800 font-medium break-words') { expense.description || '—' }
+                    p(class: 'text-sm text-slate-500') { expense.vendor.presence || '—' }
                   end
                   span(class: 'font-medium text-red-700 flex-shrink-0') { format_currency(expense.amount) }
                 end
@@ -87,10 +104,6 @@ module Dashboard
 
     def format_date(date)
       I18n.l(date, format: :short)
-    end
-
-    def category_label(expense)
-      Expense.human_enum_name(:category, expense.category)
     end
 
     def close_action
