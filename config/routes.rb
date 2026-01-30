@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   root "dashboard#index"
 
+  get "dashboard/earnings_detail", to: "dashboard#earnings_detail", as: :dashboard_earnings_detail
+
   resources :trips, only: [:new, :create]
   resources :expenses, only: [:new, :create]
   

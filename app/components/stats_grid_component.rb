@@ -31,7 +31,8 @@ class StatsGridComponent < ApplicationComponent
       value: format_currency(@totals[:earnings]),
       subtitle: earnings_subtitle,
       color: :green,
-      icon: Icons[:dollar_sign]
+      icon: Icons[:dollar_sign],
+      href: dashboard_earnings_detail_path(year: @year, month: @month)
     )
   end
 

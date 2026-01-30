@@ -9,8 +9,8 @@ module ModalHeader
   private
 
   def header_content(subtitle)
-    div do
-      h2(class: "#{modal_title_classes} #{title_classes(theme: @theme)}") { t('.title') }
+    div(class: 'min-w-0 flex-1') do
+      h2(class: "#{modal_title_classes} #{title_classes(theme: @theme)} truncate") { t('.title') }
       p(class: 'text-xs text-slate-500 mt-0.5') { subtitle } if subtitle
     end
   end

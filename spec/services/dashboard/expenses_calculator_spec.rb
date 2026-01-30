@@ -1,4 +1,3 @@
-# spec/services/dashboard/expenses_calculator_spec.rb
 require 'rails_helper'
 
 RSpec.describe Dashboard::ExpensesCalculator do
@@ -17,7 +16,7 @@ RSpec.describe Dashboard::ExpensesCalculator do
 
     it 'lists top vendors correctly' do
       expected_vendors = { 'Posto Shell' => 150.0, 'Mecânico Zé' => 200.0 }
-      # Ordenado por valor (decrescente no código, mas aqui verificamos o hash)
+
       expect(result[:top_vendors]).to include(expected_vendors)
     end
   end

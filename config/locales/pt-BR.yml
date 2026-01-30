@@ -41,6 +41,7 @@ pt-BR:
     formats:
       default: "%d/%m/%Y"
       long: "%d de %B de %Y"
+      month_and_year: "%B de %Y"
       short: "%d de %B"
     month_names:
     -

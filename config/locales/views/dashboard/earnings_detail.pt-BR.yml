@@ -1,0 +1,11 @@
+pt-BR:
+  dashboard:
+    earnings_detail_view:
+      title: "Detalhamento de Receitas"
+      columns:
+        date: "Data"
+        month: "Mês"
+        amount: "Valor"
+      total: "Total"
+      empty: "Nenhuma receita no período."
+      close: "Fechar"

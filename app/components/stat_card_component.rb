@@ -30,16 +30,17 @@ class StatCardComponent < ApplicationComponent
     }
   }.freeze
 
-  def initialize(title:, value:, subtitle: nil, color:, icon:)
+  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil)
     @title = title
     @value = value
     @subtitle = subtitle
     @color = color
     @icon = icon
+    @href = href
   end
 
   def view_template
-    div(class: card_classes) do
+    container_tag(class: card_classes) do
       div(class: 'flex items-start justify-between') do
         content_section
         icon_section
@@ -59,6 +60,14 @@ class StatCardComponent < ApplicationComponent
 
   def icon_section
     render @icon.new(class: 'w-8 h-8 opacity-50')
+  end
+
+  def container_tag(**attributes, &block)
+    if @href.present?
+      a(**attributes, href: @href, data: { turbo_frame: 'modal' }, class: class_names(attributes[:class], 'block cursor-pointer transition-opacity hover:opacity-90'), &block)
+    else
+      div(**attributes, &block)
+    end
   end
 
   def card_classes

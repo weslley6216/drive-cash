@@ -1,10 +1,16 @@
 class DashboardController < ApplicationController
-  before_action :set_filters, only: :index
+  before_action :set_filters, only: [:index, :earnings_detail]
 
   def index
     @totals = Dashboard::StatsService.new(year: @year, month: @month).call
 
     render Dashboard::IndexView.new(totals: @totals, filters: @filters)
+  end
+
+  def earnings_detail
+    detail = Dashboard::EarningsDetailService.new(year: @year, month: @month).call
+
+    render Dashboard::EarningsDetailView.new(**detail, filters: @filters)
   end
 
   private
