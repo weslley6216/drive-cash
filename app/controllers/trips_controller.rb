@@ -55,6 +55,7 @@ class TripsController < ApplicationController
       :date,
       :route_value,
       :fuel_cost,
+      :fuel_vendor,
       :maintenance_cost,
       :other_costs,
       :platform,
