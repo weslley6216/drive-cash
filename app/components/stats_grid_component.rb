@@ -42,7 +42,8 @@ class StatsGridComponent < ApplicationComponent
       value: format_currency(@totals[:expenses]),
       subtitle: expenses_subtitle,
       color: :red,
-      icon: Icons[:triangle_alert]
+      icon: Icons[:triangle_alert],
+      href: dashboard_expenses_detail_path(year: @year, month: @month)
     )
   end
 
