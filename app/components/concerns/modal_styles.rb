@@ -2,9 +2,9 @@ module ModalStyles
   MODAL_CLASSES = {
     backdrop: 'fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in',
     content: 'bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up',
-    header: 'flex items-center justify-between p-6 border-b',
-    title: 'text-2xl font-bold',
-    close_button: 'transition-colors p-2'
+    header: 'flex items-center justify-between p-6 border-b gap-2',
+    title: 'text-lg sm:text-2xl font-bold whitespace-nowrap min-w-0',
+    close_button: 'transition-colors p-2 flex-shrink-0'
   }.freeze
 
 
