@@ -64,4 +64,50 @@ RSpec.describe "Dashboard", type: :request do
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.total'))
     end
   end
+
+  describe "GET /dashboard/expenses_detail" do
+    it "renders expenses detail in modal frame with date grouping" do
+      trip = create(:trip)
+      create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: "fuel", vendor: "Posto Shell")
+      create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 25, category: "meals", vendor: "Lanchonete")
+      create(:expense, trip: trip, date: Date.new(2025, 1, 20), amount: 150, category: "maintenance", vendor: "Oficina")
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('turbo-frame id="modal"')
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include("Posto Shell")
+      expect(response.body).to include("Lanchonete")
+      expect(response.body).to include("Oficina")
+      expect(response.body).to include("80,00")
+      expect(response.body).to include("25,00")
+      expect(response.body).to include("150,00")
+      expect(response.body).to include("255,00")
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.total'))
+    end
+
+    it "shows empty state when no expenses in period" do
+      get dashboard_expenses_detail_path(year: 2020, month: 1)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.empty'))
+    end
+
+    it "renders annual view with monthly totals when month filter is all" do
+      trip = create(:trip)
+      create(:expense, trip: trip, date: Date.new(2025, 1, 10), amount: 100, category: "fuel")
+      create(:expense, trip: trip, date: Date.new(2025, 2, 15), amount: 200, category: "maintenance")
+
+      get dashboard_expenses_detail_path(year: 2025)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('date.month_names')[1])
+      expect(response.body).to include(I18n.t('date.month_names')[2])
+      expect(response.body).to include("100,00")
+      expect(response.body).to include("200,00")
+      expect(response.body).to include("300,00")
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.total'))
+    end
+  end
 end

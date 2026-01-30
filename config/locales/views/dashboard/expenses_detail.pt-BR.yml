@@ -1,0 +1,13 @@
+pt-BR:
+  dashboard:
+    expenses_detail_view:
+      title: "Detalhamento de Despesas"
+      columns:
+        date: "Data"
+        month: "Mês"
+        vendor: "Estabelecimento"
+        category: "Tipo"
+        amount: "Valor"
+      total: "Total"
+      empty: "Nenhuma despesa no período."
+      close: "Fechar"

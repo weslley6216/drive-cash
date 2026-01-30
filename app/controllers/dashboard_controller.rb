@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  before_action :set_filters, only: [:index, :earnings_detail]
+  before_action :set_filters, only: [:index, :earnings_detail, :expenses_detail]
 
   def index
     @totals = Dashboard::StatsService.new(year: @year, month: @month).call
@@ -11,6 +11,12 @@ class DashboardController < ApplicationController
     detail = Dashboard::EarningsDetailService.new(year: @year, month: @month).call
 
     render Dashboard::EarningsDetailView.new(**detail, filters: @filters)
+  end
+
+  def expenses_detail
+    detail = Dashboard::ExpensesDetailService.new(year: @year, month: @month).call
+
+    render Dashboard::ExpensesDetailView.new(**detail, filters: @filters)
   end
 
   private
