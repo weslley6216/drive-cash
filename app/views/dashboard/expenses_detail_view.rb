@@ -95,7 +95,7 @@ module Dashboard
             end
           end
         else
-          expenses_grouped_by_date.reverse_each do |date, list|
+          expenses_grouped_by_date.each do |date, list|
             div(class: 'space-y-1') do
               p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wide pt-2 first:pt-0') { format_date(date) }
               list.each do |expense|
@@ -114,7 +114,7 @@ module Dashboard
     end
 
     def expenses_grouped_by_date
-      @expenses_grouped_by_date ||= @expenses.to_a.group_by(&:date).sort_by { |date, _| date }
+      @expenses_grouped_by_date ||= @expenses.to_a.group_by(&:date)
     end
 
     def format_date(date)
