@@ -16,7 +16,8 @@ module Dashboard
     attr_reader :year, :month
 
     def monthly_detail
-      scope = Expense.for_year(year).for_month(month)
+      scope = Expense.for_year(year).for_month(month).chronological
+
       {
         expenses: scope,
         expenses_by_month: nil,

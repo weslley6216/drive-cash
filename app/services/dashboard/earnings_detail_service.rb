@@ -16,7 +16,7 @@ module Dashboard
     attr_reader :year, :month
 
     def monthly_detail
-      scope = Earning.for_year(year).for_month(month)
+      scope = Earning.for_year(year).for_month(month).chronological
 
       {
         earnings: scope,
