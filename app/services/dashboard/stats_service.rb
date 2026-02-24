@@ -9,18 +9,23 @@ module Dashboard
       earnings_data = earnings_calculator.call
       expenses_data = expenses_calculator.call
 
+      earnings_total = earnings_data[:total]
+      expenses_total = expenses_data[:total]
+      days_worked   = earnings_data[:days_count]
+      profit_value  = earnings_total - expenses_total
+
       {
-        earnings: earnings_data[:total],
-        expenses: expenses_data[:total],
-        profit: profit,
-        days: earnings_data[:days_count],
+        earnings: earnings_total,
+        expenses: expenses_total,
+        profit: profit_value,
+        days: days_worked,
 
         earnings_avg_month: earnings_data[:avg_per_month],
         earnings_avg_day: earnings_data[:avg_per_day],
-        expenses_percent: expenses_percent(earnings_data[:total], expenses_data[:total]),
-        profit_per_day: profit_per_day(earnings_data[:days_count]),
-        days_avg_month: days_avg_month(earnings_data[:days_count]),
-        days_avg_week: days_avg_week(earnings_data[:days_count]),
+        expenses_percent: expenses_percent(earnings_total, expenses_total),
+        profit_per_day: profit_per_day(profit_value, days_worked),
+        days_avg_month: days_avg_month(days_worked),
+        days_avg_week: days_avg_week(days_worked),
 
         earnings_by_platform: earnings_data[:by_platform],
         expenses_by_category: expenses_data[:by_category],
@@ -56,18 +61,14 @@ module Dashboard
       @expenses_calculator ||= ExpensesCalculator.new(expenses_scope)
     end
 
-    def profit
-      earnings_calculator.call[:total] - expenses_calculator.call[:total]
-    end
-
     def expenses_percent(earnings, expenses)
       return 0 if earnings.zero?
       (expenses / earnings * 100).round(1)
     end
 
-    def profit_per_day(days)
+    def profit_per_day(profit_value, days)
       return 0 if days.zero?
-      profit / days
+      profit_value / days
     end
 
     def days_avg_month(days)
