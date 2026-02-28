@@ -1,5 +1,5 @@
 class Earning < ApplicationRecord
-  after_commit :clear_available_years_cache
+  include CacheInvalidation
 
   belongs_to :trip
 
@@ -23,5 +23,4 @@ class Earning < ApplicationRecord
   scope :by_platform, ->(platform) { where(platform: platform) if platform.present? }
 
   def self.total_by_platform = group(:platform).sum(:amount)
-  def clear_available_years_cache = Rails.cache.delete('dashboard/available_years')
 end
