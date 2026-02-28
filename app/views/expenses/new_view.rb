@@ -8,7 +8,7 @@ module Expenses
 
     def view_template
       turbo_frame_tag 'modal' do
-        div(class: modal_backdrop_classes, data_controller: 'modal', data_action: 'mousedown->modal#handleBackgroundClick') do
+        div(class: modal_backdrop_classes, data: { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }) do
           div(class: "#{modal_content_classes} #{modal_theme_classes(theme: @theme)}") do
             render_header(subtitle: t('.subtitle'))
             render_form
@@ -42,7 +42,7 @@ module Expenses
       field_wrapper(t('.labels.category'), theme: @theme) do
         render form.select(
           :category,
-          helpers.grouped_options_for_select(Expense.grouped_category_options),
+          helpers.grouped_options_for_select(helpers.expense_category_options),
           { include_blank: t('.placeholders.select') },
           { class: "#{input_classes(theme: @theme)} bg-white", required: true }
         )
@@ -51,7 +51,7 @@ module Expenses
 
     def render_actions
       div(class: 'flex gap-3 pt-4') do
-        button(type: 'button', data_action: 'modal#close', class: button_classes(variant: :secondary, full_width: true)) { t('.buttons.cancel') }
+        button(type: 'button', data: { action: 'modal#close' }, class: button_classes(variant: :secondary, full_width: true)) { t('.buttons.cancel') }
         button(type: 'submit', class: "#{button_classes(variant: :danger, full_width: true)} flex items-center justify-center gap-2") do
           render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')
           span { t('.buttons.save') }

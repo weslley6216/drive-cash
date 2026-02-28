@@ -8,9 +8,9 @@ module Trips
 
     def view_template
       turbo_frame_tag 'modal' do
-        div(class: modal_backdrop_classes, data_controller: 'modal', data_action: 'mousedown->modal#handleBackgroundClick') do
+        div(class: modal_backdrop_classes, data: { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }) do
           div(class: "#{modal_content_classes} #{modal_theme_classes(theme: @theme)}") do
-            render_header  # <- SEM subtitle, mais simples
+            render_header
             render_form
           end
         end
@@ -60,7 +60,7 @@ module Trips
 
     def render_actions
       div(class: 'flex gap-3 pt-4') do
-        button(type: 'button', data_action: 'modal#close', class: button_classes(variant: :secondary, full_width: true)) { t('.buttons.cancel') }
+        button(type: 'button', data: { action: 'modal#close' }, class: button_classes(variant: :secondary, full_width: true)) { t('.buttons.cancel') }
         button(type: 'submit', class: "#{button_classes(variant: :primary, full_width: true)} flex items-center justify-center gap-2") do
           render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')
           span { t('.buttons.save') }
