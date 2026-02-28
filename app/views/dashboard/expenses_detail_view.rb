@@ -13,8 +13,7 @@ module Dashboard
       turbo_frame_tag 'modal' do
         div(
           class: modal_backdrop_classes,
-          data_controller: 'modal',
-          data_action: 'mousedown->modal#handleBackgroundClick'
+          data: { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }
         ) do
           div(class: "#{modal_content_classes} #{modal_theme_classes(theme: @theme)} max-w-lg flex flex-col max-h-[90vh]") do
             render_header(subtitle: period_subtitle)
@@ -56,12 +55,12 @@ module Dashboard
 
         div(class: 'px-4 sm:px-6 py-3 flex justify-between items-center') do
           div(class: 'min-h-[2.5rem] flex items-center') do
-            back_link if !@annual
+            back_link unless @annual
           end
 
           button(
             type: 'button',
-            data_action: 'modal#close',
+            data: { action: 'modal#close' },
             class: 'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors',
             aria_label: t('.close')
           ) { t('.close') }

@@ -7,11 +7,11 @@ class Trip < ApplicationRecord
   validates :date, presence: true
   validates :route_value, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
-  before_create :save_data_structure
+  before_create :build_earnings_and_expenses
 
   private
 
-  def save_data_structure
+  def build_earnings_and_expenses
     if route_value.to_f > 0
       earnings.build(
         date: date,

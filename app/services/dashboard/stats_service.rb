@@ -6,8 +6,8 @@ module Dashboard
     end
 
     def call
-      earnings_data = earnings_calculator.call
-      expenses_data = expenses_calculator.call
+      earnings_data = memoized_earnings_data
+      expenses_data = memoized_expenses_data
 
       earnings_total = earnings_data[:total]
       expenses_total = expenses_data[:total]
@@ -24,7 +24,7 @@ module Dashboard
         earnings_avg_day: earnings_data[:avg_per_day],
         expenses_percent: expenses_percent(earnings_total, expenses_total),
         profit_per_day: profit_per_day(profit_value, days_worked),
-        days_avg_month: days_avg_month(days_worked),
+        days_avg_month: days_avg_month(days_worked, earnings_data[:total]),
         days_avg_week: days_avg_week(days_worked),
 
         earnings_by_platform: earnings_data[:by_platform],
@@ -36,6 +36,14 @@ module Dashboard
     private
 
     attr_reader :year, :month
+
+    def memoized_earnings_data
+      @memoized_earnings_data ||= earnings_calculator.call
+    end
+
+    def memoized_expenses_data
+      @memoized_expenses_data ||= expenses_calculator.call
+    end
 
     def earnings_scope
       @earnings_scope ||= begin
@@ -71,8 +79,8 @@ module Dashboard
       profit_value / days
     end
 
-    def days_avg_month(days)
-      months = distinct_months_count
+    def days_avg_month(days, earnings_total)
+      months = distinct_months_count(earnings_total)
       return 0 if months.zero?
       (days.to_f / months).round(1)
     end
@@ -91,10 +99,13 @@ module Dashboard
       (days_worked / weeks_count).round
     end
 
-    def distinct_months_count
-      earnings_calculator.call[:total] > 0 ?
-        earnings_scope.pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')")).count.clamp(1, Float::INFINITY) :
-        1
+    def distinct_months_count(earnings_total)
+      return 1 unless earnings_total > 0
+
+      earnings_scope
+        .pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')"))
+        .count
+        .clamp(1, Float::INFINITY)
     end
 
     def self.available_years

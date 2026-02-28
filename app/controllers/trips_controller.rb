@@ -18,8 +18,7 @@ class TripsController < ApplicationController
     @trip = Trip.new(trip_params)
 
     if @trip.save
-      @view_context = dashboard_context(@trip)
-      @totals = Dashboard::StatsService.new(**@view_context).call
+      @view_context, @totals = build_totals_context(@trip)
 
       flash.now[:notice] = t('.success')
 
@@ -33,8 +32,8 @@ class TripsController < ApplicationController
         end
       end
     else
-      @view_context = dashboard_context(@trip)
-      flash.now[:alert] = "Erro ao salvar: #{@trip.errors.full_messages.to_sentence}"
+      @view_context, _totals = build_totals_context(@trip)
+      flash.now[:alert] = t('.error', errors: @trip.errors.full_messages.to_sentence)
 
       respond_to do |format|
         format.turbo_stream do
