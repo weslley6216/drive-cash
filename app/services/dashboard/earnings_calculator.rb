@@ -1,5 +1,7 @@
 module Dashboard
   class EarningsCalculator
+    include ScopeMonthCounter
+
     def initialize(scope)
       @scope = scope
     end
@@ -39,13 +41,6 @@ module Dashboard
 
     def by_platform
       scope.group(:platform).sum(:amount)
-    end
-
-    def distinct_months_count
-      @distinct_months_count ||= scope
-        .pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')"))
-        .count
-        .clamp(1, Float::INFINITY)
     end
   end
 end

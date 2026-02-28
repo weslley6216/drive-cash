@@ -1,5 +1,7 @@
 module Expenses
   class CreateView < ApplicationView
+    include TurboCreateResponse
+
     def initialize(expense:, totals:, context: {})
       @expense = expense
       @totals = totals
@@ -7,33 +9,7 @@ module Expenses
     end
 
     def view_template
-      if @expense.persisted? && @totals
-        raw turbo_stream.update('modal', '')
-
-        raw turbo_stream.replace('stats_grid') {
-          render StatsGridComponent.new(
-            totals: @totals,
-            month: @context[:month],
-            year: @context[:year]
-          )
-        }
-
-        raw turbo_stream.replace('dashboard_filters') {
-          render FilterComponent.new(
-            selected_year: @expense.date.year,
-            selected_month: @expense.date.month,
-            available_years: Dashboard::StatsService.available_years
-          )
-        }
-      else
-        raw turbo_stream.replace('modal') {
-          render Expenses::NewView.new(expense: @expense, context: @context)
-        }
-      end
-
-      raw turbo_stream.update('flash') {
-        render FlashComponent.new(flash: helpers.flash)
-      }
+      render_turbo_streams(record: @expense, new_view: Expenses::NewView, record_key: :expense)
     end
   end
 end

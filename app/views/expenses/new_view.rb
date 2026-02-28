@@ -42,7 +42,7 @@ module Expenses
       field_wrapper(t('.labels.category'), theme: @theme) do
         render form.select(
           :category,
-          helpers.grouped_options_for_select(Expense.grouped_category_options),
+          helpers.grouped_options_for_select(helpers.expense_category_options),
           { include_blank: t('.placeholders.select') },
           { class: "#{input_classes(theme: @theme)} bg-white", required: true }
         )

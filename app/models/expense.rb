@@ -8,6 +8,8 @@ class Expense < ApplicationRecord
 
   belongs_to :trip
 
+  before_validation :assign_trip, if: :date?
+
   enum :category, {
     car_wash: 0,
     documentation: 1,
@@ -34,12 +36,9 @@ class Expense < ApplicationRecord
     group(:category).sum(:amount)
   end
 
-  def self.grouped_category_options
-    CATEGORIES_BY_GROUP.map do |group_key, categories|
-      [
-        I18n.t("expenses.category_groups.#{group_key}"),
-        categories.map { |cat| [human_enum_name(:category, cat), cat] }
-      ]
-    end
+  private
+
+  def assign_trip
+    self.trip ||= Trip.find_or_create_by(date: date)
   end
 end

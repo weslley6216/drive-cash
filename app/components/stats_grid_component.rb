@@ -1,5 +1,5 @@
 class StatsGridComponent < ApplicationComponent
-  Icons = {
+  ICONS = {
     dollar_sign: PhlexIcons::Lucide::DollarSign,
     triangle_alert: PhlexIcons::Lucide::TriangleAlert,
     trending_up: PhlexIcons::Lucide::TrendingUp,
@@ -31,7 +31,7 @@ class StatsGridComponent < ApplicationComponent
       value: format_currency(@totals[:earnings]),
       subtitle: earnings_subtitle,
       color: :green,
-      icon: Icons[:dollar_sign],
+      icon: ICONS[:dollar_sign],
       href: dashboard_earnings_detail_path(year: @year, month: @month)
     )
   end
@@ -42,7 +42,7 @@ class StatsGridComponent < ApplicationComponent
       value: format_currency(@totals[:expenses]),
       subtitle: expenses_subtitle,
       color: :red,
-      icon: Icons[:triangle_alert],
+      icon: ICONS[:triangle_alert],
       href: dashboard_expenses_detail_path(year: @year, month: @month)
     )
   end
@@ -53,7 +53,7 @@ class StatsGridComponent < ApplicationComponent
       value: format_currency(@totals[:profit]),
       subtitle: profit_subtitle,
       color: :blue,
-      icon: Icons[:trending_up]
+      icon: ICONS[:trending_up]
     )
   end
 
@@ -63,7 +63,7 @@ class StatsGridComponent < ApplicationComponent
       value: @totals[:days].to_s,
       subtitle: days_subtitle,
       color: :yellow,
-      icon: Icons[:calendar]
+      icon: ICONS[:calendar]
     )
   end
 

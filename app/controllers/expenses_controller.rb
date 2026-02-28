@@ -7,11 +7,9 @@ class ExpensesController < ApplicationController
 
   def create
     @expense = Expense.new(expense_params)
-    @expense.trip = Trip.find_or_create_by(date: @expense.date) if @expense.date.present?
 
     if @expense.save
-      @view_context = dashboard_context(@expense)
-      @totals = Dashboard::StatsService.new(**@view_context).call
+      @view_context, @totals = build_totals_context(@expense)
 
       flash.now[:notice] = t('.success')
 
@@ -25,7 +23,7 @@ class ExpensesController < ApplicationController
         end
       end
     else
-      @view_context = dashboard_context(@expense)
+      @view_context, _totals = build_totals_context(@expense)
       flash.now[:alert] = @expense.errors.full_messages.to_sentence
 
       respond_to do |format|
