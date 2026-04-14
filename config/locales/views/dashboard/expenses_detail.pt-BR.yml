@@ -10,5 +10,6 @@ pt-BR:
         amount: "Valor"
       total: "Total"
       empty: "Nenhuma despesa no período."
+      edit: "Editar despesa"
       close: "Fechar"
       back: "Voltar"

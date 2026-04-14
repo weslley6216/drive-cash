@@ -8,5 +8,6 @@ pt-BR:
         amount: "Valor"
       total: "Total"
       empty: "Nenhuma receita no período."
+      edit: "Editar receita"
       close: "Fechar"
       back: "Voltar"

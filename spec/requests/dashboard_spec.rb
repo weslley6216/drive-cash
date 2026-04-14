@@ -25,7 +25,7 @@ RSpec.describe "Dashboard", type: :request do
   describe "GET /dashboard/earnings_detail" do
     it "renders earnings detail in modal frame" do
       trip = create(:trip)
-      create(:earning, trip: trip, date: Date.new(2025, 1, 15), amount: 100.50)
+      earning1 = create(:earning, trip: trip, date: Date.new(2025, 1, 15), amount: 100.50)
       create(:earning, trip: trip, date: Date.new(2025, 1, 20), amount: 250)
 
       get dashboard_earnings_detail_path(year: 2025, month: 1)
@@ -37,6 +37,7 @@ RSpec.describe "Dashboard", type: :request do
       expect(response.body).to include("250,00")
       expect(response.body).to include("350,50")
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.total'))
+      expect(response.body).to include(edit_earning_path(earning1))
     end
 
     it "shows empty state when no earnings in period" do
@@ -68,7 +69,7 @@ RSpec.describe "Dashboard", type: :request do
   describe "GET /dashboard/expenses_detail" do
     it "renders expenses detail in modal frame with date grouping" do
       trip = create(:trip)
-      create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: "fuel", vendor: "Posto Shell")
+      expense1 = create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: "fuel", vendor: "Posto Shell")
       create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 25, category: "meals", vendor: "Lanchonete")
       create(:expense, trip: trip, date: Date.new(2025, 1, 20), amount: 150, category: "maintenance", vendor: "Oficina")
 
@@ -85,6 +86,7 @@ RSpec.describe "Dashboard", type: :request do
       expect(response.body).to include("150,00")
       expect(response.body).to include("255,00")
       expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.total'))
+      expect(response.body).to include(edit_expense_path(expense1))
     end
 
     it "shows empty state when no expenses in period" do

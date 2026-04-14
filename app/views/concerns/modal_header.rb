@@ -17,7 +17,7 @@ module ModalHeader
 
   def close_button
     button(type: 'button', data: { action: 'modal#close' },
-           class: "#{modal_close_button_classes} #{theme_styles(@theme)[:close_button]}") do
+           class: "#{modal_close_button_classes} #{theme_styles(@theme)[:close_button]} cursor-pointer") do
       render PhlexIcons::Lucide::X.new(class: 'w-6 h-6')
     end
   end

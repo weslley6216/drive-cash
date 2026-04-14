@@ -36,7 +36,7 @@ module Dashboard
             th(class: 'py-2 text-sm font-medium text-slate-600') do
               @annual ? t('.columns.month') : t('.columns.date')
             end
-            th(class: 'py-2 text-sm font-medium text-slate-600 text-right') do
+            th(class: 'py-2 text-sm font-medium text-slate-600 text-right w-1 whitespace-nowrap') do
               t('.columns.amount')
             end
           end
@@ -60,10 +60,21 @@ module Dashboard
             end
           else
             @earnings.each do |earning|
-              tr(class: 'border-b border-slate-100') do
+              tr(class: 'border-b border-slate-100 group') do
                 td(class: 'py-2.5 text-slate-800') { format_date(earning.date) }
-                td(class: 'py-2.5 text-right font-medium text-green-700') do
-                  format_currency(earning.amount)
+                td(class: 'py-2.5 text-right w-1 whitespace-nowrap') do
+                  div(class: 'flex items-center gap-2 flex-shrink-0 group justify-end') do
+                    span(class: 'font-medium text-green-700') { format_currency(earning.amount) }
+                    link_to(
+                      edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
+                      data: { turbo_frame: 'modal' },
+                      class: 'text-slate-400 hover:text-blue-600 transition-colors',
+                      aria_label: t('.edit'),
+                      title: t('.edit')
+                    ) do
+                      render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
+                    end
+                  end
                 end
               end
             end

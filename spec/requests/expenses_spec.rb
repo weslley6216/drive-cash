@@ -61,4 +61,52 @@ RSpec.describe "Expenses", type: :request do
       post expenses_path, params: valid_params, as: :turbo_stream
     end
   end
+
+  describe "GET /expenses/:id/edit" do
+    it "renders edit modal form" do
+      expense = create(:expense, category: 'fuel', amount: 80)
+
+      get edit_expense_path(expense), params: { context: { year: 2026, month: 1 } }
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('turbo-frame id="modal"')
+      expect(response.body).to include(I18n.t('expenses.edit_view.title'))
+      expect(response.body).to include('value="2026"')
+    end
+  end
+
+  describe "PATCH /expenses/:id" do
+    let(:expense) { create(:expense, date: Date.new(2026, 1, 10), amount: 80, category: 'fuel') }
+
+    it "updates expense and responds with turbo stream" do
+      patch expense_path(expense),
+            params: {
+              expense: {
+                date: '2026-01-11',
+                amount: 120.75,
+                category: 'maintenance',
+                vendor: 'Oficina Azul',
+                description: 'Revisao'
+              },
+              context: { year: 2026, month: 1 }
+            },
+            as: :turbo_stream
+
+      expect(response).to have_http_status(:success)
+      expect(response.media_type).to eq Mime[:turbo_stream]
+      expect(expense.reload.amount).to eq(120.75)
+      expect(expense.category).to eq('maintenance')
+      expect(expense.vendor).to eq('Oficina Azul')
+      expect(response.body).to include('stats_grid')
+    end
+
+    it "handles validation errors on update" do
+      patch expense_path(expense),
+            params: { expense: { amount: 0 }, context: { year: 2026, month: 1 } },
+            as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('expenses.edit_view.title'))
+    end
+  end
 end
