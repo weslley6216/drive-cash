@@ -1,44 +1,21 @@
 module Dashboard
-  class EarningsDetailService
-    def initialize(year: Date.current.year, month: nil)
-      @year = year
-      @month = month
-    end
-
-    def call
-      return monthly_detail if @month.present?
-
-      annual_detail
-    end
-
+  class EarningsDetailService < BaseDetailService
     private
 
-    attr_reader :year, :month
-
-    def monthly_detail
-      scope = Earning.for_year(year).for_month(month).chronological
-
-      {
-        earnings: scope,
-        earnings_by_month: nil,
-        total: scope.sum(:amount),
-        annual: false
-      }
+    def base_scope
+      Earning
     end
 
-    def annual_detail
-      by_month = Earning.for_year(year).group(Arel.sql('EXTRACT(MONTH FROM date)::int')).sum(:amount)
-      month_names = I18n.t('date.month_names')
-      earnings_by_month = by_month.sort_by { |month, _| month }.map do |month, total|
-        { month: month, month_name: month_names[month], total: total }
-      end
+    def empty_scope
+      Earning.none
+    end
 
-      {
-        earnings: Earning.none,
-        earnings_by_month: earnings_by_month,
-        total: earnings_by_month.sum { |row| row[:total] },
-        annual: true
-      }
+    def list_key
+      :earnings
+    end
+
+    def by_month_key
+      :earnings_by_month
     end
   end
 end

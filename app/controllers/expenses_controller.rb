@@ -6,9 +6,9 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    @expense = Expense.new(expense_params)
+    @expense = Expenses::CreateService.new(params: expense_params).call
 
-    if @expense.save
+    if @expense.persisted?
       @view_context, @totals = build_totals_context(@expense)
 
       flash.now[:notice] = t('.success')
@@ -32,7 +32,7 @@ class ExpensesController < ApplicationController
             expense: @expense,
             totals: nil,
             context: @view_context
-          ), status: :unprocessable_entity
+          ), status: :unprocessable_content
         end
       end
     end
