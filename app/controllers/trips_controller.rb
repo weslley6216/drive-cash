@@ -41,7 +41,7 @@ class TripsController < ApplicationController
             trip: @trip,
             totals: nil,
             context: @view_context
-          )
+          ), status: :unprocessable_content
         end
       end
     end
