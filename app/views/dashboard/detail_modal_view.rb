@@ -40,7 +40,7 @@ module Dashboard
           button(
             type: 'button',
             data: { action: 'modal#close' },
-            class: 'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors',
+            class: 'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer',
             aria_label: labels[:close]
           ) { labels[:close] }
         end

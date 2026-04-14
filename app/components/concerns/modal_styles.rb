@@ -4,7 +4,7 @@ module ModalStyles
     content: 'bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up',
     header: 'flex items-center justify-between p-6 border-b gap-2',
     title: 'text-lg sm:text-2xl font-bold whitespace-nowrap min-w-0',
-    close_button: 'transition-colors p-2 flex-shrink-0'
+    close_button: 'transition-colors p-2 flex-shrink-0 cursor-pointer'
   }.freeze
 
 

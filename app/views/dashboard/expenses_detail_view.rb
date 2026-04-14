@@ -68,7 +68,18 @@ module Dashboard
                     p(class: 'text-slate-800 font-medium break-words') { expense.description || '—' }
                     p(class: 'text-sm text-slate-500') { expense.vendor.presence || '—' }
                   end
-                  span(class: 'font-medium text-red-700 flex-shrink-0') { format_currency(expense.amount) }
+                  div(class: 'flex items-center gap-2 flex-shrink-0 group') do
+                    span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
+                    link_to(
+                      edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
+                      data: { turbo_frame: 'modal' },
+                      class: 'text-slate-400 hover:text-red-600 transition-colors',
+                      aria_label: t('.edit'),
+                      title: t('.edit')
+                    ) do
+                      render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
+                    end
+                  end
                 end
               end
             end

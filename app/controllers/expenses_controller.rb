@@ -38,6 +38,45 @@ class ExpensesController < ApplicationController
     end
   end
 
+  def edit
+    @expense = Expense.find(params[:id])
+
+    render Expenses::EditView.new(expense: @expense, context: params[:context])
+  end
+
+  def update
+    @expense = Expense.find(params[:id])
+    @expense = Expenses::UpdateService.new(expense: @expense, params: expense_params).call
+
+    if @expense.persisted? && @expense.errors.empty?
+      @view_context, @totals = build_totals_context(@expense)
+      flash.now[:notice] = t('.success')
+
+      respond_to do |format|
+        format.turbo_stream do
+          render Expenses::UpdateView.new(
+            expense: @expense,
+            totals: @totals,
+            context: @view_context
+          )
+        end
+      end
+    else
+      @view_context, _totals = build_totals_context(@expense)
+      flash.now[:alert] = @expense.errors.full_messages.to_sentence
+
+      respond_to do |format|
+        format.turbo_stream do
+          render Expenses::UpdateView.new(
+            expense: @expense,
+            totals: nil,
+            context: @view_context
+          ), status: :unprocessable_content
+        end
+      end
+    end
+  end
+
   private
 
   def expense_params

@@ -9,13 +9,14 @@ pt-BR:
         date: "Data"
         amount: "Valor"
         platform: "Plataforma"
+        platforms:
+          amazon: "Amazon"
+          ifood: "iFood"
+          mercado_livre: "Mercado Livre"
+          nine_nine: "99"
+          rappi: "Rappi"
+          shopee: "Shopee"
+          uber: "Uber"
+          other: "Outros"
         trip_id: "ID da Corrida"
         notes: "Observações"
-    enums:
-      earning:
-        platform:
-          shopee: "Shopee"
-          ifood: "iFood"
-          uber: "Uber"
-          nine_nine: "99"
-          other: "Outros"
