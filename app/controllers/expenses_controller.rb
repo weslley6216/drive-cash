@@ -1,79 +1,29 @@
 class ExpensesController < ApplicationController
   def new
-    @expense = Expense.new(date: Date.current)
-
-    render Expenses::NewView.new(expense: @expense, context: params[:context])
+    render Expenses::NewView.new(expense: Expense.new(date: Date.current), context: params[:context])
   end
 
   def create
-    @expense = Expenses::CreateService.new(params: expense_params).call
+    @expense = Expense.new(expense_params)
 
-    if @expense.persisted?
-      @view_context, @totals = build_totals_context(@expense)
-
-      flash.now[:notice] = t('.success')
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Expenses::CreateView.new(
-            expense: @expense,
-            totals: @totals,
-            context: @view_context
-          )
-        end
-      end
+    if @expense.save
+      turbo_success(Expenses::CreateView, expense: @expense)
     else
-      @view_context, _totals = build_totals_context(@expense)
-      flash.now[:alert] = @expense.errors.full_messages.to_sentence
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Expenses::CreateView.new(
-            expense: @expense,
-            totals: nil,
-            context: @view_context
-          ), status: :unprocessable_content
-        end
-      end
+      turbo_error(Expenses::CreateView, expense: @expense)
     end
   end
 
   def edit
-    @expense = Expense.find(params[:id])
-
-    render Expenses::EditView.new(expense: @expense, context: params[:context])
+    render Expenses::EditView.new(expense: Expense.find(params[:id]), context: params[:context])
   end
 
   def update
     @expense = Expense.find(params[:id])
-    @expense = Expenses::UpdateService.new(expense: @expense, params: expense_params).call
 
-    if @expense.persisted? && @expense.errors.empty?
-      @view_context, @totals = build_totals_context(@expense)
-      flash.now[:notice] = t('.success')
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Expenses::UpdateView.new(
-            expense: @expense,
-            totals: @totals,
-            context: @view_context
-          )
-        end
-      end
+    if @expense.update(expense_params)
+      turbo_success(Expenses::UpdateView, expense: @expense)
     else
-      @view_context, _totals = build_totals_context(@expense)
-      flash.now[:alert] = @expense.errors.full_messages.to_sentence
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Expenses::UpdateView.new(
-            expense: @expense,
-            totals: nil,
-            context: @view_context
-          ), status: :unprocessable_content
-        end
-      end
+      turbo_error(Expenses::UpdateView, expense: @expense)
     end
   end
 

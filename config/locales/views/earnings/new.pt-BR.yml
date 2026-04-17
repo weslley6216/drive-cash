@@ -1,0 +1,19 @@
+pt-BR:
+  earnings:
+    new_view:
+      title: "Nova Receita"
+      subtitle: "Registre um valor recebido por plataforma"
+      labels:
+        date: "Data"
+        amount: "Valor da Receita"
+        platform: "Plataforma"
+        notes: "Descrição (Opcional)"
+      placeholders:
+        money: "R$ 0,00"
+        select: "Selecione..."
+        notes: "Detalhes adicionais..."
+      buttons:
+        cancel: "Cancelar"
+        save: "Salvar"
+    create:
+      success: "Receita registrada com sucesso!"

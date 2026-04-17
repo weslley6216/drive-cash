@@ -1,39 +1,27 @@
 class EarningsController < ApplicationController
-  def edit
-    @earning = Earning.find(params[:id])
+  def new
+    render Earnings::NewView.new(earning: Earning.new(date: Date.current), context: params[:context])
+  end
 
-    render Earnings::EditView.new(earning: @earning, context: params[:context])
+  def create
+    @earning = Earning.new(earning_params)
+    if @earning.save
+      turbo_success(Earnings::CreateView, earning: @earning)
+    else
+      turbo_error(Earnings::CreateView, earning: @earning)
+    end
+  end
+
+  def edit
+    render Earnings::EditView.new(earning: Earning.find(params[:id]), context: params[:context])
   end
 
   def update
     @earning = Earning.find(params[:id])
-
     if @earning.update(earning_params)
-      @view_context, @totals = build_totals_context(@earning)
-      flash.now[:notice] = t('.success')
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Earnings::UpdateView.new(
-            earning: @earning,
-            totals: @totals,
-            context: @view_context
-          )
-        end
-      end
+      turbo_success(Earnings::UpdateView, earning: @earning)
     else
-      @view_context, _totals = build_totals_context(@earning)
-      flash.now[:alert] = @earning.errors.full_messages.to_sentence
-
-      respond_to do |format|
-        format.turbo_stream do
-          render Earnings::UpdateView.new(
-            earning: @earning,
-            totals: nil,
-            context: @view_context
-          ), status: :unprocessable_content
-        end
-      end
+      turbo_error(Earnings::UpdateView, earning: @earning)
     end
   end
 

@@ -6,8 +6,6 @@ class Expense < ApplicationRecord
     personal_operations: %w[meals phone other]
   }.freeze
 
-  belongs_to :trip
-
   enum :category, {
     car_wash: 0,
     documentation: 1,

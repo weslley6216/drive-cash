@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Dashboard::BaseDetailService do
   describe '#call' do
-    let(:trip) { create(:trip) }
+    let(:jan_earning) { create(:earning, date: Date.new(2025, 1, 10), amount: 100) }
+    let(:feb_earning) { create(:earning, date: Date.new(2025, 2, 15), amount: 200) }
 
-    let!(:jan_earning) { create(:earning, trip: trip, date: Date.new(2025, 1, 10), amount: 100) }
-    let!(:feb_earning) { create(:earning, trip: trip, date: Date.new(2025, 2, 15), amount: 200) }
+    before { jan_earning; feb_earning }
 
     let(:service_class) do
       Class.new(described_class) do

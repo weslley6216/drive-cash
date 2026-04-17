@@ -1,6 +1,59 @@
 require 'rails_helper'
 
 RSpec.describe "Earnings", type: :request do
+  describe "GET /earnings/new" do
+    it "renders the modal form" do
+      get new_earning_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('turbo-frame id="modal"')
+      expect(response.body).to include(I18n.t('earnings.new_view.title'))
+    end
+
+    it "passes context params to the form" do
+      get new_earning_path, params: { context: { year: 2026 } }
+
+      expect(response.body).to include('name="context[year]"')
+      expect(response.body).to include('value="2026"')
+    end
+  end
+
+  describe "POST /earnings" do
+    let(:valid_params) do
+      {
+        earning: {
+          date: '2026-01-23',
+          amount: 200.00,
+          platform: 'uber'
+        },
+        context: { year: 2026 }
+      }
+    end
+
+    it "creates a new earning" do
+      expect {
+        post earnings_path, params: valid_params, as: :turbo_stream
+      }.to change(Earning, :count).by(1)
+    end
+
+    it "responds with turbo stream to update stats grid" do
+      post earnings_path, params: valid_params, as: :turbo_stream
+
+      expect(response.media_type).to eq Mime[:turbo_stream]
+      expect(response.body).to include('stats_grid')
+      expect(response.body).to include('flash')
+    end
+
+    it "handles validation errors by re-rendering the modal" do
+      post earnings_path,
+           params: { earning: { amount: 0, platform: 'uber' }, context: { year: 2026 } },
+           as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('earnings.new_view.title'))
+    end
+  end
+
   describe "GET /earnings/:id/edit" do
     it "renders edit modal form" do
       earning = create(:earning, amount: 100)

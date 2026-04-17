@@ -45,7 +45,7 @@ module FormFields
     end
   end
 
-  def money_field(form, attribute, label:, theme: :blue, required: false, calculator: false)
+  def money_field(form, attribute, label:, theme: :blue, required: false)
     field_wrapper(label, theme: theme) do
       render form.number_field(
         attribute,
@@ -53,12 +53,7 @@ module FormFields
         required: required,
         value: form.object.public_send(attribute),
         placeholder: t('.placeholders.money'),
-        class: input_classes(theme: theme),
-        data: calculator ? {
-          calculator_target: 'input',
-          type: calculator,
-          action: 'focus->calculator#clearIfZero blur->calculator#resetIfEmpty input->calculator#calculate'
-        } : {}
+        class: input_classes(theme: theme)
       )
     end
   end

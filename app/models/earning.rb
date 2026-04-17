@@ -1,8 +1,6 @@
 class Earning < ApplicationRecord
   include CacheInvalidation
 
-  belongs_to :trip
-
   enum :platform, {
     amazon: 0,
     ifood: 1,

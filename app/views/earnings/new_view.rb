@@ -1,9 +1,9 @@
-module Expenses
-  class EditView < ApplicationView
-    def initialize(expense:, context: {})
-      @expense = expense
+module Earnings
+  class NewView < ApplicationView
+    def initialize(earning:, context: {})
+      @earning = earning
       @context = context || {}
-      @theme = :red
+      @theme = :blue
     end
 
     def view_template
@@ -20,14 +20,13 @@ module Expenses
     private
 
     def render_form
-      form_with(model: @expense, url: expense_path(@expense), method: :patch, class: 'p-6 space-y-4') do |f|
+      form_with(model: @earning, url: earnings_path, class: 'p-6 space-y-4') do |f|
         hidden_context_fields
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
         money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
-        category_select(f)
-        text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
-        text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
+        platform_select(f)
+        text_area(f, :notes, label: t('.labels.notes'), theme: @theme, placeholder: t('.placeholders.notes'), rows: 2)
 
         render_actions
       end
@@ -38,11 +37,11 @@ module Expenses
       input(type: 'hidden', name: 'context[month]', value: @context[:month])
     end
 
-    def category_select(form)
-      field_wrapper(t('.labels.category'), theme: @theme) do
+    def platform_select(form)
+      field_wrapper(t('.labels.platform'), theme: @theme) do
         render form.select(
-          :category,
-          helpers.grouped_options_for_select(helpers.expense_category_options, @expense.category),
+          :platform,
+          Earning.platforms.keys.map { |key| [Earning.human_enum_name(:platform, key), key] },
           { include_blank: t('.placeholders.select') },
           { class: "#{input_classes(theme: @theme)} bg-white", required: true }
         )
@@ -52,7 +51,7 @@ module Expenses
     def render_actions
       div(class: 'flex gap-3 pt-4') do
         button(type: 'button', data: { action: 'modal#close' }, class: button_classes(variant: :secondary, full_width: true)) { t('.buttons.cancel') }
-        button(type: 'submit', class: "#{button_classes(variant: :danger, full_width: true)} flex items-center justify-center gap-2") do
+        button(type: 'submit', class: "#{button_classes(variant: :primary, full_width: true)} flex items-center justify-center gap-2") do
           render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')
           span { t('.buttons.save') }
         end
