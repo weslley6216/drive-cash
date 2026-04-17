@@ -10,10 +10,6 @@ RSpec.describe Expense, type: :model do
     it { is_expected.to validate_numericality_of(:amount).is_greater_than(0) }
   end
 
-  describe 'associations' do
-    it { should belong_to(:trip) }
-  end
-
   describe 'enums' do
     it { should define_enum_for(:category).with_values(
       car_wash: 0,

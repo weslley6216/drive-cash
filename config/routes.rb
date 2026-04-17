@@ -4,9 +4,8 @@ Rails.application.routes.draw do
   get "dashboard/earnings_detail", to: "dashboard#earnings_detail", as: :dashboard_earnings_detail
   get "dashboard/expenses_detail", to: "dashboard#expenses_detail", as: :dashboard_expenses_detail
 
-  resources :trips, only: [:new, :create]
-  resources :expenses, only: [:new, :create, :edit, :update]
-  resources :earnings, only: [:edit, :update]
+  resources :expenses, only: %i[new create edit update]
+  resources :earnings, only: %i[new create edit update]
   
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

@@ -20,11 +20,11 @@ module Earnings
     private
 
     def render_form
-      form_with(model: @earning, url: earning_path(@earning), method: :patch, class: 'p-6 space-y-4', data: { controller: 'calculator' }) do |f|
+      form_with(model: @earning, url: earning_path(@earning), method: :patch, class: 'p-6 space-y-4') do |f|
         hidden_context_fields
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
-        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true, calculator: 'earning')
+        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
         platform_select(f)
         text_area(f, :notes, label: t('.labels.notes'), theme: @theme, placeholder: t('.placeholders.notes'), rows: 2)
 

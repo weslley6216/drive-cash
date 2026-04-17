@@ -24,9 +24,8 @@ RSpec.describe "Dashboard", type: :request do
 
   describe "GET /dashboard/earnings_detail" do
     it "renders earnings detail in modal frame" do
-      trip = create(:trip)
-      earning1 = create(:earning, trip: trip, date: Date.new(2025, 1, 15), amount: 100.50)
-      create(:earning, trip: trip, date: Date.new(2025, 1, 20), amount: 250)
+      earning1 = create(:earning, date: Date.new(2025, 1, 15), amount: 100.50)
+      create(:earning, date: Date.new(2025, 1, 20), amount: 250)
 
       get dashboard_earnings_detail_path(year: 2025, month: 1)
 
@@ -48,10 +47,9 @@ RSpec.describe "Dashboard", type: :request do
     end
 
     it "renders annual view with monthly totals when month filter is all" do
-      trip = create(:trip)
-      create(:earning, trip: trip, date: Date.new(2025, 1, 15), amount: 100)
-      create(:earning, trip: trip, date: Date.new(2025, 2, 10), amount: 250)
-      create(:earning, trip: trip, date: Date.new(2025, 2, 20), amount: 50)
+      create(:earning, date: Date.new(2025, 1, 15), amount: 100)
+      create(:earning, date: Date.new(2025, 2, 10), amount: 250)
+      create(:earning, date: Date.new(2025, 2, 20), amount: 50)
 
       get dashboard_earnings_detail_path(year: 2025)
 
@@ -68,10 +66,9 @@ RSpec.describe "Dashboard", type: :request do
 
   describe "GET /dashboard/expenses_detail" do
     it "renders expenses detail in modal frame with date grouping" do
-      trip = create(:trip)
-      expense1 = create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 80, category: "fuel", vendor: "Posto Shell")
-      create(:expense, trip: trip, date: Date.new(2025, 1, 15), amount: 25, category: "meals", vendor: "Lanchonete")
-      create(:expense, trip: trip, date: Date.new(2025, 1, 20), amount: 150, category: "maintenance", vendor: "Oficina")
+      expense1 = create(:expense, date: Date.new(2025, 1, 15), amount: 80, category: "fuel", vendor: "Posto Shell")
+      create(:expense, date: Date.new(2025, 1, 15), amount: 25, category: "meals", vendor: "Lanchonete")
+      create(:expense, date: Date.new(2025, 1, 20), amount: 150, category: "maintenance", vendor: "Oficina")
 
       get dashboard_expenses_detail_path(year: 2025, month: 1)
 
@@ -97,9 +94,8 @@ RSpec.describe "Dashboard", type: :request do
     end
 
     it "renders annual view with monthly totals when month filter is all" do
-      trip = create(:trip)
-      create(:expense, trip: trip, date: Date.new(2025, 1, 10), amount: 100, category: "fuel")
-      create(:expense, trip: trip, date: Date.new(2025, 2, 15), amount: 200, category: "maintenance")
+      create(:expense, date: Date.new(2025, 1, 10), amount: 100, category: "fuel")
+      create(:expense, date: Date.new(2025, 2, 15), amount: 200, category: "maintenance")
 
       get dashboard_expenses_detail_path(year: 2025)
 

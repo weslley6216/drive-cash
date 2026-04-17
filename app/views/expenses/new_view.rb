@@ -20,11 +20,11 @@ module Expenses
     private
 
     def render_form
-      form_with(model: @expense, url: expenses_path, class: 'p-6 space-y-4', data: { controller: 'calculator' }) do |f|
+      form_with(model: @expense, url: expenses_path, class: 'p-6 space-y-4') do |f|
         hidden_context_fields
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
-        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true, calculator: 'cost')
+        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
         category_select(f)
         text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
         text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)

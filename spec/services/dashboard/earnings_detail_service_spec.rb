@@ -3,13 +3,12 @@ require 'rails_helper'
 RSpec.describe Dashboard::EarningsDetailService do
   describe '#call' do
     context 'with month filter (monthly detail)' do
-      let(:trip) { create(:trip) }
-      let(:earning1) { create(:earning, trip: trip, date: Date.new(2025, 1, 15), amount: 100) }
-      let(:earning2) { create(:earning, trip: trip, date: Date.new(2025, 1, 20), amount: 250) }
+      let(:earning1) { create(:earning, date: Date.new(2025, 1, 15), amount: 100) }
+      let(:earning2) { create(:earning, date: Date.new(2025, 1, 20), amount: 250) }
 
       subject(:service) { described_class.new(year: 2025, month: 1) }
 
-      before { trip; earning1; earning2 }
+      before { earning1; earning2 }
 
       it 'returns earnings list and total' do
         result = service.call
@@ -22,14 +21,13 @@ RSpec.describe Dashboard::EarningsDetailService do
     end
 
     context 'without month filter (annual detail)' do
-      let(:trip) { create(:trip) }
-      let(:jan1) { create(:earning, trip: trip, date: Date.new(2025, 1, 10), amount: 100) }
-      let(:jan2) { create(:earning, trip: trip, date: Date.new(2025, 1, 20), amount: 50) }
-      let(:feb) { create(:earning, trip: trip, date: Date.new(2025, 2, 15), amount: 200) }
+      let(:jan1) { create(:earning, date: Date.new(2025, 1, 10), amount: 100) }
+      let(:jan2) { create(:earning, date: Date.new(2025, 1, 20), amount: 50) }
+      let(:feb) { create(:earning, date: Date.new(2025, 2, 15), amount: 200) }
 
       subject(:service) { described_class.new(year: 2025, month: nil) }
 
-      before { trip; jan1; jan2; feb }
+      before { jan1; jan2; feb }
 
       it 'returns earnings by month and total' do
         result = service.call

@@ -30,7 +30,7 @@ class FabComponent < ApplicationComponent
       end
 
       a(
-        href: new_trip_path(context: @filters),
+        href: new_earning_path(context: @filters),
         data: { turbo_frame: 'modal' },
         class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105'
       ) do

@@ -32,11 +32,10 @@ RSpec.describe "Expenses", type: :request do
       }
     end
 
-    it "creates a new expense and associates it with a trip" do
+    it "creates a new expense" do
       expect {
         post expenses_path, params: valid_params, as: :turbo_stream
       }.to change(Expense, :count).by(1)
-       .and change(Trip, :count).by(1)
     end
 
     it "responds with turbo stream to update stats grid" do

@@ -56,7 +56,7 @@ RSpec.describe FabComponent, type: :component do
 
       expect(html).to include('context%5Byear%5D=2025')
       expect(html).to include('context%5Bmonth%5D=12')
-      expect(html).to include('/trips/new')
+      expect(html).to include('/earnings/new')
       expect(html).to include('/expenses/new')
     end
 
@@ -64,7 +64,7 @@ RSpec.describe FabComponent, type: :component do
       component = FabComponent.new(filters: {})
       html = view_context.render(component)
 
-      expect(html).to include('/trips/new')
+      expect(html).to include('/earnings/new')
       expect(html).not_to include('context%5Byear%5D=2025')
     end
   end
