@@ -1,6 +1,6 @@
 module Expenses
   class UpdateView < ApplicationView
-    include TurboCreateResponse
+    include TurboUpdateResponse
 
     def initialize(expense:, totals:, context: {})
       @expense = expense
@@ -9,7 +9,13 @@ module Expenses
     end
 
     def view_template
-      render_turbo_streams(record: @expense, new_view: Expenses::EditView, record_key: :expense)
+      render_turbo_streams(
+        record: @expense,
+        edit_view: Expenses::EditView,
+        record_key: :expense,
+        detail_service: Dashboard::ExpensesDetailService,
+        detail_view: Dashboard::ExpensesDetailView
+      )
     end
   end
 end

@@ -93,6 +93,21 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).to include('stats_grid')
     end
 
+
+
+    it "renders the earnings detail list after successful update" do
+      patch earning_path(earning),
+            params: {
+              earning: { amount: 300.00, platform: 'uber' },
+              context: { year: 2026, month: 1 }
+            },
+            as: :turbo_stream
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
+      expect(response.body).not_to include(I18n.t('earnings.edit_view.title'))
+      expect(response.body).to include('stats_grid')
+    end
     it "handles validation errors on update" do
       patch earning_path(earning),
             params: { earning: { amount: 0 }, context: { year: 2026, month: 1 } },
