@@ -6,7 +6,7 @@ module ButtonStyles
   }.freeze
 
   def button_classes(variant: :primary, full_width: false)
-    base = 'px-4 py-2 rounded-lg font-medium transition-colors'
+    base = 'px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer'
     width = full_width ? 'w-full' : ''
     variant_class = BUTTON_VARIANTS[variant] || BUTTON_VARIANTS[:primary]
 
