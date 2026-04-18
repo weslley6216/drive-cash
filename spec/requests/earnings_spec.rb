@@ -93,8 +93,6 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).to include('stats_grid')
     end
 
-
-
     it "renders the earnings detail list after successful update" do
       patch earning_path(earning),
             params: {
@@ -108,6 +106,7 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).not_to include(I18n.t('earnings.edit_view.title'))
       expect(response.body).to include('stats_grid')
     end
+
     it "handles validation errors on update" do
       patch earning_path(earning),
             params: { earning: { amount: 0 }, context: { year: 2026, month: 1 } },
