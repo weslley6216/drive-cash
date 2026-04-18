@@ -79,6 +79,19 @@ module Dashboard
                     ) do
                       render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
                     end
+                    link_to(
+                      expense_path(expense, context: @filters),
+                      data: {
+                        turbo_method: :delete,
+                        turbo_confirm: t('.confirm_delete')
+                      },
+                      class: 'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
+                      form: { class: 'contents' },
+                      aria_label: t('.delete'),
+                      title: t('.delete')
+                    ) do
+                      render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
+                    end
                   end
                 end
               end

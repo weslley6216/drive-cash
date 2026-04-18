@@ -30,9 +30,27 @@ module RecordSaveResponse
     end
   end
 
+  def turbo_render_list(detail_service, detail_view)
+    filter = dashboard_filter_context
+    totals = Dashboard::StatsService.new(**filter).call
+    flash.now[:notice] = t('.success')
+    detail = detail_service.new(year: filter[:year], month: filter[:month]).call
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace('modal', view_context.render(detail_view.new(**detail, filters: filter))),
+          turbo_stream.replace('stats_grid', view_context.render(StatsGridComponent.new(totals: totals, month: filter[:month], year: filter[:year]))),
+          turbo_stream.update('flash_modal', view_context.render(FlashComponent.new(flash: flash, inline: true)))
+        ]
+      end
+    end
+  end
+
   def build_totals_context(record)
     context = dashboard_context(record)
-    totals  = Dashboard::StatsService.new(**dashboard_filter_context).call
+    totals = Dashboard::StatsService.new(**context).call
+
     [context, totals]
   end
 

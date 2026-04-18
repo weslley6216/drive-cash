@@ -1,25 +1,27 @@
 class ExpensesController < ApplicationController
+  before_action :find_expense, only: [:edit, :update, :destroy]
+
   def new
-    render Expenses::NewView.new(expense: Expense.new(date: Date.current), context: params[:context])
+    expense = Expense.new(date: Date.current)
+
+    render Expenses::NewView.new(expense: expense, context: params[:context])
   end
 
   def create
-    @expense = Expense.new(expense_params)
+    expense = Expense.new(expense_params)
 
-    if @expense.save
-      turbo_success(Expenses::CreateView, expense: @expense)
+    if expense.save
+      turbo_success(Expenses::CreateView, expense: expense)
     else
-      turbo_error(Expenses::CreateView, expense: @expense)
+      turbo_error(Expenses::CreateView, expense: expense)
     end
   end
 
   def edit
-    render Expenses::EditView.new(expense: Expense.find(params[:id]), context: params[:context])
+    render Expenses::EditView.new(expense: @expense, context: params[:context])
   end
 
   def update
-    @expense = Expense.find(params[:id])
-
     if @expense.update(expense_params)
       turbo_success(Expenses::UpdateView, expense: @expense)
     else
@@ -27,9 +29,18 @@ class ExpensesController < ApplicationController
     end
   end
 
+  def destroy
+    @expense.destroy
+    turbo_render_list(Dashboard::ExpensesDetailService, Dashboard::ExpensesDetailView)
+  end
+
   private
 
   def expense_params
     params.require(:expense).permit(:date, :amount, :category, :vendor, :description)
+  end
+
+  def find_expense
+    @expense = Expense.find(params[:id])
   end
 end

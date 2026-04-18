@@ -11,3 +11,5 @@ pt-BR:
       edit: "Editar receita"
       close: "Fechar"
       back: "Voltar"
+      delete: "Excluir receita"
+      confirm_delete: "Tem certeza que deseja excluir esta receita?"
