@@ -8,7 +8,8 @@ module Dashboard
           class: modal_backdrop_classes,
           data: { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }
         ) do
-          div(class: "#{modal_content_classes} #{modal_theme_classes(theme: theme)} max-w-lg flex flex-col max-h-[90vh]") do
+          div(class: "#{modal_content_classes} #{modal_theme_classes(theme: theme)} max-w-lg flex flex-col max-h-[90vh] relative") do
+            div(id: 'flash_modal')
             yield
           end
         end

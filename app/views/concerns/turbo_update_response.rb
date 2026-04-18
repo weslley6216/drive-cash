@@ -7,10 +7,6 @@ module TurboUpdateResponse
     else
       render_failure(edit_view, record_key => record)
     end
-
-    raw turbo_stream.update('flash') {
-      render FlashComponent.new(flash: helpers.flash)
-    }
   end
 
   def render_success(detail_service, detail_view)
@@ -27,11 +23,19 @@ module TurboUpdateResponse
         year: @context[:year]
       )
     }
+
+    raw turbo_stream.update('flash_modal') {
+      render FlashComponent.new(flash: helpers.flash, inline: true)
+    }
   end
 
   def render_failure(edit_view, record_kwargs)
     raw turbo_stream.replace('modal') {
       render edit_view.new(**record_kwargs, context: @context)
+    }
+
+    raw turbo_stream.update('flash') {
+      render FlashComponent.new(flash: helpers.flash)
     }
   end
 end

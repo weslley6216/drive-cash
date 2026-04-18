@@ -99,8 +99,6 @@ RSpec.describe "Expenses", type: :request do
       expect(response.body).to include('stats_grid')
     end
 
-
-
     it "renders the expenses detail list after successful update" do
       patch expense_path(expense),
             params: {
@@ -114,6 +112,7 @@ RSpec.describe "Expenses", type: :request do
       expect(response.body).not_to include(I18n.t('expenses.edit_view.title'))
       expect(response.body).to include('stats_grid')
     end
+
     it "handles validation errors on update" do
       patch expense_path(expense),
             params: { expense: { amount: 0 }, context: { year: 2026, month: 1 } },
