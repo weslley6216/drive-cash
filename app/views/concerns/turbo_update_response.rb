@@ -19,8 +19,8 @@ module TurboUpdateResponse
     raw turbo_stream.replace('stats_grid') {
       render StatsGridComponent.new(
         totals: @totals,
-        month: @context[:month],
-        year: @context[:year]
+        month: @totals_context[:month],
+        year: @totals_context[:year]
       )
     }
 

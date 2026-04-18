@@ -23,7 +23,7 @@ class FabComponent < ApplicationComponent
       a(
         href: new_expense_path(context: @filters),
         data: { turbo_frame: 'modal' },
-        class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105'
+        class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 cursor-pointer'
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_expense') }
         render PhlexIcons::Lucide::Receipt.new(class: 'w-4 h-4')
@@ -32,7 +32,7 @@ class FabComponent < ApplicationComponent
       a(
         href: new_earning_path(context: @filters),
         data: { turbo_frame: 'modal' },
-        class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105'
+        class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105 cursor-pointer'
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_earning') }
         render PhlexIcons::Lucide::Truck.new(class: 'w-4 h-4')
@@ -43,7 +43,7 @@ class FabComponent < ApplicationComponent
   def main_button
     button(
       data: { action: 'fab#toggle', fab_target: 'button' },
-      class: 'flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 active:scale-95 z-50'
+      class: 'flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 active:scale-95 z-50 cursor-pointer'
     ) do
       render PhlexIcons::Lucide::Plus.new(class: 'w-6 h-6')
     end

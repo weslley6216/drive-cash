@@ -2,7 +2,7 @@ module Expenses
   class CreateView < ApplicationView
     include TurboCreateResponse
 
-    def initialize(expense:, totals:, context: {})
+    def initialize(expense:, totals:, context: {}, totals_context: {})
       @expense = expense
       @totals = totals
       @context = context || {}
