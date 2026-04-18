@@ -55,7 +55,7 @@ RSpec.describe "Expenses", type: :request do
     end
 
     it "updates the stats using the correct context year" do
-      expect(Dashboard::StatsService).to receive(:new).with(year: 2026, month: nil).and_call_original
+      expect(Dashboard::StatsService).to receive(:new).with(year: 2026, month: 1).and_call_original
 
       post expenses_path, params: valid_params, as: :turbo_stream
     end
@@ -120,6 +120,29 @@ RSpec.describe "Expenses", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('expenses.edit_view.title'))
+    end
+  end
+
+  describe "DELETE /expenses/:id" do
+    let!(:expense) { create(:expense, date: Date.new(2026, 1, 10), amount: 100, category: :fuel) }
+
+    it "destroys the expense" do
+      expect {
+        delete expense_path(expense),
+               params: { context: { year: 2026, month: 1 } },
+               as: :turbo_stream
+      }.to change(Expense, :count).by(-1)
+    end
+
+    it "re-renders the detail list after destroy" do
+      delete expense_path(expense),
+             params: { context: { year: 2026, month: 1 } },
+             as: :turbo_stream
+
+      expect(response).to have_http_status(:success)
+      expect(response.media_type).to eq Mime[:turbo_stream]
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include('stats_grid')
     end
   end
 end

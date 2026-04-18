@@ -17,3 +17,5 @@ pt-BR:
         save: "Salvar"
     update:
       success: "Receita atualizada com sucesso!"
+    destroy:
+      success: "Receita excluída com sucesso!"

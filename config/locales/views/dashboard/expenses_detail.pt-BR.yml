@@ -13,3 +13,5 @@ pt-BR:
       edit: "Editar despesa"
       close: "Fechar"
       back: "Voltar"
+      delete: "Excluir despesa"
+      confirm_delete: "Tem certeza que deseja excluir esta despesa?"
