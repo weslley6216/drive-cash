@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe "Earnings", type: :request do
-  describe "GET /earnings/new" do
-    it "renders the modal form" do
+RSpec.describe 'Earnings', type: :request do
+  describe 'GET /earnings/new' do
+    it 'renders the modal form' do
       get new_earning_path
 
       expect(response).to have_http_status(:success)
@@ -10,7 +10,7 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).to include(I18n.t('earnings.new_view.title'))
     end
 
-    it "passes context params to the form" do
+    it 'passes context params to the form' do
       get new_earning_path, params: { context: { year: 2026 } }
 
       expect(response.body).to include('name="context[year]"')
@@ -18,7 +18,7 @@ RSpec.describe "Earnings", type: :request do
     end
   end
 
-  describe "POST /earnings" do
+  describe 'POST /earnings' do
     let(:valid_params) do
       {
         earning: {
@@ -30,13 +30,13 @@ RSpec.describe "Earnings", type: :request do
       }
     end
 
-    it "creates a new earning" do
+    it 'creates a new earning' do
       expect {
         post earnings_path, params: valid_params, as: :turbo_stream
       }.to change(Earning, :count).by(1)
     end
 
-    it "responds with turbo stream to update stats grid" do
+    it 'responds with turbo stream updating the stats grid' do
       post earnings_path, params: valid_params, as: :turbo_stream
 
       expect(response.media_type).to eq Mime[:turbo_stream]
@@ -44,7 +44,7 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).to include('flash')
     end
 
-    it "handles validation errors by re-rendering the modal" do
+    it 'handles validation errors by re-rendering the modal' do
       post earnings_path,
            params: { earning: { amount: 0, platform: 'uber' }, context: { year: 2026 } },
            as: :turbo_stream
@@ -54,8 +54,8 @@ RSpec.describe "Earnings", type: :request do
     end
   end
 
-  describe "GET /earnings/:id/edit" do
-    it "renders edit modal form" do
+  describe 'GET /earnings/:id/edit' do
+    it 'renders edit modal form with platform options' do
       earning = create(:earning, amount: 100)
 
       get edit_earning_path(earning), params: { context: { year: 2026, month: 1 } }
@@ -70,10 +70,10 @@ RSpec.describe "Earnings", type: :request do
     end
   end
 
-  describe "PATCH /earnings/:id" do
+  describe 'PATCH /earnings/:id' do
     let(:earning) { create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: 'shopee') }
 
-    it "updates earning and responds with turbo stream" do
+    it 'updates earning attributes' do
       patch earning_path(earning),
             params: {
               earning: {
@@ -89,11 +89,11 @@ RSpec.describe "Earnings", type: :request do
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
       expect(earning.reload.amount).to eq(200.5)
-      expect(earning.platform).to eq('uber')
+      expect(earning.reload.platform).to eq('uber')
       expect(response.body).to include('stats_grid')
     end
 
-    it "renders the earnings detail list after successful update" do
+    it 'renders the earnings detail list after successful update' do
       patch earning_path(earning),
             params: {
               earning: { amount: 300.00, platform: 'uber' },
@@ -107,7 +107,7 @@ RSpec.describe "Earnings", type: :request do
       expect(response.body).to include('stats_grid')
     end
 
-    it "handles validation errors on update" do
+    it 'handles validation errors on update' do
       patch earning_path(earning),
             params: { earning: { amount: 0 }, context: { year: 2026, month: 1 } },
             as: :turbo_stream
@@ -117,10 +117,10 @@ RSpec.describe "Earnings", type: :request do
     end
   end
 
-  describe "DELETE /earnings/:id" do
-    let!(:earning) { create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee) }
+  describe 'DELETE /earnings/:id' do
+    it 'destroys the earning' do
+      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
-    it "destroys the earning" do
       expect {
         delete earning_path(earning),
                params: { context: { year: 2026, month: 1 } },
@@ -128,7 +128,9 @@ RSpec.describe "Earnings", type: :request do
       }.to change(Earning, :count).by(-1)
     end
 
-    it "re-renders the detail list after destroy" do
+    it 're-renders the detail list after destroy' do
+      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
+
       delete earning_path(earning),
              params: { context: { year: 2026, month: 1 } },
              as: :turbo_stream

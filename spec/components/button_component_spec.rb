@@ -1,104 +1,82 @@
-require "rails_helper"
+require 'rails_helper'
 
 RSpec.describe ButtonComponent, type: :component do
-  describe "#view_template" do
-    it "renders a button with primary variant by default" do
-      component = ButtonComponent.new
+  describe '#view_template' do
+    it 'renders a button with primary variant by default' do
+      html = ButtonComponent.new.call { 'Click me' }
 
-      html = component.call { "Click me" }
-
-      expect(html).to include("<button")
-      expect(html).to include("bg-blue-600")
-      expect(html).to include("Click me")
+      expect(html).to include('<button')
+      expect(html).to include('bg-blue-600')
+      expect(html).to include('Click me')
     end
 
-    it "renders secondary variant" do
-      component = ButtonComponent.new(variant: :secondary)
+    it 'renders secondary variant' do
+      html = ButtonComponent.new(variant: :secondary).call { 'Secondary' }
 
-      html = component.call { "Secondary" }
-
-      expect(html).to include("bg-gray-200")
-      expect(html).to include("Secondary")
+      expect(html).to include('bg-gray-200')
+      expect(html).to include('Secondary')
     end
 
-    it "renders danger variant" do
-      component = ButtonComponent.new(variant: :danger)
+    it 'renders danger variant' do
+      html = ButtonComponent.new(variant: :danger).call { 'Delete' }
 
-      html = component.call { "Delete" }
-
-      expect(html).to include("bg-red-600")
-      expect(html).to include("Delete")
+      expect(html).to include('bg-red-600')
+      expect(html).to include('Delete')
     end
 
-    it "renders success variant" do
-      component = ButtonComponent.new(variant: :success)
+    it 'renders success variant' do
+      html = ButtonComponent.new(variant: :success).call { 'Save' }
 
-      html = component.call { "Save" }
-
-      expect(html).to include("bg-green-600")
-      expect(html).to include("Save")
+      expect(html).to include('bg-green-600')
+      expect(html).to include('Save')
     end
 
-    it "falls back to default styles for unknown variant" do
-      component = ButtonComponent.new(variant: :unknown)
+    it 'falls back to default styles for unknown variant' do
+      html = ButtonComponent.new(variant: :unknown).call { 'Unknown' }
 
-      html = component.call { "Unknown" }
-
-      expect(html).to include("bg-gray-100")
-      expect(html).to include("hover:bg-gray-200")
+      expect(html).to include('bg-gray-100')
+      expect(html).to include('hover:bg-gray-200')
     end
 
-    it "renders small size" do
-      component = ButtonComponent.new(size: :small)
+    it 'renders small size' do
+      html = ButtonComponent.new(size: :small).call { 'Small' }
 
-      html = component.call { "Small" }
-
-      expect(html).to include("px-3 py-1.5")
-      expect(html).to include("text-sm")
+      expect(html).to include('px-3 py-1.5')
+      expect(html).to include('text-sm')
     end
 
-    it "renders medium size by default" do
-      component = ButtonComponent.new
+    it 'renders medium size by default' do
+      html = ButtonComponent.new.call { 'Medium' }
 
-      html = component.call { "Medium" }
-
-      expect(html).to include("px-4 py-2")
-      expect(html).to include("text-base")
+      expect(html).to include('px-4 py-2')
+      expect(html).to include('text-base')
     end
 
-    it "renders large size" do
-      component = ButtonComponent.new(size: :large)
+    it 'renders large size' do
+      html = ButtonComponent.new(size: :large).call { 'Large' }
 
-      html = component.call { "Large" }
-
-      expect(html).to include("px-6 py-3")
-      expect(html).to include("text-lg")
+      expect(html).to include('px-6 py-3')
+      expect(html).to include('text-lg')
     end
 
-    it "merges custom classes" do
-      component = ButtonComponent.new(class: "custom-class")
+    it 'merges custom classes' do
+      html = ButtonComponent.new(class: 'custom-class').call { 'Custom' }
 
-      html = component.call { "Custom" }
-
-      expect(html).to include("custom-class")
-      expect(html).to include("bg-blue-600")
+      expect(html).to include('custom-class')
+      expect(html).to include('bg-blue-600')
     end
 
-    it "falls back to default size for unknown size" do
-      component = ButtonComponent.new(size: :unknown)
+    it 'falls back to default size for unknown size' do
+      html = ButtonComponent.new(size: :unknown).call { 'Unknown size' }
 
-      html = component.call { "Unknown size" }
-
-      expect(html).to include("px-4 py-2")
+      expect(html).to include('px-4 py-2')
     end
 
-    it "passes custom attributes" do
-      component = ButtonComponent.new(type: "submit", disabled: true)
-
-      html = component.call { "Submit" }
+    it 'passes custom attributes' do
+      html = ButtonComponent.new(type: 'submit', disabled: true).call { 'Submit' }
 
       expect(html).to include('type="submit"')
-      expect(html).to include("disabled")
+      expect(html).to include('disabled')
     end
   end
 end
