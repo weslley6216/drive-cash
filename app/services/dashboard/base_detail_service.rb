@@ -46,21 +46,5 @@ module Dashboard
     def month_names
       I18n.t('date.month_names')
     end
-
-    def base_scope
-      raise NotImplementedError
-    end
-
-    def empty_scope
-      raise NotImplementedError
-    end
-
-    def list_key
-      raise NotImplementedError
-    end
-
-    def by_month_key
-      raise NotImplementedError
-    end
   end
 end

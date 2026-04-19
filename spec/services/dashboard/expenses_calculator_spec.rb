@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::ExpensesCalculator do
-  let(:exp1) { create(:expense, date: '2025-01-01', amount: 100, vendor: 'Posto Shell') }
-  let(:exp2) { create(:expense, date: '2025-01-01', amount: 50, vendor: 'Posto Shell') }
-  let(:exp3) { create(:expense, date: '2025-02-01', amount: 200, vendor: 'Mecânico Zé') }
-
   subject(:calculator) { described_class.new(Expense.all) }
 
-  before { exp1; exp2; exp3 }
+  before do
+    create(:expense, date: '2025-01-01', amount: 100, vendor: 'Posto Shell')
+    create(:expense, date: '2025-01-01', amount: 50,  vendor: 'Posto Shell')
+    create(:expense, date: '2025-02-01', amount: 200, vendor: 'Mecânico Zé')
+  end
 
   describe '#call' do
     let(:result) { calculator.call }
@@ -16,10 +16,11 @@ RSpec.describe Dashboard::ExpensesCalculator do
       expect(result[:total]).to eq(350.0)
     end
 
-    it 'lists top vendors correctly' do
-      expected_vendors = { 'Posto Shell' => 150.0, 'Mecânico Zé' => 200.0 }
-
-      expect(result[:top_vendors]).to include(expected_vendors)
+    it 'lists top vendors by total amount' do
+      expect(result[:top_vendors]).to include(
+        'Posto Shell' => 150.0,
+        'Mecânico Zé' => 200.0
+      )
     end
   end
 end

@@ -2,16 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Dashboard::ExpensesDetailService do
   describe '#call' do
-    context 'with month filter (monthly detail)' do
-      let(:exp1) { create(:expense, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel') }
-      let(:exp2) { create(:expense, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance') }
-
-      subject(:service) { described_class.new(year: 2025, month: 1) }
-
-      before { exp1; exp2 }
-
+    context 'with month filter' do
       it 'returns expenses list and total' do
-        result = service.call
+        exp1 = create(:expense, date: Date.new(2025, 1, 15), amount: 80,  category: 'fuel')
+        exp2 = create(:expense, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance')
+
+        result = described_class.new(year: 2025, month: 1).call
 
         expect(result[:annual]).to eq(false)
         expect(result[:expenses_by_month]).to be_nil
@@ -20,17 +16,13 @@ RSpec.describe Dashboard::ExpensesDetailService do
       end
     end
 
-    context 'without month filter (annual detail)' do
-      let(:jan) { create(:expense, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel') }
-      let(:feb1) { create(:expense, date: Date.new(2025, 2, 5), amount: 50, category: 'meals') }
-      let(:feb2) { create(:expense, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance') }
+    context 'without month filter' do
+      it 'returns expenses grouped by month and total' do
+        create(:expense, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
+        create(:expense, date: Date.new(2025, 2, 5),  amount: 50,  category: 'meals')
+        create(:expense, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance')
 
-      subject(:service) { described_class.new(year: 2025, month: nil) }
-
-      before { jan; feb1; feb2 }
-
-      it 'returns expenses by month and total' do
-        result = service.call
+        result = described_class.new(year: 2025, month: nil).call
 
         expect(result[:annual]).to eq(true)
         expect(result[:expenses]).to eq(Expense.none)

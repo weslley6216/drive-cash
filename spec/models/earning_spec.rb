@@ -10,16 +10,18 @@ RSpec.describe Earning, type: :model do
   end
 
   describe 'enums' do
-    it { should define_enum_for(:platform).with_values(
-      amazon: 0,
-      ifood: 1,
-      mercado_livre: 2,
-      nine_nine: 3,
-      rappi: 4,
-      shopee: 5,
-      uber: 6,
-      other: 7
-    ).with_prefix.backed_by_column_of_type(:integer) }
+    it {
+      should define_enum_for(:platform).with_values(
+        amazon: 0,
+        ifood: 1,
+        mercado_livre: 2,
+        nine_nine: 3,
+        rappi: 4,
+        shopee: 5,
+        uber: 6,
+        other: 7
+      ).with_prefix.backed_by_column_of_type(:integer)
+    }
   end
 
   describe 'scopes' do
@@ -39,13 +41,11 @@ RSpec.describe Earning, type: :model do
   end
 
   describe '.total_by_platform' do
-    before do
+    it 'groups and sums amounts by platform' do
       create(:earning, platform: :shopee, amount: 100)
       create(:earning, platform: :shopee, amount: 50)
       create(:earning, platform: :mercado_livre, amount: 200)
-    end
 
-    it 'groups and sums amounts returning platform names as strings' do
       result = described_class.total_by_platform
 
       expect(result['shopee']).to eq(150.0)
