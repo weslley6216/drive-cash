@@ -52,4 +52,14 @@ RSpec.describe Earning, type: :model do
       expect(result['mercado_livre']).to eq(200.0)
     end
   end
+
+  describe 'sanitize_amount' do
+    it 'converts comma-separated value to float' do
+      earning = build(:earning, amount: '45,90')
+
+      earning.valid?
+
+      expect(earning.amount).to eq(45.90)
+    end
+  end
 end

@@ -7,6 +7,14 @@ Rails.application.routes.draw do
   resources :expenses, only: %i[new create edit update destroy]
   resources :earnings, only: %i[new create edit update destroy]
   
+  # AI Chat
+  scope '/chat', module: nil, as: :chat do
+    root to: 'chat#index'
+    post 'message', to: 'chat#message', as: :message
+    post 'confirm', to: 'chat#confirm', as: :confirm
+    delete 'clear', to: 'chat#clear',   as: :clear
+  end
+
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

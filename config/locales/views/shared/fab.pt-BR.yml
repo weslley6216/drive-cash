@@ -1,4 +1,5 @@
 pt-BR:
   fab_component:
     new_earning: "Nova Receita"
+    ai_chat: "Assistente IA"
     new_expense: "Nova Despesa"

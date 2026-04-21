@@ -1,0 +1,155 @@
+require 'rails_helper'
+
+RSpec.describe Ai::ParserService do
+  let(:messages) { [{ role: 'user', content: 'user input' }] }
+  let(:service)  { described_class.new(messages: messages, today: Date.new(2026, 4, 21)) }
+
+  describe '#call' do
+    context 'when the LLM returns plain text' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({ type: :text, content: 'All good!' })
+      end
+
+      it 'passes the text response through' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq('All good!')
+      end
+    end
+
+    context 'when the LLM returns the create_expense tool' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'create_expense',
+          tool_input: { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' }
+        })
+      end
+
+      it 'builds an expense preview with raw params and summary' do
+        result = service.call
+
+        expect(result[:type]).to eq(:preview)
+        expect(result[:action]).to eq('create_expense')
+        expect(result[:params]['amount']).to eq(45.0)
+        expect(result[:summary]).to be_present
+      end
+    end
+
+    context 'when the LLM returns the create_earning tool' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'create_earning',
+          tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => '2026-04-21' }
+        })
+      end
+
+      it 'builds an earning preview with raw params and summary' do
+        result = service.call
+
+        expect(result[:type]).to eq(:preview)
+        expect(result[:action]).to eq('create_earning')
+        expect(result[:params]['amount']).to eq(100.0)
+        expect(result[:summary]).to be_present
+      end
+    end
+
+    context 'when the LLM returns the create_earning tool with an invalid date' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'create_earning',
+          tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => 'not-a-date' }
+        })
+      end
+
+      it 'returns the raw date string without raising' do
+        result = service.call
+
+        expect(result[:type]).to eq(:preview)
+        expect(result[:params]['date']).to eq('not-a-date')
+      end
+    end
+
+    context 'when the LLM returns an invalid JSON tool input' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'create_expense',
+          tool_input: '{ amount: 50, category: }'
+        })
+      end
+
+      it 'rescues JSON::ParserError and returns the fallback message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.message.fallback'))
+      end
+    end
+
+    context 'when the LLM returns an unknown response type' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({ type: :unknown, content: '???' })
+      end
+
+      it 'returns the not_understood fallback' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.message.not_understood'))
+      end
+    end
+
+    context 'when the LLM raises a RateLimitError' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_raise(Llm::RateLimitError.new('busy'))
+      end
+
+      it 'returns the rate limit message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.errors.rate_limit'))
+      end
+    end
+
+    context 'when the LLM raises a ConfigurationError' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_raise(Llm::ConfigurationError.new('no key'))
+      end
+
+      it 'returns the misconfiguration message' do
+        result = service.call
+
+        expect(result[:content]).to eq(I18n.t('chat.errors.misconfig'))
+      end
+    end
+
+    context 'when the LLM raises a generic API error' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_raise(Llm::Error.new('bad gateway'))
+      end
+
+      it 'returns the api error message' do
+        result = service.call
+
+        expect(result[:content]).to eq(I18n.t('chat.errors.api_error'))
+      end
+    end
+
+    context 'when an unexpected StandardError is raised' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_raise(StandardError.new('disk full'))
+      end
+
+      it 'returns the generic unexpected error message' do
+        result = service.call
+
+        expect(result[:content]).to eq(I18n.t('chat.errors.unexpected'))
+      end
+    end
+  end
+end

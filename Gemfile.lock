@@ -107,6 +107,14 @@ GEM
       railties (>= 6.1.0)
     faker (3.5.3)
       i18n (>= 1.8.11, < 2)
+    faraday (2.14.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ffi (1.17.3-aarch64-linux-gnu)
     ffi (1.17.3-aarch64-linux-musl)
     ffi (1.17.3-arm-linux-gnu)
@@ -155,6 +163,8 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     msgpack (1.8.0)
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.6.2)
       date
       net-protocol
@@ -375,6 +385,8 @@ DEPENDENCIES
   debug
   factory_bot_rails
   faker
+  faraday
+  faraday-retry
   hotwire-livereload
   importmap-rails
   pg (~> 1.5)
@@ -429,6 +441,9 @@ CHECKSUMS
   factory_bot (6.5.6) sha256=12beb373214dccc086a7a63763d6718c49769d5606f0501e0a4442676917e077
   factory_bot_rails (6.5.1) sha256=d3cc4851eae4dea8a665ec4a4516895045e710554d2b5ac9e68b94d351bc6d68
   faker (3.5.3) sha256=b961482dc0bb15ccb9a98ea7878b925669e9ae8f5e59b607da540b768137d765
+  faraday (2.14.1) sha256=a43cceedc1e39d188f4d2cdd360a8aaa6a11da0c407052e426ba8d3fb42ef61c
+  faraday-net_http (3.4.2) sha256=f147758260d3526939bf57ecf911682f94926a3666502e24c69992765875906c
+  faraday-retry (2.4.0) sha256=7b79c48fb7e56526faf247b12d94a680071ff40c9fda7cf1ec1549439ad11ebe
   ffi (1.17.3-aarch64-linux-gnu) sha256=28ad573df26560f0aedd8a90c3371279a0b2bd0b4e834b16a2baa10bd7a97068
   ffi (1.17.3-aarch64-linux-musl) sha256=020b33b76775b1abacc3b7d86b287cef3251f66d747092deec592c7f5df764b2
   ffi (1.17.3-arm-linux-gnu) sha256=5bd4cea83b68b5ec0037f99c57d5ce2dd5aa438f35decc5ef68a7d085c785668
@@ -453,6 +468,7 @@ CHECKSUMS
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
   minitest (6.0.1) sha256=7854c74f48e2e975969062833adc4013f249a4b212f5e7b9d5c040bf838d54bb
   msgpack (1.8.0) sha256=e64ce0212000d016809f5048b48eb3a65ffb169db22238fb4b72472fecb2d732
+  net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   net-imap (0.6.2) sha256=08caacad486853c61676cca0c0c47df93db02abc4a8239a8b67eb0981428acc6
   net-pop (0.1.2) sha256=848b4e982013c15b2f0382792268763b748cce91c9e91e36b0f27ed26420dff3
   net-protocol (0.2.2) sha256=aa73e0cba6a125369de9837b8d8ef82a61849360eba0521900e2c3713aa162a8

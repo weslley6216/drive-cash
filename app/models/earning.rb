@@ -1,5 +1,6 @@
 class Earning < ApplicationRecord
   include CacheInvalidation
+  include MonetaryAmount
 
   enum :platform, {
     amazon: 0,
