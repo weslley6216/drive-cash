@@ -66,4 +66,14 @@ RSpec.describe Expense, type: :model do
       expect(result['maintenance']).to eq(200.0)
     end
   end
+
+  describe 'sanitize_amount' do
+    it 'converts comma-separated value to float' do
+      expense = build(:expense, amount: '45,90')
+
+      expense.valid?
+
+      expect(expense.amount).to eq(45.90)
+    end
+  end
 end

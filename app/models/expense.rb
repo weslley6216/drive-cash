@@ -1,5 +1,6 @@
 class Expense < ApplicationRecord
   include CacheInvalidation
+  include MonetaryAmount
 
   CATEGORIES_BY_GROUP = {
     vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],

@@ -1,0 +1,36 @@
+pt-BR:
+  chat:
+    history:
+      preview: "Prévia de registro"
+      preview_sent: "Registro apresentado ao usuário para confirmação."
+    confirm:
+      success_earning: "✅ Receita registrada com sucesso!"
+      success_expense: "✅ Despesa registrada com sucesso!"
+      error_prefix: "Não foi possível registrar:"
+      btn_dashboard: "📊 Ver Dashboard"
+      btn_earnings: "💰 Ver Ganhos"
+      btn_expenses: "💸 Ver Despesas"
+      btn_home: "🏠 Início"
+    message:
+      understood: "Entendi o seguinte:"
+      btn_confirm: "Confirmar"
+      btn_cancel: "Cancelar"
+      not_understood: "Não entendi. Pode repetir?"
+      fallback: "Não entendi a ação solicitada. Pode tentar de novo?"
+    errors:
+      rate_limit: "O assistente está com alta demanda no momento. Aguarde uns instantes e tente novamente. ⏳"
+      misconfig: "O assistente está mal configurado. Por favor, contate o suporte."
+      api_error: "Tivemos um problema de comunicação com os servidores. Tente novamente mais tarde."
+      unexpected: "Ocorreu um erro inesperado no sistema. Tente novamente."
+    index:
+      header: "Assistente IA"
+      subtitle: "Registre por texto ou voz"
+      clear: "Limpar"
+      empty_title: "Como posso ajudar?"
+      empty_ex1: "\"Fiz uma corrida de R$45 no Uber hoje\""
+      empty_ex2: "\"Abasteci R$80 de gasolina\""
+      placeholder: "Digite sua mensagem..."
+      btn_speak: "Falar"
+    preview:
+      earning: "Receita de %{amount} via %{platform} em %{date}"
+      expense: "Despesa de %{amount} (%{category}%{vendor}) em %{date}"

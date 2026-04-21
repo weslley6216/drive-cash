@@ -66,7 +66,8 @@ module FormFields
 
   def date_field(form, attribute, label:, theme: :blue, **options)
     field_wrapper(label, theme: theme) do
-      render form.date_field(attribute, class: input_classes(theme: theme), **options)
+      value = form.object.public_send(attribute) || Time.current.to_date
+      render form.date_field(attribute, class: input_classes(theme: theme), value: value, **options)
     end
   end
 

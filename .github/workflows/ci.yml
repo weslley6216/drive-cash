@@ -29,6 +29,10 @@ jobs:
       CI: 'true'
       RAILS_ENV: test
       DATABASE_URL: "postgres://postgres:postgres@localhost:5432/drive_cash_test"
+      LLM_PROVIDER: groq
+      LLM_FALLBACK: gemini
+      GROQ_API_KEY: "dummy_groq_key"
+      GEMINI_API_KEY: "dummy_gemini_key"
 
     services:
       postgres:

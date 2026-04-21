@@ -7,6 +7,8 @@ gem 'pg', '~> 1.5'
 gem 'solid_queue'
 gem 'solid_cache'
 gem 'puma', '>= 6.0'
+gem 'faraday'
+gem 'faraday-retry'
 
 # Assets
 gem 'importmap-rails'
