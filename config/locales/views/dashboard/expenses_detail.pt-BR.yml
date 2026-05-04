@@ -15,3 +15,6 @@ pt-BR:
       back: "Voltar"
       delete: "Excluir despesa"
       confirm_delete: "Tem certeza que deseja excluir esta despesa?"
+      installment_of: "Parcela %{current} de %{total}"
+      status_paid: "Pago"
+      status_pending: "A pagar"

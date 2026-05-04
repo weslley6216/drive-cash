@@ -1,6 +1,10 @@
 class ChatController < ApplicationController
   include ChatSession
-  include ChatRecordBuilder
+
+  CONFIRM_I18N_KEYS = {
+    'create_earning' => 'chat.confirm.success_earning',
+    'create_expense' => 'chat.confirm.success_expense'
+  }.freeze
 
   def index
     render Chat::IndexView.new(messages: chat_history)
@@ -24,29 +28,19 @@ class ChatController < ApplicationController
   end
 
   def confirm
-    record = build_record(params[:record_action], params[:record] || {})
-    return head :bad_request unless record
+    persister = Chat::RecordPersister.for(params[:record_action])
+    return head(:bad_request) unless persister
+
+    result = persister.persist(params[:record] || {})
 
     respond_to do |format|
       format.turbo_stream do
-        if record.save
-          i18n_key = CONFIRM_I18N_KEYS[params[:record_action]]
-
-          add_to_history(Chat::Message.from_result(
-            { type: :text, content: t(i18n_key) },
-            fallback_content: t(i18n_key)
-          ))
-
-          render Chat::ConfirmView.new(
-            success: true,
-            message: t(i18n_key),
-            action: params[:record_action],
-            date: record.date
-          )
+        if result.success?
+          finalize_chat_confirm_success(action: result.action, record: result.record)
         else
           render Chat::ConfirmView.new(
             success: false,
-            message: "#{t('chat.confirm.error_prefix')} #{record.errors.full_messages.join(', ')}"
+            message: "#{t('chat.confirm.error_prefix')} #{result.errors.join(', ')}"
           )
         end
       end
@@ -56,5 +50,23 @@ class ChatController < ApplicationController
   def clear
     clear_history
     redirect_to chat_root_path
+  end
+
+  private
+
+  def finalize_chat_confirm_success(action:, record:)
+    i18n_key = CONFIRM_I18N_KEYS[action]
+
+    add_to_history(Chat::Message.from_result(
+      { type: :text, content: t(i18n_key) },
+      fallback_content: t(i18n_key)
+    ))
+
+    render Chat::ConfirmView.new(
+      success: true,
+      message: t(i18n_key),
+      action: action,
+      date: record.date
+    )
   end
 end

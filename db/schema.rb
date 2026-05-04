@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_18_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,12 +32,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_18_000001) do
     t.datetime "created_at", null: false
     t.date "date", null: false
     t.text "description"
+    t.integer "installment_count"
+    t.integer "installment_number"
+    t.uuid "installment_series_id"
     t.text "notes"
+    t.boolean "paid", default: true, null: false
     t.datetime "updated_at", null: false
     t.string "vendor"
     t.index ["category"], name: "index_expenses_on_category"
     t.index ["date", "category"], name: "index_expenses_on_date_and_category"
     t.index ["date"], name: "index_expenses_on_date"
+    t.index ["installment_series_id"], name: "index_expenses_on_installment_series_id"
+    t.index ["paid"], name: "index_expenses_on_paid"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|

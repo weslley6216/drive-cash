@@ -28,6 +28,21 @@ RSpec.describe Ai::SummaryBuilder do
       expect(summary).to include('24/04/2026')
     end
 
+    it 'includes installment info in the expense summary when valid' do
+      params = {
+        'amount' => 300.0,
+        'category' => 'maintenance',
+        'vendor' => 'Oficina',
+        'date' => '2026-04-24',
+        'installments' => 3,
+        'installments_period' => 'monthly'
+      }
+      summary = described_class.build('create_expense', params)
+
+      expect(summary).to include('3x')
+      expect(summary).to include('mensal')
+    end
+
     it 'returns the fallback message for an unknown action' do
       summary = described_class.build('unknown_action', {})
       expect(summary).to eq(I18n.t('chat.message.fallback'))

@@ -8,12 +8,15 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    expense = Expense.new(expense_params)
+    result = Expenses::Creator.call(
+      expense_params.to_unsafe_h,
+      installment_params.to_unsafe_h
+    )
 
-    if expense.save
-      turbo_success(Expenses::CreateView, expense: expense)
+    if result.success?
+      turbo_success(Expenses::CreateView, expense: result.expenses.first)
     else
-      turbo_error(Expenses::CreateView, expense: expense)
+      turbo_error(Expenses::NewView, expense: result.expense)
     end
   end
 
@@ -37,7 +40,11 @@ class ExpensesController < ApplicationController
   private
 
   def expense_params
-    params.require(:expense).permit(:date, :amount, :category, :vendor, :description)
+    params.require(:expense).permit(:date, :amount, :category, :vendor, :description, :paid)
+  end
+
+  def installment_params
+    params.fetch(:installment, {}).permit(:repeat, :period, :repetitions)
   end
 
   def find_expense

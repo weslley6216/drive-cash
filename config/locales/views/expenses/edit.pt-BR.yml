@@ -9,6 +9,10 @@ pt-BR:
         category: "Categoria"
         vendor: "Estabelecimento"
         description: "Descrição (Opcional)"
+        paid: "Marcar como paga (entra no lucro do período)"
+      paid_states:
+        on: "Pago: já entra no lucro líquido do período"
+        off: "A pagar: não entra no lucro até ser quitada"
       placeholders:
         money: "R$ 0,00"
         select: "Selecione..."

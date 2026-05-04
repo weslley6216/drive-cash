@@ -148,6 +148,53 @@ RSpec.describe 'Chats', type: :request do
       end
     end
 
+    context 'when confirming an installment expense' do
+      let(:params) do
+        {
+          record_action: 'create_expense',
+          record: {
+            amount: 300,
+            category: 'maintenance',
+            date: '2026-06-05',
+            vendor: 'Oficina',
+            installments: 3,
+            installments_period: 'monthly'
+          }
+        }
+      end
+
+      it 'persists installments and renders success chips' do
+        expect {
+          post chat_confirm_path, params: params, as: :turbo_stream
+        }.to change(Expense, :count).by(3)
+
+        expect(response.body).to include(I18n.t('chat.confirm.success_expense'))
+        expect(response.body).to include(I18n.t('chat.confirm.btn_expenses'))
+      end
+    end
+
+    context 'when installment confirmation is incomplete' do
+      let(:params) do
+        {
+          record_action: 'create_expense',
+          record: {
+            amount: 300,
+            category: 'maintenance',
+            date: '2026-06-05',
+            vendor: 'Oficina',
+            installments: 3,
+            installments_period: ''
+          }
+        }
+      end
+
+      it 'returns an error turbo message' do
+        post chat_confirm_path, params: params, as: :turbo_stream
+
+        expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
+      end
+    end
+
     context 'when confirming a valid earning' do
       let(:params) { { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22' } } }
 
@@ -171,6 +218,19 @@ RSpec.describe 'Chats', type: :request do
       end
     end
 
+    context 'when confirming an earning with invalid data (non-expense branch)' do
+      it 'returns the view with validation errors without calling ExpenseFromChat' do
+        post chat_confirm_path,
+             params: {
+               record_action: 'create_earning',
+               record: { amount: '', platform: 'uber', date: '2026-04-22' }
+             },
+             as: :turbo_stream
+
+        expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
+      end
+    end
+
     context 'when confirming with an unknown action' do
       let(:params) { { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } } }
 
@@ -187,6 +247,16 @@ RSpec.describe 'Chats', type: :request do
         post chat_confirm_path, params: params, as: :turbo_stream
 
         expect(response.body).to include(I18n.t('chat.confirm.btn_home'))
+      end
+    end
+
+    context 'when confirming with an unknown action' do
+      it 'returns bad request' do
+        post chat_confirm_path,
+             params: { record_action: 'unknown_action', record: {} },
+             as: :turbo_stream
+
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end

@@ -44,6 +44,30 @@ RSpec.describe Expense, type: :model do
     end
   end
 
+  describe 'installment validation' do
+    it 'invalid when series id is set but counts are missing' do
+      expense = build(
+        :expense,
+        installment_series_id: SecureRandom.uuid,
+        installment_number: nil,
+        installment_count: 3
+      )
+
+      expect(expense).not_to be_valid
+    end
+
+    it 'invalid when installment number exceeds total' do
+      expense = build(
+        :expense,
+        installment_series_id: SecureRandom.uuid,
+        installment_number: 4,
+        installment_count: 3
+      )
+
+      expect(expense).not_to be_valid
+    end
+  end
+
   describe 'scopes' do
     it '.by_category filters by the given category' do
       fuel        = create(:expense, category: 'fuel')

@@ -230,3 +230,13 @@ pt-BR:
       long: "%d de %B de %Y, %H:%M"
       short: "%d de %B, %H:%M"
     pm: pm
+  expenses:
+    period_labels:
+      weekly: "semanal"
+      biweekly: "quinzenal"
+      monthly: "mensal"
+      annual: "anual"
+    installments:
+      errors:
+        invalid_repeat: "Para parcelar, selecione o período e informe pelo menos 2 parcelas."
+        invalid_period_for_installments: "Informe um período válido entre parcelas (semanal, quinzenal, mensal ou anual)."
