@@ -85,6 +85,23 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(edit_expense_path(expense1))
     end
 
+    it 'shows installment subtitle and pending status for unpaid parcels' do
+      create(:expense,
+             date: Date.new(2025, 1, 18),
+             amount: 120,
+             category: 'maintenance',
+             vendor: 'Pneus',
+             paid: false,
+             installment_series_id: SecureRandom.uuid,
+             installment_number: 1,
+             installment_count: 3)
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.installment_of', current: 1, total: 3))
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.status_pending'))
+    end
+
     it 'shows empty state when no expenses in period' do
       get dashboard_expenses_detail_path(year: 2020, month: 1)
 

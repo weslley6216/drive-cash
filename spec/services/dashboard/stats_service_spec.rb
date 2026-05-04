@@ -4,7 +4,8 @@ RSpec.describe Dashboard::StatsService do
   describe '#call' do
     before do
       create(:earning, date: '2025-01-10', amount: 500.00)
-      create(:expense, date: '2025-01-10', amount: 100.00, category: 'fuel')
+      create(:expense, date: '2025-01-10', amount: 100.00, category: 'fuel', paid: true)
+      create(:expense, date: '2025-01-12', amount: 999.00, category: 'maintenance', paid: false)
       create(:earning, date: '2025-02-01', amount: 1000.00)
     end
 

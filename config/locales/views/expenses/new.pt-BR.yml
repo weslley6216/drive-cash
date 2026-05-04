@@ -5,10 +5,19 @@ pt-BR:
       subtitle: "Manutenção, seguros ou gastos extras"
       labels:
         date: "Data"
-        amount: "Valor da Despesa"
+        amount: "Valor total"
         category: "Categoria"
         vendor: "Estabelecimento"
         description: "Descrição (Opcional)"
+        repeat: "Parcelar ou repetir (compromissos futuros)"
+        period: "Período entre parcelas"
+        repetitions: "Número de parcelas"
+      periods:
+        weekly: "Semanal"
+        biweekly: "Quinzenal"
+        monthly: "Mensal"
+        annual: "Anual"
+      repeat_hint: "Cada parcela fica como “a pagar” até você marcar como paga; o lucro do dashboard só considera despesas pagas."
       placeholders:
         money: "R$ 0,00"
         select: "Selecione..."

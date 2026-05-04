@@ -38,6 +38,31 @@ RSpec.describe 'Expenses', type: :request do
       }.to change(Expense, :count).by(1)
     end
 
+    it 'creates multiple installments when repeat is enabled' do
+      params = {
+        expense: {
+          date: '2026-01-10',
+          amount: 300.00,
+          category: 'maintenance',
+          vendor: 'Oficina',
+          description: 'Pneus'
+        },
+        installment: {
+          repeat: '1',
+          period: 'monthly',
+          repetitions: '3'
+        },
+        context: { year: 2026 }
+      }
+
+      expect {
+        post expenses_path, params: params, as: :turbo_stream
+      }.to change(Expense, :count).by(3)
+
+      expect(Expense.order(:installment_number).pluck(:paid)).to all(eq(false))
+      expect(Expense.distinct.pluck(:installment_series_id).compact.size).to eq(1)
+    end
+
     it 'responds with turbo stream updating the stats grid' do
       post expenses_path, params: valid_params, as: :turbo_stream
 
@@ -50,6 +75,29 @@ RSpec.describe 'Expenses', type: :request do
       post expenses_path,
            params: { expense: { amount: 0, category: 'fuel' } },
            as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('expenses.new_view.title'))
+    end
+
+    it 're-renders new expense when installment parameters are invalid' do
+      params = {
+        expense: {
+          date: '2026-01-10',
+          amount: 300.00,
+          category: 'maintenance',
+          vendor: 'Oficina',
+          description: 'Pneus'
+        },
+        installment: {
+          repeat: '1',
+          period: 'monthly',
+          repetitions: '1'
+        },
+        context: { year: 2026 }
+      }
+
+      post expenses_path, params: params, as: :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('expenses.new_view.title'))

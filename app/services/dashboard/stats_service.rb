@@ -55,7 +55,7 @@ module Dashboard
 
     def expenses_scope
       @expenses_scope ||= begin
-        scope = Expense.for_year(year)
+        scope = Expense.for_year(year).paid_only
         scope = scope.for_month(month) if month
         scope
       end

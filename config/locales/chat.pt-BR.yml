@@ -34,3 +34,4 @@ pt-BR:
     preview:
       earning: "Receita de %{amount} via %{platform} em %{date}"
       expense: "Despesa de %{amount} (%{category}%{vendor}) em %{date}"
+      expense_installments: "%{base} • %{installments}x (%{period})"

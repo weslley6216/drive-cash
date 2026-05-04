@@ -34,11 +34,26 @@ module Ai
       category = I18n.t("activerecord.attributes.expense.categories.#{@params['category']}",
                         default: @params['category'].to_s.capitalize)
       vendor = @params['vendor'].present? ? " — #{@params['vendor']}" : ''
-      I18n.t('chat.preview.expense',
-             amount: format_currency(@params['amount']),
-             category: category,
-             vendor: vendor,
-             date: format_date(@params['date']))
+      base = I18n.t('chat.preview.expense',
+                    amount: format_currency(@params['amount']),
+                    category: category,
+                    vendor: vendor,
+                    date: format_date(@params['date']))
+
+      installments = installments_count
+      period = (@params['installments_period'].presence || @params['installment_period']).to_s
+      return base if installments < 2 || !Expense::INSTALLMENT_PERIODS.include?(period)
+
+      period_label = I18n.t("expenses.period_labels.#{period}", default: period)
+      I18n.t('chat.preview.expense_installments',
+             base: base,
+             installments: installments,
+             period: period_label)
+    end
+
+    def installments_count
+      v = @params['installments'] || @params['installment_count']
+      v.respond_to?(:to_i) ? v.to_i : 0
     end
 
     def format_date(date_str)

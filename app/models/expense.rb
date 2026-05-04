@@ -21,15 +21,35 @@ class Expense < ApplicationRecord
     other: 10
   }, prefix: true
 
+  INSTALLMENT_PERIODS = %w[weekly biweekly monthly annual].freeze
+
   validates :date, :amount, :category, presence: true
   validates :amount, numericality: { greater_than: 0 }
+  validate :installment_fields_consistent
 
   scope :chronological, -> { order(date: :desc, created_at: :desc) }
+  scope :paid_only, -> { where(paid: true) }
   scope :for_year, ->(year) { where('EXTRACT(YEAR FROM date) = ?', year) if year.present? }
   scope :for_month, ->(month) { where('EXTRACT(MONTH FROM date) = ?', month) if month.present? }
   scope :by_category, ->(category) { where(category: category) if category.present? }
 
   def self.total_by_category
     group(:category).sum(:amount)
+  end
+
+  def installment?
+    installment_series_id.present?
+  end
+
+  private
+
+  def installment_fields_consistent
+    return if installment_series_id.blank?
+
+    if installment_number.blank? || installment_count.blank?
+      errors.add(:base, :installment_fields)
+    elsif installment_number > installment_count
+      errors.add(:base, :installment_order)
+    end
   end
 end

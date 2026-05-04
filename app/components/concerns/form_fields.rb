@@ -76,4 +76,30 @@ module FormFields
       render form.text_area(attribute, rows: rows, class: "#{input_classes(theme: theme)} resize-none", **options)
     end
   end
+
+  def toggle_field(form, attribute, label:, theme: :blue, on_label: nil, off_label: nil)
+    styles = theme_styles(theme)
+    checked = !!form.object.public_send(attribute)
+    wrapper_classes = "mb-4 rounded-lg border #{styles[:border]} px-4 py-3"
+
+    div(class: wrapper_classes) do
+      div(class: 'flex items-center justify-between gap-3') do
+        div do
+          p(class: "text-sm font-medium #{styles[:label]}") { label }
+          if on_label && off_label
+            p(class: 'text-xs text-slate-500 mt-1') { checked ? on_label : off_label }
+          end
+        end
+
+        label(for: form.field_id(attribute), class: 'relative inline-flex cursor-pointer items-center') do
+          render form.check_box(
+            attribute,
+            class: 'peer sr-only'
+          )
+          span(class: 'h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-emerald-500')
+          span(class: 'pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5')
+        end
+      end
+    end
+  end
 end

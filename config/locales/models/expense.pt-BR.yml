@@ -4,6 +4,13 @@ pt-BR:
       expense:
         one: "Despesa"
         other: "Despesas"
+    errors:
+      models:
+        expense:
+          attributes:
+            base:
+              installment_fields: "Parcelamento incompleto (número ou total de parcelas)."
+              installment_order: "O número da parcela não pode ser maior que o total."
     attributes:
       expense:
         categories:

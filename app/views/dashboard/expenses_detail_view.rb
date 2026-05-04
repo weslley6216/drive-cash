@@ -66,10 +66,16 @@ module Dashboard
                 div(class: 'flex justify-between items-start gap-3 py-2 pl-3 border-l-2 border-slate-200') do
                   div(class: 'min-w-0 flex-1') do
                     p(class: 'text-slate-800 font-medium break-words') { expense.description || '—' }
+                    if expense.installment?
+                      p(class: 'text-xs text-slate-500 mt-0.5') { t('.installment_of', current: expense.installment_number, total: expense.installment_count) }
+                    end
                     p(class: 'text-sm text-slate-500') { expense.vendor.presence || '—' }
                   end
                   div(class: 'flex items-center gap-2 flex-shrink-0 group') do
-                    span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
+                    div(class: 'flex flex-col items-end gap-0.5') do
+                      expense_status_badge(expense)
+                      span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
+                    end
                     link_to(
                       edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
                       data: { turbo_frame: 'modal' },
@@ -103,6 +109,14 @@ module Dashboard
 
     def expenses_grouped_by_date
       @expenses_grouped_by_date ||= @expenses.to_a.group_by(&:date)
+    end
+
+    def expense_status_badge(expense)
+      if expense.paid
+        span(class: 'text-xs font-medium text-emerald-700') { t('.status_paid') }
+      else
+        span(class: 'text-xs font-medium text-amber-700') { t('.status_pending') }
+      end
     end
   end
 end

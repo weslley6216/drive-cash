@@ -25,6 +25,14 @@ module Expenses
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
         money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
+        toggle_field(
+          f,
+          :paid,
+          label: t('.labels.paid'),
+          theme: @theme,
+          on_label: t('.paid_states.on'),
+          off_label: t('.paid_states.off')
+        )
         category_select(f)
         text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
         text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
