@@ -73,6 +73,23 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when the LLM returns the create_expense tool with an invalid amount' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'create_expense',
+          tool_input: { 'amount' => 0.0, 'category' => 'fuel', 'date' => '2026-04-21' }
+        })
+      end
+
+      it 'returns the missing_amount message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.errors.missing_amount'))
+      end
+    end
+
     context 'when the LLM returns an invalid JSON tool input' do
       before do
         allow(Llm::Client).to receive(:chat).and_return({

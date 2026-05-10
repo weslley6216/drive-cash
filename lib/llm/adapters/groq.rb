@@ -63,10 +63,19 @@ module Llm
           Rails.logger.info "[Groq] Tool call: #{call['name']}"
           { type: :tool_use, tool_name: call['name'], tool_input: input }
         else
-          { type: :text, content: message['content'].to_s.strip }
+          content = message['content'].to_s.strip
+          content = sanitize_function_leaks(content)
+          { type: :text, content: content }
         end
       rescue JSON::ParserError
         { type: :text, content: '' }
+      end
+
+      def sanitize_function_leaks(text)
+        text = text.gsub(/<function[^>]*>.*?<\/function>/m, '')
+        text = text.gsub(/\{["\'](?:amount|platform|category|date)["\']:\s*[^}]+\}/m, '')
+
+        text.strip
       end
     end
   end
