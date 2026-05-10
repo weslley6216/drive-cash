@@ -57,8 +57,17 @@ module Llm
           Rails.logger.info "[Gemini] Tool call: #{call['name']}"
           { type: :tool_use, tool_name: call['name'], tool_input: call['args'] }
         else
-          { type: :text, content: part['text'].to_s.strip }
+          content = part['text'].to_s.strip
+          content = sanitize_function_leaks(content)
+          { type: :text, content: content }
         end
+      end
+
+      def sanitize_function_leaks(text)
+        text = text.gsub(/<function[^>]*>.*?<\/function>/m, '')
+        text = text.gsub(/\{["\'](?:amount|platform|category|date)["\']:\s*[^}]+\}/m, '')
+
+        text.strip
       end
     end
   end

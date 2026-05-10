@@ -22,6 +22,7 @@ pt-BR:
       misconfig: "O assistente está mal configurado. Por favor, contate o suporte."
       api_error: "Tivemos um problema de comunicação com os servidores. Tente novamente mais tarde."
       unexpected: "Ocorreu um erro inesperado no sistema. Tente novamente."
+      missing_amount: "Ops! Ainda não sei o valor. Quanto foi a despesa/receita em reais?"
     index:
       header: "Assistente IA"
       subtitle: "Registre por texto ou voz"

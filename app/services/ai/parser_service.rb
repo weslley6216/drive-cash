@@ -51,6 +51,15 @@ module Ai
 
     def build_preview(tool_name, tool_input)
       params = tool_input.is_a?(String) ? JSON.parse(tool_input) : tool_input
+
+      if tool_name == 'create_expense' || tool_name == 'create_earning'
+        amount = params['amount'].to_f
+        if amount <= 0
+          Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount: #{params['amount']}"
+          return { type: :text, content: I18n.t('chat.errors.missing_amount') }
+        end
+      end
+
       summary = SummaryBuilder.build(tool_name, params)
       content = I18n.t('chat.history.preview_sent')
 
