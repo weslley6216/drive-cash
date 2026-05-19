@@ -27,6 +27,13 @@ class StatCardComponent < ApplicationComponent
       title: 'text-yellow-700',
       value: 'text-yellow-900',
       subtitle: 'text-yellow-600'
+    },
+    purple: {
+      bg: 'bg-purple-50',
+      border: 'border-purple-200',
+      title: 'text-purple-700',
+      value: 'text-purple-900',
+      subtitle: 'text-purple-600'
     }
   }.freeze
 

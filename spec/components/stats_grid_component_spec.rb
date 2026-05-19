@@ -12,7 +12,10 @@ RSpec.describe StatsGridComponent, type: :component do
       profit_per_day: 35.0,
       days_avg_month: 10.0,
       earnings_avg_day: 50.0,
-      days_avg_week: 0
+      days_avg_week: 0,
+      trips: 25,
+      trips_avg_month: 25,
+      trips_avg_day: 25
     }
   end
 
@@ -24,6 +27,7 @@ RSpec.describe StatsGridComponent, type: :component do
       expect(html).to include('1.000,00')
       expect(html).to include('700,00')
       expect(html).to include('20')
+      expect(html).to include('25')
     end
 
     it 'renders grid container with correct ID' do
@@ -47,10 +51,16 @@ RSpec.describe StatsGridComponent, type: :component do
           I18n.t('dashboard.index_view.stats.days.subtitle_annual', value: '10')
         )
       end
+
+      it 'renders total trips in the year' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.trips.subtitle_annual', value: 25)
+        )
+      end
     end
 
     context 'when in monthly view' do
-      let(:totals_monthly) { totals.merge(days: 10, days_avg_week: 2) }
+      let(:totals_monthly) { totals.merge(days: 10, days_avg_week: 2, trips: 12, trips_avg_day: 12) }
       let(:component) { StatsGridComponent.new(totals: totals_monthly, month: 1, year: 2025) }
       let(:html) { view_context.render(component).squish }
 
@@ -63,6 +73,12 @@ RSpec.describe StatsGridComponent, type: :component do
       it 'renders weekly frequency for days' do
         expect(html).to include(
           I18n.t('dashboard.index_view.stats.days.subtitle_monthly', value: '2')
+        )
+      end
+
+      it 'renders total trips in the month' do
+        expect(html).to include(
+          I18n.t('dashboard.index_view.stats.trips.subtitle_monthly', value: 12)
         )
       end
     end

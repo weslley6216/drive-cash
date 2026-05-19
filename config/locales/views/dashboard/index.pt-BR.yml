@@ -20,3 +20,7 @@ pt-BR:
           subtitle: "%{value} dias/mês em média"
           subtitle_annual: "%{value} dias/mês em média"
           subtitle_monthly: "Média: %{value} dias/semana"
+        trips:
+          title: "Total de Rotas"
+          subtitle_annual: "Média: %{value} rotas/mês"
+          subtitle_monthly: "Média: %{value} rotas/dia"

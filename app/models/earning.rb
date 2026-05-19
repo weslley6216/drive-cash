@@ -15,6 +15,7 @@ class Earning < ApplicationRecord
 
   validates :date, :amount, presence: true
   validates :amount, numericality: { greater_than: 0 }
+  validates :trips_count, numericality: { greater_than_or_equal_to: 1, only_integer: true }
 
   scope :chronological, -> { order(date: :desc, created_at: :desc) }
   scope :for_year, ->(year) { where('EXTRACT(YEAR FROM date) = ?', year) if year.present? }

@@ -53,6 +53,20 @@ RSpec.describe Earning, type: :model do
     end
   end
 
+  describe 'trips_count' do
+    it 'defaults to 1' do
+      earning = build(:earning)
+
+      expect(earning.trips_count).to eq(1)
+    end
+
+    it 'is invalid when less than 1' do
+      earning = build(:earning, trips_count: 0)
+
+      expect(earning).not_to be_valid
+    end
+  end
+
   describe 'sanitize_amount' do
     it 'converts comma-separated value to float' do
       earning = build(:earning, amount: '45,90')

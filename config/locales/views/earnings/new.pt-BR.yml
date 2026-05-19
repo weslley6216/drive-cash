@@ -8,6 +8,7 @@ pt-BR:
         amount: "Valor da Receita"
         platform: "Plataforma"
         notes: "Descrição (Opcional)"
+        trips_count: "Quantidade de Rotas"
       placeholders:
         money: "R$ 0,00"
         select: "Selecione..."
