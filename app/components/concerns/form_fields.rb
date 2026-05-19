@@ -77,6 +77,12 @@ module FormFields
     end
   end
 
+  def integer_field(form, attribute, label:, theme: :blue, **options)
+    field_wrapper(label, theme: theme) do
+      render form.number_field(attribute, step: 1, min: 1, class: input_classes(theme: theme), **options)
+    end
+  end
+
   def toggle_field(form, attribute, label:, theme: :blue, on_label: nil, off_label: nil)
     styles = theme_styles(theme)
     checked = !!form.object.public_send(attribute)

@@ -12,7 +12,8 @@ module Dashboard
         avg_per_month: avg_per_month,
         avg_per_day: avg_per_day,
         by_platform: by_platform,
-        days_count: days_count
+        days_count: days_count,
+        trips_count: total_trips
       }
     end
 
@@ -37,6 +38,10 @@ module Dashboard
     def avg_per_day
       return 0 if days_count.zero?
       total_earnings / days_count
+    end
+
+    def total_trips
+      @total_trips ||= scope.sum(:trips_count)
     end
 
     def by_platform

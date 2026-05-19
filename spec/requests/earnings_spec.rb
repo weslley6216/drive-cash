@@ -24,7 +24,8 @@ RSpec.describe 'Earnings', type: :request do
         earning: {
           date: '2026-01-23',
           amount: 200.00,
-          platform: 'uber'
+          platform: 'uber',
+          trips_count: 2
         },
         context: { year: 2026 }
       }

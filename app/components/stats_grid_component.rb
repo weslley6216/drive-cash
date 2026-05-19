@@ -3,7 +3,8 @@ class StatsGridComponent < ApplicationComponent
     dollar_sign: PhlexIcons::Lucide::DollarSign,
     triangle_alert: PhlexIcons::Lucide::TriangleAlert,
     trending_up: PhlexIcons::Lucide::TrendingUp,
-    calendar: PhlexIcons::Lucide::Calendar
+    calendar: PhlexIcons::Lucide::Calendar,
+    package: PhlexIcons::Lucide::Package
   }.freeze
 
   def initialize(totals:, month: nil, year: Date.current.year)
@@ -18,6 +19,7 @@ class StatsGridComponent < ApplicationComponent
       expenses_card
       profit_card
       days_card
+      trips_card
     end
   end
 
@@ -67,6 +69,16 @@ class StatsGridComponent < ApplicationComponent
     )
   end
 
+  def trips_card
+    render StatCardComponent.new(
+      title: t('dashboard.index_view.stats.trips.title'),
+      value: @totals[:trips].to_s,
+      subtitle: trips_subtitle,
+      color: :purple,
+      icon: ICONS[:package]
+    )
+  end
+
   def earnings_subtitle
     key = annual_view? ? 'subtitle_annual' : 'subtitle_monthly'
     value = annual_view? ? @totals[:earnings_avg_month] : @totals[:earnings_avg_day]
@@ -88,6 +100,22 @@ class StatsGridComponent < ApplicationComponent
       t('dashboard.index_view.stats.days.subtitle_annual', value: formatted_avg)
     else
       t('dashboard.index_view.stats.days.subtitle_monthly', value: @totals[:days_avg_week])
+    end
+  end
+
+  # def trips_subtitle
+  #   if annual_view?
+  #     t('dashboard.index_view.stats.trips.subtitle_annual', value: sprintf('%.1f', @totals[:trips].to_f / [12, 1].max))
+  #   else
+  #     t('dashboard.index_view.stats.trips.subtitle_monthly', value: sprintf('%.1f', @totals[:trips].to_f / [@totals[:days], 1].max))
+  #   end
+  # end
+
+  def trips_subtitle
+    if annual_view?
+      t('dashboard.index_view.stats.trips.subtitle_annual', value: @totals[:trips_avg_month])
+    else
+      t('dashboard.index_view.stats.trips.subtitle_monthly', value: @totals[:trips_avg_day])
     end
   end
 end

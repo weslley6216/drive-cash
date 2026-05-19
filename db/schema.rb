@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_19_004644) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_000000) do
     t.date "date", null: false
     t.text "notes"
     t.integer "platform", default: 7, null: false
+    t.integer "trips_count", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["date", "platform"], name: "index_earnings_on_date_and_platform"
     t.index ["date"], name: "index_earnings_on_date"

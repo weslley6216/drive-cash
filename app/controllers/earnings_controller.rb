@@ -37,7 +37,7 @@ class EarningsController < ApplicationController
   private
 
   def earning_params
-    params.require(:earning).permit(:date, :amount, :platform, :notes)
+    params.require(:earning).permit(:date, :amount, :platform, :notes, :trips_count)
   end
 
   def find_earning

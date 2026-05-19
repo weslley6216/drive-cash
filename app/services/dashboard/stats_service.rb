@@ -27,6 +27,10 @@ module Dashboard
         days_avg_month: days_avg_month(days_worked, earnings_data[:total]),
         days_avg_week: days_avg_week(days_worked),
 
+        trips: earnings_data[:trips_count],
+        trips_avg_month: trips_avg_month(earnings_data[:trips_count], earnings_data[:total]),
+        trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked),
+
         earnings_by_platform: earnings_data[:by_platform],
         expenses_by_category: expenses_data[:by_category],
         top_expense_vendors: expenses_data[:top_vendors]
@@ -97,6 +101,19 @@ module Dashboard
       weeks_count = days_in_month / 7.0
 
       (days_worked / weeks_count).round
+    end
+
+    def trips_avg_month(trips, earnings_total)
+      months = distinct_months_count(earnings_total)
+      return 0 if months.zero?
+
+      (trips.to_f / months).round
+    end
+
+    def trips_avg_day(trips, days)
+      return 0 if days.zero?
+
+      (trips.to_f / days).round
     end
 
     def distinct_months_count(earnings_total)

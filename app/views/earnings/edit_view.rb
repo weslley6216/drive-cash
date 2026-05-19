@@ -27,6 +27,7 @@ module Earnings
         money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
         platform_select(f)
         text_area(f, :notes, label: t('.labels.notes'), theme: @theme, placeholder: t('.placeholders.notes'), rows: 2)
+        integer_field(f, :trips_count, label: t('.labels.trips_count'), theme: @theme, required: true)
 
         render_actions
       end
