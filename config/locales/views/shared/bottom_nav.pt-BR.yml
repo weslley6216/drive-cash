@@ -1,0 +1,8 @@
+pt-BR:
+  bottom_nav_component:
+    tabs:
+      home: "Início"
+      analysis: "Análise"
+      journey: "Hoje"
+      history: "Histórico"
+      more: "Mais"

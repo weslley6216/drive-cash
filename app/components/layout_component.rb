@@ -4,8 +4,9 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  def initialize(title: 'DriveCash')
+  def initialize(title: 'DriveCash', bottom_nav: nil)
     @title = title
+    @bottom_nav = bottom_nav
   end
 
   def view_template(&block)
@@ -54,7 +55,12 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: 'min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6') do
-      div(class: 'max-w-7xl mx-auto', &block)
+      div(class: container_classes, &block)
+      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav
     end
+  end
+
+  def container_classes
+    @bottom_nav ? 'max-w-7xl mx-auto pb-24' : 'max-w-7xl mx-auto'
   end
 end
