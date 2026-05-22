@@ -6,7 +6,7 @@ module Dashboard
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title')) do
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :home) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 
         header
@@ -43,7 +43,10 @@ module Dashboard
     end
 
     def fab_button
-      render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] })
+      render FabComponent.new(
+        filters: { year: @filters[:year], month: @filters[:month] },
+        bottom_nav: true
+      )
     end
 
     def modal_container

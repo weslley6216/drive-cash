@@ -1,0 +1,6 @@
+pt-BR:
+  application:
+    coming_soon_view:
+      title: "Em breve"
+      message: "Esta tela ainda está em construção."
+      back: "Voltar ao início"

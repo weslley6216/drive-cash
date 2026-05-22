@@ -50,4 +50,14 @@ RSpec.describe FabComponent, type: :component do
       expect(html).not_to include('context%5Byear%5D=2025')
     end
   end
+
+  describe 'with bottom_nav: true' do
+    let(:component) { FabComponent.new(filters: filters, bottom_nav: true) }
+    let(:html) { view_context.render(component) }
+
+    it 'positions container at bottom-24 instead of bottom-6' do
+      expect(html).to include('fixed bottom-24 right-6')
+      expect(html).not_to include('fixed bottom-6 right-6')
+    end
+  end
 end

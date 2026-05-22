@@ -19,6 +19,16 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('0,00')
     end
+
+    it 'renders bottom nav with home tab active' do
+      get root_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('fixed bottom-0 left-0 right-0')
+      expect(response.body).to include('text-blue-600')
+      expect(response.body).to include('max-w-7xl mx-auto pb-24')
+      expect(response.body).to include('fixed bottom-24 right-6')
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do
