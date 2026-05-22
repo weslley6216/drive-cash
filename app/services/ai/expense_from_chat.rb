@@ -23,7 +23,9 @@ module Ai
 
       def coerce_hash(raw)
         case raw
-        when ActionController::Parameters then raw.permit!.to_unsafe_h
+        when ActionController::Parameters
+          raw.permit(:date, :amount, :category, :vendor, :description,
+                     :installments, :installments_period).to_h.stringify_keys
         when Hash then raw.stringify_keys
         else {}
         end

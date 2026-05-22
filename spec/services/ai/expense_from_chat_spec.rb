@@ -59,5 +59,17 @@ RSpec.describe Ai::ExpenseFromChat do
       expect(result.success?).to be(true)
       expect(result.expenses.size).to eq(2)
     end
+
+    it 'ignores unknown keys from LLM payload when receiving Parameters' do
+      params_obj = ActionController::Parameters.new(
+        base.merge('malicious_key' => 'injected', 'admin' => true)
+      )
+
+      result = described_class.persist(params_obj)
+
+      expense = result.expenses.first
+      expect(expense).not_to respond_to(:malicious_key)
+      expect(expense).not_to respond_to(:admin)
+    end
   end
 end
