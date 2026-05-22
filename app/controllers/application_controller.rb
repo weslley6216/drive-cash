@@ -9,4 +9,8 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   layout false
+
+  def coming_soon
+    render Application::ComingSoonView.new
+  end
 end

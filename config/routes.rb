@@ -15,6 +15,11 @@ Rails.application.routes.draw do
     delete 'clear', to: 'chat#clear',   as: :clear
   end
 
+  get '/analysis',     to: 'application#coming_soon', as: :analysis
+  get '/work_session', to: 'application#coming_soon', as: :work_session
+  get '/history',      to: 'application#coming_soon', as: :history
+  get '/settings',     to: 'application#coming_soon', as: :settings
+
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

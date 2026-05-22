@@ -43,6 +43,9 @@
 # Ignore VSCode configs
 /.vscode
 
+# Ignore Claude Code local configs
+/.claude
+
 # Local only — não commitar
 /.rtk
 /docs/.obsidian

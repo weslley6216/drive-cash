@@ -1,11 +1,12 @@
 class FabComponent < ApplicationComponent
-  def initialize(filters: {})
+  def initialize(filters: {}, bottom_nav: false)
     @filters = filters
+    @bottom_nav = bottom_nav
   end
 
   def view_template
     div(
-      class: 'fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3',
+      class: "fixed #{@bottom_nav ? 'bottom-24' : 'bottom-6'} right-6 z-40 flex flex-col items-end gap-3",
       data: { controller: 'fab', action: 'click@window->fab#close' }
     ) do
       menu_options
