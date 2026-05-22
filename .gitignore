@@ -45,3 +45,4 @@
 
 # Local only — não commitar
 /.rtk
+/docs/.obsidian

@@ -156,13 +156,14 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 
 ## Comandos essenciais
 
+O projeto roda via Docker. Sempre usar `rtk docker compose run --rm app` para executar comandos:
+
 ```bash
-rtk bundle exec rspec                    # roda toda a suite
-rtk bundle exec rspec spec/path/file     # spec específica
-rtk bundle exec rubocop                  # lint
-rtk bundle exec rails db:migrate         # migrações
-rtk bundle exec rails tailwindcss:build  # build CSS
-rtk bundle exec rails s                  # servidor local
+rtk docker compose run --rm app bundle exec rspec                    # roda toda a suite
+rtk docker compose run --rm app bundle exec rspec spec/path/file     # spec específica
+rtk docker compose run --rm app bundle exec rubocop                  # lint
+rtk docker compose run --rm app bundle exec rails db:migrate         # migrações
+rtk docker compose up -d db                                          # sobe o banco (necessário antes dos specs)
 ```
 
 ## Arquitetura em uma linha
