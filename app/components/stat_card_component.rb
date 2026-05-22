@@ -66,6 +66,8 @@ class StatCardComponent < ApplicationComponent
   end
 
   def icon_section
+    return unless @icon
+
     render @icon.new(class: 'w-8 h-8 opacity-50')
   end
 
