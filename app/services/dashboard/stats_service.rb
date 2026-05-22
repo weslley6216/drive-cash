@@ -92,12 +92,7 @@ module Dashboard
     def days_avg_week(days_worked)
       return 0 if month.blank? || days_worked.zero?
 
-      year_int = year.to_i
-      month_int = month.to_i
-
-      return 0 if year_int.zero? || month_int.zero?
-
-      days_in_month = Time.days_in_month(month_int, year_int)
+      days_in_month = Time.days_in_month(month.to_i, year.to_i)
       weeks_count = days_in_month / 7.0
 
       (days_worked / weeks_count).round
