@@ -28,5 +28,5 @@ class DashboardController < ApplicationController
     @filters = { year: @year, month: @month, available_years: @available_years }
   end
 
-  def available_years = Dashboard::StatsService.available_years
+  def available_years = Dashboard::AvailableYears.fetch
 end
