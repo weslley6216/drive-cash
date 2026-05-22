@@ -62,7 +62,6 @@ module Llm
           { type: :text, content: content }
         end
       end
-
     end
   end
 end
