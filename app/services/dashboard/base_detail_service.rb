@@ -15,6 +15,11 @@ module Dashboard
 
     attr_reader :year, :month
 
+    def base_scope   = raise NotImplementedError
+    def empty_scope  = raise NotImplementedError
+    def list_key     = raise NotImplementedError
+    def by_month_key = raise NotImplementedError
+
     def monthly_detail
       scope = base_scope.for_year(year).for_month(month).chronological
 
