@@ -6,6 +6,13 @@ module Llm
 
     private
 
+    def sanitize_function_leaks(text)
+      text = text.gsub(/<function[^>]*>.*?<\/function>/m, '')
+      text = text.gsub(/\{["\'](?:amount|platform|category|date)["\']:\s*[^}]+\}/m, '')
+
+      text.strip
+    end
+
     def build_connection(url, &block)
       Faraday.new(url: url) do |f|
         f.request :json
