@@ -13,7 +13,7 @@ module Ai
     end
 
     def call
-      Rails.logger.info "[ParserService] Starting processing for #{@messages.size} message(s)"
+      Rails.logger.debug "[ParserService] Starting processing for #{@messages.size} message(s)"
 
       response = Llm::Client.chat(
         messages: @messages,
