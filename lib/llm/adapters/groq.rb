@@ -70,7 +70,6 @@ module Llm
       rescue JSON::ParserError
         { type: :text, content: '' }
       end
-
     end
   end
 end
