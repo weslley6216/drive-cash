@@ -28,7 +28,7 @@ module TurboCreateResponse
       render FilterComponent.new(
         selected_year: record.date.year,
         selected_month: record.date.month,
-        available_years: Dashboard::StatsService.available_years
+        available_years: Dashboard::AvailableYears.fetch
       )
     }
   end

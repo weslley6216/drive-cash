@@ -41,4 +41,14 @@ RSpec.describe Dashboard::StatsService do
       end
     end
   end
+
+  describe '.available_years' do
+    it 'delegates to Dashboard::AvailableYears.fetch' do
+      create(:earning, date: '2021-01-01')
+
+      result = described_class.available_years
+
+      expect(result).to include(2021)
+    end
+  end
 end
