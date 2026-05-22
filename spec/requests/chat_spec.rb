@@ -251,12 +251,13 @@ RSpec.describe 'Chats', type: :request do
     end
 
     context 'when confirming with an unknown action' do
-      it 'returns bad request' do
+      it 'renders a failure message via turbo stream' do
         post chat_confirm_path,
              params: { record_action: 'unknown_action', record: {} },
              as: :turbo_stream
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
       end
     end
   end

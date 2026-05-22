@@ -29,8 +29,6 @@ class ChatController < ApplicationController
 
   def confirm
     persister = Chat::RecordPersister.for(params[:record_action])
-    return head(:bad_request) unless persister
-
     result = persister.persist(params[:record] || {})
 
     respond_to do |format|
