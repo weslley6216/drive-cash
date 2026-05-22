@@ -42,3 +42,6 @@
 
 # Ignore VSCode configs
 /.vscode
+
+# Local only — não commitar
+/.rtk
