@@ -18,7 +18,7 @@ gem 'tailwindcss-rails'
 gem 'turbo-rails'
 
 # Phlex for components
-gem 'phlex-rails', '~> 2.2.0'
+gem 'phlex-rails', '~> 2.4.0'
 gem 'phlex-icons', '~> 2.56'
 
 gem 'bootsnap', require: false
