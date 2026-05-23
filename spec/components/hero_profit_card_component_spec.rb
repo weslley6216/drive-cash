@@ -84,12 +84,58 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'plots one path point per month in monthly_series' do
-    points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+  it 'plots one circle per non-future month (drops trailing zeros)' do
+    circles = html.scan(/<circle/)
 
     expect(html).to include('<svg')
     expect(html).to include('<path')
-    expect(points.size).to eq(series.size)
+    expect(html).to include('<circle')
+    expect(circles.size).to eq(5)
+  end
+
+  it 'renders chart with gradient fill' do
+    expect(html).to include('profitFill')
+    expect(html).to include('stop-color')
+    expect(html).to include('linearGradient')
+  end
+
+  it 'renders circles for data points' do
+    circles = html.scan(/<circle/)
+
+    expect(circles.size).to eq(5)
+    expect(html).to include('stroke="#1d4ed8"')
+  end
+
+  it 'renders month labels below the chart' do
+    expect(html).to include('Jan')
+    expect(html).to include('Fev')
+    expect(html).to include('Mar')
+    expect(html).to include('Abr')
+    expect(html).to include('Mai')
+  end
+
+  it 'plots all points when there are no trailing zeros' do
+    full = HeroProfitCardComponent.new(
+      profit: 1200.0, change_percent: nil, profit_per_day: 100.0, days_count: 12,
+      monthly_series: [100.0, 200.0, 150.0, 300.0, 250.0, 180.0, 220.0, 270.0, 310.0, 280.0, 350.0, 400.0],
+      year: 2025, month: nil
+    )
+
+    circles = view_context.render(full).scan(/<circle/)
+
+    expect(circles.size).to eq(12)
+  end
+
+  it 'drops leading and trailing zeros' do
+    mixed = HeroProfitCardComponent.new(
+      profit: 500.0, change_percent: nil, profit_per_day: 50.0, days_count: 10,
+      monthly_series: [0.0, 0.0, 100.0, 0.0, 200.0, 0.0, 0.0, 0.0],
+      year: 2025, month: nil
+    )
+
+    circles = view_context.render(mixed).scan(/<circle/)
+
+    expect(circles.size).to eq(3)
   end
 
   it 'omits the SVG path when all series values are zero' do
