@@ -1,0 +1,6 @@
+pt-BR:
+  category_breakdown_component:
+    title: "Para onde foi o dinheiro"
+    view_more: "Análise →"
+    empty: "Nenhuma despesa no período."
+    percent: "%{value}%"
