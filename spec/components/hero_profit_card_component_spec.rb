@@ -84,12 +84,34 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'plots one path point per non-future month (drops trailing zeros)' do
-    points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+  it 'plots one circle per non-future month (drops trailing zeros)' do
+    circles = html.scan(/<circle/)
 
     expect(html).to include('<svg')
     expect(html).to include('<path')
-    expect(points.size).to eq(5)
+    expect(html).to include('<circle')
+    expect(circles.size).to eq(5)
+  end
+
+  it 'renders chart with gradient fill' do
+    expect(html).to include('profitFill')
+    expect(html).to include('stop-color')
+    expect(html).to include('linearGradient')
+  end
+
+  it 'renders circles for data points' do
+    circles = html.scan(/<circle/)
+
+    expect(circles.size).to eq(5)
+    expect(html).to include('stroke="#1d4ed8"')
+  end
+
+  it 'renders month labels below the chart' do
+    expect(html).to include('Jan')
+    expect(html).to include('Fev')
+    expect(html).to include('Mar')
+    expect(html).to include('Abr')
+    expect(html).to include('Mai')
   end
 
   it 'plots all points when there are no trailing zeros' do
@@ -99,21 +121,21 @@ RSpec.describe HeroProfitCardComponent, type: :component do
       year: 2025, month: nil
     )
 
-    points = view_context.render(full).scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+    circles = view_context.render(full).scan(/<circle/)
 
-    expect(points.size).to eq(12)
+    expect(circles.size).to eq(12)
   end
 
-  it 'keeps interior zeros but drops only trailing zeros' do
+  it 'drops leading and trailing zeros' do
     mixed = HeroProfitCardComponent.new(
       profit: 500.0, change_percent: nil, profit_per_day: 50.0, days_count: 10,
-      monthly_series: [100.0, 0.0, 200.0, 0.0, 0.0, 0.0],
+      monthly_series: [0.0, 0.0, 100.0, 0.0, 200.0, 0.0, 0.0, 0.0],
       year: 2025, month: nil
     )
 
-    points = view_context.render(mixed).scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+    circles = view_context.render(mixed).scan(/<circle/)
 
-    expect(points.size).to eq(3)
+    expect(circles.size).to eq(3)
   end
 
   it 'omits the SVG path when all series values are zero' do
