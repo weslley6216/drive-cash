@@ -21,6 +21,21 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(html).to include('rounded-2xl')
   end
 
+  it 'renders the label in title case (no uppercase class)' do
+    label_match = html.match(%r{<p class="([^"]*text-blue-700[^"]*)"[^>]*>[^<]*Lucro})
+
+    expect(label_match).not_to be_nil
+    expect(label_match[1]).not_to include('uppercase')
+  end
+
+  it 'renders the profit value in text-2xl to avoid line wrap on mobile' do
+    value_match = html.match(%r{<p class="([^"]*text-blue-900[^"]*)"[^>]*>[^<]*R\$})
+
+    expect(value_match).not_to be_nil
+    expect(value_match[1]).to include('text-2xl')
+    expect(value_match[1]).not_to include('text-3xl')
+  end
+
   it 'renders the profit value formatted as BRL currency' do
     expect(html).to include('950,00')
   end

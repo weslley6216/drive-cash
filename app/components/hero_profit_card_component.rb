@@ -25,8 +25,8 @@ class HeroProfitCardComponent < ApplicationComponent
   def header_section
     div(class: 'flex items-start justify-between mb-1') do
       div do
-        p(class: 'text-xs font-medium text-blue-700 uppercase tracking-wider opacity-75') { label_text }
-        p(class: 'text-3xl font-bold mt-1 tracking-tight text-blue-900') { format_currency(@profit) }
+        p(class: 'text-xs font-medium text-blue-700 tracking-wider opacity-75') { label_text }
+        p(class: 'text-2xl font-bold mt-1 tracking-tight text-blue-900') { format_currency(@profit) }
       end
       change_badge if @change_percent
     end
