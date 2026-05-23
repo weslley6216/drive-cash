@@ -17,6 +17,11 @@ module Dashboard
       }
     end
 
+    def monthly_totals
+      grouped = scope.group(Arel.sql('EXTRACT(MONTH FROM date)::int')).sum(:amount)
+      (1..12).map { |month| grouped[month].to_f }
+    end
+
     private
 
     attr_reader :scope

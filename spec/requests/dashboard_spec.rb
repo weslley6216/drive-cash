@@ -29,6 +29,36 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('max-w-7xl mx-auto pb-24')
       expect(response.body).to include('fixed bottom-24 right-6')
     end
+
+    it 'renders hero profit card section' do
+      create(:earning, date: Date.new(2025, 6, 1),  amount: 500, platform: 'uber')
+      create(:expense, date: Date.new(2025, 6, 2),  amount: 100, category: 'fuel', paid: true)
+
+      get root_path, params: { year: 2025 }
+
+      expect(response.body).to include('bg-blue-50')
+      expect(response.body).to include('border-blue-200')
+      expect(response.body).to include(I18n.t('hero_profit_card_component.label_year', year: 2025))
+    end
+
+    it 'renders caju quick access linking to /chat' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('caju_quick_access_component.title'))
+      expect(response.body).to include('href="/chat"')
+    end
+
+    it 'renders recent activity and breakdown sections' do
+      create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 4)
+      create(:expense, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+
+      get root_path, params: { year: 2025, month: 6 }
+
+      expect(response.body).to include(I18n.t('recent_activity_component.title'))
+      expect(response.body).to include(I18n.t('category_breakdown_component.title'))
+      expect(response.body).to include('Posto Shell')
+      expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do

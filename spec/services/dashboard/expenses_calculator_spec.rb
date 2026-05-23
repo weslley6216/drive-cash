@@ -23,4 +23,19 @@ RSpec.describe Dashboard::ExpensesCalculator do
       )
     end
   end
+
+  describe '#monthly_totals' do
+    it 'returns a 12-month array of paid expense sums' do
+      create(:expense, date: Date.new(2026, 2, 1),  amount: 80, category: 'fuel', paid: true)
+      create(:expense, date: Date.new(2026, 2, 28), amount: 20, category: 'fuel', paid: true)
+      create(:expense, date: Date.new(2026, 7, 10), amount: 50, category: 'fuel', paid: true)
+
+      scope = Expense.for_year(2026).paid_only
+      result = described_class.new(scope).monthly_totals
+
+      expect(result.size).to eq(12)
+      expect(result[1]).to eq(100.0)
+      expect(result[6]).to eq(50.0)
+    end
+  end
 end
