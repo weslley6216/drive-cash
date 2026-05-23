@@ -1,0 +1,4 @@
+pt-BR:
+  recent_activity_component:
+    title: "Atividade recente"
+    empty: "Nenhum lançamento no período."

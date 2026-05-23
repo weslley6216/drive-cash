@@ -38,4 +38,20 @@ RSpec.describe Dashboard::EarningsCalculator do
       expect(result[:by_platform]['uber']).to eq(300.0)
     end
   end
+
+  describe '#monthly_totals' do
+    it 'returns a 12-month array of profit-eligible earnings sums' do
+      create(:earning, date: Date.new(2026, 1, 10), amount: 100)
+      create(:earning, date: Date.new(2026, 1, 20), amount: 50)
+      create(:earning, date: Date.new(2026, 6, 5),  amount: 200)
+
+      scope = Earning.for_year(2026)
+      result = described_class.new(scope).monthly_totals
+
+      expect(result.size).to eq(12)
+      expect(result[0]).to eq(150.0)
+      expect(result[5]).to eq(200.0)
+      expect(result[11]).to eq(0.0)
+    end
+  end
 end

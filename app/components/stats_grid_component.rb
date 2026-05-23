@@ -14,7 +14,7 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8') do
+    div(id: 'stats_grid', class: 'grid grid-cols-2 gap-3 mb-6') do
       earnings_card
       expenses_card
       profit_card
@@ -102,14 +102,6 @@ class StatsGridComponent < ApplicationComponent
       t('dashboard.index_view.stats.days.subtitle_monthly', value: @totals[:days_avg_week])
     end
   end
-
-  # def trips_subtitle
-  #   if annual_view?
-  #     t('dashboard.index_view.stats.trips.subtitle_annual', value: sprintf('%.1f', @totals[:trips].to_f / [12, 1].max))
-  #   else
-  #     t('dashboard.index_view.stats.trips.subtitle_monthly', value: sprintf('%.1f', @totals[:trips].to_f / [@totals[:days], 1].max))
-  #   end
-  # end
 
   def trips_subtitle
     if annual_view?

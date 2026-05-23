@@ -230,6 +230,12 @@ pt-BR:
       long: "%d de %B de %Y, %H:%M"
       short: "%d de %B, %H:%M"
     pm: pm
+  common:
+    today: "Hoje"
+    yesterday: "Ontem"
+    trips:
+      one: "%{count} corrida"
+      other: "%{count} corridas"
   expenses:
     period_labels:
       weekly: "semanal"
