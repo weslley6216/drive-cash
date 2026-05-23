@@ -2,7 +2,11 @@ pt-BR:
   dashboard:
     index_view:
       title: "DriveCash"
-      subtitle: "Gestão financeira para motoristas de aplicativo"
+      subtitle: "DriveCash"
+      greeting: "Olá!"
+      sections:
+        recent_activity: "Atividade recente"
+        breakdown: "Para onde foi o dinheiro"
       stats:
         earnings:
           title: "Total de Receitas"

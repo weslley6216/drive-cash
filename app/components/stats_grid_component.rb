@@ -14,7 +14,7 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8') do
+    div(id: 'stats_grid', class: 'grid grid-cols-2 gap-3 mb-6') do
       earnings_card
       expenses_card
       profit_card

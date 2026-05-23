@@ -3,8 +3,15 @@ class DashboardController < ApplicationController
 
   def index
     @totals = Dashboard::StatsService.new(year: @year, month: @month).call
+    @recent_activity = Dashboard::RecentActivityService.new(year: @year, month: @month).call
+    @categories = Dashboard::CategoryBreakdownService.new(year: @year, month: @month).call
 
-    render Dashboard::IndexView.new(totals: @totals, filters: @filters)
+    render Dashboard::IndexView.new(
+      totals: @totals,
+      filters: @filters,
+      recent_activity: @recent_activity,
+      categories: @categories
+    )
   end
 
   def earnings_detail

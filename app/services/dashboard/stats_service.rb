@@ -33,7 +33,9 @@ module Dashboard
 
         earnings_by_platform: earnings_data[:by_platform],
         expenses_by_category: expenses_data[:by_category],
-        top_expense_vendors: expenses_data[:top_vendors]
+        top_expense_vendors: expenses_data[:top_vendors],
+        monthly_profit_series: monthly_profit_series,
+        change_percent: change_percent
       }
     end
 
@@ -109,6 +111,27 @@ module Dashboard
       return 0 if days.zero?
 
       (trips.to_f / days).round
+    end
+
+    def monthly_profit_series
+      year_earnings = EarningsCalculator.new(Earning.for_year(year)).monthly_totals
+      year_expenses = ExpensesCalculator.new(Expense.for_year(year).paid_only).monthly_totals
+      year_earnings.zip(year_expenses).map { |earn, exp| (earn - exp).round(2) }
+    end
+
+    def change_percent
+      return nil unless month
+
+      current_index  = month.to_i - 1
+      previous_index = current_index - 1
+      return nil if previous_index.negative?
+
+      series = monthly_profit_series
+      current_profit  = series[current_index].to_f
+      previous_profit = series[previous_index].to_f
+      return nil if previous_profit.zero?
+
+      ((current_profit - previous_profit) / previous_profit.abs * 100).round(1)
     end
 
     def distinct_months_count(earnings_total)

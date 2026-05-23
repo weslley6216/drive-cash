@@ -36,6 +36,13 @@ RSpec.describe StatsGridComponent, type: :component do
       expect(html).to include('id="stats_grid"')
     end
 
+    it 'uses grid-cols-2 for mobile 2x2+1 layout' do
+      html = view_context.render(StatsGridComponent.new(totals: totals, month: nil))
+
+      expect(html).to include('grid-cols-2')
+      expect(html).not_to include('grid-cols-1 md:grid-cols-2')
+    end
+
     context 'when in annual view (month: nil)' do
       let(:component) { StatsGridComponent.new(totals: totals, month: nil) }
       let(:html) { view_context.render(component).squish }
