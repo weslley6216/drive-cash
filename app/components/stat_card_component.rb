@@ -88,7 +88,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def value_classes
-    class_names('text-2xl font-bold mt-1', colors[:value])
+    class_names('text-2xl font-bold mt-1 whitespace-nowrap', colors[:value])
   end
 
   def subtitle_classes
