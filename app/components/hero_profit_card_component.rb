@@ -80,9 +80,11 @@ class HeroProfitCardComponent < ApplicationComponent
   end
 
   def compute_points
-    return [] if @series.blank? || @series.all? { |v| v.to_f.zero? }
+    return [] if @series.blank?
 
-    values = @series.map(&:to_f)
+    values = @series.map(&:to_f).reverse.drop_while(&:zero?).reverse
+    return [] if values.empty? || values.all?(&:zero?)
+
     min = values.min
     max = values.max
     range = (max - min).nonzero? || 1.0

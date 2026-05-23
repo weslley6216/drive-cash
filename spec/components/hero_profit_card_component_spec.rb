@@ -99,12 +99,36 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'plots one path point per month in monthly_series' do
+  it 'plots one path point per non-future month (drops trailing zeros)' do
     points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
 
     expect(html).to include('<svg')
     expect(html).to include('<path')
-    expect(points.size).to eq(series.size)
+    expect(points.size).to eq(5)
+  end
+
+  it 'plots all points when there are no trailing zeros' do
+    full = HeroProfitCardComponent.new(
+      profit: 1200.0, change_percent: nil, profit_per_day: 100.0, days_count: 12,
+      monthly_series: [100.0, 200.0, 150.0, 300.0, 250.0, 180.0, 220.0, 270.0, 310.0, 280.0, 350.0, 400.0],
+      year: 2025, month: nil
+    )
+
+    points = view_context.render(full).scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+
+    expect(points.size).to eq(12)
+  end
+
+  it 'keeps interior zeros but drops only trailing zeros' do
+    mixed = HeroProfitCardComponent.new(
+      profit: 500.0, change_percent: nil, profit_per_day: 50.0, days_count: 10,
+      monthly_series: [100.0, 0.0, 200.0, 0.0, 0.0, 0.0],
+      year: 2025, month: nil
+    )
+
+    points = view_context.render(mixed).scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+
+    expect(points.size).to eq(3)
   end
 
   it 'omits the SVG path when all series values are zero' do
