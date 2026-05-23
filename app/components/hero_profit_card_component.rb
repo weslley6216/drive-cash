@@ -62,7 +62,8 @@ class HeroProfitCardComponent < ApplicationComponent
 
   def label_text
     if @month
-      I18n.t('hero_profit_card_component.label_month', month: @month, year: @year)
+      month_name = I18n.t('date.month_names')[@month]
+      I18n.t('hero_profit_card_component.label_month', month: month_name, year: @year)
     else
       I18n.t('hero_profit_card_component.label_year', year: @year)
     end

@@ -1,8 +1,4 @@
 pt-BR:
   recent_activity_component:
     title: "Atividade recente"
-    view_all: "Ver tudo →"
     empty: "Nenhum lançamento no período."
-    trips:
-      one: "%{count} corrida"
-      other: "%{count} corridas"

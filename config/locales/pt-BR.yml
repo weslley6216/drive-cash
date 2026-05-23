@@ -233,6 +233,9 @@ pt-BR:
   common:
     today: "Hoje"
     yesterday: "Ontem"
+    trips:
+      one: "%{count} corrida"
+      other: "%{count} corridas"
   expenses:
     period_labels:
       weekly: "semanal"

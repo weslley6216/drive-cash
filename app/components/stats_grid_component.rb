@@ -103,14 +103,6 @@ class StatsGridComponent < ApplicationComponent
     end
   end
 
-  # def trips_subtitle
-  #   if annual_view?
-  #     t('dashboard.index_view.stats.trips.subtitle_annual', value: sprintf('%.1f', @totals[:trips].to_f / [12, 1].max))
-  #   else
-  #     t('dashboard.index_view.stats.trips.subtitle_monthly', value: sprintf('%.1f', @totals[:trips].to_f / [@totals[:days], 1].max))
-  #   end
-  # end
-
   def trips_subtitle
     if annual_view?
       t('dashboard.index_view.stats.trips.subtitle_annual', value: @totals[:trips_avg_month])

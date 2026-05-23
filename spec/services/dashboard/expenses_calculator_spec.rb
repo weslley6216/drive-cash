@@ -31,7 +31,6 @@ RSpec.describe Dashboard::ExpensesCalculator do
       create(:expense, date: Date.new(2026, 7, 10), amount: 50, category: 'fuel', paid: true)
 
       scope = Expense.for_year(2026).paid_only
-
       result = described_class.new(scope).monthly_totals
 
       expect(result.size).to eq(12)

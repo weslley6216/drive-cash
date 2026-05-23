@@ -114,9 +114,11 @@ module Dashboard
     end
 
     def monthly_profit_series
-      year_earnings = EarningsCalculator.new(Earning.for_year(year)).monthly_totals
-      year_expenses = ExpensesCalculator.new(Expense.for_year(year).paid_only).monthly_totals
-      year_earnings.zip(year_expenses).map { |earn, exp| (earn - exp).round(2) }
+      @monthly_profit_series ||= begin
+        year_earnings = EarningsCalculator.new(Earning.for_year(year)).monthly_totals
+        year_expenses = ExpensesCalculator.new(Expense.for_year(year).paid_only).monthly_totals
+        year_earnings.zip(year_expenses).map { |earn, exp| (earn - exp).round(2) }
+      end
     end
 
     def change_percent

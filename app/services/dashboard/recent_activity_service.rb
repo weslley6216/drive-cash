@@ -58,7 +58,7 @@ module Dashboard
     def earning_fields(record)
       {
         label: I18n.t("activerecord.attributes.earning.platforms.#{record.platform}"),
-        description: I18n.t('recent_activity_component.trips', count: record.trips_count)
+        description: I18n.t('common.trips', count: record.trips_count)
       }
     end
 

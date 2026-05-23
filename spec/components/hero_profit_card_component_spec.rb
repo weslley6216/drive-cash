@@ -35,8 +35,9 @@ RSpec.describe HeroProfitCardComponent, type: :component do
       monthly_series: series, year: 2025, month: 6
     )
 
+    month_name = I18n.t('date.month_names')[6]
     expect(view_context.render(monthly)).to include(
-      I18n.t('hero_profit_card_component.label_month', month: 6, year: 2025)
+      I18n.t('hero_profit_card_component.label_month', month: month_name, year: 2025)
     )
   end
 
@@ -52,6 +53,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     )
 
     rendered = view_context.render(negative)
+
     expect(rendered).to include('text-red-700')
     expect(rendered).to include(I18n.t('hero_profit_card_component.change_negative', value: '-8.0'))
   end
@@ -63,6 +65,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     )
 
     rendered = view_context.render(no_change)
+
     expect(rendered).not_to include('text-emerald-700')
     expect(rendered).not_to include('text-red-700')
   end
@@ -82,9 +85,10 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'plots one path point per month in monthly_series' do
+    points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
+
     expect(html).to include('<svg')
     expect(html).to include('<path')
-    points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
     expect(points.size).to eq(series.size)
   end
 

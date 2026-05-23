@@ -42,7 +42,7 @@ RSpec.describe Dashboard::RecentActivityService do
 
         expect(row[:type]).to eq(:earning)
         expect(row[:label]).to eq(I18n.t('activerecord.attributes.earning.platforms.uber'))
-        expect(row[:description]).to eq(I18n.t('recent_activity_component.trips', count: 4))
+        expect(row[:description]).to eq(I18n.t('common.trips', count: 4))
         expect(row[:amount]).to eq(200.0)
       end
 

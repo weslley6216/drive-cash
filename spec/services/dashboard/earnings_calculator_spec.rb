@@ -46,7 +46,6 @@ RSpec.describe Dashboard::EarningsCalculator do
       create(:earning, date: Date.new(2026, 6, 5),  amount: 200)
 
       scope = Earning.for_year(2026)
-
       result = described_class.new(scope).monthly_totals
 
       expect(result.size).to eq(12)
