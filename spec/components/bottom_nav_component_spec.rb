@@ -20,6 +20,10 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include('z-30')
     end
 
+    it 'hides on desktop via lg:hidden' do
+      expect(html).to include('lg:hidden')
+    end
+
     it 'highlights the active tab with text-blue-600 and thicker stroke' do
       expect(html).to include('text-blue-600')
       expect(html).to include('stroke-[2.4]')
