@@ -1,6 +1,7 @@
 class HeroProfitCardComponent < ApplicationComponent
   CHART_WIDTH  = 280
   CHART_HEIGHT = 64
+  MONTHS_PT    = %w[Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez].freeze
 
   def initialize(profit:, change_percent:, profit_per_day:, days_count:, monthly_series:, year:, month: nil)
     @profit = profit
@@ -42,11 +43,27 @@ class HeroProfitCardComponent < ApplicationComponent
     div(class: 'mt-4') do
       svg(
         viewBox: "0 0 #{CHART_WIDTH} #{CHART_HEIGHT}",
-        class: 'w-full h-16 lg:h-[220px]',
-        preserveAspectRatio: 'none',
+        class: 'w-full',
         xmlns: 'http://www.w3.org/2000/svg'
       ) do |s|
-        s.path(d: path_definition, fill: 'none', stroke: '#1d4ed8', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round')
+        s.defs do
+          s.linearGradient(id: 'profitFill', x1: '0', y1: '0', x2: '0', y2: '1') do
+            s.stop(offset: '0%', 'stop-color': '#3b82f6', 'stop-opacity': '0.25')
+            s.stop(offset: '100%', 'stop-color': '#3b82f6', 'stop-opacity': '0')
+          end
+        end
+        s.path(d: area_path_definition, fill: 'url(#profitFill)')
+        s.path(d: path_definition, fill: 'none', stroke: '#1d4ed8', 'stroke-width': '2.5',
+               'stroke-linecap': 'round', 'stroke-linejoin': 'round')
+        chart_points.each_with_index do |(x, y), idx|
+          last = idx == chart_points.size - 1
+          s.circle(cx: x, cy: y, r: last ? '4' : '2.5',
+                   fill: last ? '#1d4ed8' : '#fff', stroke: '#1d4ed8', 'stroke-width': '2')
+        end
+      end
+
+      div(class: 'flex justify-between text-[10px] text-blue-700 opacity-60 mt-1 px-1') do
+        chart_labels.each { |label| span { label } }
       end
     end
   end
@@ -98,5 +115,17 @@ class HeroProfitCardComponent < ApplicationComponent
 
   def path_definition
     chart_points.each_with_index.map { |(x, y), idx| "#{idx.zero? ? 'M' : 'L'}#{x},#{y}" }.join(' ')
+  end
+
+  def area_path_definition
+    return '' if chart_points.empty?
+
+    line = chart_points.each_with_index.map { |(x, y), idx| "#{idx.zero? ? 'M' : 'L'}#{x},#{y}" }.join(' ')
+    last_x = chart_points.last.first
+    "#{line} L#{last_x},#{CHART_HEIGHT} L0,#{CHART_HEIGHT} Z"
+  end
+
+  def chart_labels
+    MONTHS_PT.first(@series.size)
   end
 end

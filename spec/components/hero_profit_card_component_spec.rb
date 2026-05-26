@@ -84,12 +84,9 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'plots one path point per month in monthly_series' do
-    points = html.scan(/[ML]\d+(?:\.\d+)?,\d+(?:\.\d+)?/)
-
+  it 'renders the SVG chart with line and area paths' do
     expect(html).to include('<svg')
     expect(html).to include('<path')
-    expect(points.size).to eq(series.size)
   end
 
   it 'omits the SVG path when all series values are zero' do
@@ -101,7 +98,18 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(flat)).not_to include('<path')
   end
 
-  it 'uses responsive height classes for the chart SVG' do
-    expect(html).to include('lg:h-[220px]')
+  it 'renders gradient area fill under the chart line' do
+    expect(html).to include('profitFill')
+    expect(html).to include('linearGradient')
+  end
+
+  it 'renders one circle per data point' do
+    expect(html.scan('<circle').size).to eq(series.size)
+  end
+
+  it 'renders month abbreviations below the chart' do
+    expect(html).to include('Jan')
+    expect(html).to include('Fev')
+    expect(html).to include('Mar')
   end
 end
