@@ -14,12 +14,12 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-2 gap-3 mb-6') do
+    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
       earnings_card
       expenses_card
-      profit_card
+      profit_card_desktop
+      trips_card_mobile
       days_card
-      trips_card
     end
   end
 
@@ -49,14 +49,28 @@ class StatsGridComponent < ApplicationComponent
     )
   end
 
-  def profit_card
-    render StatCardComponent.new(
-      title: t('dashboard.index_view.stats.profit.title'),
-      value: format_currency(@totals[:profit]),
-      subtitle: profit_subtitle,
-      color: :blue,
-      icon: ICONS[:trending_up]
-    )
+  def profit_card_desktop
+    div(class: 'hidden lg:block') do
+      render StatCardComponent.new(
+        title: t('dashboard.index_view.stats.profit.title'),
+        value: format_currency(@totals[:profit]),
+        subtitle: profit_subtitle,
+        color: :blue,
+        icon: ICONS[:trending_up]
+      )
+    end
+  end
+
+  def trips_card_mobile
+    div(class: 'block lg:hidden') do
+      render StatCardComponent.new(
+        title: t('dashboard.index_view.stats.trips.title'),
+        value: @totals[:trips].to_s,
+        subtitle: trips_subtitle,
+        color: :purple,
+        icon: ICONS[:package]
+      )
+    end
   end
 
   def days_card
@@ -66,16 +80,6 @@ class StatsGridComponent < ApplicationComponent
       subtitle: days_subtitle,
       color: :yellow,
       icon: ICONS[:calendar]
-    )
-  end
-
-  def trips_card
-    render StatCardComponent.new(
-      title: t('dashboard.index_view.stats.trips.title'),
-      value: @totals[:trips].to_s,
-      subtitle: trips_subtitle,
-      color: :purple,
-      icon: ICONS[:package]
     )
   end
 

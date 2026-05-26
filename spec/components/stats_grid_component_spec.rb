@@ -66,6 +66,24 @@ RSpec.describe StatsGridComponent, type: :component do
       end
     end
 
+    describe 'desktop layout' do
+      let(:html) { view_context.render(StatsGridComponent.new(totals: totals, month: nil)) }
+
+      it 'uses lg:grid-cols-4 for desktop row layout' do
+        expect(html).to include('lg:grid-cols-4')
+      end
+
+      it 'renders profit card visible only on desktop' do
+        expect(html).to include(I18n.t('dashboard.index_view.stats.profit.title'))
+        expect(html).to include('hidden lg:block')
+      end
+
+      it 'renders trips card hidden on desktop' do
+        expect(html).to include(I18n.t('dashboard.index_view.stats.trips.title'))
+        expect(html).to include('block lg:hidden')
+      end
+    end
+
     context 'when in monthly view' do
       let(:totals_monthly) { totals.merge(days: 10, days_avg_week: 2, trips: 12, trips_avg_day: 12) }
       let(:component) { StatsGridComponent.new(totals: totals_monthly, month: 1, year: 2025) }
