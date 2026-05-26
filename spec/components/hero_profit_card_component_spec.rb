@@ -100,4 +100,8 @@ RSpec.describe HeroProfitCardComponent, type: :component do
 
     expect(view_context.render(flat)).not_to include('<path')
   end
+
+  it 'uses responsive height classes for the chart SVG' do
+    expect(html).to include('lg:h-[220px]')
+  end
 end

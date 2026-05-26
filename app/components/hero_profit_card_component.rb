@@ -42,7 +42,8 @@ class HeroProfitCardComponent < ApplicationComponent
     div(class: 'mt-4') do
       svg(
         viewBox: "0 0 #{CHART_WIDTH} #{CHART_HEIGHT}",
-        class: 'w-full h-16',
+        class: 'w-full h-16 lg:h-[220px]',
+        preserveAspectRatio: 'none',
         xmlns: 'http://www.w3.org/2000/svg'
       ) do |s|
         s.path(d: path_definition, fill: 'none', stroke: '#1d4ed8', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round')
