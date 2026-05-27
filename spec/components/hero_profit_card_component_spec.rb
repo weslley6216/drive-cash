@@ -145,4 +145,29 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(html).to include('Fev')
     expect(html).to include('Mar')
   end
+
+  context 'when daily_mode: true' do
+    let(:daily_series) { [0.0] * 9 + [400.0, 0.0, 80.0] + [0.0] * 19 }
+    let(:component) do
+      HeroProfitCardComponent.new(
+        profit: 480, change_percent: nil, profit_per_day: 160, days_count: 2,
+        monthly_series: daily_series, year: 2025, month: 1, daily_mode: true
+      )
+    end
+    let(:html) { view_context.render(component) }
+
+    it 'renders chart including zero-value days' do
+      expect(html).to include('viewBox="0 0 320 70"')
+      expect(html).to include('<path')
+    end
+
+    it 'plots all days including zeros without trimming' do
+      expect(html.scan('<circle').size).to eq(daily_series.size * 2)
+    end
+
+    it 'does not render month label abbreviations' do
+      expect(html).not_to include('>Jan<')
+      expect(html).not_to include('>Fev<')
+    end
+  end
 end

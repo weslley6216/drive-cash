@@ -25,7 +25,6 @@ RSpec.describe StatsGridComponent, type: :component do
 
       expect(html).to include('R$')
       expect(html).to include('1.000,00')
-      expect(html).to include('700,00')
       expect(html).to include('20')
       expect(html).to include('25')
     end
@@ -69,18 +68,16 @@ RSpec.describe StatsGridComponent, type: :component do
     describe 'desktop layout' do
       let(:html) { view_context.render(StatsGridComponent.new(totals: totals, month: nil)) }
 
-      it 'uses lg:grid-cols-5 for desktop row layout' do
-        expect(html).to include('lg:grid-cols-5')
+      it 'uses lg:grid-cols-4 for desktop row layout' do
+        expect(html).to include('lg:grid-cols-4')
       end
 
-      it 'renders all five stat cards without hidden wrappers' do
+      it 'renders four stat cards without profit card' do
         expect(html).to include(I18n.t('dashboard.index_view.stats.earnings.title'))
         expect(html).to include(I18n.t('dashboard.index_view.stats.expenses.title'))
-        expect(html).to include(I18n.t('dashboard.index_view.stats.profit.title'))
         expect(html).to include(I18n.t('dashboard.index_view.stats.days.title'))
         expect(html).to include(I18n.t('dashboard.index_view.stats.trips.title'))
-        expect(html).not_to include('hidden lg:block')
-        expect(html).not_to include('block lg:hidden')
+        expect(html).not_to include(I18n.t('dashboard.index_view.stats.profit.title'))
       end
     end
 

@@ -7,7 +7,7 @@ class HeroProfitCardComponent < ApplicationComponent
 
   MONTHS_PT = %w[Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez].freeze
 
-  def initialize(profit:, change_percent:, profit_per_day:, days_count:, monthly_series:, year:, month: nil)
+  def initialize(profit:, change_percent:, profit_per_day:, days_count:, monthly_series:, year:, month: nil, daily_mode: false)
     @profit = profit
     @change_percent = change_percent
     @profit_per_day = profit_per_day
@@ -15,6 +15,7 @@ class HeroProfitCardComponent < ApplicationComponent
     @series = (monthly_series || []).map(&:to_f)
     @year = year
     @month = month
+    @daily_mode = daily_mode
   end
 
   def view_template
@@ -62,8 +63,10 @@ class HeroProfitCardComponent < ApplicationComponent
       div(class: 'lg:hidden') { mobile_chart }
       div(class: 'hidden lg:block') { desktop_chart }
 
-      div(class: 'flex justify-between text-[10px] lg:text-xs text-blue-700 opacity-60 mt-1 px-1') do
-        chart_labels.each { |label| span { label } }
+      unless chart_labels.empty?
+        div(class: 'flex justify-between text-[10px] lg:text-xs text-blue-700 opacity-60 mt-1 px-1') do
+          chart_labels.each { |label| span { label } }
+        end
       end
     end
   end
@@ -125,19 +128,24 @@ class HeroProfitCardComponent < ApplicationComponent
     @leading_zeros_count ||= @series.take_while(&:zero?).size
   end
 
-  def compute_points(width:, height:)
-    return [] if series_to_plot.empty?
+  def plot_values
+    @daily_mode ? @series : series_to_plot
+  end
 
-    max = series_to_plot.max
-    min = series_to_plot.min
+  def compute_points(width:, height:)
+    values = plot_values
+    return [] if values.empty?
+
+    max = values.max
+    min = @daily_mode ? [values.min, 0].min : values.min
     range = (max - min).nonzero? || max.nonzero? || 1.0
-    step = series_to_plot.size <= 1 ? 0 : width.to_f / (series_to_plot.size - 1)
+    step = values.size <= 1 ? 0 : width.to_f / (values.size - 1)
 
     pad_top    = height * 0.08
     pad_bottom = height * 0.08
     usable     = height - pad_top - pad_bottom
 
-    series_to_plot.each_with_index.map do |value, index|
+    values.each_with_index.map do |value, index|
       x = (index * step).round(2)
       normalized = (value - min) / range
       y = (height - pad_bottom - normalized * usable).round(2)
@@ -173,6 +181,8 @@ class HeroProfitCardComponent < ApplicationComponent
   end
 
   def chart_labels
+    return [] if @daily_mode
+
     MONTHS_PT[leading_zeros_count, series_to_plot.size] || []
   end
 end

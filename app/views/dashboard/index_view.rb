@@ -56,14 +56,16 @@ module Dashboard
     def primary_grid
       div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
         div(class: 'lg:col-span-8') do
+          monthly_view = @filters[:month].present?
           render HeroProfitCardComponent.new(
             profit: @totals[:profit],
             change_percent: @totals[:change_percent],
             profit_per_day: @totals[:profit_per_day],
             days_count: @totals[:days],
-            monthly_series: @totals[:monthly_profit_series],
+            monthly_series: monthly_view ? @totals[:daily_profit_series] : @totals[:monthly_profit_series],
             year: @filters[:year],
-            month: @filters[:month]
+            month: @filters[:month],
+            daily_mode: monthly_view
           )
         end
 

@@ -59,6 +59,21 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:change_percent]).to be_nil
     end
 
+    it 'returns a daily profit series for each day of the month when month is provided' do
+      result = described_class.new(year: 2025, month: 1).call
+
+      expect(result[:daily_profit_series]).to be_an(Array)
+      expect(result[:daily_profit_series].size).to eq(31)
+      expect(result[:daily_profit_series][9]).to eq(400.0)
+      expect(result[:daily_profit_series][0]).to eq(0.0)
+    end
+
+    it 'returns nil for daily_profit_series when no month is provided' do
+      result = described_class.new(year: 2025, month: nil).call
+
+      expect(result[:daily_profit_series]).to be_nil
+    end
+
     context 'with multiple working days in the month' do
       before do
         (1..9).each { |day| create(:earning, date: Date.new(2025, 1, day), amount: 100) }

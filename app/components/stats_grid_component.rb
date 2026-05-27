@@ -14,10 +14,9 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6') do
+    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
       render_card(:earnings)
       render_card(:expenses)
-      render_card(:profit)
       render_card(:days)
       render_card(:trips)
     end
@@ -51,14 +50,6 @@ class StatsGridComponent < ApplicationComponent
         icon: ICONS[:triangle_alert],
         href: dashboard_expenses_detail_path(year: @year, month: @month)
       }
-    when :profit
-      {
-        title: t('dashboard.index_view.stats.profit.title'),
-        value: format_currency(@totals[:profit]),
-        subtitle: profit_subtitle,
-        color: :blue,
-        icon: ICONS[:trending_up]
-      }
     when :days
       {
         title: t('dashboard.index_view.stats.days.title'),
@@ -86,10 +77,6 @@ class StatsGridComponent < ApplicationComponent
 
   def expenses_subtitle
     t('dashboard.index_view.stats.expenses.subtitle', percent: format_percentage(@totals[:expenses_percent]))
-  end
-
-  def profit_subtitle
-    t('dashboard.index_view.stats.profit.subtitle', value: format_currency(@totals[:profit_per_day]))
   end
 
   def days_subtitle
