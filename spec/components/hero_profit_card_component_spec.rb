@@ -55,7 +55,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     rendered = view_context.render(negative)
 
     expect(rendered).to include('text-red-700')
-    expect(rendered).to include(I18n.t('hero_profit_card_component.change_negative', value: '-8.0'))
+    expect(rendered).to include(I18n.t('hero_profit_card_component.change_negative', value: '8.0'))
   end
 
   it 'does not render a change badge when change_percent is nil' do
@@ -84,9 +84,51 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'renders the SVG chart with line and area paths' do
-    expect(html).to include('<svg')
-    expect(html).to include('<path')
+  it 'renders two SVG charts — mobile and desktop' do
+    expect(html.scan('viewBox="0 0').size).to eq(2)
+  end
+
+  it 'renders mobile chart hidden on desktop' do
+    expect(html).to include('lg:hidden')
+  end
+
+  it 'renders desktop chart hidden on mobile' do
+    expect(html).to include('hidden lg:block')
+  end
+
+  it 'uses mobile viewBox 320x70' do
+    expect(html).to include('viewBox="0 0 320 70"')
+  end
+
+  it 'uses desktop viewBox 720x120' do
+    expect(html).to include('viewBox="0 0 720 120"')
+  end
+
+  it 'renders gradient fills for each chart' do
+    expect(html).to include('profitFillMobile')
+    expect(html).to include('profitFillDesktop')
+  end
+
+  it 'renders responsive text sizes for header' do
+    expect(html).to include('lg:text-5xl')
+    expect(html).to include('lg:text-sm')
+  end
+
+  it 'renders change badge with border styling' do
+    expect(html).to include('border')
+    expect(html).to include('border-emerald-200')
+  end
+
+  it 'renders month labels trimming leading zeros' do
+    series_with_leading = [0.0, 0.0, 100.0, 200.0, 300.0]
+    comp = HeroProfitCardComponent.new(
+      profit: 600, change_percent: nil, profit_per_day: 30, days_count: 20,
+      monthly_series: series_with_leading, year: 2025, month: nil
+    )
+    rendered = view_context.render(comp)
+    expect(rendered).not_to include('>Jan<')
+    expect(rendered).not_to include('>Fev<')
+    expect(rendered).to include('Mar')
   end
 
   it 'omits the SVG path when all series values are zero' do
@@ -96,15 +138,6 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     )
 
     expect(view_context.render(flat)).not_to include('<path')
-  end
-
-  it 'renders gradient area fill under the chart line' do
-    expect(html).to include('profitFill')
-    expect(html).to include('linearGradient')
-  end
-
-  it 'renders one circle per data point' do
-    expect(html.scan('<circle').size).to eq(series.size)
   end
 
   it 'renders month abbreviations below the chart' do
