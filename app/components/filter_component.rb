@@ -1,11 +1,36 @@
 class FilterComponent < ApplicationComponent
-  def initialize(selected_year:, selected_month:, available_years: [])
+  def initialize(selected_year:, selected_month:, available_years: [], compact: false)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
+    @compact = compact
   end
 
   def view_template
+    @compact ? compact_view : full_view
+  end
+
+  private
+
+  def compact_view
+    div(class: 'flex items-center gap-2', data: { controller: 'filter' }) do
+      select(
+        name: 'year', class: pill_classes,
+        data: { filter_target: 'year', action: 'change->filter#submit' }
+      ) { year_options }
+      select(
+        name: 'month', class: pill_classes,
+        data: { filter_target: 'month', action: 'change->filter#submit' }
+      ) { month_options }
+    end
+  end
+
+  def pill_classes
+    'bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium ' \
+      'text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer'
+  end
+
+  def full_view
     current_params = { year: @selected_year, month: @selected_month }.compact
     target_url = helpers.url_for(controller: 'dashboard', action: 'index', **current_params)
 
@@ -33,8 +58,6 @@ class FilterComponent < ApplicationComponent
       end
     end
   end
-
-  private
 
   def filter_header
     div(class: 'flex items-center gap-2 whitespace-nowrap') do
