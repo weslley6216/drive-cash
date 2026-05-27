@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   get '/work_session', to: 'application#coming_soon', as: :work_session
   get '/history',      to: 'application#coming_soon', as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
+  get '/goals',        to: 'application#coming_soon', as: :goals
+  get '/vehicle',      to: 'application#coming_soon', as: :vehicle
 
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

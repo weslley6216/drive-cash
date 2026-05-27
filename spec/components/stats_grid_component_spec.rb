@@ -40,7 +40,7 @@ RSpec.describe StatsGridComponent, type: :component do
       expect(html).to include('id="stats_grid"')
     end
 
-    it 'uses grid-cols-2 for mobile 2x2 layout' do
+    it 'uses grid-cols-2 for mobile 2x2+1 layout' do
       html = view_context.render(StatsGridComponent.new(totals: totals, month: nil))
 
       expect(html).to include('grid-cols-2')
@@ -67,6 +67,22 @@ RSpec.describe StatsGridComponent, type: :component do
         expect(html).to include(
           I18n.t('dashboard.index_view.stats.trips.subtitle_annual', value: 25)
         )
+      end
+    end
+
+    describe 'desktop layout' do
+      let(:html) { view_context.render(StatsGridComponent.new(totals: totals, month: nil)) }
+
+      it 'uses lg:grid-cols-4 for desktop row layout' do
+        expect(html).to include('lg:grid-cols-4')
+      end
+
+      it 'renders four stat cards without profit card' do
+        expect(html).to include(I18n.t('dashboard.index_view.stats.earnings.title'))
+        expect(html).to include(I18n.t('dashboard.index_view.stats.expenses.title'))
+        expect(html).to include(I18n.t('dashboard.index_view.stats.days.title'))
+        expect(html).to include(I18n.t('dashboard.index_view.stats.trips.title'))
+        expect(html).not_to include(I18n.t('dashboard.index_view.stats.profit.title'))
       end
     end
 

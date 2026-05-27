@@ -49,28 +49,20 @@ class StatCardComponent < ApplicationComponent
   def view_template
     container_tag(class: card_classes) do
       div(class: 'flex items-start justify-between gap-2') do
-        content_section
+        p(class: title_classes) { @title }
         icon_section
       end
-    end
-  end
-
-  private
-
-  def content_section
-    div(class: 'flex-1') do
-      p(class: title_classes) { @title }
       p(class: value_classes) { @value }
       p(class: subtitle_classes) { @subtitle } if @subtitle
     end
   end
 
+  private
+
   def icon_section
     return unless @icon
 
-    div(class: 'flex-shrink-0 w-8 h-8 flex items-center justify-center') do
-      render @icon.new(class: 'w-7 h-7 opacity-40')
-    end
+    render @icon.new(class: 'w-5 h-5 lg:w-6 lg:h-6 opacity-50')
   end
 
   def container_tag(**attributes, &block)
@@ -90,7 +82,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def value_classes
-    class_names('text-xl md:text-2xl font-bold mt-1 tracking-tight whitespace-nowrap', colors[:value])
+    class_names('text-xl lg:text-2xl font-bold mt-1 whitespace-nowrap', colors[:value])
   end
 
   def subtitle_classes

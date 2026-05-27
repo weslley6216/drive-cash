@@ -1,0 +1,6 @@
+pt-BR:
+  today_card_component:
+    label: "Hoje"
+    trips_count:
+      one: "1 corrida"
+      other: "%{count} corridas"

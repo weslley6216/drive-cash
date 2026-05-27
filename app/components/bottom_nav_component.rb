@@ -12,7 +12,7 @@ class BottomNavComponent < ApplicationComponent
   end
 
   def view_template
-    nav(class: 'fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 pt-2 pb-6 z-30') do
+    nav(class: 'fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 pt-2 pb-6 z-30 lg:hidden') do
       div(class: 'flex items-stretch justify-around max-w-md mx-auto') do
         TABS.each { |tab| tab_button(tab) }
       end
