@@ -48,7 +48,7 @@ class StatCardComponent < ApplicationComponent
 
   def view_template
     container_tag(class: card_classes) do
-      div(class: 'flex items-start justify-between') do
+      div(class: 'flex items-start justify-between gap-2') do
         p(class: title_classes) { @title }
         icon_section
       end
@@ -86,7 +86,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def subtitle_classes
-    class_names('text-xs mt-1 opacity-60', colors[:subtitle])
+    class_names('text-xs mt-1 opacity-60 whitespace-nowrap', colors[:subtitle])
   end
 
   def colors

@@ -126,6 +126,7 @@ module Dashboard
       (1..days_in_month).map { |d| (earn_by_day[d].to_f - exp_by_day[d].to_f).round(2) }
     end
 
+
     def monthly_profit_series
       @monthly_profit_series ||= begin
         year_earnings = EarningsCalculator.new(Earning.for_year(year)).monthly_totals

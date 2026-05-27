@@ -5,11 +5,9 @@ RSpec.describe StatsGridComponent, type: :component do
     {
       earnings: 1000.0,
       expenses: 300.0,
-      profit: 700.0,
       days: 20,
       earnings_avg_month: 500.0,
       expenses_percent: 30.0,
-      profit_per_day: 35.0,
       days_avg_month: 10.0,
       earnings_avg_day: 50.0,
       days_avg_week: 0,
@@ -20,13 +18,20 @@ RSpec.describe StatsGridComponent, type: :component do
   end
 
   describe '#view_template' do
-    it 'renders all stat cards' do
+    it 'renders the four expected stat cards (no profit)' do
       html = view_context.render(StatsGridComponent.new(totals: totals, month: nil))
 
       expect(html).to include('R$')
       expect(html).to include('1.000,00')
+      expect(html).to include('300,00')
       expect(html).to include('20')
       expect(html).to include('25')
+    end
+
+    it 'does not render the Lucro Líquido card' do
+      html = view_context.render(StatsGridComponent.new(totals: totals, month: nil))
+
+      expect(html).not_to include(I18n.t('dashboard.index_view.stats.profit.title'))
     end
 
     it 'renders grid container with correct ID' do

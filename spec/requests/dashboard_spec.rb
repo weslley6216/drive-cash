@@ -60,6 +60,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
+
     it 'renders topbar with greeting and subtitle' do
       get root_path, params: { year: 2025 }
 

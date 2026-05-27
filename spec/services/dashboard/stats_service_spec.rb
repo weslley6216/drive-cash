@@ -74,6 +74,7 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:daily_profit_series]).to be_nil
     end
 
+
     context 'with multiple working days in the month' do
       before do
         (1..9).each { |day| create(:earning, date: Date.new(2025, 1, day), amount: 100) }

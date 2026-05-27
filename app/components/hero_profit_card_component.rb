@@ -165,6 +165,7 @@ class HeroProfitCardComponent < ApplicationComponent
     "#{line} L#{last_x},#{height} L0,#{height} Z"
   end
 
+
   def label_text
     if @month
       month_name = I18n.t('date.month_names')[@month]
