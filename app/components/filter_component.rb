@@ -13,7 +13,11 @@ class FilterComponent < ApplicationComponent
   private
 
   def compact_view
-    div(class: 'flex items-center gap-2', data: { controller: 'filter' }) do
+    form(
+      action: root_path, method: 'get',
+      class: 'flex items-center gap-2',
+      data: { turbo_frame: '_top', controller: 'filter' }
+    ) do
       select(
         name: 'year', class: pill_classes,
         data: { filter_target: 'year', action: 'change->filter#submit' }

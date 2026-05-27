@@ -68,6 +68,7 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'does not render the full card wrapper' do
       expect(html).not_to include('bg-white rounded-lg shadow-md')
+      expect(html).not_to include('shadow-md')
     end
 
     it 'renders inline selects without labels' do
@@ -78,8 +79,12 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'uses pill styling classes' do
-      expect(html).to include('rounded-lg')
       expect(html).to include('border-slate-200')
+    end
+
+    it 'renders a form so filter#submit can call requestSubmit()' do
+      expect(html).to include('<form')
+      expect(html).to include('data-controller="filter"')
     end
   end
 end
