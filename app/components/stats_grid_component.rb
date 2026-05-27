@@ -14,12 +14,12 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
-      earnings_card
-      expenses_card
-      profit_card_desktop
-      trips_card_mobile
-      days_card
+    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6') do
+      render_card(:earnings)
+      render_card(:expenses)
+      render_card(:profit)
+      render_card(:days)
+      render_card(:trips)
     end
   end
 
@@ -27,66 +27,60 @@ class StatsGridComponent < ApplicationComponent
 
   def annual_view? = @month.blank?
 
-  def earnings_card
-    render StatCardComponent.new(
-      title: t('dashboard.index_view.stats.earnings.title'),
-      value: format_currency(@totals[:earnings]),
-      subtitle: earnings_subtitle,
-      color: :green,
-      icon: ICONS[:dollar_sign],
-      href: dashboard_earnings_detail_path(year: @year, month: @month)
-    )
+  def render_card(type)
+    render StatCardComponent.new(**card_config(type))
   end
 
-  def expenses_card
-    render StatCardComponent.new(
-      title: t('dashboard.index_view.stats.expenses.title'),
-      value: format_currency(@totals[:expenses]),
-      subtitle: expenses_subtitle,
-      color: :red,
-      icon: ICONS[:triangle_alert],
-      href: dashboard_expenses_detail_path(year: @year, month: @month)
-    )
-  end
-
-  def profit_card_desktop
-    div(class: 'hidden lg:block') do
-      render StatCardComponent.new(
+  def card_config(type)
+    case type
+    when :earnings
+      {
+        title: t('dashboard.index_view.stats.earnings.title'),
+        value: format_currency(@totals[:earnings]),
+        subtitle: earnings_subtitle,
+        color: :green,
+        icon: ICONS[:dollar_sign],
+        href: dashboard_earnings_detail_path(year: @year, month: @month)
+      }
+    when :expenses
+      {
+        title: t('dashboard.index_view.stats.expenses.title'),
+        value: format_currency(@totals[:expenses]),
+        subtitle: expenses_subtitle,
+        color: :red,
+        icon: ICONS[:triangle_alert],
+        href: dashboard_expenses_detail_path(year: @year, month: @month)
+      }
+    when :profit
+      {
         title: t('dashboard.index_view.stats.profit.title'),
         value: format_currency(@totals[:profit]),
         subtitle: profit_subtitle,
         color: :blue,
         icon: ICONS[:trending_up]
-      )
-    end
-  end
-
-  def trips_card_mobile
-    div(class: 'block lg:hidden') do
-      render StatCardComponent.new(
+      }
+    when :days
+      {
+        title: t('dashboard.index_view.stats.days.title'),
+        value: @totals[:days].to_s,
+        subtitle: days_subtitle,
+        color: :yellow,
+        icon: ICONS[:calendar]
+      }
+    when :trips
+      {
         title: t('dashboard.index_view.stats.trips.title'),
         value: @totals[:trips].to_s,
         subtitle: trips_subtitle,
         color: :purple,
         icon: ICONS[:package]
-      )
+      }
     end
-  end
-
-  def days_card
-    render StatCardComponent.new(
-      title: t('dashboard.index_view.stats.days.title'),
-      value: @totals[:days].to_s,
-      subtitle: days_subtitle,
-      color: :yellow,
-      icon: ICONS[:calendar]
-    )
   end
 
   def earnings_subtitle
     key = annual_view? ? 'subtitle_annual' : 'subtitle_monthly'
     value = annual_view? ? @totals[:earnings_avg_month] : @totals[:earnings_avg_day]
-
     t("dashboard.index_view.stats.earnings.#{key}", value: format_currency(value))
   end
 
