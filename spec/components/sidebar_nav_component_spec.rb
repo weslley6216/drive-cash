@@ -22,7 +22,7 @@ RSpec.describe SidebarNavComponent, type: :component do
     end
 
     it 'dims inactive tabs with slate styling' do
-      expect(html.scan('text-slate-600').size).to eq(5)
+      expect(html.scan('text-slate-600').size).to eq(6)
     end
 
     it 'is hidden on mobile and visible on desktop' do

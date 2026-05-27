@@ -57,7 +57,7 @@ class SidebarNavComponent < ApplicationComponent
     div(class: 'p-4 border-t border-slate-100') do
       link_to(
         helpers.settings_path,
-        class: 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-50'
+        class: 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900'
       ) do
         div(class: 'w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center') do
           span(class: 'text-white text-xs font-medium') { 'W' }
