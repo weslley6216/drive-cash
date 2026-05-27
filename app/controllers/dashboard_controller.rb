@@ -5,12 +5,14 @@ class DashboardController < ApplicationController
     @totals = Dashboard::StatsService.new(year: @year, month: @month).call
     @recent_activity = Dashboard::RecentActivityService.new(year: @year, month: @month).call
     @categories = Dashboard::CategoryBreakdownService.new(year: @year, month: @month).call
+    @today = Dashboard::TodayService.new.call
 
     render Dashboard::IndexView.new(
       totals: @totals,
       filters: @filters,
       recent_activity: @recent_activity,
-      categories: @categories
+      categories: @categories,
+      today: @today
     )
   end
 

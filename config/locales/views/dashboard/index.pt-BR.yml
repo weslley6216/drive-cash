@@ -2,8 +2,9 @@ pt-BR:
   dashboard:
     index_view:
       title: "DriveCash"
-      subtitle: "Gestão financeira para motoristas de aplicativo"
-      greeting: "DriveCash"
+      greeting: "Olá, Weslley"
+      subtitle_period: "Veja seu desempenho de %{year}"
+      new_record: "Novo lançamento"
       sections:
         recent_activity: "Atividade recente"
         breakdown: "Para onde foi o dinheiro"
