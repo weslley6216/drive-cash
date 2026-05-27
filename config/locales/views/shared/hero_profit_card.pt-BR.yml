@@ -1,7 +1,7 @@
 pt-BR:
   hero_profit_card_component:
-    label_year: "Lucro líquido · %{year}"
-    label_month: "Lucro líquido · %{month}/%{year}"
+    label_year: "Lucro líquido — %{year}"
+    label_month: "Lucro líquido — %{month}/%{year}"
     change_positive: "+%{value}%"
     change_negative: "%{value}%"
     per_day: "%{value}/dia · em %{count} dias trabalhados"

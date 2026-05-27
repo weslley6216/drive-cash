@@ -54,4 +54,37 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to include('value="5" selected>MAI</option>')
     end
   end
+
+  context 'when compact: true' do
+    let(:component) do
+      FilterComponent.new(
+        selected_year: 2025,
+        selected_month: 5,
+        available_years: available_years,
+        compact: true
+      )
+    end
+    let(:html) { view_context.render(component) }
+
+    it 'does not render the full card wrapper' do
+      expect(html).not_to include('bg-white rounded-lg shadow-md')
+      expect(html).not_to include('shadow-md')
+    end
+
+    it 'renders inline selects without labels' do
+      expect(html).to include('value="2025" selected')
+      expect(html).to include('value="5" selected')
+      expect(html).not_to include(I18n.t('filter_component.year'))
+      expect(html).not_to include(I18n.t('filter_component.title'))
+    end
+
+    it 'uses pill styling classes' do
+      expect(html).to include('border-slate-200')
+    end
+
+    it 'renders a form so filter#submit can call requestSubmit()' do
+      expect(html).to include('<form')
+      expect(html).to include('data-controller="filter"')
+    end
+  end
 end

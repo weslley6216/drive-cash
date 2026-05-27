@@ -1,0 +1,12 @@
+pt-BR:
+  sidebar_nav_component:
+    brand: "DriveCash"
+    brand_subtitle: "Gestão Financeira"
+    tabs:
+      home: "Início"
+      analysis: "Análise"
+      goals: "Metas"
+      journey: "Hoje"
+      history: "Histórico"
+      vehicle: "Veículo"
+    settings: "Configurações"

@@ -1,0 +1,35 @@
+require 'rails_helper'
+
+RSpec.describe Dashboard::TodayService do
+  describe '#call' do
+    it 'returns today totals when data exists' do
+      create(:earning, date: Date.current, amount: 100, trips_count: 3)
+      create(:earning, date: Date.current, amount: 50, trips_count: 2)
+      create(:expense, date: Date.current, amount: 30, paid: true)
+
+      result = described_class.new.call
+
+      expect(result[:earnings]).to eq(150.0)
+      expect(result[:expenses]).to eq(30.0)
+      expect(result[:net]).to eq(120.0)
+      expect(result[:trips_count]).to eq(5)
+      expect(result[:duration_label]).to be_nil
+    end
+
+    it 'only counts activity from today' do
+      create(:earning, date: Date.current - 1, amount: 999)
+      create(:earning, date: Date.current, amount: 100, trips_count: 1)
+
+      result = described_class.new.call
+
+      expect(result[:earnings]).to eq(100.0)
+      expect(result[:net]).to eq(100.0)
+    end
+
+    it 'returns nil when no activity today' do
+      result = described_class.new.call
+
+      expect(result).to be_nil
+    end
+  end
+end

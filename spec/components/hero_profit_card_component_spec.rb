@@ -55,7 +55,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     rendered = view_context.render(negative)
 
     expect(rendered).to include('text-red-700')
-    expect(rendered).to include(I18n.t('hero_profit_card_component.change_negative', value: '-8.0'))
+    expect(rendered).to include(I18n.t('hero_profit_card_component.change_negative', value: '8.0'))
   end
 
   it 'does not render a change badge when change_percent is nil' do
@@ -84,58 +84,51 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
 
-  it 'plots one circle per non-future month (drops trailing zeros)' do
-    circles = html.scan(/<circle/)
-
-    expect(html).to include('<svg')
-    expect(html).to include('<path')
-    expect(html).to include('<circle')
-    expect(circles.size).to eq(5)
+  it 'renders two SVG charts — mobile and desktop' do
+    expect(html.scan('viewBox="0 0').size).to eq(2)
   end
 
-  it 'renders chart with gradient fill' do
-    expect(html).to include('profitFill')
-    expect(html).to include('stop-color')
-    expect(html).to include('linearGradient')
+  it 'renders mobile chart hidden on desktop' do
+    expect(html).to include('lg:hidden')
   end
 
-  it 'renders circles for data points' do
-    circles = html.scan(/<circle/)
-
-    expect(circles.size).to eq(5)
-    expect(html).to include('stroke="#1d4ed8"')
+  it 'renders desktop chart hidden on mobile' do
+    expect(html).to include('hidden lg:block')
   end
 
-  it 'renders month labels below the chart' do
-    expect(html).to include('Jan')
-    expect(html).to include('Fev')
-    expect(html).to include('Mar')
-    expect(html).to include('Abr')
-    expect(html).to include('Mai')
+  it 'uses mobile viewBox 320x70' do
+    expect(html).to include('viewBox="0 0 320 70"')
   end
 
-  it 'plots all points when there are no trailing zeros' do
-    full = HeroProfitCardComponent.new(
-      profit: 1200.0, change_percent: nil, profit_per_day: 100.0, days_count: 12,
-      monthly_series: [100.0, 200.0, 150.0, 300.0, 250.0, 180.0, 220.0, 270.0, 310.0, 280.0, 350.0, 400.0],
-      year: 2025, month: nil
+  it 'uses desktop viewBox 720x120' do
+    expect(html).to include('viewBox="0 0 720 120"')
+  end
+
+  it 'renders gradient fills for each chart' do
+    expect(html).to include('profitFillMobile')
+    expect(html).to include('profitFillDesktop')
+  end
+
+  it 'renders responsive text sizes for header' do
+    expect(html).to include('lg:text-5xl')
+    expect(html).to include('lg:text-sm')
+  end
+
+  it 'renders change badge with border styling' do
+    expect(html).to include('border')
+    expect(html).to include('border-emerald-200')
+  end
+
+  it 'renders month labels trimming leading zeros' do
+    series_with_leading = [0.0, 0.0, 100.0, 200.0, 300.0]
+    comp = HeroProfitCardComponent.new(
+      profit: 600, change_percent: nil, profit_per_day: 30, days_count: 20,
+      monthly_series: series_with_leading, year: 2025, month: nil
     )
-
-    circles = view_context.render(full).scan(/<circle/)
-
-    expect(circles.size).to eq(12)
-  end
-
-  it 'drops leading and trailing zeros' do
-    mixed = HeroProfitCardComponent.new(
-      profit: 500.0, change_percent: nil, profit_per_day: 50.0, days_count: 10,
-      monthly_series: [0.0, 0.0, 100.0, 0.0, 200.0, 0.0, 0.0, 0.0],
-      year: 2025, month: nil
-    )
-
-    circles = view_context.render(mixed).scan(/<circle/)
-
-    expect(circles.size).to eq(3)
+    rendered = view_context.render(comp)
+    expect(rendered).not_to include('>Jan<')
+    expect(rendered).not_to include('>Fev<')
+    expect(rendered).to include('Mar')
   end
 
   it 'omits the SVG path when all series values are zero' do
@@ -145,5 +138,36 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     )
 
     expect(view_context.render(flat)).not_to include('<path')
+  end
+
+  it 'renders month abbreviations below the chart' do
+    expect(html).to include('Jan')
+    expect(html).to include('Fev')
+    expect(html).to include('Mar')
+  end
+
+  context 'when daily_mode: true' do
+    let(:daily_series) { [0.0] * 9 + [400.0, 0.0, 80.0] + [0.0] * 19 }
+    let(:component) do
+      HeroProfitCardComponent.new(
+        profit: 480, change_percent: nil, profit_per_day: 160, days_count: 2,
+        monthly_series: daily_series, year: 2025, month: 1, daily_mode: true
+      )
+    end
+    let(:html) { view_context.render(component) }
+
+    it 'renders chart including zero-value days' do
+      expect(html).to include('viewBox="0 0 320 70"')
+      expect(html).to include('<path')
+    end
+
+    it 'plots all days including zeros without trimming' do
+      expect(html.scan('<circle').size).to eq(daily_series.size * 2)
+    end
+
+    it 'does not render month label abbreviations' do
+      expect(html).not_to include('>Jan<')
+      expect(html).not_to include('>Fev<')
+    end
   end
 end

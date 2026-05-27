@@ -59,6 +59,51 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('Posto Shell')
       expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
+
+
+    it 'renders topbar with greeting and subtitle' do
+      get root_path, params: { year: 2025 }
+
+      expect(response.body).to include(I18n.t('dashboard.index_view.greeting'))
+      expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
+    end
+
+    it 'renders "Novo lançamento" button hidden on mobile' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('dashboard.index_view.new_record'))
+      expect(response.body).to include('hidden lg:inline-flex')
+    end
+
+    it 'renders 12-column grid layout for hero and sidebar' do
+      get root_path
+
+      expect(response.body).to include('lg:grid-cols-12')
+      expect(response.body).to include('lg:col-span-8')
+      expect(response.body).to include('lg:col-span-4')
+    end
+
+    it 'renders today card when there is activity today' do
+      create(:earning, date: Date.current, amount: 100, trips_count: 2)
+
+      get root_path
+
+      expect(response.body).to include(I18n.t('today_card_component.label'))
+      expect(response.body).to include('100,00')
+    end
+
+    it 'does not render today card when no activity today' do
+      get root_path
+
+      expect(response.body).not_to include('tracking-wider text-slate-500')
+    end
+
+    it 'renders secondary grid with 7/5 column split' do
+      get root_path
+
+      expect(response.body).to include('lg:col-span-7')
+      expect(response.body).to include('lg:col-span-5')
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do

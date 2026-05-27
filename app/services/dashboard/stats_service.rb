@@ -35,6 +35,7 @@ module Dashboard
         expenses_by_category: expenses_data[:by_category],
         top_expense_vendors: expenses_data[:top_vendors],
         monthly_profit_series: monthly_profit_series,
+        daily_profit_series: daily_profit_series,
         change_percent: change_percent
       }
     end
@@ -112,6 +113,19 @@ module Dashboard
 
       (trips.to_f / days).round
     end
+
+    def daily_profit_series
+      return nil unless month
+
+      days_in_month = Date.new(year.to_i, month.to_i, -1).day
+      earn_by_day = Earning.for_year(year).for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
+      exp_by_day  = Expense.for_year(year).paid_only.for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
+
+      (1..days_in_month).map { |d| (earn_by_day[d].to_f - exp_by_day[d].to_f).round(2) }
+    end
+
 
     def monthly_profit_series
       @monthly_profit_series ||= begin
