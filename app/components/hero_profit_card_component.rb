@@ -42,9 +42,10 @@ class HeroProfitCardComponent < ApplicationComponent
   def change_badge
     positive = @change_percent.to_f >= 0
     classes = positive ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'
+    icon = positive ? PhlexIcons::Lucide::ArrowUpRight : PhlexIcons::Lucide::ArrowDownRight
 
     div(class: class_names('flex items-center gap-1 rounded-full px-2 py-1 lg:px-3 lg:py-1.5 text-xs lg:text-sm font-semibold border', classes)) do
-      render PhlexIcons::Lucide::ArrowUpRight.new(class: 'w-3 h-3 lg:w-3.5 lg:h-3.5')
+      render icon.new(class: 'w-3 h-3 lg:w-3.5 lg:h-3.5')
       plain I18n.t(positive ? 'hero_profit_card_component.change_positive' : 'hero_profit_card_component.change_negative',
                    value: @change_percent.abs.to_s)
     end
@@ -76,7 +77,7 @@ class HeroProfitCardComponent < ApplicationComponent
   def desktop_chart
     render_chart(width: DESKTOP_CHART_WIDTH, height: DESKTOP_CHART_HEIGHT,
                  gradient_id: 'profitFillDesktop', last_dot_r: 5, dot_r: 3.5,
-                 stroke_width: 2.5, height_class: 'h-[120px]')
+                 stroke_width: 3.0, height_class: 'h-[120px]')
   end
 
   def render_chart(width:, height:, gradient_id:, last_dot_r:, dot_r:, stroke_width:, height_class:)
@@ -112,12 +113,19 @@ class HeroProfitCardComponent < ApplicationComponent
     end
   end
 
-  def compute_points(width:, height:)
-    values = @series.reject(&:zero?)
-    return [] if values.empty?
+  def series_to_plot
+    @series_to_plot ||= @series
+      .drop_while(&:zero?)
+      .reverse
+      .drop_while(&:zero?)
+      .reverse
+  end
 
-    leading_zeros = @series.take_while(&:zero?).size
-    series_to_plot = @series[leading_zeros..]&.reject { |v| v.zero? && v == @series.last } || []
+  def leading_zeros_count
+    @leading_zeros_count ||= @series.take_while(&:zero?).size
+  end
+
+  def compute_points(width:, height:)
     return [] if series_to_plot.empty?
 
     max = series_to_plot.max
@@ -165,8 +173,6 @@ class HeroProfitCardComponent < ApplicationComponent
   end
 
   def chart_labels
-    leading_zeros = @series.take_while(&:zero?).size
-    trimmed = @series[leading_zeros..] || []
-    MONTHS_PT[leading_zeros, trimmed.size] || []
+    MONTHS_PT[leading_zeros_count, series_to_plot.size] || []
   end
 end
