@@ -20,7 +20,4 @@ class Earning < ApplicationRecord
   scope :chronological, -> { order(date: :desc, created_at: :desc) }
   scope :for_year, ->(year) { where('EXTRACT(YEAR FROM date) = ?', year) if year.present? }
   scope :for_month, ->(month) { where('EXTRACT(MONTH FROM date) = ?', month) if month.present? }
-  scope :by_platform, ->(platform) { where(platform: platform) if platform.present? }
-
-  def self.total_by_platform = group(:platform).sum(:amount)
 end

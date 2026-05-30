@@ -40,19 +40,6 @@ RSpec.describe Earning, type: :model do
     end
   end
 
-  describe '.total_by_platform' do
-    it 'groups and sums amounts by platform' do
-      create(:earning, platform: :shopee, amount: 100)
-      create(:earning, platform: :shopee, amount: 50)
-      create(:earning, platform: :mercado_livre, amount: 200)
-
-      result = described_class.total_by_platform
-
-      expect(result['shopee']).to eq(150.0)
-      expect(result['mercado_livre']).to eq(200.0)
-    end
-  end
-
   describe 'trips_count' do
     it 'defaults to 1' do
       earning = build(:earning)
