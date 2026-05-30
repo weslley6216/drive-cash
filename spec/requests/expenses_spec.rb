@@ -8,6 +8,7 @@ RSpec.describe 'Expenses', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
       expect(response.body).to include(I18n.t('expenses.new_view.title'))
+      expect(response.body).to include('installment[repeat]')
     end
 
     it 'passes context params to the form' do
@@ -114,6 +115,7 @@ RSpec.describe 'Expenses', type: :request do
       expect(response.body).to include('turbo-frame id="modal"')
       expect(response.body).to include(I18n.t('expenses.edit_view.title'))
       expect(response.body).to include('value="2026"')
+      expect(response.body).to include('expense[paid]')
     end
   end
 

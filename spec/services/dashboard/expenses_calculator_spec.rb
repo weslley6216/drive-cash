@@ -15,13 +15,6 @@ RSpec.describe Dashboard::ExpensesCalculator do
     it 'calculates total expenses' do
       expect(result[:total]).to eq(350.0)
     end
-
-    it 'lists top vendors by total amount' do
-      expect(result[:top_vendors]).to include(
-        'Posto Shell' => 150.0,
-        'Mecânico Zé' => 200.0
-      )
-    end
   end
 
   describe '#monthly_totals' do

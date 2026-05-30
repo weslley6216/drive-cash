@@ -32,11 +32,6 @@ RSpec.describe Dashboard::EarningsCalculator do
     it 'sums trips_count across all earnings' do
       expect(result[:trips_count]).to eq(3)
     end
-
-    it 'groups earnings by platform' do
-      expect(result[:by_platform]['shopee']).to eq(700.0)
-      expect(result[:by_platform]['uber']).to eq(300.0)
-    end
   end
 
   describe '#monthly_totals' do

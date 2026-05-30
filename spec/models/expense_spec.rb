@@ -68,29 +68,6 @@ RSpec.describe Expense, type: :model do
     end
   end
 
-  describe 'scopes' do
-    it '.by_category filters by the given category' do
-      fuel        = create(:expense, category: 'fuel')
-      maintenance = create(:expense, category: 'maintenance')
-
-      expect(described_class.by_category('fuel')).to include(fuel)
-      expect(described_class.by_category('fuel')).not_to include(maintenance)
-    end
-  end
-
-  describe '.total_by_category' do
-    it 'groups and sums amounts by category' do
-      create(:expense, category: 'fuel', amount: 100)
-      create(:expense, category: 'fuel', amount: 50)
-      create(:expense, category: 'maintenance', amount: 200)
-
-      result = described_class.total_by_category
-
-      expect(result['fuel']).to eq(150.0)
-      expect(result['maintenance']).to eq(200.0)
-    end
-  end
-
   describe 'sanitize_amount' do
     it 'converts comma-separated value to float' do
       expense = build(:expense, amount: '45,90')

@@ -31,12 +31,6 @@ class Expense < ApplicationRecord
   scope :paid_only, -> { where(paid: true) }
   scope :for_year, ->(year) { where('EXTRACT(YEAR FROM date) = ?', year) if year.present? }
   scope :for_month, ->(month) { where('EXTRACT(MONTH FROM date) = ?', month) if month.present? }
-  scope :by_category, ->(category) { where(category: category) if category.present? }
-
-  def self.total_by_category
-    group(:category).sum(:amount)
-  end
-
   def installment?
     installment_series_id.present?
   end
