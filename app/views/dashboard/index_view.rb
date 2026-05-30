@@ -55,7 +55,7 @@ module Dashboard
 
     def primary_grid
       div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
-        div(class: 'lg:col-span-8') do
+        div(id: 'hero_profit_card', class: 'lg:col-span-8') do
           monthly_view = @filters[:month].present?
           render HeroProfitCardComponent.new(
             profit: @totals[:profit],
@@ -71,7 +71,7 @@ module Dashboard
 
         div(class: 'lg:col-span-4 flex flex-col gap-4') do
           render CajuQuickAccessComponent.new
-          render TodayCardComponent.new(**@today) if @today
+          div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
         end
       end
     end
@@ -86,8 +86,12 @@ module Dashboard
 
     def secondary_grid
       div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
-        div(class: 'lg:col-span-7') { render RecentActivityComponent.new(rows: @recent_activity) }
-        div(class: 'lg:col-span-5') { render CategoryBreakdownComponent.new(categories: @categories) }
+        div(id: 'recent_activity', class: 'lg:col-span-7') do
+          render RecentActivityComponent.new(rows: @recent_activity)
+        end
+        div(id: 'category_breakdown', class: 'lg:col-span-5') do
+          render CategoryBreakdownComponent.new(categories: @categories)
+        end
       end
     end
   end

@@ -104,6 +104,21 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('lg:col-span-7')
       expect(response.body).to include('lg:col-span-5')
     end
+
+    it 'renders stable IDs on home wrappers for turbo stream targets' do
+      get root_path
+
+      expect(response.body).to include('id="hero_profit_card"')
+      expect(response.body).to include('id="today_card"')
+      expect(response.body).to include('id="recent_activity"')
+      expect(response.body).to include('id="category_breakdown"')
+    end
+
+    it 'keeps today_card wrapper in DOM even without activity today' do
+      get root_path
+
+      expect(response.body).to include('id="today_card"')
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do
