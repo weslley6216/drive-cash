@@ -150,10 +150,7 @@ module Dashboard
     def distinct_months_count(earnings_total)
       return 1 unless earnings_total > 0
 
-      earnings_scope
-        .pluck(Arel.sql("DISTINCT TO_CHAR(date, 'YYYY-MM')"))
-        .count
-        .clamp(1, Float::INFINITY)
+      ScopeMonthCounter.count_for(earnings_scope)
     end
   end
 end
