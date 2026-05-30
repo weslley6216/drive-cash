@@ -1,6 +1,7 @@
 module Dashboard
   class EarningsCalculator
     include ScopeMonthCounter
+    include MonthlyTotals
 
     def initialize(scope)
       @scope = scope
@@ -14,11 +15,6 @@ module Dashboard
         days_count: days_count,
         trips_count: total_trips
       }
-    end
-
-    def monthly_totals
-      grouped = scope.group(Arel.sql('EXTRACT(MONTH FROM date)::int')).sum(:amount)
-      (1..12).map { |month| grouped[month].to_f }
     end
 
     private
