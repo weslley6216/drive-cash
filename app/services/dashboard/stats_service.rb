@@ -158,9 +158,5 @@ module Dashboard
         .count
         .clamp(1, Float::INFINITY)
     end
-
-    def self.available_years
-      AvailableYears.fetch
-    end
   end
 end
