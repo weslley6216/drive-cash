@@ -43,6 +43,13 @@ RSpec.describe Ai::SummaryBuilder do
       expect(summary).to include('mensal')
     end
 
+    it 'formats amounts >= 1000 with thousands separator' do
+      params = { 'amount' => 1234.5, 'platform' => 'uber', 'date' => '2026-04-23' }
+      summary = described_class.build('create_earning', params)
+
+      expect(summary).to include('1.234,50')
+    end
+
     it 'returns the fallback message for an unknown action' do
       summary = described_class.build('unknown_action', {})
       expect(summary).to eq(I18n.t('chat.message.fallback'))

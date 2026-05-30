@@ -1,6 +1,6 @@
 module Ai
   class SummaryBuilder
-    include CurrencyHelper
+    include Formatting
 
     def self.build(action, params)
       new(action, params).call
