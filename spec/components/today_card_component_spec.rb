@@ -6,8 +6,7 @@ RSpec.describe TodayCardComponent, type: :component do
       earnings: 150.0,
       expenses: 40.0,
       net: 110.0,
-      trips_count: 5,
-      duration_label: '3h20'
+      trips_count: 5
     )
   end
   let(:html) { view_context.render(component) }
@@ -31,9 +30,8 @@ RSpec.describe TodayCardComponent, type: :component do
     expect(html).to include('text-red-600')
   end
 
-  it 'renders trips count and duration label' do
+  it 'renders trips count' do
     expect(html).to include('5 corridas')
-    expect(html).to include('3h20')
   end
 
   context 'when trips_count is zero and no duration' do

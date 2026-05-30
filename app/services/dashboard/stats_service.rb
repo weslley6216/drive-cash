@@ -31,8 +31,8 @@ module Dashboard
         trips_avg_month: trips_avg_month(earnings_data[:trips_count], earnings_data[:total]),
         trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked),
 
-        monthly_profit_series: monthly_profit_series,
-        daily_profit_series: daily_profit_series,
+        monthly_profit_series: profit_series.monthly,
+        daily_profit_series: profit_series.daily,
         change_percent: change_percent
       }
     end
@@ -111,25 +111,8 @@ module Dashboard
       (trips.to_f / days).round
     end
 
-    def daily_profit_series
-      return nil unless month
-
-      days_in_month = Date.new(year.to_i, month.to_i, -1).day
-      earn_by_day = Earning.for_year(year).for_month(month)
-                           .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
-      exp_by_day  = Expense.for_year(year).paid_only.for_month(month)
-                           .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
-
-      (1..days_in_month).map { |d| (earn_by_day[d].to_f - exp_by_day[d].to_f).round(2) }
-    end
-
-
-    def monthly_profit_series
-      @monthly_profit_series ||= begin
-        year_earnings = EarningsCalculator.new(Earning.for_year(year)).monthly_totals
-        year_expenses = ExpensesCalculator.new(Expense.for_year(year).paid_only).monthly_totals
-        year_earnings.zip(year_expenses).map { |earn, exp| (earn - exp).round(2) }
-      end
+    def profit_series
+      @profit_series ||= ProfitSeriesService.new(year: year, month: month)
     end
 
     def change_percent
@@ -139,7 +122,7 @@ module Dashboard
       previous_index = current_index - 1
       return nil if previous_index.negative?
 
-      series = monthly_profit_series
+      series = profit_series.monthly
       current_profit  = series[current_index].to_f
       previous_profit = series[previous_index].to_f
       return nil if previous_profit.zero?

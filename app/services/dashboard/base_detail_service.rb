@@ -15,10 +15,7 @@ module Dashboard
 
     attr_reader :year, :month
 
-    def base_scope   = raise NotImplementedError
-    def empty_scope  = raise NotImplementedError
-    def list_key     = raise NotImplementedError
-    def by_month_key = raise NotImplementedError
+    def totals_scope(scope) = scope
 
     def monthly_detail
       scope = base_scope.for_year(year).for_month(month).chronological
@@ -26,15 +23,15 @@ module Dashboard
       {
         list_key => scope,
         by_month_key => nil,
-        total: scope.sum(:amount),
+        total: totals_scope(scope).sum(:amount),
         annual: false
       }
     end
 
     def annual_detail
-      by_month = base_scope.for_year(year)
-                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                           .sum(:amount)
+      by_month = totals_scope(base_scope.for_year(year))
+                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                 .sum(:amount)
 
       monthly_rows = by_month.sort_by { |month_number, _| month_number }.map do |month_number, total|
         { month: month_number, month_name: month_names[month_number], total: total }

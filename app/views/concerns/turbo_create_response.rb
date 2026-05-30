@@ -1,41 +1,23 @@
 module TurboCreateResponse
+  include TurboSaveStreams
+
   private
 
   def render_turbo_streams(record:, new_view:, record_key:)
     if record.persisted? && @totals
-      render_success(record)
+      clear_modal_stream
+      stats_grid_stream(totals: @totals, month: record.date.month, year: record.date.year)
+      raw turbo_stream.replace('dashboard_filters') {
+        render FilterComponent.new(
+          selected_year: record.date.year,
+          selected_month: record.date.month,
+          available_years: Dashboard::AvailableYears.fetch
+        )
+      }
     else
-      render_failure(new_view, record_key => record)
+      modal_stream(new_view.new(record_key => record, context: @context))
     end
 
-    raw turbo_stream.update('flash') {
-      render FlashComponent.new(flash: helpers.flash)
-    }
-  end
-
-  def render_success(record)
-    raw turbo_stream.update('modal', '')
-
-    raw turbo_stream.replace('stats_grid') {
-      render StatsGridComponent.new(
-        totals: @totals,
-        month: record.date.month, # Usando o novo registro em vez de @context[:month]
-        year: record.date.year    # Usando o novo registro em vez de @context[:year]
-      )
-    }
-
-    raw turbo_stream.replace('dashboard_filters') {
-      render FilterComponent.new(
-        selected_year: record.date.year,
-        selected_month: record.date.month,
-        available_years: Dashboard::AvailableYears.fetch
-      )
-    }
-  end
-
-  def render_failure(new_view, record_kwargs)
-    raw turbo_stream.replace('modal') {
-      render new_view.new(**record_kwargs, context: @context)
-    }
+    flash_stream
   end
 end
