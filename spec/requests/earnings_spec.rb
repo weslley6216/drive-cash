@@ -8,6 +8,8 @@ RSpec.describe 'Earnings', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
       expect(response.body).to include(I18n.t('earnings.new_view.title'))
+      expect(response.body).to include('Nova Receita')
+      expect(response.body).to include('Registre um valor recebido por plataforma')
     end
 
     it 'passes context params to the form' do
@@ -68,6 +70,8 @@ RSpec.describe 'Earnings', type: :request do
       expect(response.body).to include('Amazon')
       expect(response.body).to include('Mercado Livre')
       expect(response.body).not_to include('Translation missing')
+      expect(response.body).to include('Editar Receita')
+      expect(response.body).to include('Ajuste os dados da receita')
     end
   end
 
