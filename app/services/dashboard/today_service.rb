@@ -14,8 +14,7 @@ module Dashboard
         earnings: earnings_sum,
         expenses: expenses_sum,
         net: earnings_sum - expenses_sum,
-        trips_count: earnings_today.sum(:trips_count),
-        duration_label: nil
+        trips_count: earnings_today.sum(:trips_count)
       }
     end
   end

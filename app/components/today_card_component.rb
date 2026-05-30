@@ -1,10 +1,9 @@
 class TodayCardComponent < ApplicationComponent
-  def initialize(earnings:, expenses:, net:, trips_count: 0, duration_label: nil)
+  def initialize(earnings:, expenses:, net:, trips_count: 0)
     @earnings = earnings
     @expenses = expenses
     @net = net
     @trips_count = trips_count.to_i
-    @duration_label = duration_label
   end
 
   def view_template
@@ -27,7 +26,6 @@ class TodayCardComponent < ApplicationComponent
   def detail_text
     parts = []
     parts << I18n.t('today_card_component.trips_count', count: @trips_count) if @trips_count.positive?
-    parts << @duration_label if @duration_label.present?
     parts.join(' · ').presence
   end
 end

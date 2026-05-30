@@ -13,7 +13,6 @@ RSpec.describe Dashboard::TodayService do
       expect(result[:expenses]).to eq(30.0)
       expect(result[:net]).to eq(120.0)
       expect(result[:trips_count]).to eq(5)
-      expect(result[:duration_label]).to be_nil
     end
 
     it 'only counts activity from today' do
