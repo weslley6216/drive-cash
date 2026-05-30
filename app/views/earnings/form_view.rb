@@ -19,7 +19,6 @@ module Earnings
 
     private
 
-    # Alvo do form derivado de persisted? (sem método abstrato → sem linha não-coberta).
     def form_url
       @earning.persisted? ? earning_path(@earning) : earnings_path
     end

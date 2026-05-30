@@ -19,7 +19,6 @@ module Expenses
 
     private
 
-    # Alvo do form derivado de persisted? (sem método abstrato → sem linha não-coberta).
     def form_url
       @expense.persisted? ? expense_path(@expense) : expenses_path
     end
@@ -43,16 +42,11 @@ module Expenses
       end
     end
 
-    # `form_body` é um hook abstrato: NÃO definido no base (assim não gera linha
-    # não-coberta). Cada subclasse concreta (NewView/EditView) o implementa, e ambas
-    # são exercitadas pelos request specs.
-
     def hidden_context_fields
       input(type: 'hidden', name: 'context[year]', value: @context[:year])
       input(type: 'hidden', name: 'context[month]', value: @context[:month])
     end
 
-    # Subclasses podem passar a categoria atual para pré-seleção.
     def category_select(form)
       field_wrapper(t('.labels.category'), theme: @theme) do
         render form.select(
