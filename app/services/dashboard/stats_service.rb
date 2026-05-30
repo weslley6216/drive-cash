@@ -31,9 +31,6 @@ module Dashboard
         trips_avg_month: trips_avg_month(earnings_data[:trips_count], earnings_data[:total]),
         trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked),
 
-        earnings_by_platform: earnings_data[:by_platform],
-        expenses_by_category: expenses_data[:by_category],
-        top_expense_vendors: expenses_data[:top_vendors],
         monthly_profit_series: monthly_profit_series,
         daily_profit_series: daily_profit_series,
         change_percent: change_percent

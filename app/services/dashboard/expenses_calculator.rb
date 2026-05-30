@@ -10,8 +10,7 @@ module Dashboard
       {
         total: total_expenses,
         avg_per_month: avg_per_month,
-        by_category: by_category,
-        top_vendors: top_vendors
+        by_category: by_category
       }
     end
 
@@ -36,15 +35,6 @@ module Dashboard
 
     def by_category
       scope.group(:category).sum(:amount)
-    end
-
-    def top_vendors
-      scope.where.not(vendor: nil)
-           .group(:vendor)
-           .sum(:amount)
-           .sort_by { |_, total| -total }
-           .first(5)
-           .to_h
     end
   end
 end
