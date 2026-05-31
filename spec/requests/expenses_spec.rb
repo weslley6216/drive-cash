@@ -172,15 +172,15 @@ RSpec.describe 'Expenses', type: :request do
       expect(response.body).to include(I18n.t('expenses.edit_view.title'))
     end
 
-    it 'does not refresh home cards (out of scope for update)' do
+    it 'refreshes home cards on update' do
       patch expense_path(expense),
             params: { expense: { amount: 120.75 }, context: { year: 2026, month: 1 } },
             as: :turbo_stream
 
-      expect(response.body).not_to include('target="hero_profit_card"')
-      expect(response.body).not_to include('target="today_card"')
-      expect(response.body).not_to include('target="recent_activity"')
-      expect(response.body).not_to include('target="category_breakdown"')
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
     end
   end
 
