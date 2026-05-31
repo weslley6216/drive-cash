@@ -7,6 +7,10 @@ module TurboCreateResponse
     if record.persisted? && @totals
       clear_modal_stream
       stats_grid_stream(totals: @totals, month: record.date.month, year: record.date.year)
+      hero_stream(totals: @totals, year: record.date.year, month: record.date.month)
+      today_card_stream
+      recent_activity_stream(year: record.date.year, month: record.date.month)
+      category_breakdown_stream(year: record.date.year, month: record.date.month)
       raw turbo_stream.replace('dashboard_filters') {
         render FilterComponent.new(
           selected_year: record.date.year,
