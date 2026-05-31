@@ -1,0 +1,21 @@
+pt-BR:
+  history:
+    index:
+      title: "Histórico"
+      subtitle: "Todos os lançamentos"
+      search_placeholder: "Buscar por descrição, posto, plataforma..."
+      filters:
+        all: "Todos"
+        earnings: "Receitas"
+        expenses: "Despesas"
+        unpaid: "Não pagas"
+      summary:
+        earnings: "Receitas"
+        expenses: "Despesas"
+        net: "Líquido"
+      day_group:
+        unpaid_badge: "Pendente"
+      empty: "Sem lançamentos no período."
+      edit:
+        earning: "Editar receita"
+        expense: "Editar despesa"

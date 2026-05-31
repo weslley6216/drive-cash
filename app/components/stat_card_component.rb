@@ -1,4 +1,9 @@
 class StatCardComponent < ApplicationComponent
+  SIZES = {
+    default: 'text-xl lg:text-2xl',
+    sm:      'text-sm lg:text-xl'
+  }.freeze
+
   COLORS = {
     green: {
       bg: 'bg-green-50',
@@ -37,13 +42,14 @@ class StatCardComponent < ApplicationComponent
     }
   }.freeze
 
-  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil)
+  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil, size: :default)
     @title = title
     @value = value
     @subtitle = subtitle
     @color = color
     @icon = icon
     @href = href
+    @size = size
   end
 
   def view_template
@@ -82,7 +88,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def value_classes
-    class_names('text-xl lg:text-2xl font-bold mt-1 whitespace-nowrap', colors[:value])
+    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-1 whitespace-nowrap", colors[:value])
   end
 
   def subtitle_classes
