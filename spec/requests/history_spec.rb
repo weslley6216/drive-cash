@@ -2,20 +2,20 @@ require 'rails_helper'
 
 RSpec.describe 'History', type: :request do
   describe 'GET /history' do
-    it 'returns 200 (AC 1)' do
+    it 'returns 200' do
       get history_path
 
       expect(response).to have_http_status(:ok)
     end
 
-    it 'highlights the history tab in the bottom nav (AC 1)' do
+    it 'highlights the history tab in the bottom nav' do
       get history_path
 
       expect(response.body).to include(I18n.t('bottom_nav_component.tabs.history'))
       expect(response.body).to include('text-blue-600')
     end
 
-    it 'renders all entries of the year grouped by day in desc order (AC 2)' do
+    it 'renders all entries of the year grouped by day in desc order' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 3)
       create(:expense, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', vendor: 'Posto Shell', paid: true)
 
@@ -28,7 +28,7 @@ RSpec.describe 'History', type: :request do
       expect(day12).to be < day10
     end
 
-    it 'renders each day group with earnings and expenses totals (AC 3)' do
+    it 'renders each day group with earnings and expenses totals' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, date: Date.new(2025, 6, 10), amount: 80,  category: 'fuel', paid: true)
 
@@ -40,7 +40,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('80,00')
     end
 
-    it 'filters by earnings only (AC 4)' do
+    it 'filters by earnings only' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', vendor: 'Posto Shell', paid: true)
 
@@ -50,7 +50,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include('Posto Shell')
     end
 
-    it 'filters by unpaid expenses only (AC 5)' do
+    it 'filters by unpaid expenses only' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', vendor: 'Posto X', paid: true)
       create(:expense, date: Date.new(2025, 6, 12), amount: 40,  category: 'meals', vendor: 'Lanchonete', paid: false)
@@ -62,7 +62,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
-    it 'searches by query case-insensitive (AC 6)' do
+    it 'searches by query case-insensitive' do
       create(:expense, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
       create(:expense, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
 
@@ -72,7 +72,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include('Lanchonete')
     end
 
-    it 'renders the pending badge for unpaid expenses (AC 7)' do
+    it 'renders the pending badge for unpaid expenses' do
       create(:expense, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
       get history_path(year: 2025)
@@ -81,7 +81,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('bg-amber-100')
     end
 
-    it 'links each entry edit through turbo_frame modal (AC 8)' do
+    it 'links each entry to its edit form inside the modal turbo frame' do
       earning = create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       expense = create(:expense, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
@@ -93,7 +93,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('data-turbo-frame="modal"')
     end
 
-    it 'matches the top summary to the applied filter (AC 9)' do
+    it 'summary totals reflect the applied filter' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
 
@@ -103,7 +103,7 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to match(/200,00.*text-green-900/m)
     end
 
-    it 'renders the FAB above the bottom nav (AC 10)' do
+    it 'renders the FAB positioned above the bottom nav' do
       get history_path
 
       expect(response.body).to include('fixed bottom-24 right-6')
