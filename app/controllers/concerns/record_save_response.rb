@@ -31,14 +31,14 @@ module RecordSaveResponse
   end
 
   def turbo_render_list(detail_service, detail_view)
-    filter = dashboard_filter_context
-    totals = Dashboard::StatsService.new(**filter).call
+    filter  = dashboard_filter_context
+    totals  = Dashboard::StatsService.new(**filter).call
+    detail  = detail_service.new(year: filter[:year], month: filter[:month]).call
+    today   = Dashboard::TodayService.new.call
+    rows    = Dashboard::RecentActivityService.new(year: filter[:year], month: filter[:month]).call
+    cats    = Dashboard::CategoryBreakdownService.new(year: filter[:year], month: filter[:month]).call
+    monthly = filter[:month].present?
     flash.now[:notice] = t('.success')
-    detail   = detail_service.new(year: filter[:year], month: filter[:month]).call
-    today    = Dashboard::TodayService.new.call
-    rows     = Dashboard::RecentActivityService.new(year: filter[:year], month: filter[:month]).call
-    cats     = Dashboard::CategoryBreakdownService.new(year: filter[:year], month: filter[:month]).call
-    monthly  = filter[:month].present?
 
     respond_to do |format|
       format.turbo_stream do
