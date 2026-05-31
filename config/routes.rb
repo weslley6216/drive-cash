@@ -6,6 +6,9 @@ Rails.application.routes.draw do
 
   resources :expenses, only: %i[new create edit update destroy]
   resources :earnings, only: %i[new create edit update destroy]
+
+  get  '/records/new', to: 'records#new',    as: :new_record
+  post '/records',     to: 'records#create', as: :records
   
   # AI Chat
   scope '/chat', module: nil, as: :chat do
