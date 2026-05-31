@@ -1,8 +1,16 @@
 import { Controller } from '@hotwired/stimulus'
 
+const TOGGLE_ACTIVE_EARN = ['bg-white', 'shadow-sm', 'text-emerald-700']
+const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
+const TOGGLE_INACTIVE = ['text-slate-500']
+
 export default class extends Controller {
   static values = { type: String }
-  static targets = ['typeInput', 'earningFields', 'expenseFields', 'submit', 'tripsValue', 'tripsInput']
+  static targets = [
+    'typeInput', 'earningFields', 'expenseFields',
+    'submit', 'tripsValue', 'tripsInput',
+    'earningToggle', 'expenseToggle', 'amountTheme'
+  ]
 
   connect() {
     this.applyType(this.typeValue)
@@ -21,6 +29,8 @@ export default class extends Controller {
     this.toggleFieldset(this.earningFieldsTarget, !isEarn)
     this.toggleFieldset(this.expenseFieldsTarget, isEarn)
     this.applyCtaTheme(isEarn)
+    this.applyToggleVisual(isEarn)
+    this.applyAmountTheme(isEarn)
   }
 
   toggleFieldset(node, disabled) {
@@ -39,6 +49,30 @@ export default class extends Controller {
     } else {
       btn.classList.add('bg-red-600', 'shadow-red-600/20')
     }
+  }
+
+  applyToggleVisual(isEarn) {
+    if (!this.hasEarningToggleTarget || !this.hasExpenseToggleTarget) return
+    const earn = this.earningToggleTarget
+    const expense = this.expenseToggleTarget
+
+    earn.classList.remove(...TOGGLE_ACTIVE_EARN, ...TOGGLE_INACTIVE)
+    expense.classList.remove(...TOGGLE_ACTIVE_EXPENSE, ...TOGGLE_INACTIVE)
+
+    if (isEarn) {
+      earn.classList.add(...TOGGLE_ACTIVE_EARN)
+      expense.classList.add(...TOGGLE_INACTIVE)
+    } else {
+      expense.classList.add(...TOGGLE_ACTIVE_EXPENSE)
+      earn.classList.add(...TOGGLE_INACTIVE)
+    }
+  }
+
+  applyAmountTheme(isEarn) {
+    if (!this.hasAmountThemeTarget) return
+    const el = this.amountThemeTarget
+    el.classList.remove('text-red-700', 'text-emerald-700')
+    el.classList.add(isEarn ? 'text-emerald-700' : 'text-red-700')
   }
 
   incrementTrips(event) {

@@ -20,7 +20,7 @@ module Records
         is_active ? "bg-white shadow-sm #{active_text_class}" : 'text-slate-500'
       ].join(' ')
 
-      label(class: label_classes) do
+      label(class: label_classes, data: { record_form_target: "#{value}Toggle" }) do
         input(
           type: 'radio',
           name: 'type',

@@ -21,6 +21,11 @@ RSpec.describe Records::EntryTypeToggleComponent, type: :component do
       expect(html).to include('value="earning"')
       expect(html).to include('value="expense"')
     end
+
+    it 'adds Stimulus toggle targets to each label' do
+      expect(html).to include('data-record-form-target="earningToggle"')
+      expect(html).to include('data-record-form-target="expenseToggle"')
+    end
   end
 
   context 'when expense is active' do

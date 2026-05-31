@@ -14,7 +14,7 @@ module Records
           p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider mb-1') do
             t('records.new_view.amount_label')
           end
-          div(class: "flex items-baseline justify-center gap-1 #{THEME_TEXT.fetch(@theme)}") do
+          div(class: "flex items-baseline justify-center gap-1 #{THEME_TEXT.fetch(@theme)}", data: { record_form_target: 'amountTheme' }) do
             span(class: 'text-2xl font-medium opacity-60') { 'R$' }
             input(
               type: 'number',

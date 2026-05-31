@@ -31,4 +31,8 @@ RSpec.describe Records::AmountInputComponent, type: :component do
     expect(html).to include('name="record[date]"')
     expect(html).to include('value="2026-05-22"')
   end
+
+  it 'exposes Stimulus target for dynamic theme switching' do
+    expect(html).to include('data-record-form-target="amountTheme"')
+  end
 end
