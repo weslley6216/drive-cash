@@ -72,11 +72,15 @@ export default class extends Controller {
 
   applyAmountTheme(isEarn) {
     const color = isEarn ? '#047857' : '#b91c1c'
+    const placeholderAdd = isEarn ? 'placeholder:text-emerald-700' : 'placeholder:text-red-700'
+    const placeholderRemove = isEarn ? 'placeholder:text-red-700' : 'placeholder:text-emerald-700'
     if (this.hasAmountThemeTarget) {
       this.amountThemeTarget.style.color = color
     }
     if (this.hasAmountDisplayTarget) {
       this.amountDisplayTarget.style.color = color
+      this.amountDisplayTarget.classList.remove(placeholderRemove)
+      this.amountDisplayTarget.classList.add(placeholderAdd)
     }
   }
 

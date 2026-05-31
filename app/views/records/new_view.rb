@@ -103,7 +103,7 @@ module Records
     end
 
     def details_section(&block)
-      div(class: 'space-y-3') do
+      div(class: 'mt-4 space-y-3') do
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider') { t('records.new_view.details') }
         yield
       end

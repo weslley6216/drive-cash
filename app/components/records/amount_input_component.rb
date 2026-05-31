@@ -1,6 +1,7 @@
 module Records
   class AmountInputComponent < ApplicationComponent
-    THEME_TEXT = { red: 'text-red-700', emerald: 'text-emerald-700' }.freeze
+    THEME_TEXT        = { red: 'text-red-700',             emerald: 'text-emerald-700' }.freeze
+    THEME_PLACEHOLDER = { red: 'placeholder:text-red-700', emerald: 'placeholder:text-emerald-700' }.freeze
 
     def initialize(amount:, theme:, date:)
       @amount = amount&.to_s
@@ -21,7 +22,7 @@ module Records
               inputmode: 'numeric',
               placeholder: '0,00',
               autocomplete: 'off',
-              class: "text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{THEME_TEXT.fetch(@theme)}",
+              class: "text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{THEME_TEXT.fetch(@theme)} #{THEME_PLACEHOLDER.fetch(@theme)}",
               data: { record_form_target: 'amountDisplay', action: 'input->record-form#formatAmount' }
             )
             input(
