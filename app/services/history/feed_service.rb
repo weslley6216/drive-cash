@@ -17,13 +17,21 @@ module History
 
       {
         groups:  grouped.map { |date, day_items| build_group(date, day_items) },
-        summary: build_summary(all_items)
+        summary: build_summary(period_items)
       }
     end
 
     private
 
     attr_reader :year, :month, :query, :filter, :limit
+
+    def period_items
+      earnings = Earning.for_year(year)
+      earnings = earnings.for_month(month) if month
+      expenses = Expense.for_year(year)
+      expenses = expenses.for_month(month) if month
+      earnings.to_a + expenses.to_a
+    end
 
     def full_scope
       base = []

@@ -113,13 +113,13 @@ RSpec.describe History::FeedService do
         expect(items.map(&:class).uniq).to eq([Earning])
       end
 
-      it 'zeroes expenses in the summary' do
+      it 'still includes expenses in the summary regardless of chip filter' do
         create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, filter: 'earnings').call
 
-        expect(result[:summary]).to eq(earnings: 200, expenses: 0, net: 200)
+        expect(result[:summary]).to eq(earnings: 200, expenses: 80, net: 120)
       end
     end
 
@@ -136,13 +136,13 @@ RSpec.describe History::FeedService do
         expect(items.size).to eq(2)
       end
 
-      it 'zeroes earnings in the summary' do
+      it 'still includes earnings in the summary regardless of chip filter' do
         create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, filter: 'expenses').call
 
-        expect(result[:summary]).to eq(earnings: 0, expenses: 80, net: -80)
+        expect(result[:summary]).to eq(earnings: 200, expenses: 80, net: 120)
       end
     end
 
@@ -168,13 +168,13 @@ RSpec.describe History::FeedService do
         expect(items.map(&:class).uniq).to eq([Expense])
       end
 
-      it 'summarizes only the unpaid amount' do
+      it 'shows full-period expenses in the summary, not only unpaid' do
         create(:expense, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         create(:expense, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
         result = described_class.new(year: 2025, filter: 'unpaid').call
 
-        expect(result[:summary]).to eq(earnings: 0, expenses: 40, net: -40)
+        expect(result[:summary]).to eq(earnings: 0, expenses: 120, net: -120)
       end
     end
 
@@ -210,14 +210,14 @@ RSpec.describe History::FeedService do
         expect(items.map(&:id)).to eq([match.id])
       end
 
-      it 'returns empty groups when nothing matches' do
+      it 'returns empty groups when nothing matches but keeps full-period summary' do
         create(:expense, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
         create(:earning, date: Date.new(2025, 6, 11), amount: 100, platform: 'uber', notes: 'normal')
 
         result = described_class.new(year: 2025, query: 'inexistente').call
 
         expect(result[:groups]).to eq([])
-        expect(result[:summary]).to eq(earnings: 0, expenses: 0, net: 0)
+        expect(result[:summary]).to eq(earnings: 100, expenses: 80, net: 20)
       end
     end
   end

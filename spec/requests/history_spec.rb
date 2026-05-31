@@ -93,14 +93,15 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('data-turbo-frame="modal"')
     end
 
-    it 'summary totals reflect the applied filter' do
+    it 'summary always shows full-period totals regardless of chip filter' do
       create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
 
       get history_path(year: 2025, filter: 'expenses')
 
+      expect(response.body).to include('200,00')
       expect(response.body).to include('80,00')
-      expect(response.body).not_to match(/200,00.*text-green-900/m)
+      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
     it 'renders the FAB positioned above the bottom nav' do
