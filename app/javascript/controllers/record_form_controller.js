@@ -71,15 +71,12 @@ export default class extends Controller {
   }
 
   applyAmountTheme(isEarn) {
-    const color = isEarn ? 'text-emerald-700' : 'text-red-700'
-    const opposite = isEarn ? 'text-red-700' : 'text-emerald-700'
+    const color = isEarn ? '#047857' : '#b91c1c'
     if (this.hasAmountThemeTarget) {
-      this.amountThemeTarget.classList.remove(opposite)
-      this.amountThemeTarget.classList.add(color)
+      this.amountThemeTarget.style.color = color
     }
     if (this.hasAmountDisplayTarget) {
-      this.amountDisplayTarget.classList.remove(opposite)
-      this.amountDisplayTarget.classList.add(color)
+      this.amountDisplayTarget.style.color = color
     }
   }
 
