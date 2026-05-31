@@ -2,9 +2,7 @@ class EarningsController < ApplicationController
   before_action :find_earning, only: [:edit, :update, :destroy]
 
   def new
-    earning = Earning.new(date: Date.current)
-
-    render Earnings::NewView.new(earning: earning, context: params[:context])
+    redirect_to new_record_path(type: 'earning', context: params[:context]&.to_unsafe_h)
   end
 
   def create

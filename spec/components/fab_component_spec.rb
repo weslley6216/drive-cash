@@ -39,15 +39,21 @@ RSpec.describe FabComponent, type: :component do
     it 'renders correct links with filter context' do
       expect(html).to include('context%5Byear%5D=2025')
       expect(html).to include('context%5Bmonth%5D=12')
-      expect(html).to include('/earnings/new')
-      expect(html).to include('/expenses/new')
+      expect(html).to include('/records/new')
+      expect(html).to include('type=earning')
+      expect(html).to include('type=expense')
     end
 
     it 'renders without filters when empty' do
       html = view_context.render(FabComponent.new(filters: {}))
 
-      expect(html).to include('/earnings/new')
+      expect(html).to include('/records/new')
+      expect(html).to include('type=earning')
       expect(html).not_to include('context%5Byear%5D=2025')
+    end
+
+    it 'does not link with turbo_frame modal' do
+      expect(html).not_to include('data-turbo-frame="modal"')
     end
   end
 

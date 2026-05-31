@@ -2,21 +2,16 @@ require 'rails_helper'
 
 RSpec.describe 'Earnings', type: :request do
   describe 'GET /earnings/new' do
-    it 'renders the modal form' do
+    it 'redirects to /records/new?type=earning' do
       get new_earning_path
 
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('earnings.new_view.title'))
-      expect(response.body).to include('Nova Receita')
-      expect(response.body).to include('Registre um valor recebido por plataforma')
+      expect(response).to redirect_to(new_record_path(type: 'earning'))
     end
 
-    it 'passes context params to the form' do
+    it 'preserves context params on redirect' do
       get new_earning_path, params: { context: { year: 2026 } }
 
-      expect(response.body).to include('name="context[year]"')
-      expect(response.body).to include('value="2026"')
+      expect(response.location).to include('context%5Byear%5D=2026')
     end
   end
 
