@@ -151,5 +151,13 @@ RSpec.describe 'Records', type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
+
+    context 'when type is unknown' do
+      it 'returns 400 bad request' do
+        post records_path, params: { type: 'unknown', record: {} }
+
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
   end
 end
