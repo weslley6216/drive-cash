@@ -10,13 +10,17 @@ module History
     end
 
     def view_template
-      render LayoutComponent.new(title: t('history.index.title'), bottom_nav: :history, sidebar_nav: :history) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
+      render LayoutComponent.new(
+        title: t('history.index.title'),
+        bottom_nav: :history,
+        sidebar_nav: :history,
+        app_shell: true
+      ) do
+        div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
-        header_section
-        render History::PeriodSummaryComponent.new(summary: @feed[:summary])
-        sticky_filters
-        feed_section
+        pinned_header
+        feed_scroll_region
+
         render FabComponent.new(filters: filter_context, bottom_nav: true)
         turbo_frame_tag 'modal'
       end
@@ -24,8 +28,27 @@ module History
 
     private
 
+    def pinned_header
+      div(class: 'flex-none px-4 sm:px-6 pt-4 space-y-4') do
+        header_section
+        render History::PeriodSummaryComponent.new(summary: @feed[:summary])
+        div do
+          render History::SearchBarComponent.new(query: @query, filter: @filter)
+          div(class: 'mt-3') do
+            render History::FilterChipsComponent.new(current_filter: @filter, query: @query)
+          end
+        end
+      end
+    end
+
+    def feed_scroll_region
+      div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
+        feed_section
+      end
+    end
+
     def header_section
-      div(class: 'mb-4 flex flex-col gap-1 lg:flex-row lg:items-end lg:justify-between') do
+      div(class: 'flex flex-col gap-1 lg:flex-row lg:items-end lg:justify-between') do
         div do
           h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('history.index.title') }
           p(class: 'text-sm text-slate-500') { t('history.index.subtitle') }
@@ -37,13 +60,6 @@ module History
           compact: true,
           action_path: history_path
         )
-      end
-    end
-
-    def sticky_filters
-      div(class: 'sticky top-0 z-10 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-3 mb-4 bg-white/90 backdrop-blur-sm') do
-        render History::SearchBarComponent.new(query: @query, filter: @filter)
-        render History::FilterChipsComponent.new(current_filter: @filter, query: @query)
       end
     end
 

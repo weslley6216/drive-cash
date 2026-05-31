@@ -4,10 +4,11 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil)
+  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false)
     @title = title
     @bottom_nav = bottom_nav
     @sidebar_nav = sidebar_nav
+    @app_shell = app_shell
   end
 
   def view_template(&block)
@@ -65,18 +66,30 @@ class LayoutComponent < ApplicationComponent
   end
 
   def body_classes
-    base = 'min-h-screen bg-gradient-to-br from-slate-50 to-slate-100'
-    @sidebar_nav ? "#{base} p-4 sm:p-6 lg:p-0" : "#{base} p-4 sm:p-6"
+    if @app_shell
+      'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
+    else
+      base = 'min-h-screen bg-gradient-to-br from-slate-50 to-slate-100'
+      @sidebar_nav ? "#{base} p-4 sm:p-6 lg:p-0" : "#{base} p-4 sm:p-6"
+    end
   end
 
   def content_wrapper_classes
-    @sidebar_nav ? 'lg:ml-64' : nil
+    classes = []
+    classes << 'lg:ml-64' if @sidebar_nav
+    classes << 'h-full'   if @app_shell
+    classes.presence&.join(' ')
   end
 
   def container_classes
-    base = 'max-w-7xl mx-auto'
-    base = "#{base} pb-24 lg:pb-6" if @bottom_nav
-    base = "#{base} lg:p-8" if @sidebar_nav
-    base
+    if @app_shell
+      base = 'h-full max-w-7xl mx-auto flex flex-col min-h-0'
+      @sidebar_nav ? "#{base} lg:px-8" : base
+    else
+      base = 'max-w-7xl mx-auto'
+      base = "#{base} pb-24 lg:pb-6" if @bottom_nav
+      base = "#{base} lg:p-8" if @sidebar_nav
+      base
+    end
   end
 end
