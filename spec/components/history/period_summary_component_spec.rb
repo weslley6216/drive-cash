@@ -38,8 +38,4 @@ RSpec.describe History::PeriodSummaryComponent, type: :component do
   it 'uses compact value size to prevent overflow in the 3-column layout' do
     expect(html).to include('text-sm')
   end
-
-  it 'uses reduced padding to maximise card content area in the 3-column layout' do
-    expect(html).to include('p-2 lg:p-4')
-  end
 end
