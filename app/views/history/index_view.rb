@@ -35,7 +35,7 @@ module History
         div do
           render History::SearchBarComponent.new(query: @query, filter: @filter)
           div(class: 'mt-3') do
-            render History::FilterChipsComponent.new(current_filter: @filter, query: @query)
+            render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
           end
         end
       end

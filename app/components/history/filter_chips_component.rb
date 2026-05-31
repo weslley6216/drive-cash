@@ -2,9 +2,11 @@ module History
   class FilterChipsComponent < ApplicationComponent
     FILTERS = History::FeedService::FILTERS
 
-    def initialize(current_filter:, query:)
+    def initialize(current_filter:, query:, year: nil, month: nil)
       @current_filter = current_filter
       @query = query
+      @year = year
+      @month = month
     end
 
     def view_template
@@ -18,7 +20,7 @@ module History
     def chip(filter)
       active = filter == @current_filter
       link_to(
-        history_path(filter: filter, q: @query.presence),
+        history_path(filter: filter, q: @query.presence, year: @year, month: @month),
         class: class_names(base_classes, active ? active_classes : inactive_classes),
         data: { turbo_frame: '_top' }
       ) { t("history.index.filters.#{filter}") }
