@@ -17,7 +17,7 @@ Rails.application.routes.draw do
 
   get '/analysis',     to: 'application#coming_soon', as: :analysis
   get '/work_session', to: 'application#coming_soon', as: :work_session
-  get '/history',      to: 'application#coming_soon', as: :history
+  get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
   get '/goals',        to: 'application#coming_soon', as: :goals
   get '/vehicle',      to: 'application#coming_soon', as: :vehicle
