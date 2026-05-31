@@ -9,11 +9,13 @@ export default class extends Controller {
   static targets = [
     'typeInput', 'earningFields', 'expenseFields',
     'submit', 'tripsValue', 'tripsInput',
-    'earningToggle', 'expenseToggle', 'amountTheme'
+    'earningToggle', 'expenseToggle', 'amountTheme',
+    'amountDisplay', 'amountInput'
   ]
 
   connect() {
     this.applyType(this.typeValue)
+    this.initAmountDisplay()
   }
 
   switch(event) {
@@ -73,6 +75,26 @@ export default class extends Controller {
     const el = this.amountThemeTarget
     el.classList.remove('text-red-700', 'text-emerald-700')
     el.classList.add(isEarn ? 'text-emerald-700' : 'text-red-700')
+  }
+
+  initAmountDisplay() {
+    if (!this.hasAmountDisplayTarget || !this.hasAmountInputTarget) return
+    const val = parseFloat(this.amountInputTarget.value || '0')
+    if (val > 0) {
+      const cents = Math.round(val * 100)
+      this.amountDisplayTarget.value = (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+    }
+  }
+
+  formatAmount(event) {
+    const digits = event.target.value.replace(/\D/g, '')
+    const cents = parseInt(digits || '0', 10)
+    const value = cents / 100
+    event.target.value = cents === 0 ? '' : value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+    event.target.setSelectionRange(event.target.value.length, event.target.value.length)
+    if (this.hasAmountInputTarget) {
+      this.amountInputTarget.value = value.toFixed(2)
+    }
   }
 
   incrementTrips(event) {
