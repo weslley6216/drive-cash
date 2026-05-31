@@ -39,12 +39,17 @@ RSpec.describe 'Earnings', type: :request do
       }.to change(Earning, :count).by(1)
     end
 
-    it 'responds with turbo stream updating the stats grid' do
+    it 'responds with turbo stream updating home cards' do
       post earnings_path, params: valid_params, as: :turbo_stream
 
       expect(response.media_type).to eq Mime[:turbo_stream]
-      expect(response.body).to include('stats_grid')
-      expect(response.body).to include('flash')
+      expect(response.body).to include('target="stats_grid"')
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
+      expect(response.body).to include('target="dashboard_filters"')
+      expect(response.body).to include('target="flash"')
     end
 
     it 'handles validation errors by re-rendering the modal' do
@@ -120,6 +125,17 @@ RSpec.describe 'Earnings', type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('earnings.edit_view.title'))
     end
+
+    it 'refreshes home cards on update' do
+      patch earning_path(earning),
+            params: { earning: { amount: 200.50 }, context: { year: 2026, month: 1 } },
+            as: :turbo_stream
+
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
+    end
   end
 
   describe 'DELETE /earnings/:id' do
@@ -133,7 +149,7 @@ RSpec.describe 'Earnings', type: :request do
       }.to change(Earning, :count).by(-1)
     end
 
-    it 're-renders the detail list after destroy' do
+    it 're-renders the detail list and home cards after destroy' do
       earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       delete earning_path(earning),
@@ -143,7 +159,11 @@ RSpec.describe 'Earnings', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
-      expect(response.body).to include('stats_grid')
+      expect(response.body).to include('target="stats_grid"')
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
     end
   end
 end

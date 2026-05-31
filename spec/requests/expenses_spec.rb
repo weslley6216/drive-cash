@@ -64,12 +64,17 @@ RSpec.describe 'Expenses', type: :request do
       expect(Expense.distinct.pluck(:installment_series_id).compact.size).to eq(1)
     end
 
-    it 'responds with turbo stream updating the stats grid' do
+    it 'responds with turbo stream updating home cards' do
       post expenses_path, params: valid_params, as: :turbo_stream
 
       expect(response.media_type).to eq Mime[:turbo_stream]
-      expect(response.body).to include('stats_grid')
-      expect(response.body).to include('flash')
+      expect(response.body).to include('target="stats_grid"')
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
+      expect(response.body).to include('target="dashboard_filters"')
+      expect(response.body).to include('target="flash"')
     end
 
     it 'handles validation errors by re-rendering the modal' do
@@ -166,6 +171,17 @@ RSpec.describe 'Expenses', type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('expenses.edit_view.title'))
     end
+
+    it 'refreshes home cards on update' do
+      patch expense_path(expense),
+            params: { expense: { amount: 120.75 }, context: { year: 2026, month: 1 } },
+            as: :turbo_stream
+
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
+    end
   end
 
   describe 'DELETE /expenses/:id' do
@@ -179,7 +195,7 @@ RSpec.describe 'Expenses', type: :request do
       }.to change(Expense, :count).by(-1)
     end
 
-    it 're-renders the detail list after destroy' do
+    it 're-renders the detail list and home cards after destroy' do
       expense = create(:expense, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
 
       delete expense_path(expense),
@@ -189,7 +205,11 @@ RSpec.describe 'Expenses', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
       expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
-      expect(response.body).to include('stats_grid')
+      expect(response.body).to include('target="stats_grid"')
+      expect(response.body).to include('target="hero_profit_card"')
+      expect(response.body).to include('target="today_card"')
+      expect(response.body).to include('target="recent_activity"')
+      expect(response.body).to include('target="category_breakdown"')
     end
   end
 end
