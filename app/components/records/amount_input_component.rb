@@ -32,9 +32,9 @@ module Records
             )
           end
         end
-        div(class: 'mt-3') do
-          label(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider block mb-1 text-center') do
-            render PhlexIcons::Lucide::Calendar.new(class: 'w-3 h-3 inline-block mr-1')
+        label(class: 'mt-3 block cursor-pointer') do
+          div(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 text-center flex items-center justify-center gap-1') do
+            render PhlexIcons::Lucide::Calendar.new(class: 'w-3 h-3')
             plain t('records.new_view.today')
           end
           input(
