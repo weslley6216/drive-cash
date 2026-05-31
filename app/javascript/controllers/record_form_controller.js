@@ -71,10 +71,16 @@ export default class extends Controller {
   }
 
   applyAmountTheme(isEarn) {
-    if (!this.hasAmountThemeTarget) return
-    const el = this.amountThemeTarget
-    el.classList.remove('text-red-700', 'text-emerald-700')
-    el.classList.add(isEarn ? 'text-emerald-700' : 'text-red-700')
+    const color = isEarn ? 'text-emerald-700' : 'text-red-700'
+    const opposite = isEarn ? 'text-red-700' : 'text-emerald-700'
+    if (this.hasAmountThemeTarget) {
+      this.amountThemeTarget.classList.remove(opposite)
+      this.amountThemeTarget.classList.add(color)
+    }
+    if (this.hasAmountDisplayTarget) {
+      this.amountDisplayTarget.classList.remove(opposite)
+      this.amountDisplayTarget.classList.add(color)
+    }
   }
 
   initAmountDisplay() {

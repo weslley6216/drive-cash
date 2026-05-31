@@ -21,7 +21,7 @@ module Records
               inputmode: 'numeric',
               placeholder: '0,00',
               autocomplete: 'off',
-              class: 'text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none',
+              class: "text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{THEME_TEXT.fetch(@theme)}",
               data: { record_form_target: 'amountDisplay', action: 'input->record-form#formatAmount' }
             )
             input(
