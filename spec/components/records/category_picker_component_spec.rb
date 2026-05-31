@@ -8,8 +8,8 @@ RSpec.describe Records::CategoryPickerComponent, type: :component do
     Expense.categories.each_key { |key| expect(html).to include("value=\"#{key}\"") }
   end
 
-  it 'highlights the selected category in red theme' do
-    expect(html).to include('bg-red-50 border-red-300 ring-2 ring-red-500')
+  it 'uses CSS has-[:checked] for red theme selection styling' do
+    expect(html).to include('has-[:checked]:bg-red-50 has-[:checked]:border-red-300 has-[:checked]:ring-2 has-[:checked]:ring-red-500')
   end
 
   it 'renders the section label' do

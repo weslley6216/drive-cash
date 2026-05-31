@@ -11,8 +11,8 @@ RSpec.describe Records::PlatformPickerComponent, type: :component do
     Earning.platforms.each_key { |key| expect(html).to include("value=\"#{key}\"") }
   end
 
-  it 'marks the selected platform with the check badge' do
-    expect(html).to include('ring-2 ring-blue-500')
+  it 'uses CSS has-[:checked] for ring selection styling' do
+    expect(html).to include('has-[:checked]:ring-2 has-[:checked]:ring-blue-500')
   end
 
   it 'uses a 4-column grid' do

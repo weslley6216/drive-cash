@@ -31,7 +31,7 @@ module Records
     def platform_button(platform)
       is_selected = @selected == platform[:id]
       label(
-        class: "relative rounded-2xl p-3 flex flex-col items-center gap-2 cursor-pointer transition #{is_selected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}",
+        class: 'group relative rounded-2xl p-3 flex flex-col items-center gap-2 cursor-pointer transition has-[:checked]:ring-2 has-[:checked]:ring-blue-500 has-[:checked]:ring-offset-1',
         style: "background: #{platform[:color]}15; border: 1px solid #{platform[:color]}30"
       ) do
         input(type: 'radio', name: 'record[platform]', value: platform[:id], checked: is_selected, class: 'sr-only')
@@ -40,10 +40,8 @@ module Records
           style: "background: #{platform[:color]}; color: #{platform[:fg]}"
         ) { platform[:label][0..3] }
         span(class: 'text-[10px] font-medium text-slate-700 leading-tight text-center') { platform[:label] }
-        if is_selected
-          span(class: 'absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white') do
-            render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3 stroke-[3]')
-          end
+        span(class: 'hidden group-has-[:checked]:flex absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-blue-500 items-center justify-center text-white') do
+          render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3 stroke-[3]')
         end
       end
     end

@@ -33,20 +33,12 @@ module Records
 
     def category_button(category)
       is_selected = @selected == category[:id]
-      wrapper_classes = if is_selected
-        'relative rounded-2xl p-3 flex flex-col items-center gap-2 border transition bg-red-50 border-red-300 ring-2 ring-red-500 ring-offset-1 cursor-pointer'
-      else
-        'relative rounded-2xl p-3 flex flex-col items-center gap-2 border transition bg-slate-50 border-slate-200 cursor-pointer'
-      end
-
-      label(class: wrapper_classes) do
+      label(class: 'group relative rounded-2xl p-3 flex flex-col items-center gap-2 border transition cursor-pointer bg-slate-50 border-slate-200 has-[:checked]:bg-red-50 has-[:checked]:border-red-300 has-[:checked]:ring-2 has-[:checked]:ring-red-500 has-[:checked]:ring-offset-1') do
         input(type: 'radio', name: 'record[category]', value: category[:id], checked: is_selected, class: 'sr-only')
-        icon_wrapper_class = is_selected ? 'bg-red-500 text-white' : 'bg-white text-slate-600'
-        div(class: "w-9 h-9 rounded-lg flex items-center justify-center #{icon_wrapper_class}") do
+        div(class: 'w-9 h-9 rounded-lg flex items-center justify-center bg-white text-slate-600 group-has-[:checked]:bg-red-500 group-has-[:checked]:text-white') do
           render PhlexIcons::Lucide.const_get(category[:icon]).new(class: 'w-4 h-4')
         end
-        text_class = is_selected ? 'text-red-900' : 'text-slate-600'
-        span(class: "text-[10px] font-medium leading-tight text-center #{text_class}") { category[:label] }
+        span(class: 'text-[10px] font-medium leading-tight text-center text-slate-600 group-has-[:checked]:text-red-900') { category[:label] }
       end
     end
   end
