@@ -33,5 +33,18 @@ RSpec.describe StatCardComponent, type: :component do
 
       expect(html).to include('T')
     end
+
+    it 'uses the default value size when value_size is not provided' do
+      html = view_context.render(described_class.new(title: 'T', value: 'V', color: :green, icon: nil))
+
+      expect(html).to include('text-xl')
+    end
+
+    it 'applies a custom value_size class when provided' do
+      html = view_context.render(described_class.new(title: 'T', value: 'V', color: :green, icon: nil, value_size: 'text-sm'))
+
+      expect(html).to include('text-sm')
+      expect(html).not_to include('text-xl')
+    end
   end
 end

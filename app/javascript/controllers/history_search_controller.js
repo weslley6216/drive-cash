@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { wait: { type: Number, default: 300 } }
+  static values = { wait: { type: Number, default: 400 } }
 
   connect() {
     this.timeout = null

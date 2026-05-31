@@ -1,6 +1,6 @@
 module History
   class FilterChipsComponent < ApplicationComponent
-    FILTERS = %w[all earnings expenses unpaid].freeze
+    FILTERS = History::FeedService::FILTERS
 
     def initialize(current_filter:, query:)
       @current_filter = current_filter

@@ -96,7 +96,7 @@ module History
     end
 
     def unpaid_expense?
-      !earning? && @record.paid == false
+      !earning? && !@record.paid?
     end
 
     def pending_badge

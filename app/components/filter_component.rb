@@ -1,9 +1,10 @@
 class FilterComponent < ApplicationComponent
-  def initialize(selected_year:, selected_month:, available_years: [], compact: false)
+  def initialize(selected_year:, selected_month:, available_years: [], compact: false, action_path: nil)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
     @compact = compact
+    @action_path = action_path
   end
 
   def view_template
@@ -14,7 +15,7 @@ class FilterComponent < ApplicationComponent
 
   def compact_view
     form(
-      action: root_path, method: 'get',
+      action: @action_path || root_path, method: 'get',
       class: 'flex items-center gap-2',
       data: { turbo_frame: '_top', controller: 'filter' }
     ) do

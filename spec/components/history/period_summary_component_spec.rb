@@ -34,4 +34,8 @@ RSpec.describe History::PeriodSummaryComponent, type: :component do
   it 'lays out the three cards in a 3-column grid' do
     expect(html).to include('grid-cols-3')
   end
+
+  it 'uses compact value size to prevent overflow in the 3-column layout' do
+    expect(html).to include('text-sm')
+  end
 end

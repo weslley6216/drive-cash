@@ -86,5 +86,17 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to include('<form')
       expect(html).to include('data-controller="filter"')
     end
+
+    it 'uses the provided action_path when given' do
+      component = FilterComponent.new(
+        selected_year: 2025,
+        selected_month: nil,
+        available_years: available_years,
+        compact: true,
+        action_path: '/history'
+      )
+
+      expect(view_context.render(component)).to include('action="/history"')
+    end
   end
 end

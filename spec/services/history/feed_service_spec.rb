@@ -92,6 +92,14 @@ RSpec.describe History::FeedService do
         total_items = result[:groups].sum { |group| group[:items].size }
         expect(total_items).to eq(3)
       end
+
+      it 'computes the summary from all matching items, not from the truncated set' do
+        5.times { |offset| create(:earning, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
+
+        result = described_class.new(year: 2025, limit: 3).call
+
+        expect(result[:summary][:earnings]).to eq(250)
+      end
     end
 
     context 'with filter earnings' do

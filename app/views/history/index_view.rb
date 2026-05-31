@@ -1,11 +1,12 @@
 module History
   class IndexView < ApplicationComponent
-    def initialize(feed:, year:, month:, query:, filter:)
-      @feed   = feed
-      @year   = year
-      @month  = month
-      @query  = query
-      @filter = filter
+    def initialize(feed:, year:, month:, query:, filter:, available_years:)
+      @feed            = feed
+      @year            = year
+      @month           = month
+      @query           = query
+      @filter          = filter
+      @available_years = available_years
     end
 
     def view_template
@@ -30,6 +31,13 @@ module History
           h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('history.index.title') }
           p(class: 'text-sm text-slate-500') { t('history.index.subtitle') }
         end
+        render FilterComponent.new(
+          selected_year: @year,
+          selected_month: @month,
+          available_years: @available_years,
+          compact: true,
+          action_path: history_path
+        )
       end
     end
 

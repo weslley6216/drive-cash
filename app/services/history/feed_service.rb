@@ -1,5 +1,7 @@
 module History
   class FeedService
+    FILTERS = %w[all earnings expenses unpaid].freeze
+
     def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', limit: 100)
       @year = year
       @month = month
@@ -9,12 +11,13 @@ module History
     end
 
     def call
-      items = combined_scope
-      grouped = items.group_by(&:date).sort_by { |date, _| date }.reverse
+      all_items = full_scope
+      limited   = all_items.first(limit)
+      grouped   = limited.group_by(&:date).sort_by { |date, _| date }.reverse
 
       {
-        groups: grouped.map { |date, day_items| build_group(date, day_items) },
-        summary: build_summary(items)
+        groups:  grouped.map { |date, day_items| build_group(date, day_items) },
+        summary: build_summary(all_items)
       }
     end
 
@@ -22,11 +25,11 @@ module History
 
     attr_reader :year, :month, :query, :filter, :limit
 
-    def combined_scope
+    def full_scope
       base = []
       base += filtered_earnings.to_a if include_earnings?
       base += filtered_expenses.to_a if include_expenses?
-      base.sort_by { |record| [record.date, record.created_at] }.reverse.first(limit)
+      base.sort_by { |record| [record.date, record.created_at] }.reverse
     end
 
     def filtered_earnings
