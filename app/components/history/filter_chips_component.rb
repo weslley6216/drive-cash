@@ -8,7 +8,7 @@ module History
     end
 
     def view_template
-      div(class: 'flex items-center gap-2 mb-4 overflow-x-auto pb-1') do
+      div(class: 'flex items-center gap-2 mt-2 overflow-x-auto pb-1') do
         FILTERS.each { |filter| chip(filter) }
       end
     end

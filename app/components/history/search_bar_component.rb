@@ -9,7 +9,7 @@ module History
       form(
         action: history_path,
         method: 'get',
-        class: 'relative mb-3',
+        class: 'relative',
         data: {
           controller: 'history-search',
           turbo_frame: '_top'

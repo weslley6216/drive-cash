@@ -15,8 +15,7 @@ module History
 
         header_section
         render History::PeriodSummaryComponent.new(summary: @feed[:summary])
-        render History::SearchBarComponent.new(query: @query, filter: @filter)
-        render History::FilterChipsComponent.new(current_filter: @filter, query: @query)
+        sticky_filters
         feed_section
         render FabComponent.new(filters: filter_context, bottom_nav: true)
         turbo_frame_tag 'modal'
@@ -38,6 +37,13 @@ module History
           compact: true,
           action_path: history_path
         )
+      end
+    end
+
+    def sticky_filters
+      div(class: 'sticky top-0 z-10 -mx-4 px-4 sm:-mx-6 sm:px-6 pt-2 pb-3 mb-4 bg-white/90 backdrop-blur-sm') do
+        render History::SearchBarComponent.new(query: @query, filter: @filter)
+        render History::FilterChipsComponent.new(current_filter: @filter, query: @query)
       end
     end
 
