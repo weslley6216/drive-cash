@@ -1,0 +1,53 @@
+module Records
+  class CategoryPickerComponent < ApplicationComponent
+    CATEGORIES = [
+      { id: 'fuel',          label: 'Combustível',    icon: 'Fuel' },
+      { id: 'maintenance',   label: 'Manutenção',     icon: 'Wrench' },
+      { id: 'car_wash',      label: 'Lavagem',        icon: 'Sparkles' },
+      { id: 'toll',          label: 'Pedágio',        icon: 'Route' },
+      { id: 'parking',       label: 'Estacionamento', icon: 'CircleParking' },
+      { id: 'documentation', label: 'Documentação',   icon: 'FileText' },
+      { id: 'insurance',     label: 'Seguro',         icon: 'Shield' },
+      { id: 'fine',          label: 'Multa',          icon: 'TriangleAlert' },
+      { id: 'meals',         label: 'Refeições',      icon: 'Utensils' },
+      { id: 'phone',         label: 'Telefone',       icon: 'Phone' },
+      { id: 'other',         label: 'Outros',         icon: 'Package' }
+    ].freeze
+
+    def initialize(selected: nil)
+      @selected = selected.to_s
+    end
+
+    def view_template
+      section do
+        p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-3') do
+          t('records.new_view.category_label')
+        end
+        div(class: 'grid grid-cols-4 gap-2') do
+          CATEGORIES.each { |category| category_button(category) }
+        end
+      end
+    end
+
+    private
+
+    def category_button(category)
+      is_selected = @selected == category[:id]
+      wrapper_classes = if is_selected
+        'relative rounded-2xl p-3 flex flex-col items-center gap-2 border transition bg-red-50 border-red-300 ring-2 ring-red-500 ring-offset-1 cursor-pointer'
+      else
+        'relative rounded-2xl p-3 flex flex-col items-center gap-2 border transition bg-slate-50 border-slate-200 cursor-pointer'
+      end
+
+      label(class: wrapper_classes) do
+        input(type: 'radio', name: 'record[category]', value: category[:id], checked: is_selected, class: 'sr-only')
+        icon_wrapper_class = is_selected ? 'bg-red-500 text-white' : 'bg-white text-slate-600'
+        div(class: "w-9 h-9 rounded-lg flex items-center justify-center #{icon_wrapper_class}") do
+          render PhlexIcons::Lucide.const_get(category[:icon]).new(class: 'w-4 h-4')
+        end
+        text_class = is_selected ? 'text-red-900' : 'text-slate-600'
+        span(class: "text-[10px] font-medium leading-tight text-center #{text_class}") { category[:label] }
+      end
+    end
+  end
+end
