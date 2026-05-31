@@ -78,4 +78,78 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include('sm:grid')
     end
   end
+
+  describe 'POST /records' do
+    context 'when type is earning' do
+      let(:valid_params) do
+        {
+          type: 'earning',
+          record: { date: '2026-05-22', amount: '245.00', platform: 'uber', notes: 'x', trips_count: 7 }
+        }
+      end
+
+      it 'creates an Earning' do
+        expect {
+          post records_path, params: valid_params
+        }.to change(Earning, :count).by(1)
+      end
+
+      it 'redirects to root with notice' do
+        post records_path, params: valid_params
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:notice]).to eq(I18n.t('records.create.success'))
+      end
+    end
+
+    context 'when type is earning and invalid' do
+      it 're-renders the new view with errors' do
+        params = { type: 'earning', record: { amount: '0', platform: 'uber', date: '2026-05-22', trips_count: 1 } }
+
+        post records_path, params: params
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Valor')
+      end
+    end
+
+    context 'when type is expense' do
+      let(:valid_params) do
+        {
+          type: 'expense',
+          record: { date: '2026-05-22', amount: '60.00', category: 'fuel', vendor: 'Posto Orense', description: '', paid: '1' }
+        }
+      end
+
+      it 'creates an Expense via Expenses::Creator' do
+        expect {
+          post records_path, params: valid_params
+        }.to change(Expense, :count).by(1)
+      end
+
+      it 'persists paid=false when toggle is off' do
+        params = valid_params.deep_merge(record: { paid: '0' })
+
+        post records_path, params: params
+
+        expect(Expense.last.paid).to eq(false)
+      end
+
+      it 'redirects to root with notice' do
+        post records_path, params: valid_params
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context 'when type is expense and invalid' do
+      it 're-renders the new view with errors' do
+        params = { type: 'expense', record: { amount: '', category: 'fuel', date: '2026-05-22' } }
+
+        post records_path, params: params
+
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+  end
 end

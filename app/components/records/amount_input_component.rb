@@ -3,7 +3,7 @@ module Records
     THEME_TEXT = { red: 'text-red-700', emerald: 'text-emerald-700' }.freeze
 
     def initialize(amount:, theme:, date:)
-      @amount = amount
+      @amount = amount&.to_s
       @theme = theme.to_sym
       @date = date || Date.current
     end
