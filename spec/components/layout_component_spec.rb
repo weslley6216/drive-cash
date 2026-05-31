@@ -32,6 +32,37 @@ RSpec.describe LayoutComponent, type: :component do
     end
   end
 
+  context 'with app_shell: true' do
+    let(:html) { view_context.render(LayoutComponent.new(title: 'X', bottom_nav: :home, app_shell: true)) { 'content' } }
+
+    it 'locks the body to full viewport height with no overflow' do
+      expect(html).to include('h-[100dvh]')
+      expect(html).to include('overflow-hidden')
+    end
+
+    it 'does not apply body padding (layout controls its own padding)' do
+      expect(html).not_to include('p-4')
+    end
+
+    it 'makes the container a full-height flex column' do
+      expect(html).to include('flex flex-col')
+      expect(html).to include('min-h-0')
+    end
+
+    it 'propagates h-full to the content wrapper' do
+      expect(html).to include('h-full')
+    end
+  end
+
+  context 'with app_shell: false (default)' do
+    let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
+
+    it 'keeps the normal min-h-screen body' do
+      expect(html).to include('min-h-screen')
+      expect(html).not_to include('h-[100dvh]')
+    end
+  end
+
   context 'with sidebar_nav: :home' do
     let(:html) do
       view_context.render(
