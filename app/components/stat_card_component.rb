@@ -37,7 +37,7 @@ class StatCardComponent < ApplicationComponent
     }
   }.freeze
 
-  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil, value_size: nil)
+  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil, value_size: nil, padding: nil)
     @title = title
     @value = value
     @subtitle = subtitle
@@ -45,6 +45,7 @@ class StatCardComponent < ApplicationComponent
     @icon = icon
     @href = href
     @value_size = value_size
+    @padding = padding
   end
 
   def view_template
@@ -75,7 +76,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def card_classes
-    class_names('border-2 rounded-lg p-4 shadow-sm', colors[:bg], colors[:border])
+    class_names("border-2 rounded-lg #{@padding || 'p-4'} shadow-sm", colors[:bg], colors[:border])
   end
 
   def title_classes

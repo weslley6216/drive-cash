@@ -46,5 +46,17 @@ RSpec.describe StatCardComponent, type: :component do
       expect(html).to include('text-sm')
       expect(html).not_to include('text-xl')
     end
+
+    it 'uses p-4 padding by default' do
+      html = view_context.render(described_class.new(title: 'T', value: 'V', color: :green, icon: nil))
+
+      expect(html).to include('p-4')
+    end
+
+    it 'applies a custom padding class when provided' do
+      html = view_context.render(described_class.new(title: 'T', value: 'V', color: :green, icon: nil, padding: 'p-2 lg:p-4'))
+
+      expect(html).to include('p-2 lg:p-4')
+    end
   end
 end
