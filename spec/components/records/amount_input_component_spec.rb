@@ -1,0 +1,40 @@
+require 'rails_helper'
+
+RSpec.describe Records::AmountInputComponent, type: :component do
+  let(:html) { view_context.render(described_class.new(amount: 60.0, theme: :red)) }
+
+  it 'renders the R$ prefix' do
+    expect(html).to include('R$')
+  end
+
+  it 'renders the hidden amount input with value' do
+    expect(html).to include('name="record[amount]"')
+    expect(html).to include('value="60.0"')
+    expect(html).to include('type="hidden"')
+  end
+
+  it 'renders the text display input for typing' do
+    expect(html).to include('type="text"')
+    expect(html).to include('inputmode="numeric"')
+    expect(html).to include('data-record-form-target="amountDisplay"')
+    expect(html).to include('data-action="input->record-form#formatAmount"')
+  end
+
+  it 'applies red theme classes when theme=red' do
+    expect(html).to include('text-red-700')
+  end
+
+  it 'applies emerald theme classes when theme=emerald' do
+    html = view_context.render(described_class.new(amount: 0, theme: :emerald))
+
+    expect(html).to include('text-emerald-700')
+  end
+
+  it 'exposes Stimulus target for dynamic theme switching' do
+    expect(html).to include('data-record-form-target="amountTheme"')
+  end
+
+  it 'exposes Stimulus target for hidden amount value' do
+    expect(html).to include('data-record-form-target="amountInput"')
+  end
+end

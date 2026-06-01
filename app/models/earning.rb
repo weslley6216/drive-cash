@@ -14,7 +14,7 @@ class Earning < ApplicationRecord
   }, prefix: true
 
   validates :date, :amount, presence: true
-  validates :amount, numericality: { greater_than: 0 }
+  validates :amount, numericality: { greater_than: 0, allow_blank: true }
   validates :trips_count, numericality: { greater_than_or_equal_to: 1, only_integer: true }
 
   scope :chronological, -> { order(date: :desc, created_at: :desc) }

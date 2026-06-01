@@ -24,7 +24,7 @@ module Expenses
     end
 
     def create_single_expense
-      expense = Expense.new(@expense_params.merge(paid: true))
+      expense = Expense.new(@expense_params.reverse_merge('paid' => true))
 
       if expense.save
         InstallmentCreator::Result.new(success?: true, expenses: [expense])

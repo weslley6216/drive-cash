@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::RecentActivityService do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe '#call' do
     context 'with month filter' do
       it 'merges earnings and expenses sorted by date desc' do
@@ -83,11 +85,13 @@ RSpec.describe Dashboard::RecentActivityService do
       end
 
       it 'labels yesterday as Ontem' do
-        create(:earning, date: Date.current - 1, amount: 100, platform: 'uber')
+        travel_to Date.new(2026, 6, 15) do
+          create(:earning, date: Date.current - 1, amount: 100, platform: 'uber')
 
-        row = described_class.new(year: Date.current.year, month: Date.current.month).call.first
+          row = described_class.new(year: Date.current.year, month: Date.current.month).call.first
 
-        expect(row[:date_label]).to eq(I18n.t('common.yesterday'))
+          expect(row[:date_label]).to eq(I18n.t('common.yesterday'))
+        end
       end
 
       it 'labels other dates using :short format' do

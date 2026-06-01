@@ -1,0 +1,41 @@
+pt-BR:
+  records:
+    new_view:
+      title: "Novo lançamento"
+      close: "Fechar"
+      save: "Salvar"
+      type_toggle:
+        earning: "Receita"
+        expense: "Despesa"
+      amount_label: "Valor"
+      today: "Hoje"
+      platform_label: "Plataforma"
+      category_label: "Categoria"
+      details: "Detalhes"
+      trips_count: "Qtd. de rotas"
+      vendor_label: "Estabelecimento"
+      vendor_placeholder: "Ex: Posto Orense"
+      description_label: "Descrição (opcional)"
+      description_placeholder: "Detalhes adicionais..."
+      notes_label: "Descrição (opcional)"
+      notes_placeholder: "Detalhes adicionais..."
+      paid_toggle:
+        title: "Marcar como paga"
+        subtitle: "Entra no lucro do período"
+      recurring_toggle:
+        title: "Despesa recorrente"
+        subtitle: "Parcelar ou repetir mensalmente"
+      installment:
+        period_label: "Período entre parcelas"
+        repetitions_label: "Número de parcelas"
+        repeat_label: "Parcelar ou repetir (compromissos futuros)"
+        repeat_hint: "Cada parcela fica como \"a pagar\" até você marcar como paga."
+        periods:
+          weekly: "Semanal"
+          biweekly: "Quinzenal"
+          monthly: "Mensal"
+          annual: "Anual"
+      save_earning: "Salvar receita"
+      save_expense: "Salvar despesa"
+    create:
+      success: "Lançamento registrado com sucesso!"
