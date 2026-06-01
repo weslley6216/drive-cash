@@ -23,7 +23,7 @@ module Records
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-3') do
           t('records.new_view.category_label')
         end
-        div(class: 'grid grid-cols-4 gap-2') do
+        div(class: 'grid grid-cols-4 sm:grid-cols-6 gap-2') do
           CATEGORIES.each { |category| category_button(category) }
         end
       end

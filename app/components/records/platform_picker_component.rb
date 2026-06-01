@@ -1,14 +1,14 @@
 module Records
   class PlatformPickerComponent < ApplicationComponent
     PLATFORMS = [
-      { id: 'uber',          label: 'Uber',          color: '#000000', fg: '#fff' },
-      { id: 'nine_nine',     label: '99',            color: '#fbbf24', fg: '#000' },
-      { id: 'ifood',         label: 'iFood',         color: '#ef4444', fg: '#fff' },
-      { id: 'rappi',         label: 'Rappi',         color: '#dc2626', fg: '#fff' },
-      { id: 'shopee',        label: 'Shopee',        color: '#f97316', fg: '#fff' },
-      { id: 'amazon',        label: 'Amazon',        color: '#1e293b', fg: '#fff' },
-      { id: 'mercado_livre', label: 'Mercado Livre', color: '#fef08a', fg: '#000' },
-      { id: 'other',         label: 'Outras',        color: '#cbd5e1', fg: '#0f172a' }
+      { id: 'uber',          label: 'Uber',          color: '#000000', tw_fg: 'text-white' },
+      { id: 'nine_nine',     label: '99',            color: '#fbbf24', tw_fg: 'text-black' },
+      { id: 'ifood',         label: 'iFood',         color: '#ef4444', tw_fg: 'text-white' },
+      { id: 'rappi',         label: 'Rappi',         color: '#dc2626', tw_fg: 'text-white' },
+      { id: 'shopee',        label: 'Shopee',        color: '#f97316', tw_fg: 'text-white' },
+      { id: 'amazon',        label: 'Amazon',        color: '#1e293b', tw_fg: 'text-white' },
+      { id: 'mercado_livre', label: 'Mercado Livre', color: '#fef08a', tw_fg: 'text-black' },
+      { id: 'other',         label: 'Outras',        color: '#cbd5e1', tw_fg: 'text-slate-900' }
     ].freeze
 
     def initialize(selected: nil)
@@ -36,8 +36,8 @@ module Records
       ) do
         input(type: 'radio', name: 'record[platform]', value: platform[:id], checked: is_selected, class: 'sr-only')
         div(
-          class: 'w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold',
-          style: "background: #{platform[:color]}; color: #{platform[:fg]}"
+          class: "w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold #{platform[:tw_fg]}",
+          style: "background: #{platform[:color]}"
         ) { platform[:label][0..3] }
         span(class: 'text-[10px] font-medium text-slate-700 leading-tight text-center') { platform[:label] }
         span(class: 'hidden group-has-[:checked]:flex absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-blue-500 items-center justify-center text-white') do

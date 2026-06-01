@@ -20,8 +20,15 @@ export default class extends Controller {
 
   switch(event) {
     const next = event.target.value
+    const departing = this.typeValue === 'earning' ? this.earningFieldsTarget : this.expenseFieldsTarget
+    this.clearFieldset(departing)
     this.typeValue = next
     this.applyType(next)
+  }
+
+  clearFieldset(node) {
+    node.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = '' })
+    node.querySelectorAll('input[type="radio"]').forEach(el => { el.checked = false })
   }
 
   applyType(type) {
@@ -71,16 +78,17 @@ export default class extends Controller {
   }
 
   applyAmountTheme(isEarn) {
-    const color = isEarn ? '#047857' : '#b91c1c'
-    const placeholderAdd = isEarn ? 'placeholder:text-emerald-700' : 'placeholder:text-red-700'
-    const placeholderRemove = isEarn ? 'placeholder:text-red-700' : 'placeholder:text-emerald-700'
+    const addText = isEarn ? 'text-emerald-700' : 'text-red-700'
+    const removeText = isEarn ? 'text-red-700' : 'text-emerald-700'
+    const addPlaceholder = isEarn ? 'placeholder:text-emerald-700' : 'placeholder:text-red-700'
+    const removePlaceholder = isEarn ? 'placeholder:text-red-700' : 'placeholder:text-emerald-700'
     if (this.hasAmountThemeTarget) {
-      this.amountThemeTarget.style.color = color
+      this.amountThemeTarget.classList.remove(removeText)
+      this.amountThemeTarget.classList.add(addText)
     }
     if (this.hasAmountDisplayTarget) {
-      this.amountDisplayTarget.style.color = color
-      this.amountDisplayTarget.classList.remove(placeholderRemove)
-      this.amountDisplayTarget.classList.add(placeholderAdd)
+      this.amountDisplayTarget.classList.remove(removeText, removePlaceholder)
+      this.amountDisplayTarget.classList.add(addText, addPlaceholder)
     }
   }
 

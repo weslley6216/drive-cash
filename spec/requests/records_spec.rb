@@ -60,22 +60,23 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include('name="record[date]"')
     end
 
-    it 'renders save button in top bar' do
-      get new_record_path
-
-      expect(response.body).to include('data-record-form-target="topSave"')
-    end
-
     it 'renders recurring section for expense type' do
       get new_record_path, params: { type: 'expense' }
 
       expect(response.body).to include(I18n.t('records.new_view.recurring_toggle.title'))
     end
 
-    it 'applies sm:grid-cols-2 desktop layout' do
+    it 'renders earningFields Stimulus target for JS toggling' do
+      get new_record_path, params: { type: 'earning' }
+
+      expect(response.body).to include('data-record-form-target="earningFields"')
+      expect(response.body).to include('data-record-form-target="expenseFields"')
+    end
+
+    it 'applies sm:grid-cols-2 two-column desktop layout for amount and date' do
       get new_record_path
 
-      expect(response.body).to include('sm:grid')
+      expect(response.body).to include('sm:grid-cols-2')
     end
   end
 

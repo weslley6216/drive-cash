@@ -41,8 +41,7 @@ module Records
         p(class: 'text-sm font-semibold text-slate-700') { t('records.new_view.title') }
         button(
           type: 'submit',
-          class: 'text-sm font-semibold text-blue-600',
-          data: { record_form_target: 'topSave' }
+          class: 'text-sm font-semibold text-blue-600'
         ) { t('records.new_view.save') }
       end
     end
@@ -64,7 +63,23 @@ module Records
 
     def amount_and_date_section
       div(class: 'sm:grid sm:grid-cols-2 sm:gap-4 sm:items-start') do
-        render Records::AmountInputComponent.new(amount: shared_amount, theme: cta_theme, date: shared_date)
+        render Records::AmountInputComponent.new(amount: shared_amount, theme: cta_theme)
+        date_cell
+      end
+    end
+
+    def date_cell
+      label(class: 'block cursor-pointer py-4') do
+        div(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 text-center flex items-center justify-center gap-1') do
+          render PhlexIcons::Lucide::Calendar.new(class: 'w-3 h-3')
+          plain t('records.new_view.today')
+        end
+        input(
+          type: 'date',
+          name: 'record[date]',
+          value: shared_date.to_s,
+          class: 'w-full text-sm text-slate-700 bg-transparent border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400'
+        )
       end
     end
 
@@ -78,9 +93,7 @@ module Records
 
     def earning_block
       div(class: (@type == 'earning' ? '' : 'hidden'), data: { record_form_target: 'earningFields' }) do
-        div(class: 'sm:grid sm:grid-cols-2 sm:gap-4') do
-          render Records::PlatformPickerComponent.new(selected: @earning.platform)
-        end
+        render Records::PlatformPickerComponent.new(selected: @earning.platform)
         details_section do
           render Records::TripsStepperComponent.new(value: @earning.trips_count || 1)
           notes_card
@@ -90,9 +103,7 @@ module Records
 
     def expense_block
       div(class: (@type == 'expense' ? '' : 'hidden'), data: { record_form_target: 'expenseFields' }) do
-        div(class: 'sm:grid sm:grid-cols-2 sm:gap-4') do
-          render Records::CategoryPickerComponent.new(selected: @expense.category)
-        end
+        render Records::CategoryPickerComponent.new(selected: @expense.category)
         details_section do
           vendor_card
           description_card
