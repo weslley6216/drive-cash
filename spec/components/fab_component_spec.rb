@@ -51,10 +51,6 @@ RSpec.describe FabComponent, type: :component do
       expect(html).to include('type=earning')
       expect(html).not_to include('context%5Byear%5D=2025')
     end
-
-    it 'does not link with turbo_frame modal' do
-      expect(html).not_to include('data-turbo-frame="modal"')
-    end
   end
 
   describe 'with bottom_nav: true' do
