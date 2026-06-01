@@ -2,9 +2,7 @@ class ExpensesController < ApplicationController
   before_action :find_expense, only: [:edit, :update, :destroy]
 
   def new
-    expense = Expense.new(date: Date.current)
-
-    render Expenses::NewView.new(expense: expense, context: params[:context])
+    redirect_to new_record_path(type: 'expense', context: params[:context]&.to_unsafe_h)
   end
 
   def create

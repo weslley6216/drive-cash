@@ -30,8 +30,7 @@ class FabComponent < ApplicationComponent
       end
 
       a(
-        href: new_expense_path(context: @filters),
-        data: { turbo_frame: 'modal' },
+        href: new_record_path(type: 'expense', context: @filters),
         class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 cursor-pointer'
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_expense') }
@@ -39,8 +38,7 @@ class FabComponent < ApplicationComponent
       end
 
       a(
-        href: new_earning_path(context: @filters),
-        data: { turbo_frame: 'modal' },
+        href: new_record_path(type: 'earning', context: @filters),
         class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105 cursor-pointer'
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_earning') }

@@ -6,7 +6,22 @@ RSpec.describe Expense, type: :model do
 
     it { is_expected.to validate_presence_of(:date) }
     it { is_expected.to validate_presence_of(:amount) }
-    it { is_expected.to validate_numericality_of(:amount).is_greater_than(0) }
+
+    it 'rejects amount equal to zero' do
+      expense = build(:expense, amount: 0)
+
+      expense.valid?
+
+      expect(expense.errors[:amount]).to be_present
+    end
+
+    it 'produces only one error when amount is blank' do
+      expense = build(:expense, amount: nil)
+
+      expense.valid?
+
+      expect(expense.errors[:amount].size).to eq(1)
+    end
   end
 
   describe 'enums' do
