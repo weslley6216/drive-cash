@@ -13,6 +13,12 @@ pt-BR:
               installment_order: "O número da parcela não pode ser maior que o total."
     attributes:
       expense:
+        date: "Data"
+        amount: "Valor"
+        category: "Categoria"
+        vendor: "Estabelecimento"
+        description: "Descrição"
+        paid: "Pago"
         categories:
           car_wash: "Lavagem"
           documentation: "Documentação"

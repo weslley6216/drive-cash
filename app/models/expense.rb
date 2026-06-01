@@ -24,7 +24,7 @@ class Expense < ApplicationRecord
   INSTALLMENT_PERIODS = %w[weekly biweekly monthly annual].freeze
 
   validates :date, :amount, :category, presence: true
-  validates :amount, numericality: { greater_than: 0 }
+  validates :amount, numericality: { greater_than: 0, allow_blank: true }
   validate :installment_fields_consistent
 
   scope :chronological, -> { order(date: :desc, created_at: :desc) }
