@@ -19,8 +19,8 @@ module Chat
         raw.permit(:date, :amount, :platform, :notes, :user_id)
       when Hash
         raw.slice('date', 'amount', 'platform', 'notes', 'user_id')
-           .merge(raw.slice(:date, :amount, :platform, :notes, :user_id))
-      else {}
+      else
+        {}
       end
     end
   end
