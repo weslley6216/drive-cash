@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Coming soon placeholders', type: :request do
-  %w[/analysis /work_session /settings].each do |path|
+  %w[/work_session /settings].each do |path|
     describe "GET #{path}" do
       it 'responds 200 with em breve content' do
         get path
