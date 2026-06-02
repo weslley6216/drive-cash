@@ -12,10 +12,9 @@ pt-BR:
         margin: "Margem"
         vs_previous: "% vs anterior"
         vs_previous_pp: " p.p. vs anterior"
-        vs_period_annual:     "vs Jan–%{month} %{year}"
+        vs_period_annual:     "vs %{year}"
+        vs_period_annual_ytd: "vs mesmo período"
         vs_period_monthly:    "vs %{month}/%{year}"
-        vs_period_annual_pp:  " p.p. · vs Jan–%{month} %{year}"
-        vs_period_monthly_pp: " p.p. · vs %{month}/%{year}"
       bar_chart:
         title: "Receitas vs Despesas"
         subtitle_annual: "Evolução mensal · %{year}"
