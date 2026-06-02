@@ -1,0 +1,39 @@
+pt-BR:
+  analysis:
+    show_view:
+      title: "Análise"
+      subtitle_annual: "%{year} · todos os meses"
+      subtitle_monthly: "%{month_name} · %{year}"
+      metrics:
+        per_day: "R$ / dia"
+        per_trip: "R$ / rota"
+        per_hour: "R$ / hora *"
+        per_hour_hint: "*estimado em 8h/dia"
+        margin: "Margem"
+        vs_previous: "%{value}% vs anterior"
+      bar_chart:
+        title: "Receitas vs Despesas"
+        subtitle: "Evolução mensal"
+        legend_earnings: "Receita"
+        legend_expenses: "Despesa"
+      categories:
+        title: "Despesas por categoria"
+        total_year: "%{value} no ano"
+      platforms:
+        title: "Receita por plataforma"
+        total_year: "%{value} no ano"
+        total_label: "Total"
+      insights:
+        section_title: "Insights"
+        category_spike:
+          title: "%{category} subiu %{pct}%%"
+          description: "Você gastou %{value} em %{category} — %{pct}%% acima do mês anterior."
+        best_day:
+          title: "Melhor dia: %{value}"
+          description: "Em %{date} você teve seu melhor resultado do período."
+        worst_platform:
+          title: "Pior plataforma: %{platform}"
+          description: "%{platform} rendeu apenas %{value} por rota."
+        margin_drop:
+          title: "Margem caiu %{pp} pp"
+          description: "Sua margem está em %{value}%%, abaixo do período anterior."
