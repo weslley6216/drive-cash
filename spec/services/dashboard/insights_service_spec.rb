@@ -114,5 +114,73 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:platforms].first[:id]).to eq('uber')
       end
     end
+
+    context 'insights' do
+      it 'emits category_spike when top category grew more than 10 percent vs previous period' do
+        create(:expense, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 2).call
+
+        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
+
+        expect(spike).not_to be_nil
+        expect(spike[:severity]).to eq('warning')
+      end
+
+      it 'emits best_day with the highest profit day of the month' do
+        create(:earning, date: Date.new(2025, 6, 10), amount: 500, trips_count: 1)
+        create(:earning, date: Date.new(2025, 6, 15), amount: 200, trips_count: 1)
+
+        result = described_class.new(year: 2025, month: 6).call
+        best = result[:insights].find { |insight| insight[:type] == 'best_day' }
+
+        expect(best).not_to be_nil
+        expect(best[:title]).to include('500,00')
+      end
+
+      it 'emits worst_platform when more than one platform has earnings in the period' do
+        create(:earning, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
+        create(:earning, date: Date.new(2025, 6, 2), amount:  50, trips_count: 5, platform: 'shopee')
+
+        result = described_class.new(year: 2025, month: 6).call
+        worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
+
+        expect(worst).not_to be_nil
+        expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
+      end
+
+      it 'emits margin_drop with critical severity when margin fell more than 5 pp' do
+        create(:earning, date: Date.new(2025, 2, 1), amount: 1000)
+        create(:expense, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
+        create(:earning, date: Date.new(2025, 1, 1), amount: 1000)
+        create(:expense, date: Date.new(2025, 1, 1), amount:  100, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 2).call
+        drop = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
+
+        expect(drop).not_to be_nil
+        expect(drop[:severity]).to eq('critical')
+      end
+
+      it 'returns at most 3 insights ordered by severity (critical first)' do
+        create(:earning, date: Date.new(2025, 2, 1), amount: 1000, trips_count: 1, platform: 'uber')
+        create(:earning, date: Date.new(2025, 2, 2), amount:  50,  trips_count: 5, platform: 'shopee')
+        create(:expense, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
+        create(:earning, date: Date.new(2025, 1, 1), amount: 1000, trips_count: 1)
+        create(:expense, date: Date.new(2025, 1, 1), amount: 100,  category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 2).call
+
+        expect(result[:insights].size).to be <= 3
+        expect(result[:insights].first[:severity]).to eq('critical')
+      end
+
+      it 'returns empty array when there is no data to analyze' do
+        result = described_class.new(year: 2025, month: 2).call
+
+        expect(result[:insights]).to eq([])
+      end
+    end
   end
 end

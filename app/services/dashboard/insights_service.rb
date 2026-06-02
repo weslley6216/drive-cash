@@ -4,6 +4,10 @@ module Dashboard
     BARS_LIMIT = 5
     CATEGORIES_LIMIT = 7
     PLATFORMS_LIMIT = 5
+    MAX_INSIGHTS = 3
+    CATEGORY_SPIKE_THRESHOLD = 10.0
+    MARGIN_DROP_THRESHOLD = 5.0
+    SEVERITY_ORDER = { 'critical' => 0, 'warning' => 1, 'info' => 2 }.freeze
 
     def initialize(year:, month: nil)
       @year = year
@@ -16,7 +20,7 @@ module Dashboard
         monthly_bars: monthly_bars,
         categories: categories,
         platforms: platforms,
-        insights: []
+        insights: insights
       }
     end
 
@@ -92,6 +96,89 @@ module Dashboard
 
     def platforms
       Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT).call
+    end
+
+    def insights
+      candidates = [category_spike_insight, best_day_insight, worst_platform_insight, margin_drop_insight].compact
+      candidates.sort_by { |insight| SEVERITY_ORDER.fetch(insight[:severity], 99) }.first(MAX_INSIGHTS)
+    end
+
+    def category_spike_insight
+      current_top = categories.first
+      previous_top_amount = previous_amount_for_category(current_top&.dig(:id))
+      return nil if current_top.nil? || previous_top_amount.zero?
+
+      pct = ((current_top[:amount].to_f - previous_top_amount) / previous_top_amount * 100).round(1)
+      return nil if pct <= CATEGORY_SPIKE_THRESHOLD
+
+      {
+        type: 'category_spike',
+        severity: 'warning',
+        title: I18n.t('analysis.show_view.insights.category_spike.title', category: current_top[:label], pct: pct),
+        description: I18n.t('analysis.show_view.insights.category_spike.description',
+                            category: current_top[:label], pct: pct, value: format_brl(current_top[:amount]))
+      }
+    end
+
+    def best_day_insight
+      return nil unless month
+
+      best = Earning.for_year(year).for_month(month)
+                    .group(:date).sum(:amount).max_by { |_date, amount| amount }
+      return nil if best.nil?
+
+      best_date, best_amount = best
+      {
+        type: 'best_day',
+        severity: 'info',
+        title: I18n.t('analysis.show_view.insights.best_day.title', value: format_brl(best_amount)),
+        description: I18n.t('analysis.show_view.insights.best_day.description',
+                            date: I18n.l(best_date, format: :default))
+      }
+    end
+
+    def worst_platform_insight
+      return nil if platforms.size < 2
+
+      worst = platforms.last
+      trips = Earning.for_year(year).then { |relation| month ? relation.for_month(month) : relation }
+                     .where(platform: worst[:id]).sum(:trips_count)
+      return nil if trips.zero?
+
+      per_trip_value = (worst[:amount].to_f / trips).round(2)
+      {
+        type: 'worst_platform',
+        severity: 'info',
+        title: I18n.t('analysis.show_view.insights.worst_platform.title', platform: worst[:label]),
+        description: I18n.t('analysis.show_view.insights.worst_platform.description',
+                            platform: worst[:label], value: format_brl(per_trip_value))
+      }
+    end
+
+    def margin_drop_insight
+      current_margin = margin(current_stats)
+      previous_margin = margin(previous_stats)
+      pp_diff = (current_margin - previous_margin).round(1)
+      return nil if previous_margin.zero? || pp_diff >= -MARGIN_DROP_THRESHOLD
+
+      {
+        type: 'margin_drop',
+        severity: 'critical',
+        title: I18n.t('analysis.show_view.insights.margin_drop.title', pp: pp_diff.abs),
+        description: I18n.t('analysis.show_view.insights.margin_drop.description', value: current_margin)
+      }
+    end
+
+    def previous_amount_for_category(category_id)
+      return 0 unless category_id
+
+      Expense.for_year(previous_year).paid_only
+             .then { |relation| previous_month ? relation.for_month(previous_month) : relation }
+             .where(category: category_id).sum(:amount).to_f
+    end
+
+    def format_brl(value)
+      ActionController::Base.helpers.number_to_currency(value, unit: 'R$ ', separator: ',', delimiter: '.', precision: 2)
     end
 
     def monthly_bars
