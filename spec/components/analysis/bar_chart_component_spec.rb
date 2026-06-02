@@ -78,4 +78,16 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
 
     expect(html).to include('height: 130px')
   end
+
+  it 'wraps in overflow-x-auto and uses flex-shrink-0 columns when bars exceed threshold' do
+    many_bars = (1..21).map do |day|
+      { unit: :day, key: day, label: day.to_s, earnings: 100.0, expenses: 20.0, empty: false }
+    end
+
+    html = view_context.render(Analysis::BarChartComponent.new(bars: many_bars, month: 6, year: 2025))
+
+    expect(html).to include('overflow-x-auto')
+    expect(html).to include('flex-shrink-0')
+    expect(html).to include('min-width:')
+  end
 end
