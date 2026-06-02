@@ -42,7 +42,7 @@ module Dashboard
 
     def ytd_cutoff
       return nil if month
-      return nil if year < Date.current.year
+      return nil if year != Date.current.year
 
       Date.current.month
     end
