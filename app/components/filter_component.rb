@@ -1,17 +1,68 @@
 class FilterComponent < ApplicationComponent
-  def initialize(selected_year:, selected_month:, available_years: [], compact: false, action_path: nil)
+  def initialize(selected_year:, selected_month:, available_years: [], compact: false, popover: false, action_path: nil)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
     @compact = compact
+    @popover = popover
     @action_path = action_path
   end
 
   def view_template
+    return popover_view if @popover
+
     @compact ? compact_view : full_view
   end
 
   private
+
+  def popover_view
+    div(
+      class: 'relative',
+      data: { controller: 'filter-popover', action: 'click@window->filter-popover#closeOnOutsideClick' }
+    ) do
+      button(
+        type: 'button',
+        class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm ' \
+               'flex items-center justify-center text-slate-600 hover:bg-slate-50 ' \
+               'focus:outline-none focus:ring-2 focus:ring-blue-500',
+        title: t('.title'),
+        data: { action: 'click->filter-popover#toggle' }
+      ) do
+        render PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]')
+      end
+
+      div(
+        class: 'hidden absolute right-0 mt-2 z-20 w-56 bg-white border border-slate-200 ' \
+               'rounded-xl shadow-lg p-3',
+        data: { filter_popover_target: 'panel' }
+      ) do
+        form(
+          action: @action_path || root_path, method: 'get',
+          class: 'flex flex-col gap-3',
+          data: { turbo_frame: '_top', controller: 'filter' }
+        ) do
+          popover_field(t('.year'),  :year,  action: 'change->filter#handleYearChange') { year_options }
+          popover_field(t('.month'), :month, action: 'change->filter#submit') { month_options }
+        end
+      end
+    end
+  end
+
+  def popover_field(label_text, name, action:)
+    div(class: 'flex flex-col gap-1') do
+      label(class: 'text-xs font-medium text-slate-500') { label_text }
+      select(
+        name: name, class: panel_select_classes,
+        data: { filter_target: name, action: action }
+      ) { yield }
+    end
+  end
+
+  def panel_select_classes
+    'w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium ' \
+      'text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer'
+  end
 
   def compact_view
     form(
@@ -21,7 +72,7 @@ class FilterComponent < ApplicationComponent
     ) do
       select(
         name: 'year', class: pill_classes,
-        data: { filter_target: 'year', action: 'change->filter#submit' }
+        data: { filter_target: 'year', action: 'change->filter#handleYearChange' }
       ) { year_options }
       select(
         name: 'month', class: pill_classes,
