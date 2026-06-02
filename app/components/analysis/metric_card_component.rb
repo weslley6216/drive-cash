@@ -34,7 +34,7 @@ module Analysis
 
     def badge_suffix
       if @period_label
-        @pp ? " p.p. #{@period_label}" : "% #{@period_label}"
+        @pp ? @period_label : "% #{@period_label}"
       else
         suffix_key = @pp ? 'analysis.show_view.metrics.vs_previous_pp' : 'analysis.show_view.metrics.vs_previous'
         I18n.t(suffix_key)

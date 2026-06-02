@@ -93,4 +93,16 @@ RSpec.describe Analysis::MetricCardComponent, type: :component do
 
     expect(rendered).to include('% vs anterior')
   end
+
+  it 'does not duplicate p.p. when pp is true and period_label already contains it' do
+    component = Analysis::MetricCardComponent.new(
+      label: 'Margem', icon: PhlexIcons::Lucide::Gauge,
+      value: '64%', change_pct: 31.8, pp: true, period_label: ' p.p. · vs Dez/2025'
+    )
+
+    rendered = view_context.render(component)
+
+    expect(rendered).to include('+31.8 p.p. · vs Dez/2025')
+    expect(rendered).not_to include('p.p. p.p.')
+  end
 end
