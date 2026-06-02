@@ -1,6 +1,7 @@
 module Dashboard
   class InsightsService
     HOURS_PER_DAY = 8
+    BARS_LIMIT = 5
 
     def initialize(year:, month: nil)
       @year = year
@@ -10,7 +11,7 @@ module Dashboard
     def call
       {
         metrics: metrics,
-        monthly_bars: [],
+        monthly_bars: monthly_bars,
         categories: [],
         platforms: [],
         insights: []
@@ -81,6 +82,27 @@ module Dashboard
       return nil if previous_float.zero?
 
       ((current_float - previous_float) / previous_float.abs * 100).round(1)
+    end
+
+    def monthly_bars
+      earnings_by_month = Earning.for_year(year)
+                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                                 .sum(:amount)
+      expenses_by_month = Expense.for_year(year).paid_only
+                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                                 .sum(:amount)
+
+      active_months = (earnings_by_month.keys + expenses_by_month.keys).uniq.sort
+      return [] if active_months.empty?
+
+      active_months.last(BARS_LIMIT).map do |month_number|
+        {
+          month: month_number,
+          earnings: earnings_by_month[month_number].to_f,
+          expenses: expenses_by_month[month_number].to_f,
+          label: I18n.t('date.abbr_month_names')[month_number].capitalize
+        }
+      end
     end
   end
 end

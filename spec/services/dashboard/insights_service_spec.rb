@@ -54,5 +54,39 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
       end
     end
+
+    context 'monthly_bars' do
+      it 'returns up to 5 most recent months that have earnings or expenses' do
+        create(:earning, date: Date.new(2025, 1, 1), amount: 100)
+        create(:earning, date: Date.new(2025, 3, 1), amount: 200)
+        create(:earning, date: Date.new(2025, 4, 1), amount: 300)
+        create(:expense, date: Date.new(2025, 5, 1), amount:  50, category: 'fuel', paid: true)
+        create(:earning, date: Date.new(2025, 6, 1), amount: 400)
+        create(:earning, date: Date.new(2025, 7, 1), amount: 500)
+        create(:earning, date: Date.new(2025, 8, 1), amount: 600)
+
+        result = described_class.new(year: 2025, month: nil).call
+
+        expect(result[:monthly_bars].size).to eq(5)
+        expect(result[:monthly_bars].map { |bar| bar[:month] }).to eq([4, 5, 6, 7, 8])
+      end
+
+      it 'maps each bar to earnings, expenses and translated label' do
+        create(:earning, date: Date.new(2025, 6, 1), amount: 300)
+        create(:expense, date: Date.new(2025, 6, 5), amount: 100, category: 'fuel', paid: true)
+
+        bar = described_class.new(year: 2025, month: nil).call[:monthly_bars].first
+
+        expect(bar[:earnings].to_f).to eq(300.0)
+        expect(bar[:expenses].to_f).to eq(100.0)
+        expect(bar[:label]).to eq(I18n.t('date.abbr_month_names')[6].capitalize)
+      end
+
+      it 'returns empty array when there is no activity in the year' do
+        result = described_class.new(year: 2025, month: nil).call
+
+        expect(result[:monthly_bars]).to eq([])
+      end
+    end
   end
 end
