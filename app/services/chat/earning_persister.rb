@@ -15,8 +15,11 @@ module Chat
 
     def coerce_params(raw)
       case raw
-      when ActionController::Parameters then raw.permit(:date, :amount, :platform, :notes)
-      when Hash then raw.slice('date', 'amount', 'platform', 'notes').merge(raw.slice(:date, :amount, :platform, :notes))
+      when ActionController::Parameters
+        raw.permit(:date, :amount, :platform, :notes, :user_id)
+      when Hash
+        raw.slice('date', 'amount', 'platform', 'notes', 'user_id')
+           .merge(raw.slice(:date, :amount, :platform, :notes, :user_id))
       else {}
       end
     end

@@ -141,6 +141,26 @@ RSpec.describe 'Chats', type: :request do
   end
 
   describe 'POST /chat/confirm' do
+    context 'when persisting a confirmed expense' do
+      it 'associates the expense to current_user' do
+        post chat_confirm_path,
+             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } },
+             as: :turbo_stream
+
+        expect(Expense.last.user).to eq(current_user)
+      end
+    end
+
+    context 'when persisting a confirmed earning' do
+      it 'associates the earning to current_user' do
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22' } },
+             as: :turbo_stream
+
+        expect(Earning.last.user).to eq(current_user)
+      end
+    end
+
     context 'when confirming a valid expense' do
       let(:params) { { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } } }
 
