@@ -123,6 +123,13 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response.body).to include('id="today_card"')
     end
+
+    it 'renders sign out link in the sidebar' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('sessions.sign_out'))
+      expect(response.body).to include(session_path)
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do
