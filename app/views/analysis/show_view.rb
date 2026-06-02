@@ -74,7 +74,7 @@ module Analysis
         metric_card(:per_day, format_currency(metrics[:per_day]))
         metric_card(:per_trip, format_currency(metrics[:per_trip]))
         metric_card(:per_hour, format_currency(metrics[:per_hour]), hint: t('.metrics.per_hour_hint'))
-        metric_card(:margin, "#{format_percentage(metrics[:margin])}%", pp: true)
+        metric_card(:margin, "#{format_percentage(metrics[:margin])}%")
       end
     end
 
