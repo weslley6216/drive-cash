@@ -78,4 +78,19 @@ RSpec.describe Earning, type: :model do
       expect(earning.amount).to eq(45.90)
     end
   end
+
+  describe 'user association' do
+    it 'belongs to user optionally' do
+      earning = build(:earning, user: nil)
+
+      expect(earning).to be_valid
+    end
+
+    it 'can be associated with a user' do
+      user = create(:user)
+      earning = create(:earning, user: user)
+
+      expect(earning.user).to eq(user)
+    end
+  end
 end

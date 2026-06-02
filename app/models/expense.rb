@@ -2,6 +2,8 @@ class Expense < ApplicationRecord
   include CacheInvalidation
   include MonetaryAmount
 
+  belongs_to :user, optional: true
+
   CATEGORIES_BY_GROUP = {
     vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],
     personal_operations: %w[meals phone other]

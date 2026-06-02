@@ -2,6 +2,8 @@ class Earning < ApplicationRecord
   include CacheInvalidation
   include MonetaryAmount
 
+  belongs_to :user, optional: true
+
   enum :platform, {
     amazon: 0,
     ifood: 1,

@@ -92,4 +92,19 @@ RSpec.describe Expense, type: :model do
       expect(expense.amount).to eq(45.90)
     end
   end
+
+  describe 'user association' do
+    it 'belongs to user optionally' do
+      expense = build(:expense, user: nil)
+
+      expect(expense).to be_valid
+    end
+
+    it 'can be associated with a user' do
+      user = create(:user)
+      expense = create(:expense, user: user)
+
+      expect(expense.user).to eq(user)
+    end
+  end
 end
