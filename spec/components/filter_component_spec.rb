@@ -55,6 +55,79 @@ RSpec.describe FilterComponent, type: :component do
     end
   end
 
+  context 'when popover: true' do
+    let(:component) do
+      FilterComponent.new(
+        selected_year: 2025,
+        selected_month: 3,
+        available_years: available_years,
+        popover: true
+      )
+    end
+    let(:html) { view_context.render(component) }
+
+    it 'renders a button as the popover trigger' do
+      expect(html).to include('<button')
+      expect(html).to include('click->filter-popover#toggle')
+    end
+
+    it 'renders the panel hidden by default' do
+      expect(html).to match(/class="hidden[^"]*absolute/)
+    end
+
+    it 'uses filter-popover controller with window click-outside action' do
+      expect(html).to include('data-controller="filter-popover"')
+      expect(html).to include('click@window->filter-popover#closeOnOutsideClick')
+    end
+
+    it 'attaches the filter controller to the form so requestSubmit works' do
+      expect(html).to match(/form[^>]*data-controller="filter"/)
+    end
+
+    it 'uses handleYearChange on year select to reset month before submitting' do
+      expect(html).to include('handleYearChange')
+    end
+
+    it 'renders the funnel icon inside the button' do
+      expect(html).to include('<button')
+      expect(html).to include('svg')
+    end
+
+    it 'renders year and month selects inside the panel' do
+      expect(html).to include('name="year"')
+      expect(html).to include('name="month"')
+    end
+
+    it 'selects the correct year option' do
+      expect(html).to include('value="2025" selected')
+    end
+
+    it 'selects the correct month option' do
+      expect(html).to include('value="3" selected')
+    end
+
+    it 'renders labels for each field' do
+      expect(html).to include(I18n.t('filter_component.year'))
+      expect(html).to include(I18n.t('filter_component.month'))
+    end
+
+    it 'uses the provided action_path when given' do
+      component = FilterComponent.new(
+        selected_year: 2025,
+        selected_month: nil,
+        available_years: available_years,
+        popover: true,
+        action_path: '/analysis'
+      )
+
+      expect(view_context.render(component)).to include('action="/analysis"')
+    end
+
+    it 'does not render the full card wrapper' do
+      expect(html).not_to include('bg-white rounded-lg shadow-md')
+    end
+  end
+
   context 'when compact: true' do
     let(:component) do
       FilterComponent.new(
@@ -85,6 +158,10 @@ RSpec.describe FilterComponent, type: :component do
     it 'renders a form so filter#submit can call requestSubmit()' do
       expect(html).to include('<form')
       expect(html).to include('data-controller="filter"')
+    end
+
+    it 'uses handleYearChange on year select to reset month before submitting' do
+      expect(html).to include('handleYearChange')
     end
 
     it 'uses the provided action_path when given' do

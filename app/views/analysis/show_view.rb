@@ -13,14 +13,16 @@ module Analysis
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :analysis, sidebar_nav: :analysis) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
+      render LayoutComponent.new(
+        title: t('.title'),
+        bottom_nav: :analysis,
+        sidebar_nav: :analysis,
+        app_shell: true
+      ) do
+        div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
-        topbar
-        metrics_grid
-        bar_chart_section
-        breakdown_section
-        insights_section
+        pinned_topbar
+        content_scroll_region
 
         turbo_frame_tag 'modal'
       end
@@ -28,8 +30,21 @@ module Analysis
 
     private
 
+    def pinned_topbar
+      div(class: 'flex-none px-4 sm:px-6 pt-4') { topbar }
+    end
+
+    def content_scroll_region
+      div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
+        metrics_grid
+        bar_chart_section
+        breakdown_section
+        insights_section
+      end
+    end
+
     def topbar
-      div(class: 'mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between') do
+      div(class: 'flex items-center justify-between gap-4') do
         div do
           h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.title') }
           p(class: 'text-sm text-slate-500 mt-0.5') { subtitle }
@@ -39,7 +54,7 @@ module Analysis
           selected_year: @filters[:year],
           selected_month: @filters[:month],
           available_years: @filters[:available_years],
-          compact: true,
+          popover: true,
           action_path: helpers.analysis_path
         )
       end
