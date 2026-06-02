@@ -51,7 +51,7 @@ module Dashboard
       if month
         {
           mode: :monthly,
-          previous_month_name: I18n.t('date.abbr_month_names')[previous_month].capitalize,
+          previous_month_name: I18n.t('date.abbr_month_names')[month].capitalize,
           previous_year: previous_year
         }
       else
@@ -66,13 +66,11 @@ module Dashboard
     end
 
     def previous_year
-      return year - 1 if month.nil?
-      month == 1 ? year - 1 : year
+      year - 1
     end
 
     def previous_month
-      return nil if month.nil?
-      month == 1 ? 12 : month - 1
+      month
     end
 
     def metrics
@@ -150,13 +148,11 @@ module Dashboard
 
     def category_spike_description(current_top, pct)
       if month
-        period_name          = I18n.t('date.month_names')[month]
-        previous_period_name = I18n.t('date.month_names')[previous_month]
         I18n.t('analysis.show_view.insights.category_spike.description_monthly',
                category: current_top[:label], pct: pct,
                value: format_brl(current_top[:amount]),
-               period: period_name,
-               previous_period: previous_period_name)
+               period: I18n.t('date.month_names')[month],
+               previous_year: previous_year)
       else
         I18n.t('analysis.show_view.insights.category_spike.description_annual',
                category: current_top[:label], pct: pct,

@@ -13,7 +13,7 @@ pt-BR:
         vs_previous: "% vs anterior"
         vs_previous_pp: " p.p. vs anterior"
         vs_period_annual:     "vs %{year}"
-        vs_period_annual_ytd: "vs mesmo período"
+        vs_period_annual_ytd: "vs jan–%{month}/%{year}"
         vs_period_monthly:    "vs %{month}/%{year}"
       bar_chart:
         title: "Receitas vs Despesas"
@@ -37,7 +37,7 @@ pt-BR:
         section_title: "Insights"
         category_spike:
           title: "%{category} subiu %{pct}%%"
-          description_monthly: "Em %{period} você gastou %{value} em %{category} — %{pct}%% acima de %{previous_period}."
+          description_monthly: "Você gastou %{value} em %{category} em %{period} — %{pct}%% acima do mesmo mês de %{previous_year}."
           description_annual:  "Você gastou %{value} em %{category} — %{pct}%% acima do mesmo período de %{previous_year}."
         best_day:
           title: "Melhor dia: %{value}"

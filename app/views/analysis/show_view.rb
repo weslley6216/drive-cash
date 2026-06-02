@@ -99,7 +99,9 @@ module Analysis
                month: ctx[:previous_month_name],
                year: ctx[:previous_year])
       elsif ctx[:cutoff_month_name]
-        I18n.t('analysis.show_view.metrics.vs_period_annual_ytd')
+        I18n.t('analysis.show_view.metrics.vs_period_annual_ytd',
+               month: ctx[:cutoff_month_name],
+               year: ctx[:previous_year])
       else
         I18n.t('analysis.show_view.metrics.vs_period_annual', year: ctx[:previous_year])
       end

@@ -71,9 +71,9 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
       end
 
-      it 'wraps to december of previous year when month is january' do
-        create(:earning, date: Date.new(2025, 1, 1),  amount: 200, trips_count: 1)
-        create(:earning, date: Date.new(2024, 12, 1), amount: 100, trips_count: 1)
+      it 'compares to same month of previous year (year-over-year) in monthly mode' do
+        create(:earning, date: Date.new(2025, 1, 1), amount: 200, trips_count: 1)
+        create(:earning, date: Date.new(2024, 1, 1), amount: 100, trips_count: 1)
 
         result = described_class.new(year: 2025, month: 1).call
 
@@ -174,12 +174,12 @@ RSpec.describe Dashboard::InsightsService do
     end
 
     context 'period_context' do
-      it 'returns mode :monthly with previous month name when month is present' do
+      it 'returns mode :monthly with same month name and previous year (YoY)' do
         result = described_class.new(year: 2025, month: 6).call
 
         expect(result[:period_context][:mode]).to eq(:monthly)
-        expect(result[:period_context][:previous_month_name]).to eq(I18n.t('date.abbr_month_names')[5].capitalize)
-        expect(result[:period_context][:previous_year]).to eq(2025)
+        expect(result[:period_context][:previous_month_name]).to eq(I18n.t('date.abbr_month_names')[6].capitalize)
+        expect(result[:period_context][:previous_year]).to eq(2024)
       end
 
       it 'returns mode :annual with nil cutoff_month_name for past years' do
@@ -199,9 +199,9 @@ RSpec.describe Dashboard::InsightsService do
     end
 
     context 'insights' do
-      it 'emits category_spike when top category grew more than 10 percent vs previous period' do
+      it 'emits category_spike when top category grew more than 10 percent vs same month previous year' do
         create(:expense, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
-        create(:expense, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2024, 2, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2).call
 
@@ -211,15 +211,15 @@ RSpec.describe Dashboard::InsightsService do
         expect(spike[:severity]).to eq('warning')
       end
 
-      it 'category_spike uses description_monthly with period names when month is present' do
+      it 'category_spike uses description_monthly with month name and previous year (YoY)' do
         create(:expense, date: Date.new(2025, 6, 1), amount: 220, category: 'fuel', paid: true)
-        create(:expense, date: Date.new(2025, 5, 1), amount: 100, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2024, 6, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 6).call
         spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
 
         expect(spike[:description]).to include('junho')
-        expect(spike[:description]).to include('maio')
+        expect(spike[:description]).to include('2024')
       end
 
       it 'category_spike uses description_annual with previous year when month is nil' do
@@ -258,8 +258,8 @@ RSpec.describe Dashboard::InsightsService do
       it 'emits margin_drop with critical severity when margin fell more than 5 pp' do
         create(:earning, date: Date.new(2025, 2, 1), amount: 1000)
         create(:expense, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
-        create(:earning, date: Date.new(2025, 1, 1), amount: 1000)
-        create(:expense, date: Date.new(2025, 1, 1), amount:  100, category: 'fuel', paid: true)
+        create(:earning, date: Date.new(2024, 2, 1), amount: 1000)
+        create(:expense, date: Date.new(2024, 2, 1), amount:  100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2).call
         drop = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
@@ -272,8 +272,8 @@ RSpec.describe Dashboard::InsightsService do
         create(:earning, date: Date.new(2025, 2, 1), amount: 1000, trips_count: 1, platform: 'uber')
         create(:earning, date: Date.new(2025, 2, 2), amount:  50,  trips_count: 5, platform: 'shopee')
         create(:expense, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
-        create(:earning, date: Date.new(2025, 1, 1), amount: 1000, trips_count: 1)
-        create(:expense, date: Date.new(2025, 1, 1), amount: 100,  category: 'fuel', paid: true)
+        create(:earning, date: Date.new(2024, 2, 1), amount: 1000, trips_count: 1)
+        create(:expense, date: Date.new(2024, 2, 1), amount: 100,  category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2).call
 
