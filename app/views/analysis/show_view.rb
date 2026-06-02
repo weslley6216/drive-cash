@@ -74,7 +74,7 @@ module Analysis
         metric_card(:per_day, format_currency(metrics[:per_day]))
         metric_card(:per_trip, format_currency(metrics[:per_trip]))
         metric_card(:per_hour, format_currency(metrics[:per_hour]), hint: t('.metrics.per_hour_hint'))
-        metric_card(:margin, "#{format_percentage(metrics[:margin])}%", pp: true)
+        metric_card(:margin, "#{format_percentage(metrics[:margin])}%")
       end
     end
 
@@ -85,18 +85,48 @@ module Analysis
         value: value,
         hint: hint,
         change_pct: metrics[:change_pct][key],
-        pp: pp
+        pp: pp,
+        period_label: period_label_for(pp)
       )
     end
 
+    def period_label_for(_pp)
+      ctx = @insights[:period_context]
+      return nil unless ctx
+
+      if ctx[:mode] == :monthly
+        I18n.t('analysis.show_view.metrics.vs_period_monthly',
+               month: ctx[:previous_month_name],
+               year: ctx[:previous_year])
+      elsif ctx[:cutoff_month_name]
+        I18n.t('analysis.show_view.metrics.vs_period_annual_ytd',
+               month: ctx[:cutoff_month_name],
+               year: ctx[:previous_year])
+      else
+        I18n.t('analysis.show_view.metrics.vs_period_annual', year: ctx[:previous_year])
+      end
+    end
+
     def bar_chart_section
-      div(class: 'mb-6') { render Analysis::BarChartComponent.new(months: @insights[:monthly_bars]) }
+      div(class: 'mb-6') do
+        render Analysis::BarChartComponent.new(
+          bars: @insights[:monthly_bars],
+          month: @filters[:month],
+          year: @filters[:year]
+        )
+      end
     end
 
     def breakdown_section
       div(class: 'grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6') do
-        div { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories]) }
-        div { render Analysis::PlatformDonutComponent.new(platforms: @insights[:platforms], total: platforms_total) }
+        div { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories], month: @filters[:month]) }
+        div do
+          render Analysis::PlatformDonutComponent.new(
+            platforms: @insights[:platforms],
+            total: platforms_total,
+            month: @filters[:month]
+          )
+        end
       end
     end
 

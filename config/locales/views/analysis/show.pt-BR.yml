@@ -12,26 +12,33 @@ pt-BR:
         margin: "Margem"
         vs_previous: "% vs anterior"
         vs_previous_pp: " p.p. vs anterior"
+        vs_period_annual:     "vs %{year}"
+        vs_period_annual_ytd: "vs jan–%{month}/%{year}"
+        vs_period_monthly:    "vs %{month}/%{year}"
       bar_chart:
         title: "Receitas vs Despesas"
-        subtitle: "Evolução mensal"
+        subtitle_annual: "Evolução mensal · %{year}"
+        subtitle_monthly: "Por dia · %{month_name} %{year}"
         legend_earnings: "Receita"
         legend_expenses: "Despesa"
         empty: "Sem dados para o período"
       categories:
         title: "Despesas por categoria"
-        total_year: "%{value} no ano"
+        total_annual: "%{value} no ano"
+        total_monthly: "%{value} no mês"
         empty: "Sem despesas no período"
       platforms:
         title: "Receita por plataforma"
-        total_year: "%{value} no ano"
+        total_annual: "%{value} no ano"
+        total_monthly: "%{value} no mês"
         total_label: "Total"
         empty: "Sem receitas no período"
       insights:
         section_title: "Insights"
         category_spike:
           title: "%{category} subiu %{pct}%%"
-          description: "Você gastou %{value} em %{category} — %{pct}%% acima do mês anterior."
+          description_monthly: "Você gastou %{value} em %{category} em %{period} — %{pct}%% acima do mesmo mês de %{previous_year}."
+          description_annual:  "Você gastou %{value} em %{category} — %{pct}%% acima do mesmo período de %{previous_year}."
         best_day:
           title: "Melhor dia: %{value}"
           description: "Em %{date} você teve seu melhor resultado do período."

@@ -73,5 +73,34 @@ RSpec.describe Dashboard::StatsService do
         expect(result[:days_avg_week]).to eq(2)
       end
     end
+
+    context 'with through_month' do
+      it 'limits earnings scope to months <= through_month' do
+        create(:earning, date: Date.new(2024, 3, 1), amount: 300)
+        create(:earning, date: Date.new(2024, 7, 1), amount: 999)
+
+        result = described_class.new(year: 2024, through_month: 6).call
+
+        expect(result[:earnings]).to eq(300.0)
+      end
+
+      it 'limits expenses scope to months <= through_month' do
+        create(:expense, date: Date.new(2024, 2, 1), amount: 100, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2024, 8, 1), amount: 500, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2024, through_month: 6).call
+
+        expect(result[:expenses]).to eq(100.0)
+      end
+
+      it 'ignores through_month when month is also set (monthly comparison is exact)' do
+        create(:earning, date: Date.new(2024, 6, 1), amount: 400)
+        create(:earning, date: Date.new(2024, 3, 1), amount: 200)
+
+        result = described_class.new(year: 2024, month: 6, through_month: 3).call
+
+        expect(result[:earnings]).to eq(400.0)
+      end
+    end
   end
 end

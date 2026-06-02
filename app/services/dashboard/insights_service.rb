@@ -1,7 +1,6 @@
 module Dashboard
   class InsightsService
     HOURS_PER_DAY = 8
-    BARS_LIMIT = 5
     CATEGORIES_LIMIT = 7
     PLATFORMS_LIMIT = 5
     MAX_INSIGHTS = 3
@@ -20,7 +19,8 @@ module Dashboard
         monthly_bars: monthly_bars,
         categories: categories,
         platforms: platforms,
-        insights: insights
+        insights: insights,
+        period_context: period_context
       }
     end
 
@@ -33,17 +33,44 @@ module Dashboard
     end
 
     def previous_stats
-      @previous_stats ||= Dashboard::StatsService.new(year: previous_year, month: previous_month).call
+      @previous_stats ||= Dashboard::StatsService.new(
+        year: previous_year,
+        month: previous_month,
+        through_month: ytd_cutoff
+      ).call
+    end
+
+    def ytd_cutoff
+      return nil if month
+      return nil if year != Date.current.year
+
+      Date.current.month
+    end
+
+    def period_context
+      if month
+        {
+          mode: :monthly,
+          previous_month_name: I18n.t('date.abbr_month_names')[month],
+          previous_year: previous_year
+        }
+      else
+        cutoff = ytd_cutoff
+        cutoff_name = cutoff ? I18n.t('date.abbr_month_names')[cutoff] : nil
+        {
+          mode: :annual,
+          cutoff_month_name: cutoff_name,
+          previous_year: previous_year
+        }
+      end
     end
 
     def previous_year
-      return year - 1 if month.nil?
-      month == 1 ? year - 1 : year
+      year - 1
     end
 
     def previous_month
-      return nil if month.nil?
-      month == 1 ? 12 : month - 1
+      month
     end
 
     def metrics
@@ -115,9 +142,23 @@ module Dashboard
         type: 'category_spike',
         severity: 'warning',
         title: I18n.t('analysis.show_view.insights.category_spike.title', category: current_top[:label], pct: pct),
-        description: I18n.t('analysis.show_view.insights.category_spike.description',
-                            category: current_top[:label], pct: pct, value: format_brl(current_top[:amount]))
+        description: category_spike_description(current_top, pct)
       }
+    end
+
+    def category_spike_description(current_top, pct)
+      if month
+        I18n.t('analysis.show_view.insights.category_spike.description_monthly',
+               category: current_top[:label], pct: pct,
+               value: format_brl(current_top[:amount]),
+               period: I18n.t('date.month_names')[month],
+               previous_year: previous_year)
+      else
+        I18n.t('analysis.show_view.insights.category_spike.description_annual',
+               category: current_top[:label], pct: pct,
+               value: format_brl(current_top[:amount]),
+               previous_year: previous_year)
+      end
     end
 
     def best_day_insight
@@ -182,22 +223,49 @@ module Dashboard
     end
 
     def monthly_bars
-      earnings_by_month = Earning.for_year(year)
-                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                                 .sum(:amount)
-      expenses_by_month = Expense.for_year(year).paid_only
-                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                                 .sum(:amount)
+      month ? daily_bars : annual_month_bars
+    end
 
-      active_months = (earnings_by_month.keys + expenses_by_month.keys).uniq.sort
-      return [] if active_months.empty?
+    def annual_month_bars
+      earnings_by = Earning.for_year(year)
+                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                           .sum(:amount)
+      expenses_by = Expense.for_year(year).paid_only
+                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                           .sum(:amount)
 
-      active_months.last(BARS_LIMIT).map do |month_number|
+      has_any_data = (earnings_by.keys + expenses_by.keys).any?
+      return [] unless has_any_data
+
+      (1..12).map do |month_number|
         {
-          month: month_number,
-          earnings: earnings_by_month[month_number].to_f,
-          expenses: expenses_by_month[month_number].to_f,
-          label: I18n.t('date.abbr_month_names')[month_number].capitalize
+          unit: :month,
+          key: month_number,
+          label: I18n.t('date.abbr_month_names')[month_number].capitalize,
+          earnings: earnings_by[month_number].to_f,
+          expenses: expenses_by[month_number].to_f,
+          empty: earnings_by[month_number].nil? && expenses_by[month_number].nil?
+        }
+      end
+    end
+
+    def daily_bars
+      earnings_by = Earning.for_year(year).for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                           .sum(:amount)
+      expenses_by = Expense.for_year(year).paid_only.for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                           .sum(:amount)
+
+      days = (earnings_by.keys + expenses_by.keys).uniq.sort
+      days.map do |day|
+        {
+          unit: :day,
+          key: day,
+          label: day.to_s,
+          earnings: earnings_by[day].to_f,
+          expenses: expenses_by[day].to_f,
+          empty: false
         }
       end
     end
