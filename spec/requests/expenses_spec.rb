@@ -184,6 +184,28 @@ RSpec.describe 'Expenses', type: :request do
     end
   end
 
+  describe 'scoping by current user' do
+    it 'returns 404 when editing another user expense' do
+      other_user = create(:user)
+      other_expense = create(:expense, user: other_user)
+
+      get edit_expense_path(other_expense), params: { context: { year: 2026, month: 1 } }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'creates expenses associated to current user' do
+      post expenses_path,
+           params: {
+             expense: { date: '2026-01-23', amount: 150.50, category: 'maintenance', vendor: 'Oficina' },
+             context: { year: 2026 }
+           },
+           as: :turbo_stream
+
+      expect(Expense.last.user).to eq(current_user)
+    end
+  end
+
   describe 'DELETE /expenses/:id' do
     it 'destroys the expense' do
       expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
