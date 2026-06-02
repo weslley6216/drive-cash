@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :user do
-    email_address { "user@example.com" }
-    password { "password" }
+    sequence(:name) { |offset| "Motorista #{offset}" }
+    sequence(:email_address) { |offset| "driver#{offset}@drivecash.test" }
+    password { 'password123' }
   end
 end
