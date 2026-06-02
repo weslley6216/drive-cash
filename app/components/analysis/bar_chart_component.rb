@@ -2,6 +2,7 @@ module Analysis
   class BarChartComponent < ApplicationComponent
     CHART_HEIGHT = 130
     STUB_HEIGHT  = 3
+    BAR_WIDTHS   = [[12, 'w-3'], [20, 'w-2'], [31, 'w-1.5']].freeze
 
     def initialize(bars:, month:, year:)
       @bars  = bars
@@ -44,7 +45,8 @@ module Analysis
     end
 
     def chart
-      div(class: 'flex items-end justify-between gap-2', style: 'height: 140px') do
+      gap = @bars.size > 15 ? 'gap-1' : 'gap-2'
+      div(class: "flex items-end justify-between #{gap}", style: 'height: 140px') do
         @bars.each { |bar_row| bar_column(bar_row) }
       end
     end
@@ -63,8 +65,8 @@ module Analysis
 
       div(class: 'flex-1 flex flex-col items-center gap-1') do
         div(class: 'flex items-end gap-0.5', style: "height: #{CHART_HEIGHT}px") do
-          div(class: 'w-3 rounded-t bg-emerald-500', style: "height: #{earn_height}px")
-          div(class: 'w-3 rounded-t bg-red-500',     style: "height: #{exp_height}px")
+          div(class: "#{bar_width_class} rounded-t bg-emerald-500", style: "height: #{earn_height}px")
+          div(class: "#{bar_width_class} rounded-t bg-red-500",     style: "height: #{exp_height}px")
         end
         span(class: 'text-[10px] text-slate-500 font-medium') { bar_row[:label] }
       end
@@ -73,11 +75,15 @@ module Analysis
     def empty_bar_column(bar_row)
       div(class: 'flex-1 flex flex-col items-center gap-1') do
         div(class: 'flex items-end gap-0.5', style: "height: #{CHART_HEIGHT}px") do
-          div(class: 'w-3 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px")
-          div(class: 'w-3 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px")
+          div(class: "#{bar_width_class} rounded-t bg-slate-200", style: "height: #{STUB_HEIGHT}px")
+          div(class: "#{bar_width_class} rounded-t bg-slate-200", style: "height: #{STUB_HEIGHT}px")
         end
         span(class: 'text-[10px] text-slate-300 font-medium') { bar_row[:label] }
       end
+    end
+
+    def bar_width_class
+      BAR_WIDTHS.find { |(limit, _)| @bars.size <= limit }&.last || 'w-1.5'
     end
 
     def bar_height(value)
