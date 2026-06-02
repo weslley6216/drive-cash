@@ -27,7 +27,8 @@ module Analysis
       positive = @change_pct.to_f >= 0
       color = positive ? 'text-emerald-600' : 'text-red-600'
       sign = positive ? '+' : '−'
-      label = @pp ? "#{sign}#{@change_pct.abs} p.p. vs anterior" : "#{sign}#{@change_pct.abs}% vs anterior"
+      suffix_key = @pp ? 'analysis.show_view.metrics.vs_previous_pp' : 'analysis.show_view.metrics.vs_previous'
+      label = "#{sign}#{@change_pct.abs}#{I18n.t(suffix_key)}"
       p(class: "text-xs font-medium mt-0.5 #{color}") { label }
     end
   end

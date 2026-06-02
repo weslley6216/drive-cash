@@ -44,6 +44,6 @@ RSpec.describe Analysis::PlatformDonutComponent, type: :component do
   it 'renders empty state when platforms is empty' do
     empty = view_context.render(Analysis::PlatformDonutComponent.new(platforms: [], total: 0))
 
-    expect(empty).to include(I18n.t('category_breakdown_component.empty'))
+    expect(empty).to include(I18n.t('analysis.show_view.platforms.empty'))
   end
 end

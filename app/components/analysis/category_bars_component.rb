@@ -45,7 +45,7 @@ module Analysis
     end
 
     def empty_state
-      p(class: 'text-sm text-slate-400 text-center py-6') { I18n.t('category_breakdown_component.empty') }
+      p(class: 'text-sm text-slate-400 text-center py-6') { I18n.t('analysis.show_view.categories.empty') }
     end
   end
 end

@@ -46,6 +46,6 @@ RSpec.describe Analysis::CategoryBarsComponent, type: :component do
   it 'renders empty state when categories is empty' do
     empty = view_context.render(Analysis::CategoryBarsComponent.new(categories: []))
 
-    expect(empty).to include(I18n.t('category_breakdown_component.empty'))
+    expect(empty).to include(I18n.t('analysis.show_view.categories.empty'))
   end
 end

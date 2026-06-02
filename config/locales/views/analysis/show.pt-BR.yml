@@ -10,19 +10,23 @@ pt-BR:
         per_hour: "R$ / hora *"
         per_hour_hint: "*estimado em 8h/dia"
         margin: "Margem"
-        vs_previous: "%{value}% vs anterior"
+        vs_previous: "% vs anterior"
+        vs_previous_pp: " p.p. vs anterior"
       bar_chart:
         title: "Receitas vs Despesas"
         subtitle: "Evolução mensal"
         legend_earnings: "Receita"
         legend_expenses: "Despesa"
+        empty: "Sem dados para o período"
       categories:
         title: "Despesas por categoria"
         total_year: "%{value} no ano"
+        empty: "Sem despesas no período"
       platforms:
         title: "Receita por plataforma"
         total_year: "%{value} no ano"
         total_label: "Total"
+        empty: "Sem receitas no período"
       insights:
         section_title: "Insights"
         category_spike:
