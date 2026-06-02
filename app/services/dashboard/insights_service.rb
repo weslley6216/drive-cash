@@ -32,7 +32,18 @@ module Dashboard
     end
 
     def previous_stats
-      @previous_stats ||= Dashboard::StatsService.new(year: previous_year, month: previous_month).call
+      @previous_stats ||= Dashboard::StatsService.new(
+        year: previous_year,
+        month: previous_month,
+        through_month: ytd_cutoff
+      ).call
+    end
+
+    def ytd_cutoff
+      return nil if month
+      return nil if year < Date.current.year
+
+      Date.current.month
     end
 
     def previous_year

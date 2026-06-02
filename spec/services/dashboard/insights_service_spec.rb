@@ -45,6 +45,32 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
       end
 
+      it 'applies YTD cutoff when year is current year and month is nil' do
+        current_year = Date.current.year
+        cutoff_month = Date.current.month
+
+        create(:earning, date: Date.new(current_year, 1, 1), amount: 200, trips_count: 1)
+        create(:earning, date: Date.new(current_year - 1, 1, 1), amount: 100, trips_count: 1)
+        create(:earning, date: Date.new(current_year - 1, 12, 1), amount: 9999, trips_count: 1)
+
+        result = described_class.new(year: current_year, month: nil).call
+
+        if cutoff_month < 12
+          expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
+        else
+          expect(result[:metrics][:change_pct][:per_day]).not_to be_nil
+        end
+      end
+
+      it 'does not apply YTD cutoff for past years' do
+        create(:earning, date: Date.new(2023, 1, 1), amount: 200, trips_count: 1)
+        create(:earning, date: Date.new(2022, 12, 1), amount: 100, trips_count: 1)
+
+        result = described_class.new(year: 2023, month: nil).call
+
+        expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
+      end
+
       it 'wraps to december of previous year when month is january' do
         create(:earning, date: Date.new(2025, 1, 1),  amount: 200, trips_count: 1)
         create(:earning, date: Date.new(2024, 12, 1), amount: 100, trips_count: 1)

@@ -1,8 +1,9 @@
 module Dashboard
   class StatsService
-    def initialize(year: Date.current.year, month: nil)
+    def initialize(year: Date.current.year, month: nil, through_month: nil)
       @year = year
       @month = month
+      @through_month = through_month
     end
 
     def call
@@ -39,7 +40,7 @@ module Dashboard
 
     private
 
-    attr_reader :year, :month
+    attr_reader :year, :month, :through_month
 
     def memoized_earnings_data
       @memoized_earnings_data ||= earnings_calculator.call
@@ -53,6 +54,7 @@ module Dashboard
       @earnings_scope ||= begin
         scope = Earning.for_year(year)
         scope = scope.for_month(month) if month
+        scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
       end
     end
@@ -61,6 +63,7 @@ module Dashboard
       @expenses_scope ||= begin
         scope = Expense.for_year(year).paid_only
         scope = scope.for_month(month) if month
+        scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
       end
     end
