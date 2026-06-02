@@ -114,9 +114,25 @@ module Dashboard
         type: 'category_spike',
         severity: 'warning',
         title: I18n.t('analysis.show_view.insights.category_spike.title', category: current_top[:label], pct: pct),
-        description: I18n.t('analysis.show_view.insights.category_spike.description',
-                            category: current_top[:label], pct: pct, value: format_brl(current_top[:amount]))
+        description: category_spike_description(current_top, pct)
       }
+    end
+
+    def category_spike_description(current_top, pct)
+      if month
+        period_name          = I18n.t('date.month_names')[month]
+        previous_period_name = I18n.t('date.month_names')[previous_month]
+        I18n.t('analysis.show_view.insights.category_spike.description_monthly',
+               category: current_top[:label], pct: pct,
+               value: format_brl(current_top[:amount]),
+               period: period_name,
+               previous_period: previous_period_name)
+      else
+        I18n.t('analysis.show_view.insights.category_spike.description_annual',
+               category: current_top[:label], pct: pct,
+               value: format_brl(current_top[:amount]),
+               previous_year: previous_year)
+      end
     end
 
     def best_day_insight

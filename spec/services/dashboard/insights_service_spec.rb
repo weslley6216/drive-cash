@@ -160,6 +160,28 @@ RSpec.describe Dashboard::InsightsService do
         expect(spike[:severity]).to eq('warning')
       end
 
+      it 'category_spike uses description_monthly with period names when month is present' do
+        create(:expense, date: Date.new(2025, 6, 1), amount: 220, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2025, 5, 1), amount: 100, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 6).call
+        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
+
+        expect(spike[:description]).to include('junho')
+        expect(spike[:description]).to include('maio')
+      end
+
+      it 'category_spike uses description_annual with previous year when month is nil' do
+        create(:expense, date: Date.new(2025, 1, 1), amount: 220, category: 'fuel', paid: true)
+        create(:expense, date: Date.new(2024, 1, 1), amount: 100, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: nil).call
+        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
+
+        expect(spike[:description]).to include('2024')
+        expect(spike[:description]).not_to include('mês anterior')
+      end
+
       it 'emits best_day with the highest profit day of the month' do
         create(:earning, date: Date.new(2025, 6, 10), amount: 500, trips_count: 1)
         create(:earning, date: Date.new(2025, 6, 15), amount: 200, trips_count: 1)

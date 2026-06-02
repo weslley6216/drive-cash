@@ -34,7 +34,8 @@ pt-BR:
         section_title: "Insights"
         category_spike:
           title: "%{category} subiu %{pct}%%"
-          description: "Você gastou %{value} em %{category} — %{pct}%% acima do mês anterior."
+          description_monthly: "Em %{period} você gastou %{value} em %{category} — %{pct}%% acima de %{previous_period}."
+          description_annual:  "Você gastou %{value} em %{category} — %{pct}%% acima do mesmo período de %{previous_year}."
         best_day:
           title: "Melhor dia: %{value}"
           description: "Em %{date} você teve seu melhor resultado do período."
