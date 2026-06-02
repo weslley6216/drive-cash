@@ -90,7 +90,13 @@ module Analysis
     end
 
     def bar_chart_section
-      div(class: 'mb-6') { render Analysis::BarChartComponent.new(months: @insights[:monthly_bars]) }
+      div(class: 'mb-6') do
+        render Analysis::BarChartComponent.new(
+          bars: @insights[:monthly_bars],
+          month: @filters[:month],
+          year: @filters[:year]
+        )
+      end
     end
 
     def breakdown_section

@@ -14,7 +14,8 @@ pt-BR:
         vs_previous_pp: " p.p. vs anterior"
       bar_chart:
         title: "Receitas vs Despesas"
-        subtitle: "Evolução mensal"
+        subtitle_annual: "Evolução mensal · %{year}"
+        subtitle_monthly: "Por dia · %{month_name} %{year}"
         legend_earnings: "Receita"
         legend_expenses: "Despesa"
         empty: "Sem dados para o período"
