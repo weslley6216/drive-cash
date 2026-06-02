@@ -41,3 +41,5 @@ group :test do
   gem 'shoulda-matchers'
   gem 'simplecov'
 end
+
+gem 'bcrypt', '~> 3.1'

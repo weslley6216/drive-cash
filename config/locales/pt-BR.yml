@@ -246,3 +246,18 @@ pt-BR:
       errors:
         invalid_repeat: "Para parcelar, selecione o período e informe pelo menos 2 parcelas."
         invalid_period_for_installments: "Informe um período válido entre parcelas (semanal, quinzenal, mensal ou anual)."
+  sessions:
+    invalid_credentials: "Email ou senha inválido."
+    rate_limit: "Muitas tentativas de login. Tente novamente em alguns minutos."
+    sign_out: "Sair"
+  sidebar_nav_component:
+    brand: "DriveCash"
+    brand_subtitle: "Seus ganhos e gastos"
+    settings: "Configurações"
+    tabs:
+      home: "Início"
+      analysis: "Análise"
+      goals: "Metas"
+      journey: "Jornada"
+      history: "Histórico"
+      vehicle: "Veículo"

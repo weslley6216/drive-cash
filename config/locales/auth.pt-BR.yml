@@ -1,0 +1,25 @@
+pt-BR:
+  sessions:
+    new_view:
+      title: "Entrar no DriveCash"
+      subtitle: "Gestão financeira para motoristas de aplicativo"
+      email: "E-mail"
+      password: "Senha"
+      sign_in: "Entrar"
+    sign_out: "Sair"
+    invalid_credentials: "E-mail ou senha inválidos."
+    rate_limit: "Muitas tentativas. Aguarde alguns minutos."
+  passwords:
+    new_view:
+      title: "Recuperar senha"
+      subtitle: "Enviaremos um link de redefinição."
+      email: "E-mail"
+      submit: "Enviar link"
+    edit_view:
+      title: "Definir nova senha"
+      password: "Nova senha"
+      password_confirmation: "Confirmar senha"
+      submit: "Salvar"
+    not_found: "Link inválido ou expirado."
+    instructions_sent: "Se este e-mail existir, você receberá instruções."
+    updated: "Senha atualizada."

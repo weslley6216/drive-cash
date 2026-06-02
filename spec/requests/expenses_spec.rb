@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Expenses', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /expenses/new' do
     it 'redirects to /records/new?type=expense' do
       get new_expense_path
@@ -108,7 +112,7 @@ RSpec.describe 'Expenses', type: :request do
 
   describe 'GET /expenses/:id/edit' do
     it 'renders edit modal form' do
-      expense = create(:expense, category: 'fuel', amount: 80)
+      expense = create(:expense, user: current_user, category: 'fuel', amount: 80)
 
       get edit_expense_path(expense), params: { context: { year: 2026, month: 1 } }
 
@@ -121,7 +125,7 @@ RSpec.describe 'Expenses', type: :request do
   end
 
   describe 'PATCH /expenses/:id' do
-    let(:expense) { create(:expense, date: Date.new(2026, 1, 10), amount: 80, category: 'fuel') }
+    let(:expense) { create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 80, category: 'fuel') }
 
     it 'updates expense attributes' do
       patch expense_path(expense),
@@ -180,9 +184,31 @@ RSpec.describe 'Expenses', type: :request do
     end
   end
 
+  describe 'scoping by current user' do
+    it 'returns 404 when editing another user expense' do
+      other_user = create(:user)
+      other_expense = create(:expense, user: other_user)
+
+      get edit_expense_path(other_expense), params: { context: { year: 2026, month: 1 } }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'creates expenses associated to current user' do
+      post expenses_path,
+           params: {
+             expense: { date: '2026-01-23', amount: 150.50, category: 'maintenance', vendor: 'Oficina' },
+             context: { year: 2026 }
+           },
+           as: :turbo_stream
+
+      expect(Expense.last.user).to eq(current_user)
+    end
+  end
+
   describe 'DELETE /expenses/:id' do
     it 'destroys the expense' do
-      expense = create(:expense, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
+      expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
 
       expect {
         delete expense_path(expense),
@@ -192,7 +218,7 @@ RSpec.describe 'Expenses', type: :request do
     end
 
     it 're-renders the detail list and home cards after destroy' do
-      expense = create(:expense, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
+      expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)
 
       delete expense_path(expense),
              params: { context: { year: 2026, month: 1 } },

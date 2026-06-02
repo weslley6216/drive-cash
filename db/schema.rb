@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_19_004644) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_02_212226) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,9 +22,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_004644) do
     t.integer "platform", default: 7, null: false
     t.integer "trips_count", default: 1, null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["date", "platform"], name: "index_earnings_on_date_and_platform"
     t.index ["date"], name: "index_earnings_on_date"
     t.index ["platform"], name: "index_earnings_on_platform"
+    t.index ["user_id"], name: "index_earnings_on_user_id"
   end
 
   create_table "expenses", force: :cascade do |t|
@@ -39,12 +41,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_004644) do
     t.text "notes"
     t.boolean "paid", default: true, null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.string "vendor"
     t.index ["category"], name: "index_expenses_on_category"
     t.index ["date", "category"], name: "index_expenses_on_date_and_category"
     t.index ["date"], name: "index_expenses_on_date"
     t.index ["installment_series_id"], name: "index_expenses_on_installment_series_id"
     t.index ["paid"], name: "index_expenses_on_paid"
+    t.index ["user_id"], name: "index_expenses_on_user_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -57,4 +70,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_004644) do
     t.index ["key"], name: "index_solid_cache_entries_on_key", unique: true
     t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
   end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "name"
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  add_foreign_key "earnings", "users"
+  add_foreign_key "expenses", "users"
+  add_foreign_key "sessions", "users"
 end

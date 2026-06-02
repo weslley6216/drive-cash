@@ -29,7 +29,9 @@ class ChatController < ApplicationController
 
   def confirm
     persister = Chat::RecordPersister.for(params[:record_action])
-    result = persister.persist(params[:record] || {})
+    record    = params[:record] || {}
+    payload   = (record.respond_to?(:to_unsafe_h) ? record.to_unsafe_h : record.to_h).merge('user_id' => Current.user.id)
+    result    = persister.persist(payload)
 
     respond_to do |format|
       format.turbo_stream do

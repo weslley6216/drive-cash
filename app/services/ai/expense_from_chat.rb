@@ -1,6 +1,6 @@
 module Ai
   class ExpenseFromChat
-    ATTRIBUTE_KEYS = %w[date amount category vendor description].freeze
+    ATTRIBUTE_KEYS = %w[date amount category vendor description user_id].freeze
 
     def self.persist(raw)
       h = coerce_hash(raw)
@@ -25,7 +25,7 @@ module Ai
         case raw
         when ActionController::Parameters
           raw.permit(:date, :amount, :category, :vendor, :description,
-                     :installments, :installments_period).to_h.stringify_keys
+                     :installments, :installments_period, :user_id).to_h.stringify_keys
         when Hash then raw.stringify_keys
         else {}
         end

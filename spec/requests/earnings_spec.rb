@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Earnings', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /earnings/new' do
     it 'redirects to /records/new?type=earning' do
       get new_earning_path
@@ -59,7 +63,7 @@ RSpec.describe 'Earnings', type: :request do
 
   describe 'GET /earnings/:id/edit' do
     it 'renders edit modal form with platform options' do
-      earning = create(:earning, amount: 100)
+      earning = create(:earning, user: current_user, amount: 100)
 
       get edit_earning_path(earning), params: { context: { year: 2026, month: 1 } }
 
@@ -76,7 +80,7 @@ RSpec.describe 'Earnings', type: :request do
   end
 
   describe 'PATCH /earnings/:id' do
-    let(:earning) { create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: 'shopee') }
+    let(:earning) { create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: 'shopee') }
 
     it 'updates earning attributes' do
       patch earning_path(earning),
@@ -133,9 +137,31 @@ RSpec.describe 'Earnings', type: :request do
     end
   end
 
+  describe 'scoping by current user' do
+    it 'returns 404 when editing another user earning' do
+      other_user = create(:user)
+      other_earning = create(:earning, user: other_user)
+
+      get edit_earning_path(other_earning), params: { context: { year: 2026, month: 1 } }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'creates earnings associated to current user' do
+      post earnings_path,
+           params: {
+             earning: { date: '2026-01-23', amount: 200.00, platform: 'uber', trips_count: 2 },
+             context: { year: 2026 }
+           },
+           as: :turbo_stream
+
+      expect(Earning.last.user).to eq(current_user)
+    end
+  end
+
   describe 'DELETE /earnings/:id' do
     it 'destroys the earning' do
-      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       expect {
         delete earning_path(earning),
@@ -145,7 +171,7 @@ RSpec.describe 'Earnings', type: :request do
     end
 
     it 're-renders the detail list and home cards after destroy' do
-      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       delete earning_path(earning),
              params: { context: { year: 2026, month: 1 } },

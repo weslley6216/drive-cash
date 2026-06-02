@@ -54,7 +54,7 @@ class SidebarNavComponent < ApplicationComponent
   end
 
   def settings_section
-    div(class: 'p-4 border-t border-slate-100') do
+    div(class: 'p-4 border-t border-slate-100 space-y-2') do
       link_to(
         helpers.settings_path,
         class: 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -64,6 +64,14 @@ class SidebarNavComponent < ApplicationComponent
         end
         span { I18n.t('sidebar_nav_component.settings') }
       end
+
+      raw helpers.button_to(
+        I18n.t('sessions.sign_out'),
+        helpers.session_path,
+        method: :delete,
+        form: { data: { turbo_confirm: I18n.t('sessions.sign_out') } },
+        class: 'w-full text-left px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+      )
     end
   end
 end

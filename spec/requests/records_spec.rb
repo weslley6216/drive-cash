@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Records', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /records/new' do
     it 'returns 200 with title' do
       get new_record_path
