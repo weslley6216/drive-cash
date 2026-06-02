@@ -2,6 +2,8 @@ module Dashboard
   class InsightsService
     HOURS_PER_DAY = 8
     BARS_LIMIT = 5
+    CATEGORIES_LIMIT = 7
+    PLATFORMS_LIMIT = 5
 
     def initialize(year:, month: nil)
       @year = year
@@ -12,8 +14,8 @@ module Dashboard
       {
         metrics: metrics,
         monthly_bars: monthly_bars,
-        categories: [],
-        platforms: [],
+        categories: categories,
+        platforms: platforms,
         insights: []
       }
     end
@@ -82,6 +84,14 @@ module Dashboard
       return nil if previous_float.zero?
 
       ((current_float - previous_float) / previous_float.abs * 100).round(1)
+    end
+
+    def categories
+      Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT).call
+    end
+
+    def platforms
+      Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT).call
     end
 
     def monthly_bars

@@ -88,5 +88,31 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:monthly_bars]).to eq([])
       end
     end
+
+    context 'categories' do
+      it 'delegates to CategoryBreakdownService with limit 7' do
+        %w[fuel maintenance car_wash toll parking documentation insurance fine].each_with_index do |category, index|
+          create(:expense, date: Date.new(2025, 6, index + 1), amount: 100 - index, category: category, paid: true)
+        end
+
+        result = described_class.new(year: 2025, month: 6).call
+
+        expect(result[:categories].size).to eq(7)
+        expect(result[:categories].first[:id]).to eq('fuel')
+      end
+    end
+
+    context 'platforms' do
+      it 'delegates to PlatformBreakdownService with limit 5' do
+        %w[uber ifood rappi shopee amazon nine_nine].each_with_index do |platform, index|
+          create(:earning, date: Date.new(2025, 6, index + 1), amount: 100 - index, platform: platform)
+        end
+
+        result = described_class.new(year: 2025, month: 6).call
+
+        expect(result[:platforms].size).to eq(5)
+        expect(result[:platforms].first[:id]).to eq('uber')
+      end
+    end
   end
 end
