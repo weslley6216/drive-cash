@@ -4,6 +4,12 @@ if Rails.env.development?
     Earning.destroy_all
     Expense.destroy_all
 
+    dev_user = User.find_or_create_by!(email_address: 'dev@drivecash.app') do |user|
+      user.name = 'Motorista Dev'
+      user.password = 'password123'
+      user.password_confirmation = 'password123'
+    end
+
     PLATFORMS = [:shopee, :mercado_livre, :ifood, :uber, :rappi]
 
     VENDORS_MECH = ['Carmaniacs', 'Auto Peças Castelo', 'Baterias Rainha', 'Zé Pneus']
@@ -22,10 +28,12 @@ if Rails.env.development?
 
       if date.day == 5
         Expense.create!(
+          user: dev_user,
           date: date, amount: 180.79, category: :insurance,
           description: 'Seguro Carro - Ituran', vendor: 'Ituran'
         )
         Expense.create!(
+          user: dev_user,
           date: date, amount: 34.99, category: :phone,
           description: 'Plano Celular - Claro', vendor: 'Claro'
         )
@@ -33,6 +41,7 @@ if Rails.env.development?
 
       if date.day == 10
         Expense.create!(
+          user: dev_user,
           date: date, amount: 27.86, category: :insurance,
           description: 'Seguro Celular - Pier', vendor: 'Pier'
         )
@@ -46,6 +55,7 @@ if Rails.env.development?
         base_earning += 150 if rand < 0.1
 
         Earning.create!(
+          user: dev_user,
           date: date,
           amount: base_earning,
           platform: PLATFORMS.sample,
@@ -54,6 +64,7 @@ if Rails.env.development?
         )
 
         Expense.create!(
+          user: dev_user,
           date: date,
           amount: random_amount(50, 120),
           category: :fuel,
@@ -63,6 +74,7 @@ if Rails.env.development?
 
         if rand < 0.6
           Expense.create!(
+            user: dev_user,
             date: date,
             amount: random_amount(25, 45),
             category: :meals,
@@ -74,6 +86,7 @@ if Rails.env.development?
 
       if rand < 0.015
         Expense.create!(
+          user: dev_user,
           date: date,
           amount: random_amount(150, 800),
           category: :maintenance,
@@ -84,6 +97,7 @@ if Rails.env.development?
 
       if rand < 0.005
         Expense.create!(
+          user: dev_user,
           date: date,
           amount: 130.16,
           category: :fine,
