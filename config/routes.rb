@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
   root "dashboard#index"
 
   get "dashboard/earnings_detail", to: "dashboard#earnings_detail", as: :dashboard_earnings_detail
