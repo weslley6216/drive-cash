@@ -29,8 +29,17 @@ RSpec.describe 'Sessions', type: :request do
     end
   end
 
+  describe 'rate limiting on POST /session' do
+    it 'redirects with rate limit alert after too many attempts' do
+      11.times { post session_path, params: { email_address: user.email_address, password: 'wrong' } }
+
+      expect(response).to redirect_to(new_session_path)
+      expect(flash[:alert]).to include(I18n.t('sessions.rate_limit'))
+    end
+  end
+
   describe 'DELETE /session' do
-    before { post session_path, params: { email_address: user.email_address, password: 'password123' } }
+    before { login_as(user) }
 
     it 'signs out the user and redirects to login' do
       delete session_path
