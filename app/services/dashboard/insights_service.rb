@@ -1,7 +1,6 @@
 module Dashboard
   class InsightsService
     HOURS_PER_DAY = 8
-    BARS_LIMIT = 5
     CATEGORIES_LIMIT = 7
     PLATFORMS_LIMIT = 5
     MAX_INSIGHTS = 3
@@ -182,22 +181,49 @@ module Dashboard
     end
 
     def monthly_bars
-      earnings_by_month = Earning.for_year(year)
-                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                                 .sum(:amount)
-      expenses_by_month = Expense.for_year(year).paid_only
-                                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                                 .sum(:amount)
+      month ? daily_bars : annual_month_bars
+    end
 
-      active_months = (earnings_by_month.keys + expenses_by_month.keys).uniq.sort
-      return [] if active_months.empty?
+    def annual_month_bars
+      earnings_by = Earning.for_year(year)
+                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                           .sum(:amount)
+      expenses_by = Expense.for_year(year).paid_only
+                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                           .sum(:amount)
 
-      active_months.last(BARS_LIMIT).map do |month_number|
+      has_any_data = (earnings_by.keys + expenses_by.keys).any?
+      return [] unless has_any_data
+
+      (1..12).map do |month_number|
         {
-          month: month_number,
-          earnings: earnings_by_month[month_number].to_f,
-          expenses: expenses_by_month[month_number].to_f,
-          label: I18n.t('date.abbr_month_names')[month_number].capitalize
+          unit: :month,
+          key: month_number,
+          label: I18n.t('date.abbr_month_names')[month_number].capitalize,
+          earnings: earnings_by[month_number].to_f,
+          expenses: expenses_by[month_number].to_f,
+          empty: earnings_by[month_number].nil? && expenses_by[month_number].nil?
+        }
+      end
+    end
+
+    def daily_bars
+      earnings_by = Earning.for_year(year).for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                           .sum(:amount)
+      expenses_by = Expense.for_year(year).paid_only.for_month(month)
+                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                           .sum(:amount)
+
+      days = (earnings_by.keys + expenses_by.keys).uniq.sort
+      days.map do |day|
+        {
+          unit: :day,
+          key: day,
+          label: day.to_s,
+          earnings: earnings_by[day].to_f,
+          expenses: expenses_by[day].to_f,
+          empty: false
         }
       end
     end

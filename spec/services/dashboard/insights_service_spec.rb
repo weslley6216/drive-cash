@@ -56,27 +56,31 @@ RSpec.describe Dashboard::InsightsService do
     end
 
     context 'monthly_bars' do
-      it 'returns up to 5 most recent months that have earnings or expenses' do
-        create(:earning, date: Date.new(2025, 1, 1), amount: 100)
+      it 'returns all 12 months when month is nil, marking months without data as empty' do
         create(:earning, date: Date.new(2025, 3, 1), amount: 200)
-        create(:earning, date: Date.new(2025, 4, 1), amount: 300)
-        create(:expense, date: Date.new(2025, 5, 1), amount:  50, category: 'fuel', paid: true)
-        create(:earning, date: Date.new(2025, 6, 1), amount: 400)
-        create(:earning, date: Date.new(2025, 7, 1), amount: 500)
-        create(:earning, date: Date.new(2025, 8, 1), amount: 600)
+        create(:expense, date: Date.new(2025, 6, 1), amount: 50, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: nil).call
 
-        expect(result[:monthly_bars].size).to eq(5)
-        expect(result[:monthly_bars].map { |bar| bar[:month] }).to eq([4, 5, 6, 7, 8])
+        expect(result[:monthly_bars].size).to eq(12)
+        expect(result[:monthly_bars].map { |bar| bar[:key] }).to eq((1..12).to_a)
+
+        march = result[:monthly_bars].find { |bar| bar[:key] == 3 }
+        june  = result[:monthly_bars].find { |bar| bar[:key] == 6 }
+        jan   = result[:monthly_bars].find { |bar| bar[:key] == 1 }
+
+        expect(march[:empty]).to be false
+        expect(june[:empty]).to be false
+        expect(jan[:empty]).to be true
       end
 
-      it 'maps each bar to earnings, expenses and translated label' do
+      it 'returns annual bars with unit :month and i18n label' do
         create(:earning, date: Date.new(2025, 6, 1), amount: 300)
         create(:expense, date: Date.new(2025, 6, 5), amount: 100, category: 'fuel', paid: true)
 
-        bar = described_class.new(year: 2025, month: nil).call[:monthly_bars].first
+        bar = described_class.new(year: 2025, month: nil).call[:monthly_bars].find { |b| b[:key] == 6 }
 
+        expect(bar[:unit]).to eq(:month)
         expect(bar[:earnings].to_f).to eq(300.0)
         expect(bar[:expenses].to_f).to eq(100.0)
         expect(bar[:label]).to eq(I18n.t('date.abbr_month_names')[6].capitalize)
@@ -84,6 +88,34 @@ RSpec.describe Dashboard::InsightsService do
 
       it 'returns empty array when there is no activity in the year' do
         result = described_class.new(year: 2025, month: nil).call
+
+        expect(result[:monthly_bars]).to eq([])
+      end
+
+      it 'returns daily bars when month is present, only days with data' do
+        create(:earning, date: Date.new(2025, 6, 5),  amount: 200)
+        create(:earning, date: Date.new(2025, 6, 10), amount: 300)
+        create(:expense, date: Date.new(2025, 6, 10), amount: 50, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 6).call
+
+        expect(result[:monthly_bars].size).to eq(2)
+        expect(result[:monthly_bars].map { |bar| bar[:key] }).to eq([5, 10])
+      end
+
+      it 'returns daily bars with unit :day and string label' do
+        create(:earning, date: Date.new(2025, 6, 7), amount: 150)
+
+        bar = described_class.new(year: 2025, month: 6).call[:monthly_bars].first
+
+        expect(bar[:unit]).to eq(:day)
+        expect(bar[:key]).to eq(7)
+        expect(bar[:label]).to eq('7')
+        expect(bar[:empty]).to be false
+      end
+
+      it 'returns empty array when month is present but no data exists' do
+        result = described_class.new(year: 2025, month: 6).call
 
         expect(result[:monthly_bars]).to eq([])
       end
