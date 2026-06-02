@@ -101,8 +101,14 @@ module Analysis
 
     def breakdown_section
       div(class: 'grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6') do
-        div { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories]) }
-        div { render Analysis::PlatformDonutComponent.new(platforms: @insights[:platforms], total: platforms_total) }
+        div { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories], month: @filters[:month]) }
+        div do
+          render Analysis::PlatformDonutComponent.new(
+            platforms: @insights[:platforms],
+            total: platforms_total,
+            month: @filters[:month]
+          )
+        end
       end
     end
 

@@ -43,13 +43,22 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('bg-red-500')
     end
 
-    it 'renders the category breakdown with total_year subtitle' do
+    it 'renders the category breakdown with total_annual subtitle when no month selected' do
+      create(:expense, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
+
+      get analysis_path, params: { year: 2025 }
+
+      expect(response.body).to include(I18n.t('analysis.show_view.categories.title'))
+      expect(response.body).to include('no ano')
+    end
+
+    it 'renders the category breakdown with total_monthly subtitle when month is selected' do
       create(:expense, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
 
       get analysis_path, params: { year: 2025, month: 6 }
 
       expect(response.body).to include(I18n.t('analysis.show_view.categories.title'))
-      expect(response.body).to include('no ano')
+      expect(response.body).to include('no mês')
     end
 
     it 'renders the platform donut with stroke-dasharray and center label' do

@@ -3,23 +3,27 @@ module Analysis
     DEFAULT_SIZE = 120
     STROKE_WIDTH = 14
 
-    def initialize(platforms:, total:, size: DEFAULT_SIZE)
+    def initialize(platforms:, total:, month: nil, size: DEFAULT_SIZE)
       @platforms = platforms
       @total = total.to_f
+      @month = month
       @size = size
     end
 
     def view_template
       section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4') do
         h3(class: 'text-sm font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.platforms.title') }
-        p(class: 'text-xs text-slate-500 mb-3') do
-          I18n.t('analysis.show_view.platforms.total_year', value: format_currency(@total))
-        end
+        p(class: 'text-xs text-slate-500 mb-3') { total_subtitle }
         @platforms.empty? ? empty_state : body
       end
     end
 
     private
+
+    def total_subtitle
+      key = @month ? 'analysis.show_view.platforms.total_monthly' : 'analysis.show_view.platforms.total_annual'
+      I18n.t(key, value: format_currency(@total))
+    end
 
     def body
       div(class: 'flex items-center gap-4') do

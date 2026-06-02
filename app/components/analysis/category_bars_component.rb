@@ -1,21 +1,25 @@
 module Analysis
   class CategoryBarsComponent < ApplicationComponent
-    def initialize(categories:)
+    def initialize(categories:, month: nil)
       @categories = categories
+      @month = month
       @total = categories.sum { |row| row[:amount].to_f }
     end
 
     def view_template
       section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4') do
         h3(class: 'text-sm font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.categories.title') }
-        p(class: 'text-xs text-slate-500 mb-3') do
-          I18n.t('analysis.show_view.categories.total_year', value: format_currency(@total))
-        end
+        p(class: 'text-xs text-slate-500 mb-3') { total_subtitle }
         @categories.empty? ? empty_state : list
       end
     end
 
     private
+
+    def total_subtitle
+      key = @month ? 'analysis.show_view.categories.total_monthly' : 'analysis.show_view.categories.total_annual'
+      I18n.t(key, value: format_currency(@total))
+    end
 
     def list
       div(class: 'space-y-3') do

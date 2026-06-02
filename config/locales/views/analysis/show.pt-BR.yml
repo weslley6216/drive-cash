@@ -21,11 +21,13 @@ pt-BR:
         empty: "Sem dados para o período"
       categories:
         title: "Despesas por categoria"
-        total_year: "%{value} no ano"
+        total_annual: "%{value} no ano"
+        total_monthly: "%{value} no mês"
         empty: "Sem despesas no período"
       platforms:
         title: "Receita por plataforma"
-        total_year: "%{value} no ano"
+        total_annual: "%{value} no ano"
+        total_monthly: "%{value} no mês"
         total_label: "Total"
         empty: "Sem receitas no período"
       insights:
