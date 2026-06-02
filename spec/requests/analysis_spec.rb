@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Analysis', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /analysis' do
     it 'responds 200' do
       get analysis_path
@@ -22,7 +26,7 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders the four metric cards in a 2x2 grid' do
-      create(:earning, date: Date.current, amount: 200, trips_count: 4)
+      create(:earning, user: current_user, date: Date.current, amount: 200, trips_count: 4)
 
       get analysis_path
 
@@ -34,7 +38,7 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders the bar chart section' do
-      create(:earning, date: Date.new(2025, 6, 1), amount: 500)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 1), amount: 500)
 
       get analysis_path, params: { year: 2025 }
 
@@ -44,7 +48,7 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders the category breakdown with total_annual subtitle when no month selected' do
-      create(:expense, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
 
       get analysis_path, params: { year: 2025 }
 
@@ -53,7 +57,7 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders the category breakdown with total_monthly subtitle when month is selected' do
-      create(:expense, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
 
       get analysis_path, params: { year: 2025, month: 6 }
 
@@ -62,7 +66,7 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders the platform donut with stroke-dasharray and center label' do
-      create(:earning, date: Date.new(2025, 6, 1), amount: 100, platform: 'uber')
+      create(:earning, user: current_user, date: Date.new(2025, 6, 1), amount: 100, platform: 'uber')
 
       get analysis_path, params: { year: 2025, month: 6 }
 
@@ -72,8 +76,8 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'renders an insight card in amber (rounded-2xl bg-amber-50) when there is data to analyze' do
-      create(:expense, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
-      create(:expense, date: Date.new(2024, 2, 1), amount: 100, category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2024, 2, 1), amount: 100, category: 'fuel', paid: true)
 
       get analysis_path, params: { year: 2025, month: 2 }
 
@@ -83,8 +87,8 @@ RSpec.describe 'Analysis', type: :request do
     end
 
     it 'filters by year and month query params' do
-      create(:earning, date: Date.new(2024, 6, 1), amount: 999)
-      create(:earning, date: Date.new(2025, 2, 1), amount: 111)
+      create(:earning, user: current_user, date: Date.new(2024, 6, 1), amount: 999)
+      create(:earning, user: current_user, date: Date.new(2025, 2, 1), amount: 111)
 
       get analysis_path, params: { year: 2025, month: 2 }
 

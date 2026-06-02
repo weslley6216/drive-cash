@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Coming soon placeholders', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   %w[/work_session /settings].each do |path|
     describe "GET #{path}" do
       it 'responds 200 with em breve content' do

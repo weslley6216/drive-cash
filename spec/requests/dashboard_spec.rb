@@ -1,9 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Dashboard', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /' do
     it 'renders the dashboard with earnings data' do
-      create(:earning, date: Date.current, amount: 500)
+      create(:earning, user: current_user, date: Date.current, amount: 500)
 
       get root_path
 
@@ -31,8 +35,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders hero profit card section' do
-      create(:earning, date: Date.new(2025, 6, 1),  amount: 500, platform: 'uber')
-      create(:expense, date: Date.new(2025, 6, 2),  amount: 100, category: 'fuel', paid: true)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 1),  amount: 500, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2025, 6, 2),  amount: 100, category: 'fuel', paid: true)
 
       get root_path, params: { year: 2025 }
 
@@ -49,8 +53,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders recent activity and breakdown sections' do
-      create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 4)
-      create(:expense, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 4)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
 
       get root_path, params: { year: 2025, month: 6 }
 
@@ -84,7 +88,7 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders today card when there is activity today' do
-      create(:earning, date: Date.current, amount: 100, trips_count: 2)
+      create(:earning, user: current_user, date: Date.current, amount: 100, trips_count: 2)
 
       get root_path
 
@@ -123,8 +127,8 @@ RSpec.describe 'Dashboard', type: :request do
 
   describe 'GET /dashboard/earnings_detail' do
     it 'renders earnings detail in modal frame' do
-      earning1 = create(:earning, date: Date.new(2025, 1, 15), amount: 100.50)
-      create(:earning, date: Date.new(2025, 1, 20), amount: 250)
+      earning1 = create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100.50)
+      create(:earning, user: current_user, date: Date.new(2025, 1, 20), amount: 250)
 
       get dashboard_earnings_detail_path(year: 2025, month: 1)
 
@@ -146,9 +150,9 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders annual view with monthly totals when no month filter' do
-      create(:earning, date: Date.new(2025, 1, 15), amount: 100)
-      create(:earning, date: Date.new(2025, 2, 10), amount: 250)
-      create(:earning, date: Date.new(2025, 2, 20), amount: 50)
+      create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100)
+      create(:earning, user: current_user, date: Date.new(2025, 2, 10), amount: 250)
+      create(:earning, user: current_user, date: Date.new(2025, 2, 20), amount: 50)
 
       get dashboard_earnings_detail_path(year: 2025)
 
@@ -165,9 +169,9 @@ RSpec.describe 'Dashboard', type: :request do
 
   describe 'GET /dashboard/expenses_detail' do
     it 'renders expenses detail in modal frame with date grouping' do
-      expense1 = create(:expense, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', vendor: 'Posto Shell')
-      create(:expense, date: Date.new(2025, 1, 15), amount: 25, category: 'meals', vendor: 'Lanchonete')
-      create(:expense, date: Date.new(2025, 1, 20), amount: 150, category: 'maintenance', vendor: 'Oficina')
+      expense1 = create(:expense, user: current_user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', vendor: 'Posto Shell')
+      create(:expense, user: current_user, date: Date.new(2025, 1, 15), amount: 25, category: 'meals', vendor: 'Lanchonete')
+      create(:expense, user: current_user, date: Date.new(2025, 1, 20), amount: 150, category: 'maintenance', vendor: 'Oficina')
 
       get dashboard_expenses_detail_path(year: 2025, month: 1)
 
@@ -187,6 +191,7 @@ RSpec.describe 'Dashboard', type: :request do
 
     it 'shows installment subtitle and pending status for unpaid parcels' do
       create(:expense,
+             user: current_user,
              date: Date.new(2025, 1, 18),
              amount: 120,
              category: 'maintenance',
@@ -210,8 +215,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders annual view with monthly totals when no month filter' do
-      create(:expense, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
-      create(:expense, date: Date.new(2025, 2, 15), amount: 200, category: 'maintenance')
+      create(:expense, user: current_user, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
+      create(:expense, user: current_user, date: Date.new(2025, 2, 15), amount: 200, category: 'maintenance')
 
       get dashboard_expenses_detail_path(year: 2025)
 

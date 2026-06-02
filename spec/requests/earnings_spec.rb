@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Earnings', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /earnings/new' do
     it 'redirects to /records/new?type=earning' do
       get new_earning_path
@@ -59,7 +63,7 @@ RSpec.describe 'Earnings', type: :request do
 
   describe 'GET /earnings/:id/edit' do
     it 'renders edit modal form with platform options' do
-      earning = create(:earning, amount: 100)
+      earning = create(:earning, user: current_user, amount: 100)
 
       get edit_earning_path(earning), params: { context: { year: 2026, month: 1 } }
 
@@ -76,7 +80,7 @@ RSpec.describe 'Earnings', type: :request do
   end
 
   describe 'PATCH /earnings/:id' do
-    let(:earning) { create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: 'shopee') }
+    let(:earning) { create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: 'shopee') }
 
     it 'updates earning attributes' do
       patch earning_path(earning),
@@ -135,7 +139,7 @@ RSpec.describe 'Earnings', type: :request do
 
   describe 'DELETE /earnings/:id' do
     it 'destroys the earning' do
-      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       expect {
         delete earning_path(earning),
@@ -145,7 +149,7 @@ RSpec.describe 'Earnings', type: :request do
     end
 
     it 're-renders the detail list and home cards after destroy' do
-      earning = create(:earning, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       delete earning_path(earning),
              params: { context: { year: 2026, month: 1 } },

@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Chats', type: :request do
+  let(:current_user) { create(:user) }
+
+  before { login_as(current_user) }
+
   describe 'GET /chat' do
     context 'when the history is empty' do
       it 'renders the initial empty state page' do
