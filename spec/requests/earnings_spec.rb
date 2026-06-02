@@ -137,6 +137,28 @@ RSpec.describe 'Earnings', type: :request do
     end
   end
 
+  describe 'scoping by current user' do
+    it 'returns 404 when editing another user earning' do
+      other_user = create(:user)
+      other_earning = create(:earning, user: other_user)
+
+      get edit_earning_path(other_earning), params: { context: { year: 2026, month: 1 } }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'creates earnings associated to current user' do
+      post earnings_path,
+           params: {
+             earning: { date: '2026-01-23', amount: 200.00, platform: 'uber', trips_count: 2 },
+             context: { year: 2026 }
+           },
+           as: :turbo_stream
+
+      expect(Earning.last.user).to eq(current_user)
+    end
+  end
+
   describe 'DELETE /earnings/:id' do
     it 'destroys the earning' do
       earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
