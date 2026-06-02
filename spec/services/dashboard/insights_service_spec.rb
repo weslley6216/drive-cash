@@ -173,6 +173,31 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
+    context 'period_context' do
+      it 'returns mode :monthly with previous month name when month is present' do
+        result = described_class.new(year: 2025, month: 6).call
+
+        expect(result[:period_context][:mode]).to eq(:monthly)
+        expect(result[:period_context][:previous_month_name]).to eq(I18n.t('date.abbr_month_names')[5].capitalize)
+        expect(result[:period_context][:previous_year]).to eq(2025)
+      end
+
+      it 'returns mode :annual with nil cutoff_month_name for past years' do
+        result = described_class.new(year: 2024, month: nil).call
+
+        expect(result[:period_context][:mode]).to eq(:annual)
+        expect(result[:period_context][:cutoff_month_name]).to be_nil
+        expect(result[:period_context][:previous_year]).to eq(2023)
+      end
+
+      it 'returns mode :annual with cutoff_month_name for current year' do
+        result = described_class.new(year: Date.current.year, month: nil).call
+
+        expect(result[:period_context][:mode]).to eq(:annual)
+        expect(result[:period_context][:cutoff_month_name]).not_to be_nil
+      end
+    end
+
     context 'insights' do
       it 'emits category_spike when top category grew more than 10 percent vs previous period' do
         create(:expense, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)

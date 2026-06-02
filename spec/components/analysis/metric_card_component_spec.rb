@@ -70,4 +70,27 @@ RSpec.describe Analysis::MetricCardComponent, type: :component do
   it 'renders the provided icon' do
     expect(html).to include('lucide')
   end
+
+  it 'renders period_label when provided instead of generic vs_previous' do
+    component = Analysis::MetricCardComponent.new(
+      label: 'R$ / dia', icon: PhlexIcons::Lucide::Zap,
+      value: 'R$ 250,00', change_pct: 12.5, period_label: 'vs Jan–Jun 2025'
+    )
+
+    rendered = view_context.render(component)
+
+    expect(rendered).to include('+12.5% vs Jan–Jun 2025')
+    expect(rendered).not_to include('vs anterior')
+  end
+
+  it 'falls back to generic vs_previous when period_label is nil' do
+    component = Analysis::MetricCardComponent.new(
+      label: 'R$ / dia', icon: PhlexIcons::Lucide::Zap,
+      value: 'R$ 250,00', change_pct: 12.5
+    )
+
+    rendered = view_context.render(component)
+
+    expect(rendered).to include('% vs anterior')
+  end
 end

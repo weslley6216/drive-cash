@@ -85,8 +85,28 @@ module Analysis
         value: value,
         hint: hint,
         change_pct: metrics[:change_pct][key],
-        pp: pp
+        pp: pp,
+        period_label: period_label_for(pp)
       )
+    end
+
+    def period_label_for(pp)
+      ctx = @insights[:period_context]
+      return nil unless ctx
+
+      if ctx[:mode] == :monthly
+        suffix = pp ? 'vs_period_monthly_pp' : 'vs_period_monthly'
+        I18n.t("analysis.show_view.metrics.#{suffix}",
+               month: ctx[:previous_month_name],
+               year: ctx[:previous_year])
+      else
+        return nil unless ctx[:cutoff_month_name]
+
+        suffix = pp ? 'vs_period_annual_pp' : 'vs_period_annual'
+        I18n.t("analysis.show_view.metrics.#{suffix}",
+               month: ctx[:cutoff_month_name],
+               year: ctx[:previous_year])
+      end
     end
 
     def bar_chart_section

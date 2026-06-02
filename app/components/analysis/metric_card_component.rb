@@ -1,12 +1,13 @@
 module Analysis
   class MetricCardComponent < ApplicationComponent
-    def initialize(label:, icon:, value:, hint: nil, change_pct: nil, pp: false)
+    def initialize(label:, icon:, value:, hint: nil, change_pct: nil, pp: false, period_label: nil)
       @label = label
       @icon = icon
       @value = value
       @hint = hint
       @change_pct = change_pct
       @pp = pp
+      @period_label = period_label
     end
 
     def view_template
@@ -27,9 +28,17 @@ module Analysis
       positive = @change_pct.to_f >= 0
       color = positive ? 'text-emerald-600' : 'text-red-600'
       sign = positive ? '+' : '−'
-      suffix_key = @pp ? 'analysis.show_view.metrics.vs_previous_pp' : 'analysis.show_view.metrics.vs_previous'
-      label = "#{sign}#{@change_pct.abs}#{I18n.t(suffix_key)}"
+      label = "#{sign}#{@change_pct.abs}#{badge_suffix}"
       p(class: "text-xs font-medium mt-0.5 #{color}") { label }
+    end
+
+    def badge_suffix
+      if @period_label
+        @pp ? " p.p. #{@period_label}" : "% #{@period_label}"
+      else
+        suffix_key = @pp ? 'analysis.show_view.metrics.vs_previous_pp' : 'analysis.show_view.metrics.vs_previous'
+        I18n.t(suffix_key)
+      end
     end
   end
 end

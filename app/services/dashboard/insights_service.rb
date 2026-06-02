@@ -19,7 +19,8 @@ module Dashboard
         monthly_bars: monthly_bars,
         categories: categories,
         platforms: platforms,
-        insights: insights
+        insights: insights,
+        period_context: period_context
       }
     end
 
@@ -44,6 +45,24 @@ module Dashboard
       return nil if year < Date.current.year
 
       Date.current.month
+    end
+
+    def period_context
+      if month
+        {
+          mode: :monthly,
+          previous_month_name: I18n.t('date.abbr_month_names')[previous_month].capitalize,
+          previous_year: previous_year
+        }
+      else
+        cutoff = ytd_cutoff
+        cutoff_name = cutoff ? I18n.t('date.abbr_month_names')[cutoff].capitalize : nil
+        {
+          mode: :annual,
+          cutoff_month_name: cutoff_name,
+          previous_year: previous_year
+        }
+      end
     end
 
     def previous_year
