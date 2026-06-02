@@ -1,9 +1,7 @@
 module Analysis
   class BarChartComponent < ApplicationComponent
-    CHART_HEIGHT  = 130
-    STUB_HEIGHT   = 3
-    SCROLL_THRESHOLD = 20
-    BAR_WIDTHS    = [[12, 'w-3'], [20, 'w-2'], [31, 'w-1.5']].freeze
+    CHART_HEIGHT = 130
+    STUB_HEIGHT  = 3
 
     def initialize(bars:, month:, year:)
       @bars  = bars
@@ -46,59 +44,37 @@ module Analysis
     end
 
     def chart
-      if scrollable?
-        div(class: 'overflow-x-auto') do
-          div(class: 'flex items-end gap-1', style: "height: 140px; min-width: #{@bars.size * 22}px") do
-            @bars.each { |bar_row| bar_column(bar_row) }
-          end
-        end
-      else
-        gap = @bars.size > 15 ? 'gap-1' : 'gap-2'
-        div(class: "flex items-end justify-between #{gap}", style: 'height: 140px') do
-          @bars.each { |bar_row| bar_column(bar_row) }
-        end
+      gap = @bars.size > 15 ? 'gap-1' : 'gap-2'
+      div(class: "flex items-end #{gap}", style: 'height: 140px') do
+        @bars.each { |bar_row| bar_column(bar_row) }
       end
     end
 
     def bar_column(bar_row)
-      if bar_row[:empty]
-        empty_bar_column(bar_row)
-      else
-        data_bar_column(bar_row)
-      end
+      bar_row[:empty] ? empty_bar_column(bar_row) : data_bar_column(bar_row)
     end
 
     def data_bar_column(bar_row)
       earn_height = bar_height(bar_row[:earnings])
       exp_height  = bar_height(bar_row[:expenses])
 
-      col_class = scrollable? ? 'flex-shrink-0 flex flex-col items-center gap-1' : 'flex-1 flex flex-col items-center gap-1'
-      div(class: col_class) do
-        div(class: 'flex items-end gap-0.5', style: "height: #{CHART_HEIGHT}px") do
-          div(class: "#{bar_width_class} rounded-t bg-emerald-500", style: "height: #{earn_height}px")
-          div(class: "#{bar_width_class} rounded-t bg-red-500",     style: "height: #{exp_height}px")
+      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5') do
+        div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
+          div(class: 'flex-1 min-w-0 rounded-t bg-emerald-500', style: "height: #{earn_height}px")
+          div(class: 'flex-1 min-w-0 rounded-t bg-red-500',     style: "height: #{exp_height}px")
         end
-        span(class: 'text-[10px] text-slate-500 font-medium') { bar_row[:label] }
+        span(class: 'block overflow-hidden text-center text-[10px] text-slate-500 font-medium') { bar_row[:label] }
       end
     end
 
     def empty_bar_column(bar_row)
-      col_class = scrollable? ? 'flex-shrink-0 flex flex-col items-center gap-1' : 'flex-1 flex flex-col items-center gap-1'
-      div(class: col_class) do
-        div(class: 'flex items-end gap-0.5', style: "height: #{CHART_HEIGHT}px") do
-          div(class: "#{bar_width_class} rounded-t bg-slate-200", style: "height: #{STUB_HEIGHT}px")
-          div(class: "#{bar_width_class} rounded-t bg-slate-200", style: "height: #{STUB_HEIGHT}px")
+      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5') do
+        div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
+          div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px")
+          div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px")
         end
-        span(class: 'text-[10px] text-slate-300 font-medium') { bar_row[:label] }
+        span(class: 'block overflow-hidden text-center text-[10px] text-slate-300 font-medium') { bar_row[:label] }
       end
-    end
-
-    def scrollable?
-      @bars.size > SCROLL_THRESHOLD
-    end
-
-    def bar_width_class
-      BAR_WIDTHS.find { |(limit, _)| @bars.size <= limit }&.last || 'w-1.5'
     end
 
     def bar_height(value)
