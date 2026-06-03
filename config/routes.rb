@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
+  resources :registrations, only: %i[new create]
+  get '/account', to: 'account#show', as: :account
+  get '/coming_soon', to: 'application#coming_soon', as: :coming_soon
+  get '/auth/:provider/callback', to: 'sessions#oauth_callback'
+  get '/auth/failure',            to: 'sessions#oauth_failure'
   root "dashboard#index"
 
   get "dashboard/earnings_detail", to: "dashboard#earnings_detail", as: :dashboard_earnings_detail
