@@ -91,6 +91,19 @@ RSpec.describe 'Registrations', type: :request do
       post registrations_path, params: params
 
       expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('activerecord.attributes.user.password_confirmation'))
+      expect(response.body).not_to include('Password confirmation')
+    end
+
+    it 'returns 422 with a readable domain error when email provider is not allowed' do
+      params = valid_params.deep_dup
+      params[:user][:email_address] = 'user@empresa.com'
+
+      post registrations_path, params: params
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('activerecord.attributes.user.email_address'))
+      expect(response.body).not_to include('Email address')
     end
 
     it 'returns 422 when name is blank' do

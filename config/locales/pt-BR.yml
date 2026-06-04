@@ -1,15 +1,21 @@
 ---
 pt-BR:
   activerecord:
+    attributes:
+      user:
+        name: "Nome"
+        email_address: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirmação de senha"
     errors:
       messages:
         record_invalid: 'A validação falhou: %{errors}'
-        domain_not_allowed: "Use um e-mail de um provedor conhecido (Gmail, Hotmail, iCloud etc.)"
+        domain_not_allowed: "deve ser de um provedor conhecido (Gmail, Hotmail, iCloud etc.)"
       models:
         user:
           attributes:
             email_address:
-              domain_not_allowed: "Use um e-mail de um provedor conhecido (Gmail, Hotmail, iCloud etc.)"
+              domain_not_allowed: "deve ser de um provedor conhecido (Gmail, Hotmail, iCloud etc.)"
         restrict_dependent_destroy:
           has_one: Não é possível excluir o registro pois existe um %{record} dependente
           has_many: Não é possível excluir o registro pois existem %{record} dependentes

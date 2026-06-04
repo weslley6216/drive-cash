@@ -101,6 +101,13 @@ RSpec.describe 'Sessions', type: :request do
       expect(response.body).to include(I18n.t('sessions.invalid_credentials'))
     end
 
+    it 'renders the notice banner after a password reset request redirect' do
+      post passwords_path, params: { email_address: user.email_address }
+      follow_redirect!
+
+      expect(response.body).to include(I18n.t('passwords.instructions_sent'))
+    end
+
     context 'with remember_me' do
       it 'sets a permanent session cookie when remember_me is "1"' do
         post session_path, params: { email_address: user.email_address, password: 'password123', remember_me: '1' }

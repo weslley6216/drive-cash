@@ -49,6 +49,7 @@ class Sessions::NewView < ApplicationView
     div(class: 'flex-1 flex items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100') do
       div(class: 'w-full max-w-sm') do
         mobile_brand_header
+        flash_banner
         form_block
       end
     end
@@ -63,7 +64,6 @@ class Sessions::NewView < ApplicationView
   def form_block
     h1(class: 'text-3xl font-bold text-slate-900 tracking-tight') { t('.welcome') }
     p(class: 'text-sm text-slate-500 mt-2') { t('.welcome_subtitle') }
-    alert_banner
     form_with(url: helpers.session_path, data: { turbo: false }, class: 'space-y-4 mt-8') do |form|
       email_field(form)
       password_field(form)
@@ -176,11 +176,17 @@ class Sessions::NewView < ApplicationView
     end
   end
 
-  def alert_banner
-    return unless helpers.flash[:alert]
+  def flash_banner
+    if helpers.flash[:notice].present?
+      div(class: 'mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700') do
+        plain helpers.flash[:notice]
+      end
+    end
 
-    div(class: 'mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700') do
-      plain helpers.flash[:alert]
+    if helpers.flash[:alert].present?
+      div(class: 'mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700') do
+        plain helpers.flash[:alert]
+      end
     end
   end
 
