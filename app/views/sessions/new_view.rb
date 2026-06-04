@@ -157,7 +157,7 @@ class Sessions::NewView < ApplicationView
   end
 
   def google_button
-    form(action: '/auth/google_oauth2', method: 'post', data: { turbo: false }) do
+    form(action: '/auth/google_oauth2', method: 'post', data: { turbo: 'false' }) do
       raw helpers.hidden_field_tag(:authenticity_token, helpers.form_authenticity_token)
       button(
         type: 'submit',
