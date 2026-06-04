@@ -65,6 +65,20 @@ RSpec.describe User, type: :model do
     expect { user.destroy }.to change(Earning, :count).by(-1)
   end
 
+  describe '#first_name' do
+    it 'returns the first word of the name' do
+      user = build(:user, name: 'Weslley Campos')
+
+      expect(user.first_name).to eq('Weslley')
+    end
+
+    it 'handles single-word names' do
+      user = build(:user, name: 'Weslley')
+
+      expect(user.first_name).to eq('Weslley')
+    end
+  end
+
   describe '.find_or_create_from_oauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(

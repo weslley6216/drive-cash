@@ -11,6 +11,8 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
+  def first_name = name.split.first
+
   def self.find_or_create_from_oauth(auth)
     existing = find_by(provider: auth.provider, uid: auth.uid)
     return existing if existing

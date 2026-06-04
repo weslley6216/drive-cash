@@ -68,7 +68,7 @@ RSpec.describe 'Dashboard', type: :request do
     it 'renders topbar with greeting and subtitle' do
       get root_path, params: { year: 2025 }
 
-      expect(response.body).to include(I18n.t('dashboard.index_view.greeting'))
+      expect(response.body).to include(I18n.t('dashboard.index_view.greeting', name: current_user.first_name))
       expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
     end
 

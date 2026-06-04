@@ -2,7 +2,7 @@ pt-BR:
   dashboard:
     index_view:
       title: "DriveCash"
-      greeting: "Olá, Weslley"
+      greeting: "Olá, %{name}"
       subtitle_period: "Veja seu desempenho de %{year}"
       new_record: "Novo lançamento"
       sections:
