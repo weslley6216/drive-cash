@@ -15,16 +15,34 @@ RSpec.describe 'Passwords', type: :request do
   end
 
   describe 'POST /passwords' do
-    it 'always redirects to login (silent on unknown email)' do
+    before { ActionMailer::Base.deliveries.clear }
+
+    it 'sends a reset email when the address belongs to a user' do
+      expect {
+        post passwords_path, params: { email_address: user.email_address }
+      }.to change { ActionMailer::Base.deliveries.size }.by(1)
+
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([user.email_address])
+      expect(mail.subject).to eq(I18n.t('passwords.mailer.reset.subject'))
+    end
+
+    it 'does not send an email when the address is unknown' do
+      expect {
+        post passwords_path, params: { email_address: 'unknown@drivecash.test' }
+      }.not_to change { ActionMailer::Base.deliveries.size }
+    end
+
+    it 'redirects to the login page with the same neutral notice in both cases' do
       post passwords_path, params: { email_address: 'unknown@drivecash.test' }
 
       expect(response).to redirect_to(new_session_path)
-    end
+      expect(flash[:notice]).to eq(I18n.t('passwords.instructions_sent'))
 
-    it 'redirects to login when email exists' do
       post passwords_path, params: { email_address: user.email_address }
 
       expect(response).to redirect_to(new_session_path)
+      expect(flash[:notice]).to eq(I18n.t('passwords.instructions_sent'))
     end
   end
 
