@@ -67,6 +67,16 @@ RSpec.describe History::FeedService do
         first_day_items = result[:groups].first[:items]
         expect(first_day_items.first.created_at).to be >= first_day_items.last.created_at
       end
+
+      it 'excludes unpaid expenses from the feed' do
+        paid = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
+
+        result = described_class.new(year: 2025, user: user).call
+
+        ids = result[:groups].flat_map { |group| group[:items].map(&:id) }
+        expect(ids).to eq([paid.id])
+      end
     end
 
     context 'with month filter' do
@@ -122,16 +132,15 @@ RSpec.describe History::FeedService do
     end
 
     context 'with filter expenses' do
-      it 'returns only expenses (including paid and unpaid)' do
+      it 'returns only paid expenses' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
+        paid = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
         result = described_class.new(year: 2025, filter: 'expenses', user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
-        expect(items.map(&:class).uniq).to eq([Expense])
-        expect(items.size).to eq(2)
+        expect(items.map(&:id)).to eq([paid.id])
       end
 
       it 'still includes earnings in the summary regardless of chip filter' do

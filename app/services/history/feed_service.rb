@@ -51,7 +51,7 @@ module History
     def filtered_expenses
       scope = @user.expenses.for_year(year)
       scope = scope.for_month(month) if month
-      scope = scope.where(paid: false) if filter == 'unpaid'
+      scope = filter == 'unpaid' ? scope.where(paid: false) : scope.paid_only
       scope = scope.where('description ILIKE ? OR vendor ILIKE ?', "%#{query}%", "%#{query}%") if query.present?
       scope
     end
