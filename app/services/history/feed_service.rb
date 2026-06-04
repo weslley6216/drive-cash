@@ -2,12 +2,13 @@ module History
   class FeedService
     FILTERS = %w[all earnings expenses unpaid].freeze
 
-    def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', limit: 100)
+    def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', limit: 100, user: Current.user)
       @year = year
       @month = month
       @query = query
       @filter = filter
       @limit = limit
+      @user = user
     end
 
     def call
@@ -26,9 +27,9 @@ module History
     attr_reader :year, :month, :query, :filter, :limit
 
     def period_items
-      earnings = Earning.for_year(year)
+      earnings = @user.earnings.for_year(year)
       earnings = earnings.for_month(month) if month
-      expenses = Expense.for_year(year)
+      expenses = @user.expenses.for_year(year)
       expenses = expenses.for_month(month) if month
       earnings.to_a + expenses.to_a
     end
@@ -41,14 +42,14 @@ module History
     end
 
     def filtered_earnings
-      scope = Earning.for_year(year)
+      scope = @user.earnings.for_year(year)
       scope = scope.for_month(month) if month
       scope = scope.where('notes ILIKE ?', "%#{query}%") if query.present?
       scope
     end
 
     def filtered_expenses
-      scope = Expense.for_year(year)
+      scope = @user.expenses.for_year(year)
       scope = scope.for_month(month) if month
       scope = scope.where(paid: false) if filter == 'unpaid'
       scope = scope.where('description ILIKE ? OR vendor ILIKE ?', "%#{query}%", "%#{query}%") if query.present?

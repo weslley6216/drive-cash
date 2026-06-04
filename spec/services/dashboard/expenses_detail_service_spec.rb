@@ -1,13 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::ExpensesDetailService do
+  let(:user) { create(:user) }
+
   describe '#call' do
     context 'with month filter' do
       it 'returns expenses list and total' do
-        exp1 = create(:expense, date: Date.new(2025, 1, 15), amount: 80,  category: 'fuel')
-        exp2 = create(:expense, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance')
+        exp1 = create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80,  category: 'fuel')
+        exp2 = create(:expense, user: user, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance')
 
-        result = described_class.new(year: 2025, month: 1).call
+        result = described_class.new(year: 2025, month: 1, user: user).call
 
         expect(result[:annual]).to eq(false)
         expect(result[:expenses_by_month]).to be_nil
@@ -16,10 +18,10 @@ RSpec.describe Dashboard::ExpensesDetailService do
       end
 
       it 'sums only paid expenses in total while listing all in period' do
-        create(:expense, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', paid: true)
-        create(:expense, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance', paid: false)
+        create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance', paid: false)
 
-        result = described_class.new(year: 2025, month: 1).call
+        result = described_class.new(year: 2025, month: 1, user: user).call
 
         expect(result[:expenses].size).to eq(2)
         expect(result[:total]).to eq(80.0)
@@ -28,18 +30,18 @@ RSpec.describe Dashboard::ExpensesDetailService do
 
     context 'without month filter' do
       it 'returns expenses grouped by month and total' do
-        create(:expense, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
-        create(:expense, date: Date.new(2025, 2, 5),  amount: 50,  category: 'meals')
-        create(:expense, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance')
+        create(:expense, user: user, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
+        create(:expense, user: user, date: Date.new(2025, 2, 5),  amount: 50,  category: 'meals')
+        create(:expense, user: user, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance')
 
-        result = described_class.new(year: 2025, month: nil).call
+        result = described_class.new(year: 2025, month: nil, user: user).call
 
         expect(result[:annual]).to eq(true)
         expect(result[:expenses]).to eq(Expense.none)
         expect(result[:expenses_by_month].size).to eq(2)
-        expect(result[:expenses_by_month].map { |r| r[:month_name] }).to include('janeiro', 'fevereiro')
-        expect(result[:expenses_by_month].find { |r| r[:month_name] == 'janeiro' }[:total]).to eq(100.0)
-        expect(result[:expenses_by_month].find { |r| r[:month_name] == 'fevereiro' }[:total]).to eq(200.0)
+        expect(result[:expenses_by_month].map { |row| row[:month_name] }).to include('janeiro', 'fevereiro')
+        expect(result[:expenses_by_month].find { |row| row[:month_name] == 'janeiro' }[:total]).to eq(100.0)
+        expect(result[:expenses_by_month].find { |row| row[:month_name] == 'fevereiro' }[:total]).to eq(200.0)
         expect(result[:total]).to eq(300.0)
       end
     end

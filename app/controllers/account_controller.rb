@@ -1,5 +1,5 @@
 class AccountController < ApplicationController
   def show
-    render Account::ShowView.new(user: Current.user)
+    render Account::ShowView.new(user: current_user)
   end
 end

@@ -7,7 +7,7 @@ class ExpensesController < ApplicationController
 
   def create
     result = Expenses::Creator.call(
-      expense_params.to_unsafe_h.merge('user_id' => Current.user.id),
+      expense_params.to_unsafe_h.merge('user_id' => current_user.id),
       installment_params.to_unsafe_h
     )
 
@@ -46,6 +46,6 @@ class ExpensesController < ApplicationController
   end
 
   def find_expense
-    @expense = Current.user.expenses.find(params[:id])
+    @expense = current_user.expenses.find(params[:id])
   end
 end

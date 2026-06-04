@@ -9,11 +9,12 @@ class HistoryController < ApplicationController
       year: @year,
       month: @month,
       query: @query,
-      filter: @filter
+      filter: @filter,
+      user: current_user
     ).call
 
-    earning_years = Earning.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
-    expense_years = Expense.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
+    earning_years = current_user.earnings.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
+    expense_years = current_user.expenses.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
     @available_years = (earning_years + expense_years).uniq.sort.reverse
     @available_years = [Date.current.year] if @available_years.empty?
 

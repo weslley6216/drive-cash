@@ -14,4 +14,8 @@ class ApplicationController < ActionController::Base
   def coming_soon
     render Application::ComingSoonView.new
   end
+
+  private
+
+  def current_user = Current.user
 end

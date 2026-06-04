@@ -236,4 +236,36 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.total'))
     end
   end
+
+  describe 'data isolation between users' do
+    let(:other_user) { create(:user) }
+
+    it 'does not show earnings from another user on the dashboard' do
+      create(:earning, user: other_user, amount: 8_888.00, date: Date.current)
+
+      get root_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('8.888')
+    end
+
+    it 'does not show expenses from another user on the dashboard' do
+      create(:expense, user: other_user, amount: 7_777.00, date: Date.current)
+
+      get root_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('7.777')
+    end
+
+    it 'shows only the current user earnings even when another user has records' do
+      create(:earning, user: current_user, amount: 1_234.00, date: Date.current)
+      create(:earning, user: other_user,   amount: 9_876.00, date: Date.current)
+
+      get root_path
+
+      expect(response.body).to include('1.234')
+      expect(response.body).not_to include('9.876')
+    end
+  end
 end

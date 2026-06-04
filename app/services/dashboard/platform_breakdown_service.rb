@@ -12,10 +12,11 @@ module Dashboard
 
     DEFAULT_COLOR = '#94a3b8'
 
-    def initialize(year:, month: nil, limit: 5)
+    def initialize(year:, month: nil, limit: 5, user: Current.user)
       @year = year
       @month = month
       @limit = limit
+      @user = user
     end
 
     def call
@@ -35,7 +36,7 @@ module Dashboard
 
     def scope
       @scope ||= begin
-        relation = Earning.for_year(year)
+        relation = @user.earnings.for_year(year)
         relation = relation.for_month(month) if month
         relation
       end

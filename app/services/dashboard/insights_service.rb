@@ -8,9 +8,10 @@ module Dashboard
     MARGIN_DROP_THRESHOLD = 5.0
     SEVERITY_ORDER = { 'critical' => 0, 'warning' => 1, 'info' => 2 }.freeze
 
-    def initialize(year:, month: nil)
+    def initialize(year:, month: nil, user: Current.user)
       @year = year
       @month = month
+      @user = user
     end
 
     def call
@@ -29,14 +30,15 @@ module Dashboard
     attr_reader :year, :month
 
     def current_stats
-      @current_stats ||= Dashboard::StatsService.new(year: year, month: month).call
+      @current_stats ||= Dashboard::StatsService.new(year: year, month: month, user: @user).call
     end
 
     def previous_stats
       @previous_stats ||= Dashboard::StatsService.new(
         year: previous_year,
         month: previous_month,
-        through_month: ytd_cutoff
+        through_month: ytd_cutoff,
+        user: @user
       ).call
     end
 
@@ -118,11 +120,11 @@ module Dashboard
     end
 
     def categories
-      Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT).call
+      Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
     end
 
     def platforms
-      Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT).call
+      Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
     end
 
     def insights
@@ -164,8 +166,8 @@ module Dashboard
     def best_day_insight
       return nil unless month
 
-      best = Earning.for_year(year).for_month(month)
-                    .group(:date).sum(:amount).max_by { |_date, amount| amount }
+      best = @user.earnings.for_year(year).for_month(month)
+                  .group(:date).sum(:amount).max_by { |_date, amount| amount }
       return nil if best.nil?
 
       best_date, best_amount = best
@@ -182,8 +184,8 @@ module Dashboard
       return nil if platforms.size < 2
 
       worst = platforms.last
-      trips = Earning.for_year(year).then { |relation| month ? relation.for_month(month) : relation }
-                     .where(platform: worst[:id]).sum(:trips_count)
+      trips = @user.earnings.for_year(year).then { |relation| month ? relation.for_month(month) : relation }
+                   .where(platform: worst[:id]).sum(:trips_count)
       return nil if trips.zero?
 
       per_trip_value = (worst[:amount].to_f / trips).round(2)
@@ -213,9 +215,9 @@ module Dashboard
     def previous_amount_for_category(category_id)
       return 0 unless category_id
 
-      Expense.for_year(previous_year).paid_only
-             .then { |relation| previous_month ? relation.for_month(previous_month) : relation }
-             .where(category: category_id).sum(:amount).to_f
+      @user.expenses.for_year(previous_year).paid_only
+           .then { |relation| previous_month ? relation.for_month(previous_month) : relation }
+           .where(category: category_id).sum(:amount).to_f
     end
 
     def format_brl(value)
@@ -227,12 +229,12 @@ module Dashboard
     end
 
     def annual_month_bars
-      earnings_by = Earning.for_year(year)
-                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                           .sum(:amount)
-      expenses_by = Expense.for_year(year).paid_only
-                           .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                           .sum(:amount)
+      earnings_by = @user.earnings.for_year(year)
+                         .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                         .sum(:amount)
+      expenses_by = @user.expenses.for_year(year).paid_only
+                         .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+                         .sum(:amount)
 
       has_any_data = (earnings_by.keys + expenses_by.keys).any?
       return [] unless has_any_data
@@ -250,12 +252,12 @@ module Dashboard
     end
 
     def daily_bars
-      earnings_by = Earning.for_year(year).for_month(month)
-                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
-                           .sum(:amount)
-      expenses_by = Expense.for_year(year).paid_only.for_month(month)
-                           .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
-                           .sum(:amount)
+      earnings_by = @user.earnings.for_year(year).for_month(month)
+                         .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                         .sum(:amount)
+      expenses_by = @user.expenses.for_year(year).paid_only.for_month(month)
+                         .group(Arel.sql('EXTRACT(DAY FROM date)::int'))
+                         .sum(:amount)
 
       days = (earnings_by.keys + expenses_by.keys).uniq.sort
       days.map do |day|

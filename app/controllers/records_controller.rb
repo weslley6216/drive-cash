@@ -23,7 +23,7 @@ class RecordsController < ApplicationController
   private
 
   def create_earning
-    earning = Earning.new(earning_params)
+    earning = Earning.new(earning_params.merge(user: current_user))
     if earning.save
       redirect_to root_path, notice: t('records.create.success')
     else
@@ -37,7 +37,10 @@ class RecordsController < ApplicationController
   end
 
   def create_expense
-    result = Expenses::Creator.call(expense_params.to_unsafe_h, installment_params.to_unsafe_h)
+    result = Expenses::Creator.call(
+      expense_params.to_unsafe_h.merge('user_id' => current_user.id),
+      installment_params.to_unsafe_h
+    )
     if result.success?
       redirect_to root_path, notice: t('records.create.success')
     else
