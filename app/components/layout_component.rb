@@ -58,15 +58,11 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
-      if @auth
-        instance_exec(&block)
-      else
-        render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav
-        div(class: content_wrapper_classes) do
-          div(class: container_classes, &block)
-        end
-        render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav
+      render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
+      div(class: content_wrapper_classes) do
+        div(class: container_classes, &block)
       end
+      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav && !@auth
     end
   end
 
@@ -82,6 +78,8 @@ class LayoutComponent < ApplicationComponent
   end
 
   def content_wrapper_classes
+    return nil if @auth
+
     classes = []
     classes << 'lg:ml-64' if @sidebar_nav
     classes << 'h-full'   if @app_shell
@@ -89,6 +87,8 @@ class LayoutComponent < ApplicationComponent
   end
 
   def container_classes
+    return nil if @auth
+
     if @app_shell
       base = 'h-full max-w-7xl mx-auto flex flex-col min-h-0'
       @sidebar_nav ? "#{base} lg:px-8" : base
