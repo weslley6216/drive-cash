@@ -3,7 +3,8 @@ module MonetaryAmount
 
   def amount=(value)
     if value.is_a?(String)
-      value = value.gsub(/[^\d.,]/, '').gsub(',', '.')
+      cleaned = value.gsub(/[^\d.,]/, '')
+      value = cleaned.include?(',') ? cleaned.delete('.').tr(',', '.') : cleaned
     end
 
     super(value)
