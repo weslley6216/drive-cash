@@ -26,16 +26,18 @@ class Account::ShowView < ApplicationView
 
   def view_template
     render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-      mobile_layout
-      desktop_layout
-      logout_overlay
+      div(data: { controller: 'logout-confirm' }) do
+        mobile_layout
+        desktop_layout
+        logout_overlay
+      end
     end
   end
 
   private
 
   def mobile_layout
-    div(class: 'lg:hidden', data: { controller: 'logout-confirm' }) do
+    div(class: 'lg:hidden') do
       header(class: 'px-5 pt-2 pb-3') do
         h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
       end
@@ -49,7 +51,7 @@ class Account::ShowView < ApplicationView
   end
 
   def desktop_layout
-    div(class: 'hidden lg:block', data: { controller: 'logout-confirm' }) do
+    div(class: 'hidden lg:block') do
       div(class: 'mb-6') do
         h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
         p(class: 'text-sm text-slate-500 mt-1') { t('.desktop_subtitle') }
