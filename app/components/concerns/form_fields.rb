@@ -46,15 +46,20 @@ module FormFields
   end
 
   def money_field(form, attribute, label:, theme: :blue, required: false)
+    raw_value = form.object.public_send(attribute)
     field_wrapper(label, theme: theme) do
-      render form.number_field(
-        attribute,
-        step: '0.01',
-        required: required,
-        value: form.object.public_send(attribute),
-        placeholder: t('.placeholders.money'),
-        class: input_classes(theme: theme)
-      )
+      div(data: { controller: 'money-field' }) do
+        input(
+          type: 'text',
+          inputmode: 'numeric',
+          autocomplete: 'off',
+          placeholder: t('.placeholders.money'),
+          required: required,
+          class: input_classes(theme: theme),
+          data: { money_field_target: 'display', action: 'input->money-field#format' }
+        )
+        render form.hidden_field(attribute, value: raw_value, data: { money_field_target: 'input' })
+      end
     end
   end
 
