@@ -196,14 +196,14 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(edit_expense_path(expense1))
     end
 
-    it 'shows installment subtitle and pending status for unpaid parcels' do
+    it 'shows installment subtitle for paid parcels' do
       create(:expense,
              user: current_user,
              date: Date.new(2025, 1, 18),
              amount: 120,
              category: 'maintenance',
              vendor: 'Pneus',
-             paid: false,
+             paid: true,
              installment_series_id: SecureRandom.uuid,
              installment_number: 1,
              installment_count: 3)
@@ -211,7 +211,18 @@ RSpec.describe 'Dashboard', type: :request do
       get dashboard_expenses_detail_path(year: 2025, month: 1)
 
       expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.installment_of', current: 1, total: 3))
-      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.status_pending'))
+    end
+
+    it 'excludes unpaid expenses from the monthly detail list and total' do
+      create(:expense, user: current_user, date: Date.new(2025, 1, 10), amount: 80, category: 'fuel', vendor: 'Posto Paid', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 1, 12), amount: 120, category: 'maintenance', vendor: 'Oficina Unpaid', paid: false)
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('Posto Paid')
+      expect(response.body).not_to include('Oficina Unpaid')
+      expect(response.body).to include('80,00')
+      expect(response.body).not_to include('120,00')
     end
 
     it 'shows empty state when no expenses in period' do
