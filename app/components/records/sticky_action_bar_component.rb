@@ -14,7 +14,7 @@ module Records
       div(class: 'px-5 pt-3 pb-6 border-t border-slate-100 bg-white sticky bottom-0') do
         button(
           type: 'submit',
-          class: "w-full rounded-xl py-3.5 text-base font-semibold text-white flex items-center justify-center gap-2 shadow-lg #{style[:bg]} #{style[:shadow]}",
+          class: "w-full rounded-xl py-3.5 text-base font-semibold text-white flex items-center justify-center gap-2 shadow-lg cursor-pointer #{style[:bg]} #{style[:shadow]}",
           data: { record_form_target: 'submit' }
         ) do
           render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')

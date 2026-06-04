@@ -84,7 +84,7 @@ class Account::ShowView < ApplicationView
         p(class: 'text-xl font-bold text-slate-900') { @user.name }
         p(class: 'text-sm text-slate-500') { "#{@user.email_address} · #{t('.free_plan')}" }
       end
-      button(class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50') do
+      button(class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer') do
         t('.edit_profile')
       end
     end
@@ -138,7 +138,7 @@ class Account::ShowView < ApplicationView
   def sign_out_button_mobile
     button(
       type: 'button',
-      class: 'w-full flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 rounded-2xl py-3.5 text-sm font-semibold shadow-sm',
+      class: 'w-full flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 rounded-2xl py-3.5 text-sm font-semibold shadow-sm cursor-pointer',
       data: { action: 'click->logout-confirm#open' }
     ) do
       render PhlexIcons::Lucide::LogOut.new(class: 'w-[18px] h-[18px]')
@@ -154,7 +154,7 @@ class Account::ShowView < ApplicationView
       end
       button(
         type: 'button',
-        class: 'flex items-center gap-2 bg-white border border-red-200 text-red-600 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-red-50',
+        class: 'flex items-center gap-2 bg-white border border-red-200 text-red-600 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-red-50 cursor-pointer',
         data: { action: 'click->logout-confirm#open' }
       ) do
         render PhlexIcons::Lucide::LogOut.new(class: 'w-4 h-4')
@@ -182,7 +182,7 @@ class Account::ShowView < ApplicationView
       end
       h2(class: 'text-xl font-bold text-slate-900 text-center mt-4') { t('.logout_modal.headline') }
       p(class: 'text-sm text-slate-500 text-center mt-2 leading-relaxed') { t('.logout_modal.description') }
-      logout_buttons('w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold', 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold mt-2.5')
+      logout_buttons('w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold cursor-pointer', 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold mt-2.5 cursor-pointer')
     end
   end
 
@@ -197,10 +197,10 @@ class Account::ShowView < ApplicationView
         div(class: 'flex items-center justify-end gap-3 mt-6') do
           button(
             type: 'button',
-            class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900',
+            class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
             data: { action: 'click->logout-confirm#dismiss' }
           ) { t('.logout_modal.cancel') }
-          inline_logout_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2', t('.logout_modal.confirm'))
+          inline_logout_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer', t('.logout_modal.confirm'))
         end
       end
     end
