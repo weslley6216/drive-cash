@@ -77,12 +77,19 @@ RSpec.describe 'Passwords', type: :request do
   end
 
   describe 'PATCH /passwords/:token' do
-    it 'updates password and redirects to login' do
+    it 'updates the password, invalidates the token and redirects to login' do
       token = user.password_reset_token
 
       patch password_path(token), params: { password: 'newpassword', password_confirmation: 'newpassword' }
 
       expect(response).to redirect_to(new_session_path)
+      expect(flash[:notice]).to eq(I18n.t('passwords.updated'))
+      expect(User.authenticate_by(email_address: user.email_address, password: 'newpassword')).to eq(user)
+
+      get edit_password_path(token)
+
+      expect(response).to redirect_to(new_password_path)
+      expect(flash[:alert]).to eq(I18n.t('passwords.not_found'))
     end
 
     it 're-renders the edit form when confirmation mismatches' do
@@ -91,6 +98,7 @@ RSpec.describe 'Passwords', type: :request do
       patch password_path(token), params: { password: 'newpassword', password_confirmation: 'mismatch' }
 
       expect(response).to redirect_to(edit_password_path(token))
+      expect(flash[:alert]).to be_present
     end
   end
 end
