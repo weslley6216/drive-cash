@@ -88,7 +88,7 @@ RSpec.describe 'Sessions', type: :request do
     end
 
     it 'redirects to new_session_path with the same alert when email is not registered' do
-      post session_path, params: { email_address: 'unknown@drivecash.test', password: 'password123' }
+      post session_path, params: { email_address: 'unknown@gmail.com', password: 'password123' }
 
       expect(response).to redirect_to(new_session_path)
       expect(flash[:alert]).to eq(I18n.t('sessions.invalid_credentials'))
@@ -144,7 +144,7 @@ RSpec.describe 'Sessions', type: :request do
       OmniAuth::AuthHash.new(
         provider: 'google_oauth2',
         uid:      'oauth-uid-123',
-        info:     { email: 'driver-oauth@drivecash.test', name: 'Driver OAuth' }
+        info:     { email: 'driver-oauth@gmail.com', name: 'Driver OAuth' }
       )
     end
 
@@ -166,7 +166,7 @@ RSpec.describe 'Sessions', type: :request do
     end
 
     it 'links provider and uid to an existing user with matching email' do
-      existing = create(:user, email_address: 'driver-oauth@drivecash.test')
+      existing = create(:user, email_address: 'driver-oauth@gmail.com')
 
       get '/auth/google_oauth2/callback'
 

@@ -41,7 +41,7 @@ RSpec.describe 'Registrations', type: :request do
       {
         user: {
           name:                  'New Driver',
-          email_address:         'new-driver@drivecash.test',
+          email_address:         'new-driver@gmail.com',
           password:              'password123',
           password_confirmation: 'password123'
         }
@@ -66,7 +66,7 @@ RSpec.describe 'Registrations', type: :request do
     end
 
     it 'returns 422 when email is already taken' do
-      create(:user, email_address: 'new-driver@drivecash.test')
+      create(:user, email_address: 'new-driver@gmail.com')
 
       post registrations_path, params: valid_params
 

@@ -29,12 +29,12 @@ RSpec.describe 'Passwords', type: :request do
 
     it 'does not send an email when the address is unknown' do
       expect {
-        post passwords_path, params: { email_address: 'unknown@drivecash.test' }
+        post passwords_path, params: { email_address: 'unknown@gmail.com' }
       }.not_to change { ActionMailer::Base.deliveries.size }
     end
 
     it 'redirects to the login page with the same neutral notice in both cases' do
-      post passwords_path, params: { email_address: 'unknown@drivecash.test' }
+      post passwords_path, params: { email_address: 'unknown@gmail.com' }
 
       expect(response).to redirect_to(new_session_path)
       expect(flash[:notice]).to eq(I18n.t('passwords.instructions_sent'))

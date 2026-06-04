@@ -1,4 +1,9 @@
 class User < ApplicationRecord
+  ALLOWED_EMAIL_DOMAINS = %w[
+    gmail.com hotmail.com outlook.com yahoo.com icloud.com
+    live.com uol.com.br bol.com.br terra.com.br protonmail.com
+  ].freeze
+
   has_secure_password
   has_many :sessions,  dependent: :destroy
   has_many :expenses,  dependent: :destroy
@@ -6,6 +11,7 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validate :email_domain_allowed, if: -> { provider.blank? && email_address.present? }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
 
@@ -38,4 +44,11 @@ class User < ApplicationRecord
     auth.info[:name].presence || auth.info.email.to_s.split('@').first
   end
   private_class_method :oauth_name
+
+  private
+
+  def email_domain_allowed
+    domain = email_address.to_s.split('@').last.downcase
+    errors.add(:email_address, :domain_not_allowed) unless ALLOWED_EMAIL_DOMAINS.include?(domain)
+  end
 end

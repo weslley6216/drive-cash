@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe PasswordsMailer, type: :mailer do
-  let(:user) { create(:user, name: 'Weslley Campos', email_address: 'driver@drivecash.test') }
+  let(:user) { create(:user, name: 'Weslley Campos', email_address: 'driver@gmail.com') }
 
   describe '#reset' do
     it 'sends to the user with the i18n subject' do
