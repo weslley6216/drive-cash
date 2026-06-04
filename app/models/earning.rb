@@ -1,5 +1,4 @@
 class Earning < ApplicationRecord
-  include CacheInvalidation
   include MonetaryAmount
 
   belongs_to :user, optional: true

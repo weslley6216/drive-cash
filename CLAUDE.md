@@ -177,7 +177,7 @@ rtk docker compose up -d db                                          # sobe o ba
 - **Phlex, não ERB**: views são arquivos `.rb`, herdam de `ApplicationView` ou `ApplicationComponent`.
 - **Turbo Streams**: respostas parciais via `RecordSaveResponse` concern — não redireciona.
 - **Monetário**: sempre `decimal(10,2)`, concern `MonetaryAmount` converte string de input.
-- **Cache**: invalidado automaticamente via `CacheInvalidation` concern no save/destroy.
+- **Cache**: sem invalidação automática. `Dashboard::AvailableYears.fetch` consulta o banco direto (overhead trivial). Se for cachear agregações pesadas no futuro, usar chave por-usuário (`"...#{user.id}"`).
 - **LLM fallback**: se Groq falha (rate limit/config), cai automaticamente no Gemini.
 - **i18n**: todas as strings visíveis em `config/locales/pt-BR.yml`.
 
