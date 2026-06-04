@@ -109,7 +109,7 @@ class Sessions::NewView < ApplicationView
                                 class: input_classes(icon: true, trailing: true)).to_s
         button(
           type: 'button',
-          class: 'absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400',
+          class: 'absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer',
           data: { action: 'click->password-toggle#toggle' }
         ) do
           span(data: { 'password-toggle-target': 'eye' }) do
@@ -131,16 +131,16 @@ class Sessions::NewView < ApplicationView
         name: 'remember_me',
         value: '1',
         id: 'remember_me',
-        class: 'w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500'
+        class: 'w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer'
       )
-      label(for: 'remember_me', class: 'text-sm text-slate-600') { t('.remember_me') }
+      label(for: 'remember_me', class: 'text-sm text-slate-600 cursor-pointer') { t('.remember_me') }
     end
   end
 
   def submit_button
     button(
       type: 'submit',
-      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2'
+      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
     ) do
       plain t('.sign_in')
       render PhlexIcons::Lucide::ArrowRight.new(class: 'w-4 h-4 stroke-[2.4]')
@@ -160,7 +160,7 @@ class Sessions::NewView < ApplicationView
       raw helpers.hidden_field_tag(:authenticity_token, helpers.form_authenticity_token)
       button(
         type: 'submit',
-        class: 'w-full flex items-center justify-center gap-2.5 bg-white border border-slate-200 rounded-xl py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50'
+        class: 'w-full flex items-center justify-center gap-2.5 bg-white border border-slate-200 rounded-xl py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer'
       ) do
         span(class: 'w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 via-emerald-500 to-amber-500 flex items-center justify-center text-white text-[11px] font-bold') { 'G' }
         span { t('.google') }
