@@ -19,12 +19,12 @@ module Dashboard
     def totals_scope(scope) = scope
 
     def monthly_detail
-      scope = base_scope.for_year(year).for_month(month).chronological
+      scope = totals_scope(base_scope.for_year(year).for_month(month).chronological)
 
       {
         list_key => scope,
         by_month_key => nil,
-        total: totals_scope(scope).sum(:amount),
+        total: scope.sum(:amount),
         annual: false
       }
     end

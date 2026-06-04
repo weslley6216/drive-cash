@@ -5,26 +5,24 @@ RSpec.describe Dashboard::ExpensesDetailService do
 
   describe '#call' do
     context 'with month filter' do
-      it 'returns expenses list and total' do
-        exp1 = create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80,  category: 'fuel')
-        exp2 = create(:expense, user: user, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance')
-
-        result = described_class.new(year: 2025, month: 1, user: user).call
-
-        expect(result[:annual]).to eq(false)
-        expect(result[:expenses_by_month]).to be_nil
-        expect(result[:expenses].to_a).to match_array([exp1, exp2])
-        expect(result[:total]).to eq(200.0)
-      end
-
-      it 'sums only paid expenses in total while listing all in period' do
-        create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', paid: true)
+      it 'lists only paid expenses in the monthly view' do
+        paid = create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', paid: true)
         create(:expense, user: user, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance', paid: false)
 
         result = described_class.new(year: 2025, month: 1, user: user).call
 
-        expect(result[:expenses].size).to eq(2)
+        expect(result[:expenses].to_a).to eq([paid])
         expect(result[:total]).to eq(80.0)
+      end
+
+      it 'includes all expenses when none are unpaid' do
+        expense1 = create(:expense, user: user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', paid: true)
+        expense2 = create(:expense, user: user, date: Date.new(2025, 1, 20), amount: 120, category: 'maintenance', paid: true)
+
+        result = described_class.new(year: 2025, month: 1, user: user).call
+
+        expect(result[:expenses].to_a).to match_array([expense1, expense2])
+        expect(result[:total]).to eq(200.0)
       end
     end
 

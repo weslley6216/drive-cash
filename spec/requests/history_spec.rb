@@ -66,6 +66,18 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
+    it 'excludes unpaid expenses from the default feed and net summary' do
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Paid', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete Unpaid', paid: false)
+
+      get history_path(year: 2025)
+
+      expect(response.body).to include('Posto Paid')
+      expect(response.body).not_to include('Lanchonete Unpaid')
+      expect(response.body).to include('120,00')
+    end
+
     it 'searches by query case-insensitive' do
       create(:expense, user: current_user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
@@ -76,10 +88,14 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include('Lanchonete')
     end
 
-    it 'renders the pending badge for unpaid expenses' do
+    it 'renders the pending badge only inside the unpaid filter' do
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
       get history_path(year: 2025)
+
+      expect(response.body).not_to include(I18n.t('history.index.day_group.unpaid_badge'))
+
+      get history_path(year: 2025, filter: 'unpaid')
 
       expect(response.body).to include(I18n.t('history.index.day_group.unpaid_badge'))
       expect(response.body).to include('bg-amber-100')

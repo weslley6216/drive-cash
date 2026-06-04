@@ -72,10 +72,7 @@ module Dashboard
                     p(class: 'text-sm text-slate-500') { expense.vendor.presence || '—' }
                   end
                   div(class: 'flex items-center gap-2 flex-shrink-0 group') do
-                    div(class: 'flex flex-col items-end gap-0.5') do
-                      expense_status_badge(expense)
-                      span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
-                    end
+                    span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
                     link_to(
                       edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
                       data: { turbo_frame: 'modal' },
@@ -109,14 +106,6 @@ module Dashboard
 
     def expenses_grouped_by_date
       @expenses_grouped_by_date ||= @expenses.to_a.group_by(&:date)
-    end
-
-    def expense_status_badge(expense)
-      if expense.paid
-        span(class: 'text-xs font-medium text-emerald-700') { t('.status_paid') }
-      else
-        span(class: 'text-xs font-medium text-amber-700') { t('.status_pending') }
-      end
     end
   end
 end
