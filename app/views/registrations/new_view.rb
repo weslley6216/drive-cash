@@ -4,7 +4,7 @@ class Registrations::NewView < ApplicationView
   end
 
   def view_template
-    render LayoutComponent.new(title: t('.title')) do
+    render LayoutComponent.new(title: t('.title'), auth: true) do
       div(class: 'min-h-screen flex bg-white') do
         desktop_brand_panel
         form_panel

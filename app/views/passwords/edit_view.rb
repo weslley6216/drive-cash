@@ -4,7 +4,7 @@ class Passwords::EditView < ApplicationView
   end
 
   def view_template
-    render LayoutComponent.new(title: t('.title')) do
+    render LayoutComponent.new(title: t('.title'), auth: true) do
       div(class: 'min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100') do
         div(class: 'w-full max-w-sm') do
           div(class: 'pb-8') { render BrandMarkComponent.new(size: :lg) }

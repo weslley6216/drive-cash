@@ -4,11 +4,12 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false)
+  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false)
     @title = title
     @bottom_nav = bottom_nav
     @sidebar_nav = sidebar_nav
     @app_shell = app_shell
+    @auth = auth
   end
 
   def view_template(&block)
@@ -57,15 +58,21 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
-      render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav
-      div(class: content_wrapper_classes) do
-        div(class: container_classes, &block)
+      if @auth
+        instance_exec(&block)
+      else
+        render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav
+        div(class: content_wrapper_classes) do
+          div(class: container_classes, &block)
+        end
+        render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav
       end
-      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav
     end
   end
 
   def body_classes
+    return 'min-h-screen' if @auth
+
     if @app_shell
       'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
     else
