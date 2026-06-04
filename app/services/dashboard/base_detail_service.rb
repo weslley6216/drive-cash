@@ -14,7 +14,7 @@ module Dashboard
 
     private
 
-    attr_reader :year, :month
+    attr_reader :year, :month, :user
 
     def totals_scope(scope) = scope
 
