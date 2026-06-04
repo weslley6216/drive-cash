@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Account', type: :request do
-  let(:user) { create(:user, name: 'Weslley Souza', email_address: 'weslley@drivecash.test') }
+  let(:user) { create(:user, name: 'Weslley Souza', email_address: 'weslley@gmail.com') }
 
   describe 'GET /account' do
     it 'redirects to login when unauthenticated' do
@@ -30,7 +30,7 @@ RSpec.describe 'Account', type: :request do
         get account_path
 
         expect(response.body).to include('Weslley Souza')
-        expect(response.body).to include('weslley@drivecash.test')
+        expect(response.body).to include('weslley@gmail.com')
       end
 
       it 'renders both account groups with their items' do

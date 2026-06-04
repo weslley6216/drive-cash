@@ -19,6 +19,30 @@ RSpec.describe User, type: :model do
     expect(user).not_to be_valid
   end
 
+  describe 'email domain validation' do
+    it 'accepts emails from allowed providers' do
+      User::ALLOWED_EMAIL_DOMAINS.each do |domain|
+        user = build(:user, email_address: "driver@#{domain}")
+
+        expect(user).to be_valid, "expected #{domain} to be allowed"
+      end
+    end
+
+    it 'rejects emails from unknown domains' do
+      user = build(:user, email_address: 'driver@unknowndomain.xyz')
+
+      expect(user).not_to be_valid
+      expect(user.errors[:email_address]).to be_present
+    end
+
+    it 'skips domain check for OAuth users' do
+      user = build(:user, email_address: 'driver@unknowndomain.xyz',
+                          provider: 'google_oauth2', uid: 'uid-123')
+
+      expect(user).to be_valid
+    end
+  end
+
   it 'is invalid when password is shorter than 8 characters' do
     user = build(:user, password: 'short', password_confirmation: 'short')
 
@@ -34,9 +58,9 @@ RSpec.describe User, type: :model do
   end
 
   it 'normalizes email_address by stripping and downcasing' do
-    user = create(:user, email_address: '  Driver@DriveCash.Test  ')
+    user = create(:user, email_address: '  Driver@Gmail.Com  ')
 
-    expect(user.email_address).to eq('driver@drivecash.test')
+    expect(user.email_address).to eq('driver@gmail.com')
   end
 
   it 'authenticates with correct password' do
@@ -79,12 +103,47 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe 'password_reset token' do
+    it 'generates a token and finds the user back by it' do
+      user = create(:user)
+
+      token = user.password_reset_token
+
+      expect(User.find_by_password_reset_token!(token)).to eq(user)
+    end
+
+    it 'raises InvalidSignature when the token string is malformed' do
+      expect { User.find_by_password_reset_token!('not-a-real-token') }
+        .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+    end
+
+    it 'invalidates previous tokens when the password changes' do
+      user  = create(:user)
+      token = user.password_reset_token
+
+      user.update!(password: 'newpassword123', password_confirmation: 'newpassword123')
+
+      expect { User.find_by_password_reset_token!(token) }
+        .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+    end
+
+    it 'expires the token after 15 minutes' do
+      user  = create(:user)
+      token = user.password_reset_token
+
+      travel_to 16.minutes.from_now do
+        expect { User.find_by_password_reset_token!(token) }
+          .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+      end
+    end
+  end
+
   describe '.find_or_create_from_oauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(
         provider: 'google_oauth2',
         uid:      '1234567890',
-        info:     { email: 'oauth-user@drivecash.test', name: 'OAuth User' }
+        info:     { email: 'oauth-user@gmail.com', name: 'OAuth User' }
       )
     end
 
@@ -97,7 +156,7 @@ RSpec.describe User, type: :model do
 
       expect(user.provider).to eq('google_oauth2')
       expect(user.uid).to eq('1234567890')
-      expect(user.email_address).to eq('oauth-user@drivecash.test')
+      expect(user.email_address).to eq('oauth-user@gmail.com')
       expect(user.password_digest).to be_present
     end
 
@@ -109,13 +168,26 @@ RSpec.describe User, type: :model do
     end
 
     it 'links provider and uid to an existing user with matching email' do
-      existing = create(:user, email_address: 'oauth-user@drivecash.test')
+      existing = create(:user, email_address: 'oauth-user@gmail.com')
 
       result = User.find_or_create_from_oauth(auth)
 
       expect(result).to eq(existing)
       expect(existing.reload.provider).to eq('google_oauth2')
       expect(existing.uid).to eq('1234567890')
+    end
+
+    it 'falls back to the email local-part when the provider omits name' do
+      anon_auth = OmniAuth::AuthHash.new(
+        provider: 'google_oauth2',
+        uid:      'no-name-123',
+        info:     { email: 'no-name@gmail.com', name: nil }
+      )
+
+      user = User.find_or_create_from_oauth(anon_auth)
+
+      expect(user).to be_persisted
+      expect(user.name).to eq('no-name')
     end
   end
 end

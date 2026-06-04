@@ -77,4 +77,8 @@ Rails.application.configure do
   config.hotwire_livereload.debounce_delay_ms = 100
   config.hotwire_livereload.listen_options[:force_polling] = true
   config.hotwire_livereload.listen_options[:latency] = 0.2
+
+  config.action_mailer.delivery_method = :test
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 end

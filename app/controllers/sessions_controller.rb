@@ -28,6 +28,8 @@ class SessionsController < ApplicationController
     user = User.find_or_create_from_oauth(auth)
     start_new_session_for(user, remember_me: true)
     redirect_to after_authentication_url
+  rescue ActiveRecord::RecordInvalid, NoMethodError
+    redirect_to '/auth/failure'
   end
 
   def oauth_failure
