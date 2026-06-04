@@ -94,6 +94,13 @@ RSpec.describe 'Sessions', type: :request do
       expect(flash[:alert]).to eq(I18n.t('sessions.invalid_credentials'))
     end
 
+    it 'renders the alert banner inline after following the redirect' do
+      post session_path, params: { email_address: user.email_address, password: 'wrong' }
+      follow_redirect!
+
+      expect(response.body).to include(I18n.t('sessions.invalid_credentials'))
+    end
+
     context 'with remember_me' do
       it 'sets a permanent session cookie when remember_me is "1"' do
         post session_path, params: { email_address: user.email_address, password: 'password123', remember_me: '1' }

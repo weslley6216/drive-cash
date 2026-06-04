@@ -63,6 +63,7 @@ class Sessions::NewView < ApplicationView
   def form_block
     h1(class: 'text-3xl font-bold text-slate-900 tracking-tight') { t('.welcome') }
     p(class: 'text-sm text-slate-500 mt-2') { t('.welcome_subtitle') }
+    alert_banner
     form_with(url: helpers.session_path, data: { turbo: false }, class: 'space-y-4 mt-8') do |form|
       email_field(form)
       password_field(form)
@@ -172,6 +173,14 @@ class Sessions::NewView < ApplicationView
     p(class: 'text-sm text-slate-500 text-center mt-8') do
       plain "#{t('.no_account')} "
       link_to(t('.create_account'), helpers.new_registration_path, class: 'font-semibold text-blue-600 hover:underline')
+    end
+  end
+
+  def alert_banner
+    return unless helpers.flash[:alert]
+
+    div(class: 'mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700') do
+      plain helpers.flash[:alert]
     end
   end
 
