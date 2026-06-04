@@ -1,0 +1,41 @@
+pt-BR:
+  account:
+    show_view:
+      title: "Conta — DriveCash"
+      heading: "Conta"
+      desktop_subtitle: "Gerencie seu perfil e preferências"
+      edit_profile: "Editar perfil"
+      free_plan: "Plano Gratuito"
+      session_label: "Sessão"
+      session_description: "Conectado neste dispositivo"
+      sign_out_button: "Sair da conta"
+      sign_out_short: "Sair"
+      version_label: "DriveCash · versão %{version}"
+      logout_modal:
+        headline: "Sair da conta?"
+        description: "Você precisará entrar novamente com seu e-mail e senha para acessar seus dados."
+        confirm: "Sim, sair"
+        cancel: "Cancelar"
+    groups:
+      account: "Conta"
+      preferences: "Preferências"
+    items:
+      personal_data:
+        label: "Dados pessoais"
+        sub: "Nome, e-mail, telefone"
+      plan:
+        label: "Plano"
+        sub: "Gratuito"
+        badge: "Free"
+      notifications:
+        label: "Notificações"
+        sub: "Lembretes e resumos"
+      vehicle:
+        label: "Veículo"
+        sub: "Dados do seu veículo"
+      export:
+        label: "Exportar dados"
+        sub: "CSV, PDF"
+      help:
+        label: "Ajuda e suporte"
+        sub: "Central de ajuda"

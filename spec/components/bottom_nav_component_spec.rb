@@ -38,7 +38,7 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include('href="/analysis"')
       expect(html).to include('href="/work_session"')
       expect(html).to include('href="/history"')
-      expect(html).to include('href="/settings"')
+      expect(html).to include('href="/account"')
     end
   end
 
