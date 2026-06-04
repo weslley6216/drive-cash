@@ -180,6 +180,16 @@ RSpec.describe 'Sessions', type: :request do
 
       expect { get '/auth/google_oauth2/callback' }.not_to change(User, :count)
     end
+
+    it 'redirects to oauth_failure when persistence raises RecordInvalid' do
+      allow(User).to receive(:find_or_create_from_oauth).and_raise(
+        ActiveRecord::RecordInvalid.new(User.new)
+      )
+
+      get '/auth/google_oauth2/callback'
+
+      expect(response).to redirect_to('/auth/failure')
+    end
   end
 
   describe 'GET /auth/failure' do
