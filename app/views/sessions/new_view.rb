@@ -69,9 +69,9 @@ class Sessions::NewView < ApplicationView
       password_field(form)
       remember_me_block
       submit_button
-      divider_block
-      google_button
     end
+    divider_block
+    google_button
     footer_links
   end
 
