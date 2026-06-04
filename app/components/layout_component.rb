@@ -38,6 +38,7 @@ class LayoutComponent < ApplicationComponent
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
       link(rel: 'apple-touch-icon', href: '/icon-192.png')
 
+      meta(name: 'turbo-cache-control', content: 'no-cache') if @auth
       csrf_meta_tags
       csp_meta_tag
       stylesheet_link_tag('tailwind', "data-turbo-track": 'reload')
