@@ -33,6 +33,18 @@ pt-BR:
       password: "Nova senha"
       password_confirmation: "Confirmar senha"
       submit: "Salvar"
+    mailer:
+      reset:
+        subject: "DriveCash — redefina sua senha"
+        body: |
+          Olá, %{name}!
+
+          Recebemos um pedido para redefinir a senha da sua conta DriveCash.
+          Clique no link abaixo para escolher uma nova senha (válido por 15 minutos):
+
+          %{url}
+
+          Se não foi você, ignore este e-mail — sua senha continua a mesma.
     not_found: "Link inválido ou expirado."
     instructions_sent: "Se este e-mail existir, você receberá instruções."
     updated: "Senha atualizada."
