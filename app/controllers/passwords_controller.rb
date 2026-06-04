@@ -8,7 +8,7 @@ class PasswordsController < ApplicationController
 
   def create
     user = User.find_by(email_address: params[:email_address].to_s.strip.downcase)
-    PasswordsMailer.reset(user).deliver_later if user
+    PasswordsMailer.reset(user).deliver_now if user
 
     redirect_to new_session_path, notice: I18n.t('passwords.instructions_sent')
   end
