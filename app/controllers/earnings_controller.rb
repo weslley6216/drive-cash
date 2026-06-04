@@ -6,7 +6,7 @@ class EarningsController < ApplicationController
   end
 
   def create
-    earning = Current.user.earnings.new(earning_params)
+    earning = current_user.earnings.new(earning_params)
 
     if earning.save
       turbo_success(Earnings::CreateView, earning: earning)
@@ -39,6 +39,6 @@ class EarningsController < ApplicationController
   end
 
   def find_earning
-    @earning = Current.user.earnings.find(params[:id])
+    @earning = current_user.earnings.find(params[:id])
   end
 end

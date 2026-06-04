@@ -16,14 +16,15 @@ module Dashboard
     DEFAULT_COLOR = '#94a3b8'
     DEFAULT_ICON  = PhlexIcons::Lucide::Package
 
-    def initialize(year:, month: nil, limit: 4)
+    def initialize(year:, month: nil, limit: 4, user: Current.user)
       @year = year
       @month = month
       @limit = limit
+      @user = user
     end
 
     def call
-      scope = Expense.for_year(year).paid_only
+      scope = @user.expenses.for_year(year).paid_only
       scope = scope.for_month(month) if month
 
       total = scope.sum(:amount).to_f

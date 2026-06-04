@@ -1,9 +1,13 @@
 module Dashboard
   class TodayService
+    def initialize(user: Current.user)
+      @user = user
+    end
+
     def call
       today = Date.current
-      earnings_today = Earning.where(date: today)
-      expenses_today = Expense.where(date: today)
+      earnings_today = @user.earnings.where(date: today)
+      expenses_today = @user.expenses.where(date: today)
 
       return nil if earnings_today.none? && expenses_today.none?
 

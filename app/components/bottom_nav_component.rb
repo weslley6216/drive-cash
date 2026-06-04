@@ -4,7 +4,7 @@ class BottomNavComponent < ApplicationComponent
     { id: :analysis, label_key: 'bottom_nav_component.tabs.analysis', icon: PhlexIcons::Lucide::ChartColumn, path_method: :analysis_path },
     { id: :journey,  label_key: 'bottom_nav_component.tabs.journey',  icon: PhlexIcons::Lucide::Play,        path_method: :work_session_path },
     { id: :history,  label_key: 'bottom_nav_component.tabs.history',  icon: PhlexIcons::Lucide::List,        path_method: :history_path },
-    { id: :more,     label_key: 'bottom_nav_component.tabs.more',     icon: PhlexIcons::Lucide::SlidersHorizontal, path_method: :settings_path }
+    { id: :more,     label_key: 'bottom_nav_component.tabs.more',     icon: PhlexIcons::Lucide::SlidersHorizontal, path_method: :account_path }
   ].freeze
 
   def initialize(active:)

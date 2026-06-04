@@ -4,11 +4,12 @@ class Passwords::EditView < ApplicationView
   end
 
   def view_template
-    render LayoutComponent.new(title: t('.title')) do
-      div(class: 'min-h-[80vh] flex items-center justify-center p-4') do
+    render LayoutComponent.new(title: t('.title'), auth: true) do
+      div(class: 'min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100') do
         div(class: 'w-full max-w-sm') do
-          header_section
-          form_section
+          div(class: 'pb-8') { render BrandMarkComponent.new(size: :lg) }
+          h1(class: 'text-3xl font-bold text-slate-900 tracking-tight') { t('.title') }
+          form_block
         end
       end
     end
@@ -16,28 +17,23 @@ class Passwords::EditView < ApplicationView
 
   private
 
-  def header_section
-    div(class: 'text-center mb-8') do
-      h1(class: 'text-2xl font-bold text-slate-800') { t('.title') }
-    end
-  end
-
-  def form_section
-    div(class: 'bg-white rounded-2xl border border-slate-200 shadow-sm p-6') do
-      form_with(url: helpers.password_path(@token), method: :patch, data: { turbo: false }) do |form|
-        div(class: 'space-y-4') do
-          password_input(form, :password, label_key: 'password', autocomplete: 'new-password')
-          password_input(form, :password_confirmation, label_key: 'password_confirmation', autocomplete: 'new-password')
-          raw form.submit(t('.submit'), class: 'w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer').to_s
-        end
-      end
+  def form_block
+    form_with(url: helpers.password_path(@token), method: :patch, data: { turbo: false }, class: 'space-y-4 mt-8') do |form|
+      password_input(form, :password, label_key: 'password', autocomplete: 'new-password')
+      password_input(form, :password_confirmation, label_key: 'password_confirmation', autocomplete: 'new-password')
+      raw form.submit(t('.submit'),
+                      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25').to_s
     end
   end
 
   def password_input(form, name, label_key:, autocomplete:)
     div do
-      label(class: 'block text-sm font-medium text-slate-700 mb-1') { t(".#{label_key}") }
-      raw form.password_field(name, required: true, autocomplete: autocomplete, class: 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500').to_s
+      label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: name.to_s) { t(".#{label_key}") }
+      raw form.password_field(name,
+                              id: name.to_s,
+                              required: true,
+                              autocomplete: autocomplete,
+                              class: 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
     end
   end
 end

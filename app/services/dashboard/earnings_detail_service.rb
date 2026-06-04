@@ -3,7 +3,7 @@ module Dashboard
     private
 
     def base_scope
-      Earning
+      @user.earnings
     end
 
     def empty_scope

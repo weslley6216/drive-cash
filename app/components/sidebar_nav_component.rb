@@ -25,9 +25,7 @@ class SidebarNavComponent < ApplicationComponent
   def brand_section
     div(class: 'p-5 border-b border-slate-100') do
       div(class: 'flex items-center gap-3') do
-        div(class: 'w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center') do
-          span(class: 'text-white font-bold text-sm') { 'DC' }
-        end
+        render BrandMarkComponent.new(size: :sm, wordmark: false)
         div do
           p(class: 'font-bold text-slate-800 text-sm') { I18n.t('sidebar_nav_component.brand') }
           p(class: 'text-xs text-slate-500') { I18n.t('sidebar_nav_component.brand_subtitle') }

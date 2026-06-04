@@ -1,9 +1,10 @@
 module Dashboard
   class StatsService
-    def initialize(year: Date.current.year, month: nil, through_month: nil)
+    def initialize(year: Date.current.year, month: nil, through_month: nil, user: Current.user)
       @year = year
       @month = month
       @through_month = through_month
+      @user = user
     end
 
     def call
@@ -52,7 +53,7 @@ module Dashboard
 
     def earnings_scope
       @earnings_scope ||= begin
-        scope = Earning.for_year(year)
+        scope = @user.earnings.for_year(year)
         scope = scope.for_month(month) if month
         scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
@@ -61,7 +62,7 @@ module Dashboard
 
     def expenses_scope
       @expenses_scope ||= begin
-        scope = Expense.for_year(year).paid_only
+        scope = @user.expenses.for_year(year).paid_only
         scope = scope.for_month(month) if month
         scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
@@ -115,7 +116,7 @@ module Dashboard
     end
 
     def profit_series
-      @profit_series ||= ProfitSeriesService.new(year: year, month: month)
+      @profit_series ||= ProfitSeriesService.new(year: year, month: month, user: @user)
     end
 
     def change_percent

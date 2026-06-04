@@ -25,7 +25,7 @@ class FilterComponent < ApplicationComponent
         type: 'button',
         class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm ' \
                'flex items-center justify-center text-slate-600 hover:bg-slate-50 ' \
-               'focus:outline-none focus:ring-2 focus:ring-blue-500',
+               'focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
         title: t('.title'),
         data: { action: 'click->filter-popover#toggle' }
       ) do

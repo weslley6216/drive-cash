@@ -41,7 +41,7 @@ module Records
         p(class: 'text-sm font-semibold text-slate-700') { t('records.new_view.title') }
         button(
           type: 'submit',
-          class: 'text-sm font-semibold text-blue-600'
+          class: 'text-sm font-semibold text-blue-600 cursor-pointer'
         ) { t('records.new_view.save') }
       end
     end

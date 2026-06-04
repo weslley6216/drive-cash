@@ -1,9 +1,10 @@
 module Dashboard
   class RecentActivityService
-    def initialize(year:, month: nil, limit: 5)
+    def initialize(year:, month: nil, limit: 5, user: Current.user)
       @year = year
       @month = month
       @limit = limit
+      @user = user
     end
 
     def call
@@ -32,13 +33,13 @@ module Dashboard
     end
 
     def earnings_scope
-      scope = Earning.for_year(year)
+      scope = @user.earnings.for_year(year)
       scope = scope.for_month(month) if month
       scope.order(date: :desc, created_at: :desc).limit(limit)
     end
 
     def expenses_scope
-      scope = Expense.for_year(year).paid_only
+      scope = @user.expenses.for_year(year).paid_only
       scope = scope.for_month(month) if month
       scope.order(date: :desc, created_at: :desc).limit(limit)
     end

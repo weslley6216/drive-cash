@@ -4,11 +4,13 @@ RSpec.describe 'Passwords', type: :request do
   let(:user) { create(:user) }
 
   describe 'GET /passwords/new' do
-    it 'renders the password reset request form' do
+    it 'renders the password reset request form with BrandMark' do
       get new_password_path
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(I18n.t('passwords.new_view.title'))
+      expect(response.body).to include('viewBox="0 0 100 100"')
+      expect(response.body).to include(I18n.t('brand_mark_component.title'))
     end
   end
 
@@ -27,13 +29,14 @@ RSpec.describe 'Passwords', type: :request do
   end
 
   describe 'GET /passwords/:token/edit' do
-    it 'renders the reset form for a valid token' do
+    it 'renders the reset form with BrandMark for a valid token' do
       token = user.password_reset_token
 
       get edit_password_path(token)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(I18n.t('passwords.edit_view.title'))
+      expect(response.body).to include('viewBox="0 0 100 100"')
     end
 
     it 'redirects with alert when token is invalid' do

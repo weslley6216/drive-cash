@@ -1,8 +1,9 @@
 module Dashboard
   class BaseDetailService
-    def initialize(year: Date.current.year, month: nil)
+    def initialize(year: Date.current.year, month: nil, user: Current.user)
       @year = year
       @month = month
+      @user = user
     end
 
     def call
@@ -13,7 +14,7 @@ module Dashboard
 
     private
 
-    attr_reader :year, :month
+    attr_reader :year, :month, :user
 
     def totals_scope(scope) = scope
 

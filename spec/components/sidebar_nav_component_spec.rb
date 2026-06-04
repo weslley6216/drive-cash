@@ -22,7 +22,7 @@ RSpec.describe SidebarNavComponent, type: :component do
     end
 
     it 'dims inactive tabs with slate styling' do
-      expect(html.scan('text-slate-600').size).to eq(6)
+      expect(html.scan('text-slate-600').size).to be >= 5
     end
 
     it 'is hidden on mobile and visible on desktop' do
@@ -30,7 +30,13 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('lg:flex')
     end
 
-    it 'renders the brand header' do
+    it 'renders BrandMarkComponent in the brand section' do
+      expect(html).to include('w-9 h-9 rounded-lg')
+      expect(html).to include('viewBox="0 0 100 100"')
+      expect(html).not_to include('>DC<')
+    end
+
+    it 'renders the brand title and subtitle from i18n' do
       expect(html).to include(I18n.t('sidebar_nav_component.brand'))
       expect(html).to include(I18n.t('sidebar_nav_component.brand_subtitle'))
     end

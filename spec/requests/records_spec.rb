@@ -164,5 +164,33 @@ RSpec.describe 'Records', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    describe 'data isolation on record creation' do
+      let(:other_user) { create(:user) }
+
+      it 'associates the created earning with the current user' do
+        params = { type: 'earning', record: { date: Date.current.to_s, amount: '100', platform: 'uber', trips_count: '1' } }
+
+        post records_path, params: params
+
+        expect(Earning.unscoped.last.user).to eq(current_user)
+      end
+
+      it 'associates the created expense with the current user' do
+        params = { type: 'expense', record: { date: Date.current.to_s, amount: '50', category: 'fuel' } }
+
+        post records_path, params: params
+
+        expect(Expense.unscoped.last.user).to eq(current_user)
+      end
+
+      it 'does not show another user earnings on the dashboard' do
+        create(:earning, user: other_user, amount: 9_555.00, date: Date.current)
+
+        get root_path
+
+        expect(response.body).not_to include('9.555')
+      end
+    end
   end
 end

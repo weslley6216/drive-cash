@@ -19,6 +19,20 @@ RSpec.describe User, type: :model do
     expect(user).not_to be_valid
   end
 
+  it 'is invalid when password is shorter than 8 characters' do
+    user = build(:user, password: 'short', password_confirmation: 'short')
+
+    expect(user).not_to be_valid
+    expect(user.errors[:password]).to be_present
+  end
+
+  it 'is invalid when password_confirmation does not match password' do
+    user = build(:user, password: 'password123', password_confirmation: 'different123')
+
+    expect(user).not_to be_valid
+    expect(user.errors[:password_confirmation]).to be_present
+  end
+
   it 'normalizes email_address by stripping and downcasing' do
     user = create(:user, email_address: '  Driver@DriveCash.Test  ')
 
@@ -49,5 +63,45 @@ RSpec.describe User, type: :model do
     create(:earning, user: user)
 
     expect { user.destroy }.to change(Earning, :count).by(-1)
+  end
+
+  describe '.find_or_create_from_oauth' do
+    let(:auth) do
+      OmniAuth::AuthHash.new(
+        provider: 'google_oauth2',
+        uid:      '1234567890',
+        info:     { email: 'oauth-user@drivecash.test', name: 'OAuth User' }
+      )
+    end
+
+    it 'creates a new user when provider and uid do not exist' do
+      expect { User.find_or_create_from_oauth(auth) }.to change(User, :count).by(1)
+    end
+
+    it 'sets provider, uid and a random password on new oauth users' do
+      user = User.find_or_create_from_oauth(auth)
+
+      expect(user.provider).to eq('google_oauth2')
+      expect(user.uid).to eq('1234567890')
+      expect(user.email_address).to eq('oauth-user@drivecash.test')
+      expect(user.password_digest).to be_present
+    end
+
+    it 'returns the existing user when provider and uid already exist' do
+      existing = User.find_or_create_from_oauth(auth)
+
+      expect { User.find_or_create_from_oauth(auth) }.not_to change(User, :count)
+      expect(User.find_or_create_from_oauth(auth)).to eq(existing)
+    end
+
+    it 'links provider and uid to an existing user with matching email' do
+      existing = create(:user, email_address: 'oauth-user@drivecash.test')
+
+      result = User.find_or_create_from_oauth(auth)
+
+      expect(result).to eq(existing)
+      expect(existing.reload.provider).to eq('google_oauth2')
+      expect(existing.uid).to eq('1234567890')
+    end
   end
 end

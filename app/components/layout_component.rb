@@ -4,11 +4,12 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false)
+  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false)
     @title = title
     @bottom_nav = bottom_nav
     @sidebar_nav = sidebar_nav
     @app_shell = app_shell
+    @auth = auth
   end
 
   def view_template(&block)
@@ -37,6 +38,7 @@ class LayoutComponent < ApplicationComponent
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
       link(rel: 'apple-touch-icon', href: '/icon-192.png')
 
+      meta(name: 'turbo-cache-control', content: 'no-cache') if @auth
       csrf_meta_tags
       csp_meta_tag
       stylesheet_link_tag('tailwind', "data-turbo-track": 'reload')
@@ -57,15 +59,17 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
-      render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav
+      render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
       div(class: content_wrapper_classes) do
         div(class: container_classes, &block)
       end
-      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav
+      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav && !@auth
     end
   end
 
   def body_classes
+    return 'min-h-screen' if @auth
+
     if @app_shell
       'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
     else
@@ -75,6 +79,8 @@ class LayoutComponent < ApplicationComponent
   end
 
   def content_wrapper_classes
+    return nil if @auth
+
     classes = []
     classes << 'lg:ml-64' if @sidebar_nav
     classes << 'h-full'   if @app_shell
@@ -82,6 +88,8 @@ class LayoutComponent < ApplicationComponent
   end
 
   def container_classes
+    return nil if @auth
+
     if @app_shell
       base = 'h-full max-w-7xl mx-auto flex flex-col min-h-0'
       @sidebar_nav ? "#{base} lg:px-8" : base
