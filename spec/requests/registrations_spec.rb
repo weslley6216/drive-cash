@@ -25,6 +25,14 @@ RSpec.describe 'Registrations', type: :request do
       expect(response.body).to include("href=\"#{new_session_path}\"")
     end
 
+    it 'wires the registration-form Stimulus controller and field targets' do
+      get new_registration_path
+
+      expect(response.body).to include('data-controller="registration-form"')
+      expect(response.body).to include('data-registration-form-target="nameField"')
+      expect(response.body).to include('data-registration-form-target="emailAddressField"')
+    end
+
     it 'redirects to root with notice when already authenticated' do
       user = create(:user)
       login_as(user)
@@ -91,8 +99,9 @@ RSpec.describe 'Registrations', type: :request do
       post registrations_path, params: params
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('activerecord.attributes.user.password_confirmation'))
       expect(response.body).not_to include('Password confirmation')
+      expect(response.body).not_to include('space-y-1')
+      expect(response.body).to match(/data-registration-form-target="passwordConfirmationError"[^>]*>[^<]/)
     end
 
     it 'returns 422 with a readable domain error when email provider is not allowed' do
@@ -102,8 +111,9 @@ RSpec.describe 'Registrations', type: :request do
       post registrations_path, params: params
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('activerecord.attributes.user.email_address'))
       expect(response.body).not_to include('Email address')
+      expect(response.body).not_to include('space-y-1')
+      expect(response.body).to match(/data-registration-form-target="emailAddressError"[^>]*>[^<]/)
     end
 
     it 'returns 422 when name is blank' do
