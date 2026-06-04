@@ -138,7 +138,9 @@ class Registrations::NewView < ApplicationView
   def submit_button
     button(
       type: 'submit',
-      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
+      disabled: true,
+      data: { 'registration-form-target': 'submitButton' },
+      class: 'w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
     ) do
       plain t('.submit')
       render PhlexIcons::Lucide::ArrowRight.new(class: 'w-4 h-4 stroke-[2.4]')

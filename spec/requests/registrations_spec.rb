@@ -33,6 +33,13 @@ RSpec.describe 'Registrations', type: :request do
       expect(response.body).to include('data-registration-form-target="emailAddressField"')
     end
 
+    it 'renders the submit button disabled on initial page load' do
+      get new_registration_path
+
+      expect(response.body).to include('data-registration-form-target="submitButton"')
+      expect(response.body).to match(/data-registration-form-target="submitButton"[^>]*disabled/)
+    end
+
     it 'redirects to root with notice when already authenticated' do
       user = create(:user)
       login_as(user)

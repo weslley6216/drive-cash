@@ -5,10 +5,12 @@ export default class extends Controller {
     "nameField", "nameError", "nameValidIcon", "nameErrorIcon",
     "emailAddressField", "emailAddressError", "emailAddressValidIcon", "emailAddressErrorIcon",
     "passwordField", "passwordError",
-    "passwordConfirmationField", "passwordConfirmationError"
+    "passwordConfirmationField", "passwordConfirmationError",
+    "submitButton"
   ]
 
   #touched = new Set()
+  #valid = new Set()
 
   validate({ target }) {
     const field = target.dataset.registrationFormField
@@ -18,43 +20,40 @@ export default class extends Controller {
   }
 
   #validateField(field) {
+    let message
     switch (field) {
       case "name":
-        this.#applyTextState(
-          this.nameFieldTarget,
-          this.nameErrorTarget,
-          this.nameValidIconTarget,
-          this.nameErrorIconTarget,
-          this.nameFieldTarget.value.trim() ? null : "Nome não pode ficar em branco"
-        )
+        message = this.nameFieldTarget.value.trim() ? null : "Nome não pode ficar em branco"
+        this.#applyTextState(this.nameFieldTarget, this.nameErrorTarget, this.nameValidIconTarget, this.nameErrorIconTarget, message)
         break
       case "email_address":
-        this.#applyTextState(
-          this.emailAddressFieldTarget,
-          this.emailAddressErrorTarget,
-          this.emailAddressValidIconTarget,
-          this.emailAddressErrorIconTarget,
-          this.#emailError(this.emailAddressFieldTarget.value.trim())
-        )
+        message = this.#emailError(this.emailAddressFieldTarget.value.trim())
+        this.#applyTextState(this.emailAddressFieldTarget, this.emailAddressErrorTarget, this.emailAddressValidIconTarget, this.emailAddressErrorIconTarget, message)
         break
       case "password":
-        this.#applyPasswordState(
-          this.passwordFieldTarget,
-          this.passwordErrorTarget,
-          this.#passwordError(this.passwordFieldTarget.value)
-        )
+        message = this.#passwordError(this.passwordFieldTarget.value)
+        this.#applyPasswordState(this.passwordFieldTarget, this.passwordErrorTarget, message)
         if (this.#touched.has("password_confirmation")) this.#validateField("password_confirmation")
         break
       case "password_confirmation":
-        this.#applyPasswordState(
-          this.passwordConfirmationFieldTarget,
-          this.passwordConfirmationErrorTarget,
-          this.passwordConfirmationFieldTarget.value === this.passwordFieldTarget.value
-            ? null
-            : "As senhas não coincidem"
-        )
+        message = this.passwordConfirmationFieldTarget.value === this.passwordFieldTarget.value
+          ? null
+          : "As senhas não coincidem"
+        this.#applyPasswordState(this.passwordConfirmationFieldTarget, this.passwordConfirmationErrorTarget, message)
         break
     }
+    if (message === null) {
+      this.#valid.add(field)
+    } else {
+      this.#valid.delete(field)
+    }
+    this.#updateSubmitButton()
+  }
+
+  #updateSubmitButton() {
+    const allValid = ["name", "email_address", "password", "password_confirmation"]
+      .every(field => this.#valid.has(field))
+    this.submitButtonTarget.disabled = !allValid
   }
 
   #applyTextState(inputEl, errorEl, validIconEl, errorIconEl, message) {
