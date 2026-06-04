@@ -57,10 +57,22 @@ RSpec.describe 'Passwords', type: :request do
       expect(response.body).to include('viewBox="0 0 100 100"')
     end
 
-    it 'redirects with alert when token is invalid' do
+    it 'redirects with alert when the token is malformed' do
       get edit_password_path('invalid-token')
 
       expect(response).to redirect_to(new_password_path)
+      expect(flash[:alert]).to eq(I18n.t('passwords.not_found'))
+    end
+
+    it 'redirects with alert when the token is expired' do
+      token = user.password_reset_token
+
+      travel_to 16.minutes.from_now do
+        get edit_password_path(token)
+
+        expect(response).to redirect_to(new_password_path)
+        expect(flash[:alert]).to eq(I18n.t('passwords.not_found'))
+      end
     end
   end
 
