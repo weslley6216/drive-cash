@@ -175,13 +175,13 @@ RSpec.describe History::FeedService do
         expect(items.map(&:class).uniq).to eq([Expense])
       end
 
-      it 'shows full-period expenses in the summary, not only unpaid' do
+      it 'computes summary excluding unpaid expenses' do
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
         result = described_class.new(year: 2025, filter: 'unpaid', user: user).call
 
-        expect(result[:summary]).to eq(earnings: 0, expenses: 120, net: -120)
+        expect(result[:summary]).to eq(earnings: 0, expenses: 80, net: -80)
       end
     end
 

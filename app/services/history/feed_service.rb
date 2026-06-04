@@ -29,7 +29,7 @@ module History
     def period_items
       earnings = @user.earnings.for_year(year)
       earnings = earnings.for_month(month) if month
-      expenses = @user.expenses.for_year(year)
+      expenses = @user.expenses.paid_only.for_year(year)
       expenses = expenses.for_month(month) if month
       earnings.to_a + expenses.to_a
     end
