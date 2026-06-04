@@ -25,7 +25,7 @@ class User < ApplicationRecord
 
     random_password = SecureRandom.hex(16)
     create!(
-      name:                  auth.info.name,
+      name:                  oauth_name(auth),
       email_address:         auth.info.email,
       provider:              auth.provider,
       uid:                   auth.uid,
@@ -33,4 +33,9 @@ class User < ApplicationRecord
       password_confirmation: random_password
     )
   end
+
+  def self.oauth_name(auth)
+    auth.info[:name].presence || auth.info.email.to_s.split('@').first
+  end
+  private_class_method :oauth_name
 end

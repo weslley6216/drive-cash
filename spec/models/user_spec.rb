@@ -152,5 +152,18 @@ RSpec.describe User, type: :model do
       expect(existing.reload.provider).to eq('google_oauth2')
       expect(existing.uid).to eq('1234567890')
     end
+
+    it 'falls back to the email local-part when the provider omits name' do
+      anon_auth = OmniAuth::AuthHash.new(
+        provider: 'google_oauth2',
+        uid:      'no-name-123',
+        info:     { email: 'no-name@drivecash.test', name: nil }
+      )
+
+      user = User.find_or_create_from_oauth(anon_auth)
+
+      expect(user).to be_persisted
+      expect(user.name).to eq('no-name')
+    end
   end
 end
