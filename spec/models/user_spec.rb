@@ -79,6 +79,41 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe 'password_reset token' do
+    it 'generates a token and finds the user back by it' do
+      user = create(:user)
+
+      token = user.password_reset_token
+
+      expect(User.find_by_password_reset_token!(token)).to eq(user)
+    end
+
+    it 'raises InvalidSignature when the token string is malformed' do
+      expect { User.find_by_password_reset_token!('not-a-real-token') }
+        .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+    end
+
+    it 'invalidates previous tokens when the password changes' do
+      user  = create(:user)
+      token = user.password_reset_token
+
+      user.update!(password: 'newpassword123', password_confirmation: 'newpassword123')
+
+      expect { User.find_by_password_reset_token!(token) }
+        .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+    end
+
+    it 'expires the token after 15 minutes' do
+      user  = create(:user)
+      token = user.password_reset_token
+
+      travel_to 16.minutes.from_now do
+        expect { User.find_by_password_reset_token!(token) }
+          .to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
+      end
+    end
+  end
+
   describe '.find_or_create_from_oauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(
