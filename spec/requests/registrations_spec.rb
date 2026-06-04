@@ -25,13 +25,14 @@ RSpec.describe 'Registrations', type: :request do
       expect(response.body).to include("href=\"#{new_session_path}\"")
     end
 
-    it 'redirects to root when already authenticated' do
+    it 'redirects to root with notice when already authenticated' do
       user = create(:user)
       login_as(user)
 
       get new_registration_path
 
       expect(response).to redirect_to(root_path)
+      expect(flash[:notice]).to eq(I18n.t('registrations.already_signed_in'))
     end
   end
 
@@ -45,6 +46,16 @@ RSpec.describe 'Registrations', type: :request do
           password_confirmation: 'password123'
         }
       }
+    end
+
+    it 'redirects to root with notice when already authenticated' do
+      user = create(:user)
+      login_as(user)
+
+      post registrations_path, params: valid_params
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:notice]).to eq(I18n.t('registrations.already_signed_in'))
     end
 
     it 'creates a user, starts a session and redirects to root with flash welcome' do

@@ -49,3 +49,4 @@ pt-BR:
       already_have_account: "Já tem conta?"
       sign_in: "Entrar"
     welcome: "Bem-vindo ao DriveCash!"
+    already_signed_in: "Você já está autenticado. Saia antes de criar uma nova conta."

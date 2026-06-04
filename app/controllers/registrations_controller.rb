@@ -1,6 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[new create]
-  before_action :redirect_if_authenticated, only: :new
+  before_action :redirect_if_authenticated, only: %i[new create]
 
   def new
     render Registrations::NewView.new(user: User.new)
@@ -23,6 +23,6 @@ class RegistrationsController < ApplicationController
   end
 
   def redirect_if_authenticated
-    redirect_to root_path if find_session_by_cookie
+    redirect_to root_path, notice: I18n.t('registrations.already_signed_in') if find_session_by_cookie
   end
 end
