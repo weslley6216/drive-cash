@@ -5,4 +5,4 @@ pt-BR:
     change_positive: "+%{value}%"
     change_negative: "%{value}%"
     per_day: "%{value}/dia · em %{count} dias trabalhados"
-    per_day_zero: "sem dias trabalhados no período"
+    per_day_zero: "Sem dias trabalhados no período"

@@ -4,7 +4,7 @@ if Rails.env.development?
     Earning.destroy_all
     Expense.destroy_all
 
-    dev_user = User.find_or_create_by!(email_address: 'dev@drivecash.app') do |user|
+    dev_user = User.find_or_create_by!(email_address: 'dev@gmail.com') do |user|
       user.name = 'Motorista Dev'
       user.password = 'password123'
       user.password_confirmation = 'password123'

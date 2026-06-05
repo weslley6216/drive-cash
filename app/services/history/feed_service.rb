@@ -44,7 +44,7 @@ module History
     def filtered_earnings
       scope = @user.earnings.for_year(year)
       scope = scope.for_month(month) if month
-      scope = scope.where('notes ILIKE ?', "%#{query}%") if query.present?
+      scope = apply_earning_search(scope, query) if query.present?
       scope
     end
 
@@ -52,8 +52,40 @@ module History
       scope = @user.expenses.for_year(year)
       scope = scope.for_month(month) if month
       scope = filter == 'unpaid' ? scope.where(paid: false) : scope.paid_only
-      scope = scope.where('description ILIKE ? OR vendor ILIKE ?', "%#{query}%", "%#{query}%") if query.present?
+      scope = apply_expense_search(scope, query) if query.present?
       scope
+    end
+
+    def apply_earning_search(scope, term)
+      matched_platforms = enum_matches(Earning.platforms, earning_platform_labels, term)
+      if matched_platforms.any?
+        scope.where('notes ILIKE ? OR platform IN (?)', "%#{term}%", matched_platforms)
+      else
+        scope.where('notes ILIKE ?', "%#{term}%")
+      end
+    end
+
+    def apply_expense_search(scope, term)
+      matched_categories = enum_matches(Expense.categories, expense_category_labels, term)
+      if matched_categories.any?
+        scope.where('description ILIKE ? OR vendor ILIKE ? OR category IN (?)', "%#{term}%", "%#{term}%", matched_categories)
+      else
+        scope.where('description ILIKE ? OR vendor ILIKE ?', "%#{term}%", "%#{term}%")
+      end
+    end
+
+    def enum_matches(enum_map, labels, term)
+      labels.filter_map do |key, label|
+        enum_map[key.to_s] if label.downcase.include?(term.downcase)
+      end
+    end
+
+    def expense_category_labels
+      I18n.t('activerecord.attributes.expense.categories')
+    end
+
+    def earning_platform_labels
+      I18n.t('activerecord.attributes.earning.platforms')
     end
 
     def include_earnings?

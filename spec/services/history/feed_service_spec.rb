@@ -217,6 +217,28 @@ RSpec.describe History::FeedService do
         expect(items.map(&:id)).to eq([match.id])
       end
 
+      it 'matches expense by category label' do
+        match    = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
+        no_match = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
+
+        result = described_class.new(year: 2025, query: 'Combustível', user: user).call
+
+        items = result[:groups].flat_map { |group| group[:items] }
+        expect(items.map(&:id)).to include(match.id)
+        expect(items.map(&:id)).not_to include(no_match.id)
+      end
+
+      it 'matches earning by platform label' do
+        match    = create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', notes: nil)
+        no_match = create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 100, platform: 'ifood', notes: nil)
+
+        result = described_class.new(year: 2025, query: 'uber', user: user).call
+
+        items = result[:groups].flat_map { |group| group[:items] }
+        expect(items.map(&:id)).to include(match.id)
+        expect(items.map(&:id)).not_to include(no_match.id)
+      end
+
       it 'returns empty groups when nothing matches but keeps full-period summary' do
         create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
         create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 100, platform: 'uber', notes: 'normal')
