@@ -23,7 +23,8 @@ class RecordsController < ApplicationController
   private
 
   def create_earning
-    earning = Earning.new(earning_params.merge(user: current_user))
+    earning = Earning.new(earning_attributes(:record).merge(user: current_user))
+
     if earning.save
       redirect_to root_path, notice: t('records.create.success')
     else
@@ -37,10 +38,8 @@ class RecordsController < ApplicationController
   end
 
   def create_expense
-    result = Expenses::Creator.call(
-      expense_params.to_unsafe_h.merge('user_id' => current_user.id),
-      installment_params.to_unsafe_h
-    )
+    result = create_expense_via_creator(:record)
+
     if result.success?
       redirect_to root_path, notice: t('records.create.success')
     else
@@ -51,17 +50,5 @@ class RecordsController < ApplicationController
         context: params[:context]
       ), status: :unprocessable_content
     end
-  end
-
-  def earning_params
-    params.require(:record).permit(:date, :amount, :platform, :notes, :trips_count)
-  end
-
-  def expense_params
-    params.require(:record).permit(:date, :amount, :category, :vendor, :description, :paid)
-  end
-
-  def installment_params
-    params.fetch(:installment, {}).permit(:repeat, :period, :repetitions)
   end
 end

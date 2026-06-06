@@ -13,10 +13,7 @@ class HistoryController < ApplicationController
       user: current_user
     ).call
 
-    earning_years = current_user.earnings.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
-    expense_years = current_user.expenses.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::integer'))
-    @available_years = (earning_years + expense_years).uniq.sort.reverse
-    @available_years = [Date.current.year] if @available_years.empty?
+    @available_years = Dashboard::AvailableYears.fetch(user: current_user)
 
     render History::IndexView.new(
       feed: @feed,

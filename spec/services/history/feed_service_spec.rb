@@ -110,6 +110,38 @@ RSpec.describe History::FeedService do
       end
     end
 
+    context 'aggregation contract' do
+      it 'returns the same summary numbers regardless of limit' do
+        create(:earning, user: user, date: Date.new(2025, 1, 5),  amount: 100, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 3, 5),  amount: 50,  platform: 'ifood')
+        create(:expense, user: user, date: Date.new(2025, 6, 1),  amount: 30,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 7, 1),  amount: 70,  category: 'meals', paid: false)
+
+        capped = described_class.new(year: 2025, limit: 1, user: user).call
+        full   = described_class.new(year: 2025, limit: 999, user: user).call
+
+        expect(capped[:summary]).to eq(full[:summary])
+        expect(capped[:summary]).to eq(earnings: 150, expenses: 30, net: 120)
+      end
+
+      it 'computes the summary without loading every record into memory' do
+        base = Date.new(2025, 6, 1)
+        25.times { |offset| create(:earning, user: user, date: base + offset, amount: 10, platform: 'uber') }
+
+        queries = []
+        callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM \"(earnings|expenses)\"/ }
+
+        ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+          described_class.new(year: 2025, limit: 5, user: user).call
+        end
+
+        summary_queries = queries.grep(/SUM\(.*amount.*\)/i)
+        expect(summary_queries.size).to be >= 2
+        full_loads = queries.reject { |sql| sql =~ /SUM\(|COUNT\(|LIMIT/ }
+        expect(full_loads).to be_empty
+      end
+    end
+
     context 'with filter earnings' do
       it 'returns only earnings' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
