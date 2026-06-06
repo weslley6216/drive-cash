@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Expenses::Creator do
+  let(:user) { create(:user) }
+
   describe '.call' do
     context 'when not creating installments' do
       let(:expense_params) do
@@ -8,7 +10,8 @@ RSpec.describe Expenses::Creator do
           date: '2026-01-10',
           amount: 100.00,
           category: 'fuel',
-          vendor: 'Shell'
+          vendor: 'Shell',
+          user_id: user.id
         }
       end
 
@@ -34,7 +37,8 @@ RSpec.describe Expenses::Creator do
           date: '2026-01-10',
           amount: 300.00,
           category: 'maintenance',
-          vendor: 'Oficina'
+          vendor: 'Oficina',
+          user_id: user.id
         }
       end
 

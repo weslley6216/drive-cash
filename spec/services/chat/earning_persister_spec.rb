@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe Chat::EarningPersister do
   describe '#persist' do
     it 'returns success with ActionController::Parameters' do
-      payload = ActionController::Parameters.new(amount: 200, platform: 'uber', date: '2026-04-22')
+      user = create(:user)
+      payload = ActionController::Parameters.new(amount: 200, platform: 'uber', date: '2026-04-22', user_id: user.id)
       result = described_class.new.persist(payload)
 
       expect(result.success?).to be true
@@ -12,7 +13,8 @@ RSpec.describe Chat::EarningPersister do
     end
 
     it 'returns success with a plain Hash' do
-      payload = { 'amount' => 200, 'platform' => 'uber', 'date' => '2026-04-22' }
+      user = create(:user)
+      payload = { 'amount' => 200, 'platform' => 'uber', 'date' => '2026-04-22', 'user_id' => user.id }
       result = described_class.new.persist(payload)
 
       expect(result.success?).to be true

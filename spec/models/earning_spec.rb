@@ -80,10 +80,12 @@ RSpec.describe Earning, type: :model do
   end
 
   describe 'user association' do
-    it 'belongs to user optionally' do
+    it 'is invalid without a user' do
       earning = build(:earning, user: nil)
 
-      expect(earning).to be_valid
+      earning.valid?
+
+      expect(earning.errors[:user]).to be_present
     end
 
     it 'can be associated with a user' do

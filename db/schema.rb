@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_04_175256) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_06_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,7 +22,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_175256) do
     t.integer "platform", default: 7, null: false
     t.integer "trips_count", default: 1, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.index ["date", "platform"], name: "index_earnings_on_date_and_platform"
     t.index ["date"], name: "index_earnings_on_date"
     t.index ["platform"], name: "index_earnings_on_platform"
@@ -41,7 +41,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_175256) do
     t.text "notes"
     t.boolean "paid", default: true, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.string "vendor"
     t.index ["category"], name: "index_expenses_on_category"
     t.index ["date", "category"], name: "index_expenses_on_date_and_category"
