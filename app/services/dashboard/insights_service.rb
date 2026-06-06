@@ -1,5 +1,7 @@
 module Dashboard
   class InsightsService
+    include Formatting
+
     HOURS_PER_DAY = 8
     CATEGORIES_LIMIT = 7
     PLATFORMS_LIMIT = 5
@@ -152,13 +154,13 @@ module Dashboard
       if month
         I18n.t('analysis.show_view.insights.category_spike.description_monthly',
                category: current_top[:label], pct: pct,
-               value: format_brl(current_top[:amount]),
+               value: format_currency(current_top[:amount]),
                period: I18n.t('date.month_names')[month],
                previous_year: previous_year)
       else
         I18n.t('analysis.show_view.insights.category_spike.description_annual',
                category: current_top[:label], pct: pct,
-               value: format_brl(current_top[:amount]),
+               value: format_currency(current_top[:amount]),
                previous_year: previous_year)
       end
     end
@@ -174,7 +176,7 @@ module Dashboard
       {
         type: 'best_day',
         severity: 'info',
-        title: I18n.t('analysis.show_view.insights.best_day.title', value: format_brl(best_amount)),
+        title: I18n.t('analysis.show_view.insights.best_day.title', value: format_currency(best_amount)),
         description: I18n.t('analysis.show_view.insights.best_day.description',
                             date: I18n.l(best_date, format: :default))
       }
@@ -194,7 +196,7 @@ module Dashboard
         severity: 'info',
         title: I18n.t('analysis.show_view.insights.worst_platform.title', platform: worst[:label]),
         description: I18n.t('analysis.show_view.insights.worst_platform.description',
-                            platform: worst[:label], value: format_brl(per_trip_value))
+                            platform: worst[:label], value: format_currency(per_trip_value))
       }
     end
 
@@ -218,10 +220,6 @@ module Dashboard
       @user.expenses.for_year(previous_year).paid_only
            .then { |relation| previous_month ? relation.for_month(previous_month) : relation }
            .where(category: category_id).sum(:amount).to_f
-    end
-
-    def format_brl(value)
-      ActionController::Base.helpers.number_to_currency(value, unit: 'R$ ', separator: ',', delimiter: '.', precision: 2)
     end
 
     def monthly_bars
