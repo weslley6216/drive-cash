@@ -1,7 +1,7 @@
 class Expense < ApplicationRecord
   include MonetaryAmount
 
-  belongs_to :user, optional: true
+  belongs_to :user
 
   CATEGORIES_BY_GROUP = {
     vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],

@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe Chat::ExpensePersister do
   describe '#persist' do
     it 'returns success when expense is created' do
-      payload = { amount: 100, category: 'fuel', date: '2026-01-10', vendor: 'Shell' }
+      user = create(:user)
+      payload = { amount: 100, category: 'fuel', date: '2026-01-10', vendor: 'Shell', user_id: user.id }
       persister = described_class.new
 
       result = persister.persist(payload)

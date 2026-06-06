@@ -94,10 +94,12 @@ RSpec.describe Expense, type: :model do
   end
 
   describe 'user association' do
-    it 'belongs to user optionally' do
+    it 'is invalid without a user' do
       expense = build(:expense, user: nil)
 
-      expect(expense).to be_valid
+      expense.valid?
+
+      expect(expense.errors[:user]).to be_present
     end
 
     it 'can be associated with a user' do

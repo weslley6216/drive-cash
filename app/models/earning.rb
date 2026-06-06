@@ -1,7 +1,7 @@
 class Earning < ApplicationRecord
   include MonetaryAmount
 
-  belongs_to :user, optional: true
+  belongs_to :user
 
   enum :platform, {
     amazon: 0,
