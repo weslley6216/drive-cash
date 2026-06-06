@@ -13,7 +13,7 @@ module RecordSaveResponse
           **kwargs,
           totals: totals,
           context: context,
-          totals_context: dashboard_filter_context
+          totals_context: dashboard_context
         )
       end
     end
@@ -31,7 +31,7 @@ module RecordSaveResponse
   end
 
   def turbo_render_list(detail_service, detail_view)
-    filter  = dashboard_filter_context
+    filter  = dashboard_context
     totals  = Dashboard::StatsService.new(**filter).call
     detail  = detail_service.new(year: filter[:year], month: filter[:month]).call
     today   = Dashboard::TodayService.new.call
@@ -69,12 +69,5 @@ module RecordSaveResponse
     totals = Dashboard::StatsService.new(**context).call
 
     [context, totals]
-  end
-
-  def dashboard_filter_context
-    {
-      year:  params.dig(:context, :year).presence&.to_i || Date.current.year,
-      month: params.dig(:context, :month).presence&.to_i
-    }
   end
 end

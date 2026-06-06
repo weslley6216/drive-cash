@@ -3,13 +3,13 @@ module DashboardContext
 
   private
 
-  def dashboard_context(record)
+  def dashboard_context(record = nil)
     if record&.persisted?
       { year: record.date.year, month: record.date.month }
     else
       {
         year: params.dig(:context, :year).presence&.to_i || Date.current.year,
-        month: params.dig(:context, :month).presence
+        month: params.dig(:context, :month).presence&.to_i
       }
     end
   end
