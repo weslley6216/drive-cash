@@ -12,13 +12,11 @@ module History
     end
 
     def call
-      all_items = full_scope
-      limited   = all_items.first(limit)
-      grouped   = limited.group_by(&:date).sort_by { |date, _| date }.reverse
+      grouped = limited_items.group_by(&:date).sort_by { |date, _| date }.reverse
 
       {
         groups:  grouped.map { |date, day_items| build_group(date, day_items) },
-        summary: build_summary(period_items)
+        summary: build_summary
       }
     end
 
@@ -26,19 +24,14 @@ module History
 
     attr_reader :year, :month, :query, :filter, :limit
 
-    def period_items
-      earnings = @user.earnings.for_year(year)
-      earnings = earnings.for_month(month) if month
-      expenses = @user.expenses.paid_only.for_year(year)
-      expenses = expenses.for_month(month) if month
-      earnings.to_a + expenses.to_a
-    end
+    def limited_items
+      earnings = include_earnings? ? filtered_earnings.chronological.limit(limit).to_a : []
+      expenses = include_expenses? ? filtered_expenses.chronological.limit(limit).to_a : []
 
-    def full_scope
-      base = []
-      base += filtered_earnings.to_a if include_earnings?
-      base += filtered_expenses.to_a if include_expenses?
-      base.sort_by { |record| [record.date, record.created_at] }.reverse
+      (earnings + expenses)
+        .sort_by { |record| [record.date, record.created_at] }
+        .reverse
+        .first(limit)
     end
 
     def filtered_earnings
@@ -54,6 +47,29 @@ module History
       scope = filter == 'unpaid' ? scope.where(paid: false) : scope.paid_only
       scope = apply_expense_search(scope, query) if query.present?
       scope
+    end
+
+    def summary_earnings_scope
+      scope = @user.earnings.for_year(year)
+      scope = scope.for_month(month) if month
+      scope
+    end
+
+    def summary_expenses_scope
+      scope = @user.expenses.paid_only.for_year(year)
+      scope = scope.for_month(month) if month
+      scope
+    end
+
+    def build_summary
+      earnings_total = summary_earnings_scope.sum(:amount)
+      expenses_total = summary_expenses_scope.sum(:amount)
+
+      {
+        earnings: earnings_total,
+        expenses: expenses_total,
+        net: earnings_total - expenses_total
+      }
     end
 
     def apply_earning_search(scope, term)
@@ -105,17 +121,6 @@ module History
         items: day_items.sort_by(&:created_at).reverse,
         earnings_total: day_earnings,
         expenses_total: day_expenses
-      }
-    end
-
-    def build_summary(items)
-      earnings_total = items.select { |record| record.is_a?(Earning) }.sum(&:amount)
-      expenses_total = items.select { |record| record.is_a?(Expense) }.sum(&:amount)
-
-      {
-        earnings: earnings_total,
-        expenses: expenses_total,
-        net: earnings_total - expenses_total
       }
     end
   end
