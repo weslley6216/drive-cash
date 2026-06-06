@@ -186,8 +186,7 @@ module Dashboard
       return nil if platforms.size < 2
 
       worst = platforms.last
-      trips = @user.earnings.for_year(year).then { |relation| month ? relation.for_month(month) : relation }
-                   .where(platform: worst[:id]).sum(:trips_count)
+      trips = worst[:trips_count].to_i
       return nil if trips.zero?
 
       per_trip_value = (worst[:amount].to_f / trips).round(2)

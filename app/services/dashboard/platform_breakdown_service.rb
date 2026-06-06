@@ -23,11 +23,13 @@ module Dashboard
       total = scope.sum(:amount).to_f
       return [] if total.zero?
 
-      scope.group(:platform)
-           .sum(:amount)
-           .sort_by { |_platform, amount| -amount }
-           .first(@limit)
-           .map { |platform, amount| build_row(platform, amount, total) }
+      amounts = scope.group(:platform).sum(:amount)
+      trips   = scope.group(:platform).sum(:trips_count)
+
+      amounts
+        .sort_by { |_platform, amount| -amount }
+        .first(@limit)
+        .map { |platform, amount| build_row(platform, amount, total, trips[platform].to_i) }
     end
 
     private
@@ -42,14 +44,15 @@ module Dashboard
       end
     end
 
-    def build_row(platform, amount, total)
+    def build_row(platform, amount, total, trips)
       meta = PLATFORM_META[platform] || {}
       {
         id: platform,
         label: I18n.t("activerecord.attributes.earning.platforms.#{platform}"),
         amount: amount,
         percent: (amount.to_f / total * 100).round(1),
-        color: meta[:color] || DEFAULT_COLOR
+        color: meta[:color] || DEFAULT_COLOR,
+        trips_count: trips
       }
     end
   end

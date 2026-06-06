@@ -257,6 +257,18 @@ RSpec.describe Dashboard::InsightsService do
         expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
       end
 
+      it 'worst_platform reuses platforms breakdown trips_count for per-trip calculation' do
+        create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 10, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 100, trips_count: 4,  platform: 'shopee')
+
+        result = described_class.new(year: 2025, month: 6, user: user).call
+        worst  = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
+
+        expect(worst).not_to be_nil
+        expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
+        expect(worst[:description]).to include('25,00')
+      end
+
       it 'emits margin_drop with critical severity when margin fell more than 5 pp' do
         create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 1000)
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)

@@ -76,5 +76,19 @@ RSpec.describe Dashboard::PlatformBreakdownService do
 
       expect(result.size).to eq(3)
     end
+
+    it 'returns trips_count per platform row' do
+      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, platform: 'uber', trips_count: 10)
+      create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 500, platform: 'uber', trips_count: 5)
+      create(:earning, user: user, date: Date.new(2025, 6, 3), amount: 200, platform: 'ifood', trips_count: 3)
+
+      result = described_class.new(year: 2025, month: 6, user: user).call
+
+      uber_row  = result.find { |row| row[:id] == 'uber' }
+      ifood_row = result.find { |row| row[:id] == 'ifood' }
+
+      expect(uber_row[:trips_count]).to eq(15)
+      expect(ifood_row[:trips_count]).to eq(3)
+    end
   end
 end
