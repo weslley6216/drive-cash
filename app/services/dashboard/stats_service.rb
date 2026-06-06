@@ -26,11 +26,11 @@ module Dashboard
         earnings_avg_day: earnings_data[:avg_per_day],
         expenses_percent: expenses_percent(earnings_total, expenses_total),
         profit_per_day: profit_per_day(profit_value, days_worked),
-        days_avg_month: days_avg_month(days_worked, earnings_data[:total]),
+        days_avg_month: days_avg_month(days_worked),
         days_avg_week: days_avg_week(days_worked),
 
         trips: earnings_data[:trips_count],
-        trips_avg_month: trips_avg_month(earnings_data[:trips_count], earnings_data[:total]),
+        trips_avg_month: trips_avg_month(earnings_data[:trips_count]),
         trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked),
 
         monthly_profit_series: profit_series.monthly,
@@ -87,8 +87,8 @@ module Dashboard
       profit_value / days
     end
 
-    def days_avg_month(days, earnings_total)
-      months = distinct_months_count(earnings_total)
+    def days_avg_month(days)
+      months = ScopeMonthCounter.count_for(earnings_scope)
       return 0 if months.zero?
       (days.to_f / months).round(1)
     end
@@ -102,8 +102,8 @@ module Dashboard
       (days_worked / weeks_count).round
     end
 
-    def trips_avg_month(trips, earnings_total)
-      months = distinct_months_count(earnings_total)
+    def trips_avg_month(trips)
+      months = ScopeMonthCounter.count_for(earnings_scope)
       return 0 if months.zero?
 
       (trips.to_f / months).round
@@ -132,12 +132,6 @@ module Dashboard
       return nil if previous_profit.zero?
 
       ((current_profit - previous_profit) / previous_profit.abs * 100).round(1)
-    end
-
-    def distinct_months_count(earnings_total)
-      return 1 unless earnings_total > 0
-
-      ScopeMonthCounter.count_for(earnings_scope)
     end
   end
 end

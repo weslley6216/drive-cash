@@ -6,11 +6,5 @@ module Dashboard
         .count
         .clamp(1, Float::INFINITY)
     end
-
-    private
-
-    def distinct_months_count
-      @distinct_months_count ||= ScopeMonthCounter.count_for(scope)
-    end
   end
 end
