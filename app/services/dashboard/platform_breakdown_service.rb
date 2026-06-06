@@ -23,13 +23,16 @@ module Dashboard
       total = scope.sum(:amount).to_f
       return [] if total.zero?
 
-      amounts = scope.group(:platform).sum(:amount)
-      trips   = scope.group(:platform).sum(:trips_count)
+      aggregates = scope.group(:platform).pluck(
+        :platform,
+        Arel.sql('SUM(amount)'),
+        Arel.sql('SUM(trips_count)')
+      )
 
-      amounts
-        .sort_by { |_platform, amount| -amount }
+      aggregates
+        .sort_by { |_platform, amount, _trips| -amount }
         .first(@limit)
-        .map { |platform, amount| build_row(platform, amount, total, trips[platform].to_i) }
+        .map { |platform, amount, trips| build_row(platform, amount, total, trips.to_i) }
     end
 
     private
