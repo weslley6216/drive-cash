@@ -1,6 +1,5 @@
 module Dashboard
   class EarningsCalculator
-    include ScopeMonthCounter
     include MonthlyTotals
 
     def initialize(scope)
@@ -30,7 +29,7 @@ module Dashboard
     end
 
     def avg_per_month
-      months = distinct_months_count
+      months = ScopeMonthCounter.count_for(scope)
       return 0 if months.zero?
       total_earnings / months
     end
