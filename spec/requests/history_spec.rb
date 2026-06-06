@@ -145,5 +145,25 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
       expect(response.body).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
     end
+
+    it 'always includes the current year in the year selector even when the user has no records' do
+      get history_path
+
+      expect(response.body).to include(%(value="#{Date.current.year}"))
+    end
+
+    it 'lists historical years from earnings and expenses in descending order' do
+      create(:earning, user: current_user, date: Date.new(2023, 5, 1), amount: 100, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2024, 7, 1), amount: 50, category: 'fuel', paid: true)
+
+      get history_path
+
+      idx_2024 = response.body.index(%(value="2024"))
+      idx_2023 = response.body.index(%(value="2023"))
+
+      expect(idx_2024).not_to be_nil
+      expect(idx_2023).not_to be_nil
+      expect(idx_2024).to be < idx_2023
+    end
   end
 end
