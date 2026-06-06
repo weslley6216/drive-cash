@@ -6,10 +6,7 @@ class ExpensesController < ApplicationController
   end
 
   def create
-    result = Expenses::Creator.call(
-      expense_params.to_unsafe_h.merge('user_id' => current_user.id),
-      installment_params.to_unsafe_h
-    )
+    result = create_expense_via_creator(:expense)
 
     if result.success?
       turbo_success(Expenses::CreateView, expense: result.expenses.first)
@@ -23,7 +20,7 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    if @expense.update(expense_params)
+    if @expense.update(expense_attributes(:expense))
       turbo_success(Expenses::UpdateView, expense: @expense)
     else
       turbo_error(Expenses::UpdateView, expense: @expense)
@@ -36,14 +33,6 @@ class ExpensesController < ApplicationController
   end
 
   private
-
-  def expense_params
-    params.require(:expense).permit(:date, :amount, :category, :vendor, :description, :paid)
-  end
-
-  def installment_params
-    params.fetch(:installment, {}).permit(:repeat, :period, :repetitions)
-  end
 
   def find_expense
     @expense = current_user.expenses.find(params[:id])

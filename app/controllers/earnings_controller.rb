@@ -6,7 +6,7 @@ class EarningsController < ApplicationController
   end
 
   def create
-    earning = current_user.earnings.new(earning_params)
+    earning = current_user.earnings.new(earning_attributes(:earning))
 
     if earning.save
       turbo_success(Earnings::CreateView, earning: earning)
@@ -20,7 +20,7 @@ class EarningsController < ApplicationController
   end
 
   def update
-    if @earning.update(earning_params)
+    if @earning.update(earning_attributes(:earning))
       turbo_success(Earnings::UpdateView, earning: @earning)
     else
       turbo_error(Earnings::UpdateView, earning: @earning)
@@ -33,10 +33,6 @@ class EarningsController < ApplicationController
   end
 
   private
-
-  def earning_params
-    params.require(:earning).permit(:date, :amount, :platform, :notes, :trips_count)
-  end
 
   def find_earning
     @earning = current_user.earnings.find(params[:id])
