@@ -34,6 +34,39 @@ RSpec.describe Expenses::InstallmentPlan do
 
       expect(plan.valid?).to be false
     end
+
+    it 'is valid at the MAX_INSTALLMENTS boundary' do
+      plan = described_class.new(
+        total_amount: 600,
+        start_date: '2026-01-10',
+        period: 'monthly',
+        repetitions: described_class::MAX_INSTALLMENTS
+      )
+
+      expect(plan.valid?).to be true
+    end
+
+    it 'is invalid when count exceeds MAX_INSTALLMENTS' do
+      plan = described_class.new(
+        total_amount: 600,
+        start_date: '2026-01-10',
+        period: 'monthly',
+        repetitions: described_class::MAX_INSTALLMENTS + 1
+      )
+
+      expect(plan.valid?).to be false
+    end
+
+    it 'is invalid when total_amount is not positive' do
+      plan = described_class.new(
+        total_amount: 0,
+        start_date: '2026-01-10',
+        period: 'monthly',
+        repetitions: 3
+      )
+
+      expect(plan.valid?).to be false
+    end
   end
 
   describe '#amounts' do
