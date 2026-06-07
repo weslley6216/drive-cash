@@ -27,13 +27,15 @@ RSpec.describe Ai::ParserService do
         })
       end
 
-      it 'builds an expense preview with raw params and summary' do
+      it 'builds an expense preview with raw params and a summary that includes amount, category and date' do
         result = service.call
 
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_expense')
         expect(result[:params]['amount']).to eq(45.0)
-        expect(result[:summary]).to be_present
+        expect(result[:summary]).to include('R$ 45,00')
+        expect(result[:summary]).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
+        expect(result[:summary]).to include('21/04/2026')
       end
     end
 
@@ -46,13 +48,15 @@ RSpec.describe Ai::ParserService do
         })
       end
 
-      it 'builds an earning preview with raw params and summary' do
+      it 'builds an earning preview with raw params and a summary that includes amount, platform and date' do
         result = service.call
 
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_earning')
         expect(result[:params]['amount']).to eq(100.0)
-        expect(result[:summary]).to be_present
+        expect(result[:summary]).to include('R$ 100,00')
+        expect(result[:summary]).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+        expect(result[:summary]).to include('21/04/2026')
       end
     end
 
