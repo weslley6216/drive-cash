@@ -23,7 +23,7 @@ module Dashboard
       exp_by_day  = @user.expenses.for_year(year).paid_only.for_month(month)
                          .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
 
-      (1..days_in_month).map { |d| (earn_by_day[d].to_f - exp_by_day[d].to_f).round(2) }
+      (1..days_in_month).map { |day| (earn_by_day[day].to_f - exp_by_day[day].to_f).round(2) }
     end
 
     private

@@ -27,13 +27,15 @@ RSpec.describe Ai::ParserService do
         })
       end
 
-      it 'builds an expense preview with raw params and summary' do
+      it 'builds an expense preview with raw params and a summary that includes amount, category and date' do
         result = service.call
 
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_expense')
         expect(result[:params]['amount']).to eq(45.0)
-        expect(result[:summary]).to be_present
+        expect(result[:summary]).to include('R$ 45,00')
+        expect(result[:summary]).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
+        expect(result[:summary]).to include('21/04/2026')
       end
     end
 
@@ -46,13 +48,15 @@ RSpec.describe Ai::ParserService do
         })
       end
 
-      it 'builds an earning preview with raw params and summary' do
+      it 'builds an earning preview with raw params and a summary that includes amount, platform and date' do
         result = service.call
 
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_earning')
         expect(result[:params]['amount']).to eq(100.0)
-        expect(result[:summary]).to be_present
+        expect(result[:summary]).to include('R$ 100,00')
+        expect(result[:summary]).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+        expect(result[:summary]).to include('21/04/2026')
       end
     end
 
@@ -138,9 +142,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(Llm::ConfigurationError.new('no key'))
       end
 
-      it 'returns the misconfiguration message' do
+      it 'returns the misconfiguration message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.misconfig'))
       end
     end
@@ -150,9 +155,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(Llm::Error.new('bad gateway'))
       end
 
-      it 'returns the api error message' do
+      it 'returns the api error message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.api_error'))
       end
     end
@@ -162,9 +168,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(StandardError.new('disk full'))
       end
 
-      it 'returns the generic unexpected error message' do
+      it 'returns the generic unexpected error message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.unexpected'))
       end
     end

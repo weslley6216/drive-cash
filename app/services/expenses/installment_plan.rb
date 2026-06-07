@@ -42,14 +42,14 @@ module Expenses
       base = cents / @count
       remainder = cents % @count
 
-      (0...@count).map do |i|
-        chunk = base + (i < remainder ? 1 : 0)
+      (0...@count).map do |index|
+        chunk = base + (index < remainder ? 1 : 0)
         BigDecimal(chunk) / 100
       end
     end
 
     def calculate_dates
-      (0...@count).map { |i| advance_date(@start_date, i) }
+      (0...@count).map { |index| advance_date(@start_date, index) }
     end
 
     def advance_date(start, index)

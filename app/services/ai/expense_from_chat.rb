@@ -3,11 +3,11 @@ module Ai
     ATTRIBUTE_KEYS = %w[date amount category vendor description user_id].freeze
 
     def self.persist(raw)
-      h = coerce_hash(raw)
+      attrs_hash = coerce_hash(raw)
 
-      installments = extract_installments_int(h.delete('installments'))
-      period = extract_period(h.delete('installments_period'))
-      attrs = h.slice(*ATTRIBUTE_KEYS)
+      installments = extract_installments_int(attrs_hash.delete('installments'))
+      period = extract_period(attrs_hash.delete('installments_period'))
+      attrs = attrs_hash.slice(*ATTRIBUTE_KEYS)
 
       if installments >= 2
         return installments_period_error(attrs) unless Expense::INSTALLMENT_PERIODS.include?(period)
@@ -38,8 +38,8 @@ module Ai
       end
 
       def extract_period(value)
-        val = value.respond_to?(:to_s) ? value.to_s : ''
-        val.presence || ''
+        period_text = value.respond_to?(:to_s) ? value.to_s : ''
+        period_text.presence || ''
       end
 
       def installments_period_error(attrs)
