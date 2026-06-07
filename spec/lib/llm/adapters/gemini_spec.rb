@@ -44,7 +44,7 @@ RSpec.describe Llm::Adapters::Gemini do
         })
       end
 
-      it 'returns a normalized hash with type :tool_use' do
+      it 'returns a normalized hash with type :tool_use and preserves the JSON-parsed amount type' do
         result = adapter.chat(messages: messages)
 
         expect(result).to eq({
@@ -52,6 +52,7 @@ RSpec.describe Llm::Adapters::Gemini do
           tool_name:  'create_expense',
           tool_input: { 'amount' => 45, 'category' => 'fuel' }
         })
+        expect(result[:tool_input]['amount']).to be_a(Integer)
       end
     end
 

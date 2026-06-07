@@ -43,12 +43,13 @@ RSpec.describe Llm::Adapters::Groq do
         })
       end
 
-      it 'returns a normalized hash with type :tool_use' do
+      it 'returns a normalized hash with type :tool_use and preserves the JSON-parsed amount type' do
         result = adapter.chat(messages: messages)
 
         expect(result[:type]).to eq(:tool_use)
         expect(result[:tool_name]).to eq('create_expense')
         expect(result[:tool_input]).to eq({ 'amount' => 45 })
+        expect(result[:tool_input]['amount']).to be_a(Integer)
       end
     end
 
