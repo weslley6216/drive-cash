@@ -33,12 +33,16 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:expenses_percent]).to eq(20.0)
     end
 
-    it 'delegates profit series to ProfitSeriesService' do
-      result = described_class.new(year: 2025, month: 1, user: user).call
+    it 'returns the monthly profit series for the year (12 entries from earnings minus paid expenses)' do
+      expect(result[:monthly_profit_series]).to eq([400.0, 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    end
 
-      expect(result[:monthly_profit_series]).to be_an(Array)
-      expect(result[:monthly_profit_series].size).to eq(12)
-      expect(result[:daily_profit_series]).to be_an(Array)
+    it 'returns the daily profit series for the selected month (one entry per day)' do
+      january_series = result[:daily_profit_series]
+
+      expect(january_series.size).to eq(31)
+      expect(january_series[9]).to eq(400.0)
+      expect(january_series.sum).to eq(400.0)
     end
 
     it 'returns change_percent as nil when month is not provided' do
@@ -64,7 +68,6 @@ RSpec.describe Dashboard::StatsService do
 
       expect(result[:daily_profit_series]).to be_nil
     end
-
 
     context 'with multiple working days in the month' do
       before do
