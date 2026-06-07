@@ -2,23 +2,24 @@ module Expenses
   class InstallmentCreator
     Result = Struct.new(:success?, :expenses, :expense, keyword_init: true)
 
-    def self.call(expense_attributes, installment_attributes)
-      new(expense_attributes, installment_attributes).call
+    def self.call(expense_attributes, installment_attributes, user:)
+      new(expense_attributes, installment_attributes, user: user).call
     end
 
-    def initialize(expense_attributes, installment_attributes)
-      @base_attrs = expense_attributes.to_h.stringify_keys
+    def initialize(expense_attributes, installment_attributes, user:)
+      @base_attrs = expense_attributes.to_h.stringify_keys.except('user_id')
       @installment_attrs = installment_attributes.to_h.symbolize_keys
+      @user = user
     end
 
     def call
       plan = build_plan
-      return invalid_plan_failure unless plan.valid?
+      return invalid_plan_failure(plan) unless plan.valid?
 
       expenses = persist_installments(plan)
       Result.new(success?: true, expenses: expenses)
-    rescue ActiveRecord::RecordInvalid => e
-      record_invalid_failure(e)
+    rescue ActiveRecord::RecordInvalid => exception
+      record_invalid_failure(exception)
     end
 
     private
@@ -45,19 +46,27 @@ module Expenses
     end
 
     def create_installment(plan, index)
-      Expense.create!(
+      @user.expenses.create!(
         @base_attrs.merge(plan.installment_attributes(index))
       )
     end
 
-    def invalid_plan_failure
-      expense = Expense.new(@base_attrs)
-      expense.errors.add(:base, I18n.t('expenses.installments.errors.invalid_repeat'))
+    def invalid_plan_failure(plan)
+      expense = @user.expenses.new(@base_attrs)
+      expense.errors.add(:base, I18n.t(invalid_plan_i18n_key(plan)))
       Result.new(success?: false, expense: expense)
     end
 
+    def invalid_plan_i18n_key(plan)
+      if plan.count > InstallmentPlan::MAX_INSTALLMENTS
+        'expenses.installments.errors.invalid_repeat_max'
+      else
+        'expenses.installments.errors.invalid_repeat'
+      end
+    end
+
     def record_invalid_failure(exception)
-      expense = Expense.new(@base_attrs)
+      expense = @user.expenses.new(@base_attrs)
       expense.errors.add(:base, exception.record.errors.full_messages.to_sentence)
       Result.new(success?: false, expense: expense)
     end
