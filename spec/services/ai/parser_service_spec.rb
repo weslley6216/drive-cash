@@ -175,5 +175,24 @@ RSpec.describe Ai::ParserService do
         expect(result[:content]).to eq(I18n.t('chat.errors.unexpected'))
       end
     end
+
+    context 'when the tool_input amount comes as an Integer (Gemini-shaped) and as a Float (legacy Groq-shaped)' do
+      let(:integer_input) { { 'amount' => 45, 'category' => 'fuel', 'date' => '2026-04-21' } }
+      let(:float_input)   { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' } }
+
+      it 'produces the same preview regardless of the numeric type' do
+        allow(Llm::Client).to receive(:chat).and_return(
+          { type: :tool_use, tool_name: 'create_expense', tool_input: integer_input },
+          { type: :tool_use, tool_name: 'create_expense', tool_input: float_input }
+        )
+
+        preview_with_integer = described_class.new(messages: messages, today: Date.new(2026, 4, 21)).call
+        preview_with_float   = described_class.new(messages: messages, today: Date.new(2026, 4, 21)).call
+
+        expect(preview_with_integer[:type]).to eq(:preview)
+        expect(preview_with_integer[:summary]).to eq(preview_with_float[:summary])
+        expect(preview_with_integer[:action]).to eq(preview_with_float[:action])
+      end
+    end
   end
 end
