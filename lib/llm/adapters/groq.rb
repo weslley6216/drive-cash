@@ -59,7 +59,6 @@ module Llm
         if message['tool_calls']
           call = message['tool_calls'].first['function']
           input = JSON.parse(call['arguments'])
-          input['amount'] = input['amount'].to_f if input.key?('amount')
           Rails.logger.info "[Groq] Tool call: #{call['name']}"
           { type: :tool_use, tool_name: call['name'], tool_input: input }
         else
