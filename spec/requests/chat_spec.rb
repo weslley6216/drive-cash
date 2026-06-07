@@ -284,6 +284,55 @@ RSpec.describe 'Chats', type: :request do
         expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
       end
     end
+
+    context 'when the payload tries to forge user_id for an expense' do
+      let(:other) { create(:user) }
+
+      it 'persists the expense owned by current_user' do
+        post chat_confirm_path,
+             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', user_id: other.id } },
+             as: :turbo_stream
+
+        expect(Expense.last.user).to eq(current_user)
+      end
+    end
+
+    context 'when the payload tries to forge user_id for an earning' do
+      let(:other) { create(:user) }
+
+      it 'persists the earning owned by current_user' do
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22', user_id: other.id } },
+             as: :turbo_stream
+
+        expect(Earning.last.user).to eq(current_user)
+      end
+    end
+
+    context 'when installments exceed the maximum' do
+      let(:params) do
+        {
+          record_action: 'create_expense',
+          record: {
+            amount: 300,
+            category: 'maintenance',
+            date: '2026-06-05',
+            vendor: 'Oficina',
+            installments: Expenses::InstallmentPlan::MAX_INSTALLMENTS + 1,
+            installments_period: 'monthly'
+          }
+        }
+      end
+
+      it 'does not persist any expense and renders the error' do
+        expect {
+          post chat_confirm_path, params: params, as: :turbo_stream
+        }.not_to change(Expense, :count)
+
+        expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
+        expect(response.body).to include(I18n.t('expenses.installments.errors.invalid_repeat_max'))
+      end
+    end
   end
 
   describe 'DELETE /chat/clear' do
