@@ -52,7 +52,7 @@ module Ai
     def build_preview(tool_name, tool_input)
       params = tool_input.is_a?(String) ? JSON.parse(tool_input) : tool_input
 
-      if tool_name == 'create_expense' || tool_name == 'create_earning'
+      if %w[create_expense create_earning].include?(tool_name)
         amount = params['amount'].to_f
         if amount <= 0
           Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount: #{params['amount']}"
