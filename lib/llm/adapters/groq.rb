@@ -22,23 +22,23 @@ module Llm
       end
 
       def connection(api_key)
-        build_connection(BASE_URL) do |f|
-          f.request :authorization, 'Bearer', api_key
+        build_connection(BASE_URL) do |conn|
+          conn.request :authorization, 'Bearer', api_key
         end
       end
 
       def build_payload(messages, tools, system)
         payload = { model: model, messages: [] }
         payload[:messages] << { role: 'system', content: system } if system.present?
-        payload[:messages] += messages.map { |m| { role: m[:role], content: m[:content] } }
-        payload[:tools] = tools.map { |t| { type: 'function', function: normalize_schema(t) } } if tools.any?
+        payload[:messages] += messages.map { |message| { role: message[:role], content: message[:content] } }
+        payload[:tools] = tools.map { |tool| { type: 'function', function: normalize_schema(tool) } } if tools.any?
         payload
       end
 
       def normalize_schema(tool)
         adapted = tool.deep_dup
-        adapted.dig(:parameters, :type)&.then { |t| adapted[:parameters][:type] = t.downcase }
-        adapted.dig(:parameters, :properties)&.each_value { |p| p[:type] = p[:type].to_s.downcase if p[:type] }
+        adapted.dig(:parameters, :type)&.then { |type| adapted[:parameters][:type] = type.downcase }
+        adapted.dig(:parameters, :properties)&.each_value { |property| property[:type] = property[:type].to_s.downcase if property[:type] }
         adapted
       end
 
