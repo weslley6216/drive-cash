@@ -1,5 +1,7 @@
 module Expenses
   class InstallmentPlan
+    MAX_INSTALLMENTS = 60
+
     attr_reader :series_id, :count
 
     def initialize(total_amount:, start_date:, period:, repetitions:)
@@ -11,9 +13,9 @@ module Expenses
     end
 
     def valid?
-      @count >= 2 &&
+      @count.between?(2, MAX_INSTALLMENTS) &&
         Expense::INSTALLMENT_PERIODS.include?(@period) &&
-        @total_amount > 0
+        @total_amount.positive?
     end
 
     def amounts

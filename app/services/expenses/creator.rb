@@ -1,17 +1,18 @@
 module Expenses
   class Creator
-    def self.call(expense_params, installment_params = {})
-      new(expense_params, installment_params).call
+    def self.call(expense_params, installment_params = {}, user:)
+      new(expense_params, installment_params, user: user).call
     end
 
-    def initialize(expense_params, installment_params)
-      @expense_params = expense_params.to_h.stringify_keys
+    def initialize(expense_params, installment_params, user:)
+      @expense_params = expense_params.to_h.stringify_keys.except('user_id')
       @installment_params = installment_params.to_h.symbolize_keys
+      @user = user
     end
 
     def call
       if should_create_installments?
-        InstallmentCreator.call(@expense_params, @installment_params)
+        InstallmentCreator.call(@expense_params, @installment_params, user: @user)
       else
         create_single_expense
       end
@@ -24,7 +25,7 @@ module Expenses
     end
 
     def create_single_expense
-      expense = Expense.new(@expense_params.reverse_merge('paid' => true))
+      expense = @user.expenses.new(@expense_params.reverse_merge('paid' => true))
 
       if expense.save
         InstallmentCreator::Result.new(success?: true, expenses: [expense])

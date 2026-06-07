@@ -25,8 +25,9 @@ module RecordParams
 
   def create_expense_via_creator(scope_key)
     Expenses::Creator.call(
-      expense_attributes(scope_key).to_unsafe_h.merge('user_id' => current_user.id),
-      installment_attributes.to_unsafe_h
+      expense_attributes(scope_key).to_unsafe_h,
+      installment_attributes.to_unsafe_h,
+      user: current_user
     )
   end
 end

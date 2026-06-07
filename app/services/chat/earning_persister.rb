@@ -1,8 +1,7 @@
 module Chat
   class EarningPersister
-    def persist(payload)
-      attrs = coerce_params(payload)
-      record = Earning.new(attrs)
+    def persist(payload, user:)
+      record = user.earnings.new(coerce_params(payload))
 
       if record.save
         PersistedResult.success(record: record, action: 'create_earning')
@@ -16,9 +15,9 @@ module Chat
     def coerce_params(raw)
       case raw
       when ActionController::Parameters
-        raw.permit(:date, :amount, :platform, :notes, :user_id)
+        raw.permit(:date, :amount, :platform, :notes)
       when Hash
-        raw.slice('date', 'amount', 'platform', 'notes', 'user_id')
+        raw.slice('date', 'amount', 'platform', 'notes')
       else
         {}
       end

@@ -20,8 +20,10 @@ RSpec.describe Chat::RecordPersister do
       expect(result).to be_a(described_class::NullPersister)
     end
 
-    it 'NullPersister returns a failure result' do
-      result = described_class.for('unknown_action').persist({})
+    it 'NullPersister returns a failure result and accepts the user kwarg' do
+      user = create(:user)
+
+      result = described_class.for('unknown_action').persist({}, user: user)
 
       expect(result.success?).to be false
       expect(result.errors).to be_present
