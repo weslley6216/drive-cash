@@ -52,8 +52,8 @@ module Ai
     end
 
     def installments_count
-      v = @params['installments'] || @params['installment_count']
-      v.respond_to?(:to_i) ? v.to_i : 0
+      raw_value = @params['installments'] || @params['installment_count']
+      raw_value.respond_to?(:to_i) ? raw_value.to_i : 0
     end
 
     def format_date(date_str)
