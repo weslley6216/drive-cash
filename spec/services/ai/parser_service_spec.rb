@@ -142,9 +142,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(Llm::ConfigurationError.new('no key'))
       end
 
-      it 'returns the misconfiguration message' do
+      it 'returns the misconfiguration message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.misconfig'))
       end
     end
@@ -154,9 +155,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(Llm::Error.new('bad gateway'))
       end
 
-      it 'returns the api error message' do
+      it 'returns the api error message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.api_error'))
       end
     end
@@ -166,9 +168,10 @@ RSpec.describe Ai::ParserService do
         allow(Llm::Client).to receive(:chat).and_raise(StandardError.new('disk full'))
       end
 
-      it 'returns the generic unexpected error message' do
+      it 'returns the generic unexpected error message as a text response' do
         result = service.call
 
+        expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.errors.unexpected'))
       end
     end
