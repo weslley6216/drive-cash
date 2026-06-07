@@ -1,7 +1,7 @@
 module Chat
   class ExpensePersister
-    def persist(payload)
-      result = Ai::ExpenseFromChat.persist(payload)
+    def persist(payload, user:)
+      result = Ai::ExpenseFromChat.persist(payload, user: user)
 
       if result.success?
         PersistedResult.success(record: result.expenses.first, action: 'create_expense')

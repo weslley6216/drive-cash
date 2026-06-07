@@ -1,7 +1,7 @@
 module Chat
   class RecordPersister
     class NullPersister
-      def persist(_payload)
+      def persist(_payload, **)
         PersistedResult.failure(errors: [I18n.t('chat.errors.unknown_action')])
       end
     end
