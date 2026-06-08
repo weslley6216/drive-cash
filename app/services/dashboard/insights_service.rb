@@ -122,11 +122,11 @@ module Dashboard
     end
 
     def categories
-      Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
+      @categories ||= Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
     end
 
     def platforms
-      Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
+      @platforms ||= Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
     end
 
     def insights
