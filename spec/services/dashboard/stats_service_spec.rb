@@ -79,6 +79,19 @@ RSpec.describe Dashboard::StatsService do
       end
     end
 
+    it 'counts months once per call across days_avg_month and trips_avg_month' do
+      service = described_class.new(year: 2025, user: user)
+
+      allow(Dashboard::ScopeMonthCounter).to receive(:count_for).and_call_original
+
+      service.call
+
+      earnings_scope_calls = Dashboard::ScopeMonthCounter
+                             .singleton_class
+                             .ancestors
+      expect(Dashboard::ScopeMonthCounter).to have_received(:count_for).at_most(:twice)
+    end
+
     context 'with through_month' do
       it 'limits earnings scope to months <= through_month' do
         create(:earning, user: user, date: Date.new(2024, 3, 1), amount: 300)

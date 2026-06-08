@@ -87,8 +87,12 @@ module Dashboard
       profit_value / days
     end
 
+    def earnings_months_count
+      @earnings_months_count ||= ScopeMonthCounter.count_for(earnings_scope)
+    end
+
     def days_avg_month(days)
-      months = ScopeMonthCounter.count_for(earnings_scope)
+      months = earnings_months_count
       return 0 if months.zero?
       (days.to_f / months).round(1)
     end
@@ -103,7 +107,7 @@ module Dashboard
     end
 
     def trips_avg_month(trips)
-      months = ScopeMonthCounter.count_for(earnings_scope)
+      months = earnings_months_count
       return 0 if months.zero?
 
       (trips.to_f / months).round
