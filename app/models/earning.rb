@@ -19,6 +19,16 @@ class Earning < ApplicationRecord
   validates :trips_count, numericality: { greater_than_or_equal_to: 1, only_integer: true }
 
   scope :chronological, -> { order(date: :desc, created_at: :desc) }
-  scope :for_year, ->(year) { where('EXTRACT(YEAR FROM date) = ?', year) if year.present? }
-  scope :for_month, ->(month) { where('EXTRACT(MONTH FROM date) = ?', month) if month.present? }
+  scope :for_year, lambda { |year|
+    next all if year.blank?
+
+    start_of_year = Date.new(year.to_i, 1, 1)
+    where(date: start_of_year..start_of_year.end_of_year)
+  }
+
+  scope :for_month, lambda { |month|
+    next all if month.blank?
+
+    where('EXTRACT(MONTH FROM date) = ?', month)
+  }
 end

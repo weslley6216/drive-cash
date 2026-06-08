@@ -40,18 +40,28 @@ RSpec.describe Earning, type: :model do
   end
 
   describe 'scopes' do
-    let(:earning_2024) { create(:earning, date: '2024-05-10') }
-    let(:earning_2025) { create(:earning, date: '2025-05-10') }
-    let(:earning_jan) { create(:earning, date: '2025-01-10') }
+    let(:earning_dec_2024) { create(:earning, date: Date.new(2024, 12, 31)) }
+    let(:earning_jan_2025) { create(:earning, date: Date.new(2025, 1, 1)) }
+    let(:earning_dec_2025) { create(:earning, date: Date.new(2025, 12, 31)) }
 
-    it '.for_year returns earnings matching the year' do
-      expect(described_class.for_year(2025)).to include(earning_2025, earning_jan)
-      expect(described_class.for_year(2025)).not_to include(earning_2024)
+    it '.for_year returns earnings with date inside the given year' do
+      expect(described_class.for_year(2025)).to include(earning_jan_2025, earning_dec_2025)
+      expect(described_class.for_year(2025)).not_to include(earning_dec_2024)
+    end
+
+    it '.for_year returns all when year is blank' do
+      earning_jan_2025
+
+      expect(described_class.for_year(nil)).to include(earning_jan_2025)
+      expect(described_class.for_year('')).to include(earning_jan_2025)
     end
 
     it '.for_month returns earnings matching the month' do
-      expect(described_class.for_month(5)).to include(earning_2024, earning_2025)
-      expect(described_class.for_month(5)).not_to include(earning_jan)
+      earning_jan_2025
+      earning_dec_2025
+
+      expect(described_class.for_month(1)).to include(earning_jan_2025)
+      expect(described_class.for_month(1)).not_to include(earning_dec_2025)
     end
   end
 
