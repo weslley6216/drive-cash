@@ -27,5 +27,14 @@ RSpec.describe Dashboard::ScopeMonthCounter do
 
       expect(result).to eq(3)
     end
+
+    it 'counts months in the database without loading rows into Ruby' do
+      create(:earning, date: Date.new(2025, 1, 10))
+      create(:earning, date: Date.new(2025, 7, 1))
+
+      expect_any_instance_of(ActiveRecord::Relation).not_to receive(:pluck)
+
+      described_class.count_for(Earning.all)
+    end
   end
 end
