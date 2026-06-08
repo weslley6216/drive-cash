@@ -89,8 +89,14 @@ RSpec.describe Expense, type: :model do
     let(:expense_dec_2025) { create(:expense, date: Date.new(2025, 12, 31)) }
 
     it '.for_year returns expenses with date inside the given year' do
-      expect(described_class.for_year(2025)).to include(expense_jan_2025, expense_dec_2025)
-      expect(described_class.for_year(2025)).not_to include(expense_dec_2024)
+      expense_jan_2025
+      expense_dec_2025
+      expense_dec_2024
+
+      result = described_class.for_year(2025)
+
+      expect(result).to include(expense_jan_2025, expense_dec_2025)
+      expect(result).not_to include(expense_dec_2024)
     end
 
     it '.for_year returns all when year is blank' do
@@ -104,8 +110,10 @@ RSpec.describe Expense, type: :model do
       expense_jan_2025
       expense_dec_2025
 
-      expect(described_class.for_month(1)).to include(expense_jan_2025)
-      expect(described_class.for_month(1)).not_to include(expense_dec_2025)
+      result = described_class.for_month(1)
+
+      expect(result).to include(expense_jan_2025)
+      expect(result).not_to include(expense_dec_2025)
     end
   end
 

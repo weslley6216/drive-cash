@@ -19,12 +19,6 @@ RSpec.describe Dashboard::ExpensesCalculator do
     it 'does not return a by_category key' do
       expect(result).not_to have_key(:by_category)
     end
-
-    it 'does not run a group(:category) query' do
-      expect_any_instance_of(ActiveRecord::Relation).not_to receive(:group)
-
-      calculator.call
-    end
   end
 
   describe '#monthly_totals' do

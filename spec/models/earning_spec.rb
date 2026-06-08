@@ -45,8 +45,14 @@ RSpec.describe Earning, type: :model do
     let(:earning_dec_2025) { create(:earning, date: Date.new(2025, 12, 31)) }
 
     it '.for_year returns earnings with date inside the given year' do
-      expect(described_class.for_year(2025)).to include(earning_jan_2025, earning_dec_2025)
-      expect(described_class.for_year(2025)).not_to include(earning_dec_2024)
+      earning_jan_2025
+      earning_dec_2025
+      earning_dec_2024
+
+      result = described_class.for_year(2025)
+
+      expect(result).to include(earning_jan_2025, earning_dec_2025)
+      expect(result).not_to include(earning_dec_2024)
     end
 
     it '.for_year returns all when year is blank' do
@@ -60,8 +66,10 @@ RSpec.describe Earning, type: :model do
       earning_jan_2025
       earning_dec_2025
 
-      expect(described_class.for_month(1)).to include(earning_jan_2025)
-      expect(described_class.for_month(1)).not_to include(earning_dec_2025)
+      result = described_class.for_month(1)
+
+      expect(result).to include(earning_jan_2025)
+      expect(result).not_to include(earning_dec_2025)
     end
   end
 
