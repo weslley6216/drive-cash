@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_06_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_08_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,8 +24,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_000000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["date", "platform"], name: "index_earnings_on_date_and_platform"
-    t.index ["date"], name: "index_earnings_on_date"
     t.index ["platform"], name: "index_earnings_on_platform"
+    t.index ["user_id", "date"], name: "index_earnings_on_user_id_and_date"
     t.index ["user_id"], name: "index_earnings_on_user_id"
   end
 
@@ -45,9 +45,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_000000) do
     t.string "vendor"
     t.index ["category"], name: "index_expenses_on_category"
     t.index ["date", "category"], name: "index_expenses_on_date_and_category"
-    t.index ["date"], name: "index_expenses_on_date"
     t.index ["installment_series_id"], name: "index_expenses_on_installment_series_id"
-    t.index ["paid"], name: "index_expenses_on_paid"
+    t.index ["user_id", "date", "paid"], name: "index_expenses_on_user_id_and_date_and_paid"
     t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
