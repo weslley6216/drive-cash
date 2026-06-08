@@ -8,8 +8,7 @@ module Dashboard
 
     def call
       {
-        total: total_expenses,
-        by_category: by_category
+        total: total_expenses
       }
     end
 
@@ -19,10 +18,6 @@ module Dashboard
 
     def total_expenses
       @total_expenses ||= scope.sum(:amount)
-    end
-
-    def by_category
-      scope.group(:category).sum(:amount)
     end
   end
 end
