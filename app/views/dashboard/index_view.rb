@@ -74,7 +74,6 @@ module Dashboard
         div(class: 'lg:col-span-4 flex flex-col gap-4') do
           render CajuQuickAccessComponent.new
           div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
-          div(id: 'monthly_goal_card', class: 'hidden lg:block') { render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal }
         end
       end
     end

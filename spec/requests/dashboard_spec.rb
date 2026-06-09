@@ -124,20 +124,6 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="today_card"')
     end
 
-    it 'renders monthly goal card hidden on mobile inside primary grid (desktop slot)' do
-      create(:goal, user: current_user, kind: 'monthly',
-                    period_start: Date.current.beginning_of_month,
-                    period_end: Date.current.end_of_month,
-                    target_amount: 5000)
-
-      get root_path
-
-      expect(response.body).to include('id="monthly_goal_card"')
-      expect(response.body).to match(/id="monthly_goal_card"[^>]*class="[^"]*hidden lg:block/)
-      expect(response.body).to include(I18n.t('goals.index.monthly.label'))
-      expect(response.body).to include('5.000,00')
-    end
-
     it 'renders monthly goal card visible only on mobile after stats grid' do
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.current.beginning_of_month,
@@ -152,10 +138,9 @@ RSpec.describe 'Dashboard', type: :request do
       expect(mobile_card_position).to be > stats_position
     end
 
-    it 'keeps both monthly_goal wrappers in DOM (desktop + mobile) even without an active goal' do
+    it 'keeps mobile monthly_goal wrapper in DOM even without an active goal' do
       get root_path
 
-      expect(response.body).to include('id="monthly_goal_card"')
       expect(response.body).to include('class="lg:hidden mb-6"')
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
@@ -180,7 +165,6 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path, params: { year: 2026, month: 3 }
 
-      expect(response.body).to include('id="monthly_goal_card"')
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
 
