@@ -81,6 +81,24 @@ RSpec.describe 'Goals', type: :request do
     end
   end
 
+  describe 'GET /goals/:id/edit' do
+    let!(:goal) do
+      create(:goal,
+             user: current_user,
+             kind: 'monthly',
+             target_amount: 5000,
+             period_start: Date.current.beginning_of_month,
+             period_end: Date.current.end_of_month)
+    end
+
+    it 'renders the edit modal form' do
+      get edit_goal_path(goal)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('goals.index.form.title_edit'))
+    end
+  end
+
   describe 'PATCH /goals/:id' do
     let!(:goal) do
       create(:goal,
@@ -96,6 +114,13 @@ RSpec.describe 'Goals', type: :request do
 
       expect(goal.reload.target_amount).to eq(9000)
       expect(response).to redirect_to(goals_path)
+    end
+
+    it 'rerenders the edit form with errors on invalid params' do
+      patch goal_path(goal), params: { goal: { target_amount: '0' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('goals.index.form.title_edit'))
     end
   end
 

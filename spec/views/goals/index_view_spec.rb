@@ -53,6 +53,42 @@ RSpec.describe Goals::IndexView, type: :component do
       expect(html).to include('width="220" height="220"')
     end
   end
+
+  context 'when weekly and annual goals exist' do
+    let(:weekly_goal) do
+      create(:goal, user: user, kind: 'weekly',
+                    period_start: Date.new(2026, 6, 8), period_end: Date.new(2026, 6, 14))
+    end
+    let(:annual_goal) do
+      create(:goal, user: user, kind: 'annual',
+                    period_start: Date.new(2026, 1, 1), period_end: Date.new(2026, 12, 31))
+    end
+    let(:progress) do
+      {
+        weekly: {
+          goal: weekly_goal, current: 500, target: 1400, percent: 35,
+          days: (Date.new(2026, 6, 8)..Date.new(2026, 6, 14)).map { |day|
+            { date: day, value: 100, done: day < Date.new(2026, 6, 10), today: day == Date.new(2026, 6, 10) }
+          }
+        },
+        monthly: nil,
+        annual: {
+          goal: annual_goal, current: 20_000, target: 80_000, percent: 25,
+          projection: 40_000, on_track: false, remaining_per_day: 200, days_remaining: 199
+        },
+        achievements: []
+      }
+    end
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+
+    it 'renders weekly bars section' do
+      expect(html).to include(I18n.t('goals.index.weekly.label'))
+    end
+
+    it 'renders annual bar section' do
+      expect(html).to include('width: 25%')
+    end
+  end
 end
 
 RSpec.describe Goals::CreateView, type: :component do
