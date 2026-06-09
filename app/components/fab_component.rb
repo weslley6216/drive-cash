@@ -22,6 +22,14 @@ class FabComponent < ApplicationComponent
       class: 'hidden flex-col items-end gap-3 transition-all duration-200'
     ) do
       a(
+        href: work_session_path,
+        class: 'flex items-center gap-2 bg-sky-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-sky-700 transition-all transform hover:scale-105 cursor-pointer'
+      ) do
+        span(class: 'text-sm font-medium whitespace-nowrap') { t('.start_journey') }
+        render PhlexIcons::Lucide::Play.new(class: 'w-4 h-4')
+      end
+
+      a(
         href: chat_root_path,
         class: 'flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-violet-700 transition-all transform hover:scale-105 cursor-pointer'
       ) do

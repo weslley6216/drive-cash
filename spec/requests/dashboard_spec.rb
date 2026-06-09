@@ -124,6 +124,26 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="today_card"')
     end
 
+    it 'renders monthly goal card when user has an active monthly goal' do
+      goal = create(:goal, user: current_user, kind: 'monthly',
+                           period_start: Date.current.beginning_of_month,
+                           period_end: Date.current.end_of_month,
+                           target_amount: 5000)
+
+      get root_path
+
+      expect(response.body).to include('id="monthly_goal_card"')
+      expect(response.body).to include(I18n.t('goals.index.monthly.label'))
+      expect(response.body).to include('5.000,00')
+    end
+
+    it 'does not render monthly goal card when user has no active goal' do
+      get root_path
+
+      expect(response.body).to include('id="monthly_goal_card"')
+      expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
+    end
+
     it 'renders sign out link in the sidebar' do
       get root_path
 

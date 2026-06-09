@@ -10,7 +10,7 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html.scan('<a ').size).to eq(5)
       expect(html).to include(I18n.t('bottom_nav_component.tabs.home'))
       expect(html).to include(I18n.t('bottom_nav_component.tabs.analysis'))
-      expect(html).to include(I18n.t('bottom_nav_component.tabs.journey'))
+      expect(html).to include(I18n.t('bottom_nav_component.tabs.goals'))
       expect(html).to include(I18n.t('bottom_nav_component.tabs.history'))
       expect(html).to include(I18n.t('bottom_nav_component.tabs.more'))
     end
@@ -36,7 +36,7 @@ RSpec.describe BottomNavComponent, type: :component do
     it 'links each tab to its corresponding route' do
       expect(html).to include('href="/"')
       expect(html).to include('href="/analysis"')
-      expect(html).to include('href="/work_session"')
+      expect(html).to include('href="/goals"')
       expect(html).to include('href="/history"')
       expect(html).to include('href="/account"')
     end
