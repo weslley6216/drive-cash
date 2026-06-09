@@ -61,6 +61,8 @@ module Goals
     def achievements
       badges = []
       badges << streak_badge if streak_7d?
+      completed = goal_completed
+      badges << completed if completed
       best = best_day_in_month
       badges << best if best
       badges
@@ -76,12 +78,28 @@ module Goals
       { icon: 'flame', label: I18n.t('goals.index.achievements.streak_7d', days: 7), color: '#f97316' }
     end
 
+    def goal_completed
+      @user.goals.for_kind('monthly')
+           .where('period_end < ?', @date)
+           .order(period_end: :desc)
+           .limit(6)
+           .each do |goal|
+        current = compute_metric_for_period(goal)
+        next if current < goal.target_amount
+
+        period_label = I18n.l(goal.period_start, format: '%B').capitalize
+        return { icon: 'star', label: I18n.t('goals.index.achievements.goal_completed', period: period_label), color: '#a855f7' }
+      end
+      nil
+    end
+
     def best_day_in_month
       range = @date.beginning_of_month..@date.end_of_month
       row = @user.earnings.where(date: range).group(:date).sum(:amount).max_by { |_date, total| total }
       return nil unless row
 
-      { icon: 'star', label: I18n.t('goals.index.achievements.best_day', value: row.last), color: '#eab308', value: row.last }
+      formatted = format('%.2f', row.last.to_f).tr('.', ',')
+      { icon: 'zap', label: I18n.t('goals.index.achievements.best_day', value: formatted), color: '#3b82f6', value: row.last }
     end
   end
 end

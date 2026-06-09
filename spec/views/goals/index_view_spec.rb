@@ -41,16 +41,16 @@ RSpec.describe Goals::IndexView, type: :component do
     end
     let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
 
-    it 'uses lg:grid-cols-3 below the hero' do
-      expect(html).to include('lg:grid-cols-3')
+    it 'uses 12-column grid layout for cards' do
+      expect(html).to include('grid-cols-12')
     end
 
-    it 'renders the achievements row in a section below the columns' do
+    it 'renders the achievements row within the columns grid' do
       expect(html).to include(I18n.t('goals.index.achievements.title'))
     end
 
-    it 'renders the wide 220px ring in the hero area' do
-      expect(html).to include('width="220" height="220"')
+    it 'renders the wide 200px ring in the hero area' do
+      expect(html).to include('width="200" height="200"')
     end
   end
 
@@ -81,8 +81,18 @@ RSpec.describe Goals::IndexView, type: :component do
     end
     let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
 
-    it 'renders weekly bars section' do
+    it 'renders weekly label and percentage' do
       expect(html).to include(I18n.t('goals.index.weekly.label'))
+      expect(html).to include('35.0%')
+    end
+
+    it 'renders the weekly period date range' do
+      expect(html).to include('8 a 14 de')
+    end
+
+    it 'renders weekly progress amounts side by side' do
+      expect(html).to include(I18n.t('goals.index.weekly.progress', value: 'R$ 500,00', target: 'R$ 1.400,00'))
+      expect(html).to include(I18n.t('goals.index.weekly.remaining', value: 'R$ 900,00'))
     end
 
     it 'renders annual bar section' do

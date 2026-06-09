@@ -1,18 +1,12 @@
 module Goals
   class WeeklyBarsComponent < ApplicationComponent
-    BAR_COLORS = {
-      done: 'bg-emerald-500',
-      today: 'bg-blue-600',
-      future: 'bg-slate-200'
-    }.freeze
-
     def initialize(days:, target:)
       @days = days
       @target = target
     end
 
     def view_template
-      div(class: 'flex items-end justify-between gap-2 h-32') do
+      div(class: 'grid grid-cols-7 gap-1.5') do
         @days.first(7).each { |day_data| render_bar(day_data) }
       end
     end
@@ -22,20 +16,37 @@ module Goals
     def render_bar(day_data)
       ratio = @target.to_f.positive? ? (day_data[:value].to_f / @target).clamp(0, 1) : 0
       height_pct = (ratio * 100).round
-      state = day_data[:today] ? :today : day_data[:done] ? :done : :future
+      height_style = height_pct.positive? ? "height: #{height_pct}%" : 'height: 8px'
+      state = day_data[:today] ? :today : (day_data[:done] ? :done : :future)
 
-      div(class: 'flex flex-col items-center flex-1 gap-2') do
-        div(class: 'w-full flex items-end justify-center h-24') do
+      div(class: 'flex flex-col items-center gap-1') do
+        div(class: 'w-full flex items-end justify-center', style: 'height: 60px') do
           div(
             data: { day_bar: day_data[:date].iso8601 },
-            class: "w-full rounded-t-md #{BAR_COLORS[state]}",
-            style: "height: #{height_pct}%"
+            class: bar_classes(state),
+            style: height_style
           )
         end
-        span(class: 'text-[10px] uppercase font-medium text-slate-500') do
-          plain I18n.l(day_data[:date], format: '%a').downcase[0, 3]
+        span(class: "lg:hidden text-[10px] font-medium #{label_color(state)}") do
+          plain I18n.l(day_data[:date], format: '%a').upcase[0]
+        end
+        span(class: "hidden lg:block text-[10px] font-medium #{label_color(state)}") do
+          plain I18n.l(day_data[:date], format: '%a').capitalize.first(3)
         end
       end
+    end
+
+    def bar_classes(state)
+      base = 'w-full rounded'
+      case state
+      when :done   then "#{base} bg-emerald-500"
+      when :today  then "#{base} bg-blue-200 border-2 border-blue-500 border-dashed"
+      when :future then "#{base} bg-slate-100"
+      end
+    end
+
+    def label_color(state)
+      state == :today ? 'text-blue-600' : 'text-slate-400'
     end
   end
 end

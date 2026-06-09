@@ -20,6 +20,16 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
     expect(html).to include(I18n.t('goals.index.annual.remaining_months', count: expected_months))
   end
 
+  it 'shows percentage and remaining months together in purple' do
+    expect(html).to include('text-purple-700')
+    expect(html).to include('25.0%')
+  end
+
+  it 'renders gradient bar from purple-400 to purple-600' do
+    expect(html).to include('from-purple-400')
+    expect(html).to include('to-purple-600')
+  end
+
   it 'clamps the bar width when percent exceeds 100' do
     output = view_context.render(described_class.new(progress: progress.merge(percent: 120)))
 

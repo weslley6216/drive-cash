@@ -16,15 +16,26 @@ RSpec.describe Goals::WeeklyBarsComponent, type: :component do
     expect(html).to include('bg-emerald-500')
   end
 
-  it 'highlights today with blue-600' do
-    expect(html).to include('bg-blue-600')
+  it 'highlights today with dashed blue border' do
+    expect(html).to include('border-blue-500')
+    expect(html).to include('border-dashed')
   end
 
-  it 'styles future days with slate-200' do
-    expect(html).to include('bg-slate-200')
+  it 'styles future days with slate-100' do
+    expect(html).to include('bg-slate-100')
   end
 
-  it 'shows the day abbreviation below each bar' do
-    expect(html).to include(I18n.l(Date.new(2026, 6, 8), format: '%a').downcase[0, 3])
+  it 'shows single-letter uppercase abbreviation for mobile' do
+    first_letter = I18n.l(Date.new(2026, 6, 8), format: '%a').upcase[0]
+    expect(html).to include(first_letter)
+  end
+
+  it 'shows 3-letter capitalized abbreviation for desktop' do
+    three_letters = I18n.l(Date.new(2026, 6, 8), format: '%a').capitalize.first(3)
+    expect(html).to include(three_letters)
+  end
+
+  it 'labels today with blue text' do
+    expect(html).to include('text-blue-600')
   end
 end
