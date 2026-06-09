@@ -115,6 +115,53 @@ RSpec.describe Expense, type: :model do
       expect(result).to include(expense_jan_2025)
       expect(result).not_to include(expense_dec_2025)
     end
+
+    let(:paid_jan_2025)   { create(:expense, date: Date.new(2025, 1, 5),  paid: true) }
+    let(:unpaid_jan_2025) { create(:expense, date: Date.new(2025, 1, 6),  paid: false) }
+    let(:paid_jun_2025)   { create(:expense, date: Date.new(2025, 6, 1),  paid: true) }
+
+    it '.in_period filters by year only when month is nil' do
+      paid_jan_2025
+      paid_jun_2025
+      expense_dec_2024
+
+      result = described_class.in_period(2025)
+
+      expect(result).to include(paid_jan_2025, paid_jun_2025)
+      expect(result).not_to include(expense_dec_2024)
+    end
+
+    it '.in_period filters by year and month when month is given' do
+      paid_jan_2025
+      paid_jun_2025
+
+      result = described_class.in_period(2025, 1)
+
+      expect(result).to include(paid_jan_2025)
+      expect(result).not_to include(paid_jun_2025)
+    end
+
+    it '.paid_in_period filters by paid_only and the given period' do
+      paid_jan_2025
+      unpaid_jan_2025
+      paid_jun_2025
+
+      result = described_class.paid_in_period(2025, 1)
+
+      expect(result).to include(paid_jan_2025)
+      expect(result).not_to include(unpaid_jan_2025, paid_jun_2025)
+    end
+
+    it '.paid_in_period ignores month when nil' do
+      paid_jan_2025
+      paid_jun_2025
+      unpaid_jan_2025
+
+      result = described_class.paid_in_period(2025)
+
+      expect(result).to include(paid_jan_2025, paid_jun_2025)
+      expect(result).not_to include(unpaid_jan_2025)
+    end
   end
 
   describe 'sanitize_amount' do
