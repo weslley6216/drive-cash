@@ -52,6 +52,10 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     it 'shows days_left' do
       expect(html).to include(I18n.t('goals.index.monthly.days_left', count: 15))
     end
+
+    it 'shows the month name from period_start' do
+      expect(html).to include(I18n.l(goal.period_start, format: '%B'))
+    end
   end
 
   context 'with :wide variant (desktop hero)' do
