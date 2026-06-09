@@ -13,7 +13,7 @@ module Goals
 
     def view_template
       div(class: 'flex items-end justify-between gap-2 h-32') do
-        @days.each { |day_data| render_bar(day_data) }
+        @days.first(7).each { |day_data| render_bar(day_data) }
       end
     end
 
