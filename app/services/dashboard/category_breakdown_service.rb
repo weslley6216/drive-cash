@@ -24,8 +24,7 @@ module Dashboard
     end
 
     def call
-      scope = @user.expenses.for_year(year).paid_only
-      scope = scope.for_month(month) if month
+      scope = @user.expenses.paid_in_period(year, month)
 
       total = scope.sum(:amount).to_f
       return [] if total.zero?

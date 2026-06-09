@@ -33,15 +33,11 @@ module Dashboard
     end
 
     def earnings_scope
-      scope = @user.earnings.for_year(year)
-      scope = scope.for_month(month) if month
-      scope.order(date: :desc, created_at: :desc).limit(limit)
+      @user.earnings.in_period(year, month).order(date: :desc, created_at: :desc).limit(limit)
     end
 
     def expenses_scope
-      scope = @user.expenses.for_year(year).paid_only
-      scope = scope.for_month(month) if month
-      scope.order(date: :desc, created_at: :desc).limit(limit)
+      @user.expenses.paid_in_period(year, month).order(date: :desc, created_at: :desc).limit(limit)
     end
 
     def build_row(row)

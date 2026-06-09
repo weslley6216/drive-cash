@@ -54,8 +54,7 @@ module Dashboard
 
     def earnings_scope
       @earnings_scope ||= begin
-        scope = @user.earnings.for_year(year)
-        scope = scope.for_month(month) if month
+        scope = @user.earnings.in_period(year, month)
         scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
       end
@@ -63,8 +62,7 @@ module Dashboard
 
     def expenses_scope
       @expenses_scope ||= begin
-        scope = @user.expenses.for_year(year).paid_only
-        scope = scope.for_month(month) if month
+        scope = @user.expenses.paid_in_period(year, month)
         scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
         scope
       end

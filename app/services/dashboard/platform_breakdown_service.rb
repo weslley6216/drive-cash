@@ -40,11 +40,7 @@ module Dashboard
     attr_reader :year, :month, :limit
 
     def scope
-      @scope ||= begin
-        relation = @user.earnings.for_year(year)
-        relation = relation.for_month(month) if month
-        relation
-      end
+      @scope ||= @user.earnings.in_period(year, month)
     end
 
     def build_row(platform, amount, total, trips)
