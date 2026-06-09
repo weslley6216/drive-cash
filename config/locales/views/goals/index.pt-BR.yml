@@ -1,0 +1,66 @@
+pt-BR:
+  goals:
+    index:
+      title: "Metas"
+      subtitle: "%{month_name} · %{year}"
+      monthly:
+        label: "Meta do mês"
+        sublabel: "Lucro líquido"
+        sublabel_profit: "Lucro líquido"
+        sublabel_earnings: "Receita bruta"
+        sublabel_expenses: "Despesas"
+        of_target: "de %{target}"
+        days_left:
+          one: "%{count} dia restante"
+          other: "%{count} dias restantes"
+        on_track_projection: "Vai bater · projeção %{value}"
+        at_risk_projection: "Em risco · projeção %{value}"
+        remaining: "Faltam"
+        per_day: "Por dia"
+        current_pace: "Ritmo atual"
+      weekly:
+        label: "Meta semanal"
+        progress: "%{value} de %{target}"
+        remaining: "%{value} restantes"
+        period_range: "%{start} a %{end}"
+        date_format: "%-d de %B"
+      annual:
+        label: "Meta do ano"
+        of_target: "de %{target}"
+        remaining_months:
+          one: "%{count} mês restante"
+          other: "%{count} meses restantes"
+      achievements:
+        title: "Últimas conquistas"
+        empty: "Continue registrando ganhos para destravar conquistas."
+        streak_7d: "Sequência %{days} dias"
+        goal_completed: "Meta de %{period}"
+        best_day: "Melhor dia: R$ %{value}"
+      empty:
+        title: "Defina sua primeira meta"
+        subtitle: "Acompanhe seu progresso semanal, mensal e anual."
+        cta: "Criar meta"
+      form:
+        title_new: "Nova meta"
+        title_edit: "Editar meta"
+        labels:
+          kind: "Período"
+          target_amount: "Meta (R$)"
+          period_start: "Início"
+          period_end: "Fim"
+          metric: "Métrica"
+        kinds:
+          weekly: "Semanal"
+          monthly: "Mensal"
+          annual: "Anual"
+        metrics:
+          profit: "Lucro"
+          earnings: "Receita"
+        buttons:
+          cancel: "Cancelar"
+          save: "Salvar"
+        placeholders:
+          money: "0,00"
+      created: "Meta criada com sucesso."
+      updated: "Meta atualizada."
+      destroyed: "Meta removida."

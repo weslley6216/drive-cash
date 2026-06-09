@@ -1,11 +1,12 @@
 module Dashboard
   class IndexView < ApplicationComponent
-    def initialize(totals:, filters: {}, recent_activity: [], categories: [], today: nil)
+    def initialize(totals:, filters: {}, recent_activity: [], categories: [], today: nil, monthly_goal: nil)
       @totals = totals
       @filters = filters
       @recent_activity = recent_activity
       @categories = categories
       @today = today
+      @monthly_goal = monthly_goal
     end
 
     def view_template
@@ -72,6 +73,7 @@ module Dashboard
         div(class: 'lg:col-span-4 flex flex-col gap-4') do
           render CajuQuickAccessComponent.new
           div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
+          div(id: 'monthly_goal_card') { render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal }
         end
       end
     end

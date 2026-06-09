@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_09_135101) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_000000) do
     t.index ["installment_series_id"], name: "index_expenses_on_installment_series_id"
     t.index ["user_id", "date", "paid"], name: "index_expenses_on_user_id_and_date_and_paid"
     t.index ["user_id"], name: "index_expenses_on_user_id"
+  end
+
+  create_table "goals", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.string "metric", default: "profit", null: false
+    t.date "period_end", null: false
+    t.date "period_start", null: false
+    t.decimal "target_amount", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "kind", "period_start"], name: "index_goals_on_user_id_and_kind_and_period_start", unique: true
+    t.index ["user_id"], name: "index_goals_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -205,6 +218,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_000000) do
 
   add_foreign_key "earnings", "users"
   add_foreign_key "expenses", "users"
+  add_foreign_key "goals", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

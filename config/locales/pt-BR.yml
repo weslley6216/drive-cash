@@ -16,6 +16,10 @@ pt-BR:
           attributes:
             email_address:
               domain_not_allowed: "E-mail deve ser de um provedor válido (Gmail, Hotmail, iCloud etc.)"
+        goal:
+          attributes:
+            period_end:
+              after_start: "deve ser depois do início"
         restrict_dependent_destroy:
           has_one: Não é possível excluir o registro pois existe um %{record} dependente
           has_many: Não é possível excluir o registro pois existem %{record} dependentes

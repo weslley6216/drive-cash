@@ -29,7 +29,7 @@ Rails.application.routes.draw do
   get '/work_session', to: 'application#coming_soon', as: :work_session
   get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
-  get '/goals',        to: 'application#coming_soon', as: :goals
+  resources :goals, only: %i[index new create edit update destroy]
   get '/vehicle',      to: 'application#coming_soon', as: :vehicle
 
   # PWA routes

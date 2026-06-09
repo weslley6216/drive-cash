@@ -203,3 +203,29 @@ Earning.platforms   # amazon, ifood, mercado_livre, nine_nine,
 ## Documentação completa
 
 Ver vault Obsidian em `docs/` para regras detalhadas de testes, services, components, convenções e LLM.
+
+## Design como fonte da verdade
+
+O protótipo React é a **única fonte de verdade** para qualquer decisão visual. Nunca implementar UI por suposição ou memória.
+
+### Arquivos do protótipo
+
+```
+/home/rebase/Downloads/Cosmic scale animation (1)/
+├── screen-[nome].jsx       ← layout mobile de cada tela
+├── screens-desktop.jsx     ← layout desktop de todas as telas
+└── lib.jsx                 ← componentes compartilhados (BRL, Icon, etc.)
+```
+
+Vault Obsidian em `~/Obsidian/DriveCash/system-design/` — abrir com alias `design`.
+
+### Regras obrigatórias por fase
+
+**Discovery**: antes de qualquer discovery de tela, ler `screen-[nome].jsx` e a seção correspondente em `screens-desktop.jsx`. Extrair classes Tailwind, valores exatos, estrutura de grid e nomes de ícones. Nunca descrever o design de memória.
+
+**Plan**: cada decisão visual deve citar o arquivo e linha de origem. Exemplo:
+> `WeeklyBarsComponent`: labels "Seg/Ter…" no desktop — `screens-desktop.jsx:444`
+
+Se uma linha do plan não tem referência ao protótipo, é suposição — revisar antes de executar.
+
+**Execute**: antes de fechar qualquer tarefa de UI, tirar screenshot da tela e comparar item a item com o protótipo. Listar divergências explicitamente. Só marcar como concluído quando não houver diferença visual relevante.

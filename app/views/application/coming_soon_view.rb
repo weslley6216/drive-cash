@@ -1,7 +1,12 @@
 module Application
   class ComingSoonView < ApplicationComponent
+    def initialize(bottom_nav: :home, sidebar_nav: :home)
+      @bottom_nav = bottom_nav
+      @sidebar_nav = sidebar_nav
+    end
+
     def view_template
-      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title')) do
+      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title'), bottom_nav: @bottom_nav, sidebar_nav: @sidebar_nav) do
         div(class: 'flex flex-col items-center justify-center min-h-[60vh] text-center') do
           h1(class: 'text-3xl font-bold text-slate-800 mb-2') do
             I18n.t('application.coming_soon_view.title')
