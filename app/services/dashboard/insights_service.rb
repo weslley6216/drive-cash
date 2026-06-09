@@ -32,7 +32,7 @@ module Dashboard
     attr_reader :year, :month
 
     def current_stats
-      @current_stats ||= Dashboard::StatsService.new(year: year, month: month, user: @user).call
+      @current_stats ||= Dashboard::StatsService.new(year: year, month: month, user: @user).metrics
     end
 
     def previous_stats
@@ -41,7 +41,7 @@ module Dashboard
         month: previous_month,
         through_month: ytd_cutoff,
         user: @user
-      ).call
+      ).metrics
     end
 
     def ytd_cutoff
@@ -122,11 +122,11 @@ module Dashboard
     end
 
     def categories
-      Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
+      @categories ||= Dashboard::CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
     end
 
     def platforms
-      Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
+      @platforms ||= Dashboard::PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
     end
 
     def insights

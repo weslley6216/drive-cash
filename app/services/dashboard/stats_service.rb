@@ -7,36 +7,37 @@ module Dashboard
       @user = user
     end
 
-    def call
+    def metrics
       earnings_data = memoized_earnings_data
       expenses_data = memoized_expenses_data
-
       earnings_total = earnings_data[:total]
       expenses_total = expenses_data[:total]
-      days_worked   = earnings_data[:days_count]
-      profit_value  = earnings_total - expenses_total
+      days_worked = earnings_data[:days_count]
+      profit_value = earnings_total - expenses_total
 
       {
         earnings: earnings_total,
         expenses: expenses_total,
         profit: profit_value,
         days: days_worked,
-
         earnings_avg_month: earnings_data[:avg_per_month],
         earnings_avg_day: earnings_data[:avg_per_day],
         expenses_percent: expenses_percent(earnings_total, expenses_total),
         profit_per_day: profit_per_day(profit_value, days_worked),
         days_avg_month: days_avg_month(days_worked),
         days_avg_week: days_avg_week(days_worked),
-
         trips: earnings_data[:trips_count],
         trips_avg_month: trips_avg_month(earnings_data[:trips_count]),
-        trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked),
+        trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked)
+      }
+    end
 
+    def call
+      metrics.merge(
         monthly_profit_series: profit_series.monthly,
         daily_profit_series: profit_series.daily,
         change_percent: change_percent
-      }
+      )
     end
 
     private
@@ -87,8 +88,12 @@ module Dashboard
       profit_value / days
     end
 
+    def earnings_months_count
+      @earnings_months_count ||= ScopeMonthCounter.count_for(earnings_scope)
+    end
+
     def days_avg_month(days)
-      months = ScopeMonthCounter.count_for(earnings_scope)
+      months = earnings_months_count
       return 0 if months.zero?
       (days.to_f / months).round(1)
     end
@@ -103,7 +108,7 @@ module Dashboard
     end
 
     def trips_avg_month(trips)
-      months = ScopeMonthCounter.count_for(earnings_scope)
+      months = earnings_months_count
       return 0 if months.zero?
 
       (trips.to_f / months).round

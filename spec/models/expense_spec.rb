@@ -83,6 +83,40 @@ RSpec.describe Expense, type: :model do
     end
   end
 
+  describe 'scopes' do
+    let(:expense_dec_2024) { create(:expense, date: Date.new(2024, 12, 31)) }
+    let(:expense_jan_2025) { create(:expense, date: Date.new(2025, 1, 1)) }
+    let(:expense_dec_2025) { create(:expense, date: Date.new(2025, 12, 31)) }
+
+    it '.for_year returns expenses with date inside the given year' do
+      expense_jan_2025
+      expense_dec_2025
+      expense_dec_2024
+
+      result = described_class.for_year(2025)
+
+      expect(result).to include(expense_jan_2025, expense_dec_2025)
+      expect(result).not_to include(expense_dec_2024)
+    end
+
+    it '.for_year returns all when year is blank' do
+      expense_jan_2025
+
+      expect(described_class.for_year(nil)).to include(expense_jan_2025)
+      expect(described_class.for_year('')).to include(expense_jan_2025)
+    end
+
+    it '.for_month returns expenses matching the month' do
+      expense_jan_2025
+      expense_dec_2025
+
+      result = described_class.for_month(1)
+
+      expect(result).to include(expense_jan_2025)
+      expect(result).not_to include(expense_dec_2025)
+    end
+  end
+
   describe 'sanitize_amount' do
     it 'converts comma-separated value to float' do
       expense = build(:expense, amount: '45,90')

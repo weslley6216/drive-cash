@@ -27,5 +27,14 @@ RSpec.describe Dashboard::ScopeMonthCounter do
 
       expect(result).to eq(3)
     end
+
+    it 'returns an Integer (counted in database, not loaded into Ruby)' do
+      create(:earning, date: Date.new(2025, 1, 10))
+      create(:earning, date: Date.new(2025, 7, 1))
+
+      result = described_class.count_for(Earning.all)
+
+      expect(result).to be_an(Integer)
+    end
   end
 end

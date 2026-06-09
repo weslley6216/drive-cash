@@ -1,6 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::StatsService do
+  describe '#metrics' do
+    let(:user) { create(:user) }
+
+    before do
+      create(:earning, user: user, date: '2025-01-10', amount: 500.00)
+      create(:expense, user: user, date: '2025-01-10', amount: 100.00, category: 'fuel', paid: true)
+    end
+
+    subject(:result) { described_class.new(year: 2025, month: 1, user: user).metrics }
+
+    it 'returns scalar metrics' do
+      expect(result[:earnings]).to eq(500.00)
+      expect(result[:expenses]).to eq(100.00)
+      expect(result[:profit]).to eq(400.00)
+      expect(result[:days]).to eq(1)
+      expect(result[:expenses_percent]).to eq(20.0)
+    end
+
+    it 'does not include profit series keys' do
+      expect(result).not_to have_key(:monthly_profit_series)
+      expect(result).not_to have_key(:daily_profit_series)
+      expect(result).not_to have_key(:change_percent)
+    end
+
+    it 'does not instantiate ProfitSeriesService' do
+      allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
+
+      described_class.new(year: 2025, month: 1, user: user).metrics
+
+      expect(Dashboard::ProfitSeriesService).not_to have_received(:new)
+    end
+  end
+
   describe '#call' do
     let(:user) { create(:user) }
 
@@ -77,6 +110,19 @@ RSpec.describe Dashboard::StatsService do
       it 'calculates average days per week' do
         expect(result[:days_avg_week]).to eq(2)
       end
+    end
+
+    it 'counts months once per call across days_avg_month and trips_avg_month' do
+      service = described_class.new(year: 2025, user: user)
+
+      allow(Dashboard::ScopeMonthCounter).to receive(:count_for).and_call_original
+
+      service.call
+
+      earnings_scope_calls = Dashboard::ScopeMonthCounter
+                             .singleton_class
+                             .ancestors
+      expect(Dashboard::ScopeMonthCounter).to have_received(:count_for).at_most(:twice)
     end
 
     context 'with through_month' do

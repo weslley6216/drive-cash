@@ -200,6 +200,41 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
+    it 'does not instantiate ProfitSeriesService for scalar comparisons' do
+      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1)
+      create(:earning, user: user, date: Date.new(2024, 6, 1), amount: 300, trips_count: 1)
+
+      allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
+
+      described_class.new(year: 2025, month: 6, user: user).call
+
+      expect(Dashboard::ProfitSeriesService).not_to have_received(:new)
+    end
+
+    it 'instantiates CategoryBreakdownService only once per call' do
+      %w[fuel maintenance].each_with_index do |category, offset|
+        create(:expense, user: user, date: Date.new(2025, 6, offset + 1), amount: 100, category: category, paid: true)
+        create(:expense, user: user, date: Date.new(2024, 6, offset + 1), amount: 50,  category: category, paid: true)
+      end
+
+      allow(Dashboard::CategoryBreakdownService).to receive(:new).and_call_original
+
+      described_class.new(year: 2025, month: 6, user: user).call
+
+      expect(Dashboard::CategoryBreakdownService).to have_received(:new).once
+    end
+
+    it 'instantiates PlatformBreakdownService only once per call' do
+      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
+      create(:earning, user: user, date: Date.new(2025, 6, 2), amount:  50, trips_count: 5, platform: 'shopee')
+
+      allow(Dashboard::PlatformBreakdownService).to receive(:new).and_call_original
+
+      described_class.new(year: 2025, month: 6, user: user).call
+
+      expect(Dashboard::PlatformBreakdownService).to have_received(:new).once
+    end
+
     context 'insights' do
       it 'emits category_spike when top category grew more than 10 percent vs same month previous year' do
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
