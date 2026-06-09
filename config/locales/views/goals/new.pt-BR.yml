@@ -1,0 +1,5 @@
+pt-BR:
+  goals:
+    new_view:
+      placeholders:
+        money: "0,00"
