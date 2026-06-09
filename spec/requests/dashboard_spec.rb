@@ -168,7 +168,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
 
-    it 'renders monthly goal card on annual view (no month filter) when current month has active goal' do
+    it 'does not render monthly goal card on annual view (no month filter)' do
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.current.beginning_of_month,
                     period_end: Date.current.end_of_month,
@@ -176,7 +176,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path, params: { year: Date.current.year }
 
-      expect(response.body).to include(I18n.t('goals.index.monthly.label'))
+      expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
 
     it 'renders sign out link in the sidebar' do
