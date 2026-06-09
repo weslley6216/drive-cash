@@ -42,6 +42,17 @@ class Expense < ApplicationRecord
 
     where('EXTRACT(MONTH FROM date) = ?', month)
   }
+
+  scope :in_period, lambda { |year, month = nil|
+    relation = for_year(year)
+    month ? relation.for_month(month) : relation
+  }
+
+  scope :paid_in_period, lambda { |year, month = nil|
+    relation = paid_only.for_year(year)
+    month ? relation.for_month(month) : relation
+  }
+
   def installment?
     installment_series_id.present?
   end

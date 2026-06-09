@@ -31,4 +31,9 @@ class Earning < ApplicationRecord
 
     where('EXTRACT(MONTH FROM date) = ?', month)
   }
+
+  scope :in_period, lambda { |year, month = nil|
+    relation = for_year(year)
+    month ? relation.for_month(month) : relation
+  }
 end

@@ -60,7 +60,7 @@ module Ai
         end
       end
 
-      summary = SummaryBuilder.build(tool_name, params)
+      summary = Chat::SummaryPresenter.build(tool_name, params)
       content = I18n.t('chat.history.preview_sent')
 
       { type: :preview, action: tool_name, params: params, summary: summary, content: content }

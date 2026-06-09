@@ -1,5 +1,5 @@
-module Ai
-  class SummaryBuilder
+module Chat
+  class SummaryPresenter
     include Formatting
 
     def self.build(action, params)

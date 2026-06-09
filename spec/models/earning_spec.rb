@@ -71,6 +71,27 @@ RSpec.describe Earning, type: :model do
       expect(result).to include(earning_jan_2025)
       expect(result).not_to include(earning_dec_2025)
     end
+
+    it '.in_period filters by year only when month is nil' do
+      earning_jan_2025
+      earning_dec_2025
+      earning_dec_2024
+
+      result = described_class.in_period(2025)
+
+      expect(result).to include(earning_jan_2025, earning_dec_2025)
+      expect(result).not_to include(earning_dec_2024)
+    end
+
+    it '.in_period filters by year and month when month is given' do
+      earning_jan_2025
+      earning_dec_2025
+
+      result = described_class.in_period(2025, 1)
+
+      expect(result).to include(earning_jan_2025)
+      expect(result).not_to include(earning_dec_2025)
+    end
   end
 
   describe 'trips_count' do

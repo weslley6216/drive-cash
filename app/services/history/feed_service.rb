@@ -35,30 +35,24 @@ module History
     end
 
     def filtered_earnings
-      scope = @user.earnings.for_year(year)
-      scope = scope.for_month(month) if month
+      scope = @user.earnings.in_period(year, month)
       scope = apply_earning_search(scope, query) if query.present?
       scope
     end
 
     def filtered_expenses
-      scope = @user.expenses.for_year(year)
-      scope = scope.for_month(month) if month
-      scope = filter == 'unpaid' ? scope.where(paid: false) : scope.paid_only
+      scope = filter == 'unpaid' ? @user.expenses.in_period(year, month).where(paid: false)
+                                 : @user.expenses.paid_in_period(year, month)
       scope = apply_expense_search(scope, query) if query.present?
       scope
     end
 
     def summary_earnings_scope
-      scope = @user.earnings.for_year(year)
-      scope = scope.for_month(month) if month
-      scope
+      @user.earnings.in_period(year, month)
     end
 
     def summary_expenses_scope
-      scope = @user.expenses.paid_only.for_year(year)
-      scope = scope.for_month(month) if month
-      scope
+      @user.expenses.paid_in_period(year, month)
     end
 
     def build_summary
