@@ -6,3 +6,6 @@ I18n.available_locales = [:en, :'pt-BR']
 
 # Set default locale to something other than :en
 I18n.default_locale = :'pt-BR'
+
+# Brazilian convention: week starts on Sunday
+Date.beginning_of_week = :sunday
