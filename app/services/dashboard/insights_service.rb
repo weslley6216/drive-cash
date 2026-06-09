@@ -32,7 +32,7 @@ module Dashboard
     attr_reader :year, :month
 
     def current_stats
-      @current_stats ||= Dashboard::StatsService.new(year: year, month: month, user: @user).call
+      @current_stats ||= Dashboard::StatsService.new(year: year, month: month, user: @user).metrics
     end
 
     def previous_stats
@@ -41,7 +41,7 @@ module Dashboard
         month: previous_month,
         through_month: ytd_cutoff,
         user: @user
-      ).call
+      ).metrics
     end
 
     def ytd_cutoff

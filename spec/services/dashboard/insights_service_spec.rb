@@ -200,6 +200,17 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
+    it 'does not instantiate ProfitSeriesService for scalar comparisons' do
+      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1)
+      create(:earning, user: user, date: Date.new(2024, 6, 1), amount: 300, trips_count: 1)
+
+      allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
+
+      described_class.new(year: 2025, month: 6, user: user).call
+
+      expect(Dashboard::ProfitSeriesService).not_to have_received(:new)
+    end
+
     it 'instantiates CategoryBreakdownService only once per call' do
       %w[fuel maintenance].each_with_index do |category, offset|
         create(:expense, user: user, date: Date.new(2025, 6, offset + 1), amount: 100, category: category, paid: true)
