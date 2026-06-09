@@ -124,24 +124,75 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="today_card"')
     end
 
-    it 'renders monthly goal card when user has an active monthly goal' do
-      goal = create(:goal, user: current_user, kind: 'monthly',
-                           period_start: Date.current.beginning_of_month,
-                           period_end: Date.current.end_of_month,
-                           target_amount: 5000)
+    it 'renders monthly goal card hidden on mobile inside primary grid (desktop slot)' do
+      create(:goal, user: current_user, kind: 'monthly',
+                    period_start: Date.current.beginning_of_month,
+                    period_end: Date.current.end_of_month,
+                    target_amount: 5000)
 
       get root_path
 
       expect(response.body).to include('id="monthly_goal_card"')
+      expect(response.body).to match(/id="monthly_goal_card"[^>]*class="[^"]*hidden lg:block/)
       expect(response.body).to include(I18n.t('goals.index.monthly.label'))
       expect(response.body).to include('5.000,00')
     end
 
-    it 'does not render monthly goal card when user has no active goal' do
+    it 'renders monthly goal card visible only on mobile after stats grid' do
+      create(:goal, user: current_user, kind: 'monthly',
+                    period_start: Date.current.beginning_of_month,
+                    period_end: Date.current.end_of_month,
+                    target_amount: 5000)
+
+      get root_path
+
+      expect(response.body).to include('class="lg:hidden mb-6"')
+      stats_position = response.body.index('grid-cols-2') || response.body.index(I18n.t('stats_grid_component.income'))
+      mobile_card_position = response.body.index('class="lg:hidden mb-6"')
+      expect(mobile_card_position).to be > stats_position
+    end
+
+    it 'keeps both monthly_goal wrappers in DOM (desktop + mobile) even without an active goal' do
       get root_path
 
       expect(response.body).to include('id="monthly_goal_card"')
+      expect(response.body).to include('class="lg:hidden mb-6"')
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
+    end
+
+    it 'renders monthly goal card when filtered month matches an active goal' do
+      create(:goal, user: current_user, kind: 'monthly',
+                    period_start: Date.new(2026, 3, 1),
+                    period_end: Date.new(2026, 3, 31),
+                    target_amount: 5000)
+
+      get root_path, params: { year: 2026, month: 3 }
+
+      expect(response.body).to include(I18n.t('goals.index.monthly.label'))
+      expect(response.body).to include('5.000,00')
+    end
+
+    it 'does not render monthly goal card when filtered month has no active goal' do
+      create(:goal, user: current_user, kind: 'monthly',
+                    period_start: Date.new(2026, 6, 1),
+                    period_end: Date.new(2026, 6, 30),
+                    target_amount: 5000)
+
+      get root_path, params: { year: 2026, month: 3 }
+
+      expect(response.body).to include('id="monthly_goal_card"')
+      expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
+    end
+
+    it 'renders monthly goal card on annual view (no month filter) when current month has active goal' do
+      create(:goal, user: current_user, kind: 'monthly',
+                    period_start: Date.current.beginning_of_month,
+                    period_end: Date.current.end_of_month,
+                    target_amount: 5000)
+
+      get root_path, params: { year: Date.current.year }
+
+      expect(response.body).to include(I18n.t('goals.index.monthly.label'))
     end
 
     it 'renders sign out link in the sidebar' do

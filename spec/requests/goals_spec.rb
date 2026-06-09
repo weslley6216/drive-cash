@@ -66,10 +66,9 @@ RSpec.describe 'Goals', type: :request do
     end
 
     it 'creates a goal and responds with turbo_stream refresh' do
-      expect {
-        post goals_path, params: valid_params, as: :turbo_stream
-      }.to change(Goal, :count).by(1)
+      post goals_path, params: valid_params, as: :turbo_stream
 
+      expect(Goal.count).to eq(1)
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq(Mime[:turbo_stream])
       expect(response.body).to include('<turbo-stream')

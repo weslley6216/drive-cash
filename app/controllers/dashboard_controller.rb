@@ -6,7 +6,8 @@ class DashboardController < ApplicationController
     @recent_activity = Dashboard::RecentActivityService.new(year: @year, month: @month, user: current_user).call
     @categories = Dashboard::CategoryBreakdownService.new(year: @year, month: @month, user: current_user).call
     @today = Dashboard::TodayService.new(user: current_user).call
-    @monthly_goal = Goals::ProgressService.new(user: current_user).call[:monthly]
+    goal_date = @month ? Date.new(@year, @month, 1) : Date.current
+    @monthly_goal = Goals::ProgressService.new(user: current_user, date: goal_date).call[:monthly]
 
     render Dashboard::IndexView.new(
       totals: @totals,
