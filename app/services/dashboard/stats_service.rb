@@ -130,11 +130,7 @@ module Dashboard
       return nil if previous_index.negative?
 
       series = profit_series.monthly
-      current_profit  = series[current_index].to_f
-      previous_profit = series[previous_index].to_f
-      return nil if previous_profit.zero?
-
-      ((current_profit - previous_profit) / previous_profit.abs * 100).round(1)
+      PercentChange.between(series[current_index], series[previous_index])
     end
   end
 end

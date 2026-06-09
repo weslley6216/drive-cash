@@ -114,11 +114,7 @@ module Dashboard
     end
 
     def pct_change(current_value, previous_value)
-      current_float  = current_value.to_f
-      previous_float = previous_value.to_f
-      return nil if previous_float.zero?
-
-      ((current_float - previous_float) / previous_float.abs * 100).round(1)
+      PercentChange.between(current_value, previous_value)
     end
 
     def categories
