@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Ai::SummaryBuilder do
+RSpec.describe Chat::SummaryPresenter do
   describe '.build' do
     it 'builds an earning summary correctly' do
       params = { 'amount' => 150.5, 'platform' => 'uber', 'date' => '2026-04-23' }
