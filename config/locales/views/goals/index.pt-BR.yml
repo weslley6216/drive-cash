@@ -6,6 +6,10 @@ pt-BR:
       monthly:
         label: "Meta do mês"
         sublabel: "Lucro líquido"
+        sublabel_profit: "Lucro líquido"
+        sublabel_earnings: "Receita bruta"
+        sublabel_expenses: "Despesas"
+        of_target: "de %{target}"
         days_left:
           one: "%{count} dia restante"
           other: "%{count} dias restantes"
@@ -18,8 +22,11 @@ pt-BR:
         label: "Meta semanal"
         progress: "%{value} de %{target}"
         remaining: "%{value} restantes"
+        period_range: "%{start} a %{end}"
+        date_format: "%-d de %B"
       annual:
         label: "Meta do ano"
+        of_target: "de %{target}"
         remaining_months:
           one: "%{count} mês restante"
           other: "%{count} meses restantes"
@@ -57,4 +64,3 @@ pt-BR:
       created: "Meta criada com sucesso."
       updated: "Meta atualizada."
       destroyed: "Meta removida."
-      success: "Pronto!"

@@ -82,7 +82,7 @@ RSpec.describe 'Goals', type: :request do
   end
 
   describe 'GET /goals/:id/edit' do
-    let!(:goal) do
+    let(:goal) do
       create(:goal,
              user: current_user,
              kind: 'monthly',
@@ -100,7 +100,7 @@ RSpec.describe 'Goals', type: :request do
   end
 
   describe 'PATCH /goals/:id' do
-    let!(:goal) do
+    let(:goal) do
       create(:goal,
              user: current_user,
              kind: 'monthly',
@@ -125,7 +125,7 @@ RSpec.describe 'Goals', type: :request do
   end
 
   describe 'DELETE /goals/:id' do
-    let!(:goal) do
+    let(:goal) do
       create(:goal,
              user: current_user,
              kind: 'monthly',
@@ -133,6 +133,8 @@ RSpec.describe 'Goals', type: :request do
              period_start: Date.current.beginning_of_month,
              period_end: Date.current.end_of_month)
     end
+
+    before { goal }
 
     it 'destroys the goal and redirects' do
       expect {

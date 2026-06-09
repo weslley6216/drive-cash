@@ -17,11 +17,8 @@ module Goals
             p(class: 'text-xs text-slate-500') { year_label }
           end
         end
-        p(class: 'text-2xl font-bold text-slate-900 tabular-nums') { brl(@progress[:current]) }
-        p(class: 'text-xs text-slate-500 mt-0.5') do
-          plain 'de '
-          plain brl(@progress[:target])
-        end
+        p(class: 'text-2xl font-bold text-slate-900 tabular-nums') { format_currency(@progress[:current]) }
+        p(class: 'text-xs text-slate-500 mt-0.5') { t('goals.index.annual.of_target', target: format_currency(@progress[:target])) }
         div(class: 'h-2 bg-slate-100 rounded-full overflow-hidden mt-3') do
           div(class: 'h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full', style: "width: #{width}%")
         end
@@ -41,10 +38,6 @@ module Goals
 
     def months_remaining
       (@progress[:days_remaining].to_f / 30).round
-    end
-
-    def brl(value)
-      helpers.number_to_currency(value, unit: 'R$', separator: ',', delimiter: '.')
     end
   end
 end

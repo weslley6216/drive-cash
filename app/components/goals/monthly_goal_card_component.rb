@@ -32,8 +32,8 @@ module Goals
               render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
               span(class: 'text-xs font-bold uppercase tracking-wider') { t('goals.index.monthly.label') }
             end
-            p(class: 'text-4xl font-bold text-slate-900 tracking-tight tabular-nums') { brl(@progress[:current]) }
-            p(class: 'text-sm text-slate-500 mt-1') { "de #{brl(@progress[:target])}" }
+            p(class: 'text-4xl font-bold text-slate-900 tracking-tight tabular-nums') { format_currency(@progress[:current]) }
+            p(class: 'text-sm text-slate-500 mt-1') { t('goals.index.monthly.of_target', target: format_currency(@progress[:target])) }
             projection_badge(mt: 'mt-4')
           end
           div(class: 'col-span-12 lg:col-span-4') do
@@ -45,9 +45,9 @@ module Goals
 
     def wide_metrics
       div(class: 'grid grid-cols-3 gap-4') do
-        wide_metric(t('goals.index.monthly.remaining'), brl([@progress[:target] - @progress[:current], 0].max))
-        wide_metric(t('goals.index.monthly.per_day'), brl(@progress[:remaining_per_day]))
-        wide_metric(t('goals.index.monthly.current_pace'), brl(pace))
+        wide_metric(t('goals.index.monthly.remaining'), format_currency([@progress[:target] - @progress[:current], 0].max))
+        wide_metric(t('goals.index.monthly.per_day'), format_currency(@progress[:remaining_per_day]))
+        wide_metric(t('goals.index.monthly.current_pace'), format_currency(pace))
       end
     end
 
@@ -66,7 +66,7 @@ module Goals
           end
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider') { t('goals.index.monthly.label') }
-            p(class: 'text-sm font-semibold text-slate-700') { t('goals.index.monthly.sublabel') }
+            p(class: 'text-sm font-semibold text-slate-700') { t("goals.index.monthly.sublabel_#{@progress[:goal].metric}") }
           end
         end
         span(class: 'text-xs font-medium text-slate-400') do
@@ -79,11 +79,8 @@ module Goals
       div(class: 'flex items-center gap-5') do
         render Goals::ProgressRingComponent.new(percent: @progress[:percent], size: 120, color: '#2563eb')
         div(class: 'flex-1 min-w-0') do
-          p(class: 'text-3xl font-bold text-slate-800 leading-none') { brl(@progress[:current]) }
-          p(class: 'text-sm text-slate-500 mt-1') do
-            plain 'de '
-            plain brl(@progress[:target])
-          end
+          p(class: 'text-3xl font-bold text-slate-800 leading-none') { format_currency(@progress[:current]) }
+          p(class: 'text-sm text-slate-500 mt-1') { t('goals.index.monthly.of_target', target: format_currency(@progress[:target])) }
           projection_badge
         end
       end
@@ -96,15 +93,15 @@ module Goals
 
       div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 #{colors}") do
         render PhlexIcons::Lucide::TrendingUp.new(class: 'w-3 h-3', 'stroke-width': '2.5')
-        span(class: 'text-xs font-medium') { t(key, value: brl(@progress[:projection])) }
+        span(class: 'text-xs font-medium') { t(key, value: format_currency(@progress[:projection])) }
       end
     end
 
     def metrics_grid
       div(class: 'grid grid-cols-3 pt-4 border-t border-slate-100') do
-        metric_block(t('goals.index.monthly.remaining'), brl([@progress[:target] - @progress[:current], 0].max))
-        metric_block(t('goals.index.monthly.per_day'), brl(@progress[:remaining_per_day]), middle: true)
-        metric_block(t('goals.index.monthly.current_pace'), brl(pace))
+        metric_block(t('goals.index.monthly.remaining'), format_currency([@progress[:target] - @progress[:current], 0].max))
+        metric_block(t('goals.index.monthly.per_day'), format_currency(@progress[:remaining_per_day]), middle: true)
+        metric_block(t('goals.index.monthly.current_pace'), format_currency(pace))
       end
     end
 
@@ -120,10 +117,6 @@ module Goals
       goal = @progress[:goal]
       total_days = (goal.period_end - goal.period_start).to_i + 1
       total_days.zero? ? 0 : @progress[:current] / total_days
-    end
-
-    def brl(value)
-      helpers.number_to_currency(value, unit: 'R$', separator: ',', delimiter: '.')
     end
   end
 end

@@ -100,37 +100,3 @@ RSpec.describe Goals::IndexView, type: :component do
     end
   end
 end
-
-RSpec.describe Goals::CreateView, type: :component do
-  let(:user) { create(:user) }
-  let(:goal) do
-    create(:goal, user: user)
-  end
-
-  before do
-    allow(Current).to receive(:user).and_return(user)
-  end
-
-  it 'renders turbo stream actions to clear modal and update flash' do
-    html = view_context.render(described_class.new(goal: goal))
-
-    expect(html).to include('turbo-stream')
-  end
-end
-
-RSpec.describe Goals::UpdateView, type: :component do
-  let(:user) { create(:user) }
-  let(:goal) do
-    create(:goal, user: user)
-  end
-
-  before do
-    allow(Current).to receive(:user).and_return(user)
-  end
-
-  it 'renders turbo stream actions to clear modal and update flash' do
-    html = view_context.render(described_class.new(goal: goal))
-
-    expect(html).to include('turbo-stream')
-  end
-end

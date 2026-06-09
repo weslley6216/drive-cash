@@ -86,7 +86,7 @@ module Goals
               p(class: 'text-sm font-semibold text-slate-800') { t('goals.index.weekly.label') }
               p(class: 'text-xs text-slate-500 lg:hidden') { weekly_period_label(goal) }
               p(class: 'hidden lg:block text-xs text-slate-500') do
-                plain "#{weekly_period_label(goal)} · #{brl(weekly[:current])} de #{brl(weekly[:target])}"
+                plain "#{weekly_period_label(goal)} · #{t('goals.index.weekly.progress', value: format_currency(weekly[:current]), target: format_currency(weekly[:target]))}"
               end
             end
           end
@@ -97,10 +97,10 @@ module Goals
         render Goals::WeeklyBarsComponent.new(days: weekly[:days], target: weekly[:target])
         div(class: 'flex items-center justify-between text-xs mt-2 lg:hidden') do
           span(class: 'text-slate-500') do
-            plain t('goals.index.weekly.progress', value: brl(weekly[:current]), target: brl(weekly[:target]))
+            plain t('goals.index.weekly.progress', value: format_currency(weekly[:current]), target: format_currency(weekly[:target]))
           end
           span(class: 'text-slate-700 font-medium') do
-            plain t('goals.index.weekly.remaining', value: brl([weekly[:target] - weekly[:current], 0].max))
+            plain t('goals.index.weekly.remaining', value: format_currency([weekly[:target] - weekly[:current], 0].max))
           end
         end
       end
@@ -122,12 +122,8 @@ module Goals
 
     def weekly_period_label(goal)
       start_day = I18n.l(goal.period_start, format: '%-d')
-      end_label = I18n.l(goal.period_end, format: '%-d de %B')
-      "#{start_day} a #{end_label}"
-    end
-
-    def brl(value)
-      helpers.number_to_currency(value, unit: 'R$', separator: ',', delimiter: '.')
+      end_label = I18n.l(goal.period_end, format: t('goals.index.weekly.date_format'))
+      t('goals.index.weekly.period_range', start: start_day, end: end_label)
     end
   end
 end

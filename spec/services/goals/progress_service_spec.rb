@@ -17,7 +17,7 @@ RSpec.describe Goals::ProgressService do
     end
 
     context 'with a monthly profit goal' do
-      let!(:goal) do
+      let(:goal) do
         create(:goal,
                user: user,
                kind: 'monthly',
@@ -28,6 +28,7 @@ RSpec.describe Goals::ProgressService do
       end
 
       before do
+        goal
         create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
         create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 500)
       end
@@ -73,7 +74,7 @@ RSpec.describe Goals::ProgressService do
     end
 
     context 'with a weekly goal' do
-      let!(:goal) do
+      let(:goal) do
         create(:goal,
                user: user,
                kind: 'weekly',
@@ -84,6 +85,7 @@ RSpec.describe Goals::ProgressService do
       end
 
       before do
+        goal
         create(:earning, user: user, date: Date.new(2026, 6, 8), amount: 200)
         create(:earning, user: user, date: Date.new(2026, 6, 10), amount: 300)
       end
@@ -108,7 +110,7 @@ RSpec.describe Goals::ProgressService do
     end
 
     context 'with an annual goal' do
-      let!(:goal) do
+      let(:goal) do
         create(:goal,
                user: user,
                kind: 'annual',
@@ -117,6 +119,8 @@ RSpec.describe Goals::ProgressService do
                period_end: Date.new(2026, 12, 31),
                metric: 'profit')
       end
+
+      before { goal }
 
       it 'computes annual projection with days_remaining' do
         create(:earning, user: user, date: Date.new(2026, 3, 1), amount: 10_000)
