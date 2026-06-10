@@ -97,14 +97,14 @@ RSpec.describe 'Vehicles', type: :request do
 
   describe 'PATCH /vehicle' do
     context 'without an existing vehicle (registration)' do
-      it 'creates the vehicle and responds with turbo refresh' do
+      it 'creates the vehicle and responds with turbo refresh and modal clear' do
         patch vehicle_path,
               params: { vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: 2018,
                                    license_plate: 'ABC-1D23', odometer_km: 48_230 } },
               as: :turbo_stream
 
         expect(current_user.reload.vehicle).to be_present
-        expect(response.body).to include('action="refresh"')
+        expect(response.body).to include('action="update"').and include('action="refresh"')
       end
 
       it 'redirects html to /vehicle after registration' do
@@ -127,11 +127,11 @@ RSpec.describe 'Vehicles', type: :request do
 
       before { vehicle }
 
-      it 'updates the odometer and responds with turbo refresh' do
+      it 'updates the odometer and responds with turbo refresh and modal clear' do
         patch vehicle_path, params: { vehicle: { odometer_km: 49_000 } }, as: :turbo_stream
 
         expect(vehicle.reload.odometer_km).to eq(49_000)
-        expect(response.body).to include('action="refresh"')
+        expect(response.body).to include('action="update"').and include('action="refresh"')
       end
 
       it 'redirects html to /vehicle after update' do

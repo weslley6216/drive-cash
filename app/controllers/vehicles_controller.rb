@@ -20,7 +20,9 @@ class VehiclesController < ApplicationController
     if @vehicle.update(vehicle_params)
       flash[:notice] = t('vehicle.flash.updated')
       respond_to do |format|
-        format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+        format.turbo_stream do
+          render turbo_stream: [turbo_stream.update('modal', ''), turbo_stream.refresh]
+        end
         format.html { redirect_to vehicle_path }
       end
     else
