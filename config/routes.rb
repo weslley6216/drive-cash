@@ -30,7 +30,9 @@ Rails.application.routes.draw do
   get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
   resources :goals, only: %i[index new create edit update destroy]
-  get '/vehicle',      to: 'application#coming_soon', as: :vehicle
+  resource :vehicle, only: %i[show update]
+  resources :maintenances, only: %i[new create edit update destroy]
+  resources :refuelings,    only: %i[new create edit update destroy]
 
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
