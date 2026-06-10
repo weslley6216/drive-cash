@@ -6,7 +6,7 @@ module RecordSaveResponse
   def turbo_success(view_class, **kwargs)
     record = kwargs.values.first
     context, totals = build_totals_context(record)
-    flash.now[:notice] = t('.success')
+    flash[:notice] = t('.success')
     respond_to do |format|
       format.turbo_stream do
         render view_class.new(
@@ -34,7 +34,7 @@ module RecordSaveResponse
     filter = dashboard_context
     detail = detail_service.new(year: filter[:year], month: filter[:month]).call
     totals = Dashboard::StatsService.new(**filter).call
-    flash.now[:notice] = t('.success')
+    flash[:notice] = t('.success')
 
     respond_to do |format|
       format.turbo_stream do
