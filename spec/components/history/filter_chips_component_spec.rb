@@ -48,4 +48,8 @@ RSpec.describe History::FilterChipsComponent, type: :component do
   it 'renders chips in a horizontally scrollable row' do
     expect(html).to include('overflow-x-auto')
   end
+
+  it 'keeps chip links within the current turbo_frame' do
+    expect(html).not_to include('data-turbo-frame="_top"')
+  end
 end

@@ -128,6 +128,26 @@ RSpec.describe FilterComponent, type: :component do
     end
   end
 
+  describe 'frame targeting' do
+    it 'keeps full view form within its current turbo_frame' do
+      html = view_context.render(FilterComponent.new(selected_year: 2025, selected_month: nil, available_years: [2025]))
+
+      expect(html).not_to include('data-turbo-frame="_top"')
+    end
+
+    it 'keeps compact form within its current turbo_frame' do
+      html = view_context.render(FilterComponent.new(selected_year: 2025, selected_month: nil, available_years: [2025], compact: true))
+
+      expect(html).not_to include('data-turbo-frame="_top"')
+    end
+
+    it 'keeps popover form within its current turbo_frame' do
+      html = view_context.render(FilterComponent.new(selected_year: 2025, selected_month: nil, available_years: [2025], popover: true))
+
+      expect(html).not_to include('data-turbo-frame="_top"')
+    end
+  end
+
   context 'when compact: true' do
     let(:component) do
       FilterComponent.new(

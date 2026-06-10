@@ -21,8 +21,7 @@ module History
       active = filter == @current_filter
       link_to(
         history_path(filter: filter, q: @query.presence, year: @year, month: @month),
-        class: class_names(base_classes, active ? active_classes : inactive_classes),
-        data: { turbo_frame: '_top' }
+        class: class_names(base_classes, active ? active_classes : inactive_classes)
       ) { t("history.index.filters.#{filter}") }
     end
 

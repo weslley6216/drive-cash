@@ -10,10 +10,7 @@ module History
         action: history_path,
         method: 'get',
         class: 'relative',
-        data: {
-          controller: 'history-search',
-          turbo_frame: '_top'
-        }
+        data: { controller: 'history-search' }
       ) do
         input(type: 'hidden', name: 'filter', value: @filter)
 

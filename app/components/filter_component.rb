@@ -40,7 +40,7 @@ class FilterComponent < ApplicationComponent
         form(
           action: @action_path || root_path, method: 'get',
           class: 'flex flex-col gap-3',
-          data: { turbo_frame: '_top', controller: 'filter' }
+          data: { controller: 'filter' }
         ) do
           popover_field(t('.year'),  :year,  action: 'change->filter#handleYearChange') { year_options }
           popover_field(t('.month'), :month, action: 'change->filter#submit') { month_options }
@@ -68,7 +68,7 @@ class FilterComponent < ApplicationComponent
     form(
       action: @action_path || root_path, method: 'get',
       class: 'flex items-center gap-2',
-      data: { turbo_frame: '_top', controller: 'filter' }
+      data: { controller: 'filter' }
     ) do
       select(
         name: 'year', class: pill_classes,
@@ -102,7 +102,6 @@ class FilterComponent < ApplicationComponent
         action: root_path,
         method: 'get',
         data: {
-          turbo_frame: '_top',
           controller: 'filter',
           action: 'change->filter#submit'
         },
