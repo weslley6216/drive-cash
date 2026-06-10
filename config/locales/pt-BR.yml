@@ -263,6 +263,12 @@ pt-BR:
         invalid_repeat: "Para parcelar, selecione o período e informe pelo menos 2 parcelas."
         invalid_period_for_installments: "Informe um período válido entre parcelas (semanal, quinzenal, mensal ou anual)."
         invalid_repeat_max: "Você só pode parcelar em até 60 vezes."
+    refueling_extension:
+      heading: "Detalhes do abastecimento (opcional)"
+      labels:
+        liters: "Litros"
+        odometer_km: "Odômetro (km)"
+        full_tank: "Tanque cheio"
   sessions:
     invalid_credentials: "Email ou senha inválido."
     rate_limit: "Muitas tentativas de login. Tente novamente em alguns minutos."
@@ -278,3 +284,104 @@ pt-BR:
       journey: "Jornada"
       history: "Histórico"
       vehicle: "Veículo"
+  vehicle:
+    title: "Meu veículo"
+    subtitle: "%{brand} %{model_name} · %{year}"
+    odometer:
+      label: "Odômetro"
+      unit: "km"
+      update: "Atualizar"
+      delta_this_month: "+ %{value} km este mês"
+      not_set: "—"
+    metrics:
+      cost_per_km: "Custo/km"
+      revenue_per_km: "Receita/km"
+      profit_per_km: "Lucro/km"
+      km_per_liter: "Consumo"
+      empty_value: "—"
+    maintenances:
+      title: "Próximas manutenções"
+      add: "+ Adicionar"
+      km_remaining: "em %{value} km"
+      days_remaining: "~%{value} dias"
+      urgent: "Em breve"
+      mark_done: "Marcar feita"
+      empty: "Nenhuma manutenção cadastrada"
+    refuelings:
+      title: "Abastecimentos"
+      view_all: "Ver tudo →"
+      liters: "%{value} L"
+      km_per_l: "%{value} km/L"
+      empty: "Nenhum abastecimento registrado"
+      table_headers:
+        date: "Data"
+        vendor: "Posto"
+        price_per_liter: "R$/L"
+        km_per_liter: "km/L"
+        total: "Total"
+    insights:
+      cheapest_vendor:
+        title: "%{vendor} é o mais econômico"
+        description: "%{km_per_l} km/L em média. Economia estimada: %{savings}/mês."
+    registration:
+      title: "Cadastrar veículo"
+      submit: "Salvar"
+      labels:
+        brand: "Marca"
+        model_name: "Modelo"
+        year: "Ano"
+        license_plate: "Placa"
+        odometer_km: "Odômetro (km)"
+    form:
+      edit_title: "Editar veículo"
+      submit: "Salvar"
+      cancel: "Cancelar"
+    flash:
+      created: "Veículo cadastrado com sucesso."
+      updated: "Veículo atualizado."
+  maintenances:
+    form:
+      title_new: "Nova manutenção"
+      title_edit: "Editar manutenção"
+      labels:
+        name: "Nome"
+        category: "Categoria"
+        due_at_km: "Disparo em (km)"
+        due_at_date: "Disparo em (data)"
+        estimated_cost: "Custo estimado"
+        completed: "Concluída"
+      placeholders:
+        name: "Troca de óleo"
+      buttons:
+        save: "Salvar"
+        cancel: "Cancelar"
+      categories:
+        oil_change: "Troca de óleo"
+        brake: "Freios"
+        alignment: "Alinhamento"
+        tires: "Pneus"
+        other: "Outra"
+    flash:
+      created: "Manutenção cadastrada."
+      updated: "Manutenção atualizada."
+      destroyed: "Manutenção removida."
+  refuelings:
+    form:
+      title_new: "Novo abastecimento"
+      title_edit: "Editar abastecimento"
+      labels:
+        date: "Data"
+        vendor: "Posto"
+        liters: "Litros"
+        total_amount: "Total (R$)"
+        odometer_km: "Odômetro (km)"
+        full_tank: "Tanque cheio"
+      placeholders:
+        vendor: "Posto Orense"
+      buttons:
+        save: "Salvar"
+        cancel: "Cancelar"
+    flash:
+      created: "Abastecimento registrado."
+      updated: "Abastecimento atualizado."
+      destroyed: "Abastecimento removido."
