@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class MaintenanceCardComponent < ApplicationComponent
     CATEGORY_STYLES = {
       'oil_change' => { color: '#3b82f6', icon: PhlexIcons::Lucide::Wrench },

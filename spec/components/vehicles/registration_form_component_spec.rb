@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::RegistrationFormComponent, type: :component do
+RSpec.describe Vehicles::RegistrationFormComponent, type: :component do
   describe '#view_template' do
     it 'renders title and labels' do
       vehicle = Vehicle.new

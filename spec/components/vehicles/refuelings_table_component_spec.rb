@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::RefuelingsTableComponent, type: :component do
+RSpec.describe Vehicles::RefuelingsTableComponent, type: :component do
   let(:vehicle) { create(:vehicle) }
   let(:entries) do
     [

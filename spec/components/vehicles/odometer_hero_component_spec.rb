@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::OdometerHeroComponent, type: :component do
+RSpec.describe Vehicles::OdometerHeroComponent, type: :component do
   describe '#view_template' do
     it 'renders odometer formatted in pt-BR' do
       html = view_context.render(described_class.new(current_km: 48_230, km_this_month: 1840))

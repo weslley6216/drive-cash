@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::InsightCardComponent, type: :component do
+RSpec.describe Vehicles::InsightCardComponent, type: :component do
   describe '#view_template' do
     it 'renders title and description' do
       html = view_context.render(described_class.new(insight: {

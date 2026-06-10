@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class OdometerHeroComponent < ApplicationComponent
     def initialize(current_km:, km_this_month:, variant: :mobile)
       @current_km = current_km

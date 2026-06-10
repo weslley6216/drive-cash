@@ -180,6 +180,7 @@ rtk docker compose up -d db                                          # sobe o ba
 - **Cache**: sem invalidação automática. `Dashboard::AvailableYears.fetch` consulta o banco direto (overhead trivial). Se for cachear agregações pesadas no futuro, usar chave por-usuário (`"...#{user.id}"`).
 - **LLM fallback**: se Groq falha (rate limit/config), cai automaticamente no Gemini.
 - **i18n**: todas as strings visíveis em `config/locales/pt-BR.yml`.
+- **Namespaces sempre no plural**: diretórios e módulos usam a forma plural (`module Vehicles`, `module Expenses`, `module Maintenances`). Nunca usar `class ModelName` para criar namespace — se o nome do namespace coincidir com um model AR (singular), renomear para plural. Isso evita o `TypeError: X is not a module`.
 
 ## Estrutura de serviços
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::Statistics do
+RSpec.describe Vehicles::Statistics do
   let(:user) { create(:user) }
   let(:vehicle) { create(:vehicle, user: user, odometer_km: 48_230) }
   let(:reference_date) { Date.new(2026, 6, 15) }

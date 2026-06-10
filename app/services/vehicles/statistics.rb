@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class Statistics
     PERIOD_DAYS = 90
     VEHICLE_EXPENSE_CATEGORIES = Expense::CATEGORIES_BY_GROUP[:vehicle].freeze

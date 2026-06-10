@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class InsightCardComponent < ApplicationComponent
     def initialize(insight:)
       @insight = insight

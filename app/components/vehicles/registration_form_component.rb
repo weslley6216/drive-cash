@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class RegistrationFormComponent < ApplicationComponent
     include Phlex::Rails::Helpers::FormWith
 

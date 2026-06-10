@@ -2,10 +2,10 @@ class VehiclesController < ApplicationController
   def show
     @vehicle = current_user.vehicle
     if @vehicle
-      payload = Vehicle::MaintenanceService.new(user: current_user).call
-      render Vehicle::ShowView.new(payload: payload)
+      payload = Vehicles::MaintenanceService.new(user: current_user).call
+      render Vehicles::ShowView.new(payload: payload)
     else
-      render Vehicle::ShowView.new(payload: empty_payload, vehicle_form: current_user.build_vehicle)
+      render Vehicles::ShowView.new(payload: empty_payload, vehicle_form: current_user.build_vehicle)
     end
   end
 
@@ -19,8 +19,8 @@ class VehiclesController < ApplicationController
         format.html { redirect_to vehicle_path }
       end
     else
-      payload = current_user.vehicle ? Vehicle::MaintenanceService.new(user: current_user).call : empty_payload
-      render Vehicle::ShowView.new(payload: payload, vehicle_form: @vehicle), status: :unprocessable_content
+      payload = current_user.vehicle ? Vehicles::MaintenanceService.new(user: current_user).call : empty_payload
+      render Vehicles::ShowView.new(payload: payload, vehicle_form: @vehicle), status: :unprocessable_content
     end
   end
 

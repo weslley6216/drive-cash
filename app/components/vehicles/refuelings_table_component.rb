@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class RefuelingsTableComponent < ApplicationComponent
     def initialize(entries:)
       @entries = entries

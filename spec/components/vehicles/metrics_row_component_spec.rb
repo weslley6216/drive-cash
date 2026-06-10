@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::MetricsRowComponent, type: :component do
+RSpec.describe Vehicles::MetricsRowComponent, type: :component do
   let(:metrics) do
     { cost_per_km: 0.27, revenue_per_km: 0.61, profit_per_km: 0.34, km_per_liter: 11.2 }
   end

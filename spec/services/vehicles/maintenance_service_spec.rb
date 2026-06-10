@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::MaintenanceService do
+RSpec.describe Vehicles::MaintenanceService do
   let(:user) { create(:user) }
   let(:reference_date) { Date.new(2026, 6, 15) }
 
@@ -33,7 +33,7 @@ RSpec.describe Vehicle::MaintenanceService do
         expect(result[:odometer][:km_this_month]).to eq(1840)
       end
 
-      it 'returns metrics from Vehicle::Statistics' do
+      it 'returns metrics from Vehicles::Statistics' do
         create(:refueling, vehicle: vehicle, date: reference_date - 30.days, odometer_km: 47_000, liters: 30, full_tank: true)
         create(:refueling, vehicle: vehicle, date: reference_date,           odometer_km: 47_330, liters: 30, full_tank: true)
         create(:earning, user: user, amount: 610, date: reference_date - 10.days)

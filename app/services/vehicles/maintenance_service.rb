@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class MaintenanceService
     RECENT_LIMIT = 5
     PROGRESS_KM_WINDOW = 3000

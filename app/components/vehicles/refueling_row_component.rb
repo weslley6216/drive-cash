@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class RefuelingRowComponent < ApplicationComponent
     def initialize(refueling:, computed_km_per_liter:)
       @refueling = refueling

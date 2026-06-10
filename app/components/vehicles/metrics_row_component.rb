@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class MetricsRowComponent < ApplicationComponent
     DESKTOP_TONES = {
       cost_per_km:    { bg: 'bg-red-50',     border: 'border-red-200',     value: 'text-red-900' },

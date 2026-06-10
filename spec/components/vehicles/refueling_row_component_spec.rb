@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::RefuelingRowComponent, type: :component do
+RSpec.describe Vehicles::RefuelingRowComponent, type: :component do
   let(:vehicle) { create(:vehicle) }
   let(:refueling) { create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', liters: 32.5, total_amount: 180.50, date: Date.new(2026, 5, 20)) }
 

@@ -1,4 +1,4 @@
-class Vehicle
+module Vehicles
   class ShowView < ApplicationView
     def initialize(payload:, vehicle_form: nil)
       @payload = payload
@@ -23,7 +23,7 @@ class Vehicle
 
     def empty_state
       div(class: 'py-12') do
-        render Vehicle::RegistrationFormComponent.new(vehicle: @vehicle_form)
+        render Vehicles::RegistrationFormComponent.new(vehicle: @vehicle_form)
       end
     end
 
@@ -35,11 +35,11 @@ class Vehicle
     def mobile_layout
       div(class: 'space-y-4') do
         header_mobile
-        render Vehicle::OdometerHeroComponent.new(
+        render Vehicles::OdometerHeroComponent.new(
           current_km: @payload[:odometer][:current_km],
           km_this_month: @payload[:odometer][:km_this_month]
         )
-        render Vehicle::MetricsRowComponent.new(metrics: @payload[:metrics])
+        render Vehicles::MetricsRowComponent.new(metrics: @payload[:metrics])
         mobile_maintenances_section
         mobile_refuelings_section
         insight_section
@@ -72,7 +72,7 @@ class Vehicle
           if maintenances.empty?
             empty_row(t('vehicle.maintenances.empty'))
           else
-            maintenances.each { |entry| render Vehicle::MaintenanceCardComponent.new(**entry) }
+            maintenances.each { |entry| render Vehicles::MaintenanceCardComponent.new(**entry) }
           end
         end
       end
@@ -88,7 +88,7 @@ class Vehicle
           empty_row(t('vehicle.refuelings.empty'))
         else
           div(class: 'bg-white rounded-xl border border-slate-100 divide-y divide-slate-100') do
-            refuelings.each { |entry| render Vehicle::RefuelingRowComponent.new(**entry) }
+            refuelings.each { |entry| render Vehicles::RefuelingRowComponent.new(**entry) }
           end
         end
       end
@@ -120,14 +120,14 @@ class Vehicle
     def desktop_row_one
       div(class: 'grid grid-cols-12 gap-4') do
         div(class: 'col-span-5') do
-          render Vehicle::OdometerHeroComponent.new(
+          render Vehicles::OdometerHeroComponent.new(
             current_km: @payload[:odometer][:current_km],
             km_this_month: @payload[:odometer][:km_this_month],
             variant: :desktop
           )
         end
         div(class: 'col-span-7') do
-          render Vehicle::MetricsRowComponent.new(metrics: @payload[:metrics], variant: :desktop)
+          render Vehicles::MetricsRowComponent.new(metrics: @payload[:metrics], variant: :desktop)
         end
       end
     end
@@ -144,7 +144,7 @@ class Vehicle
               empty_row(t('vehicle.maintenances.empty'))
             else
               maintenances.each do |entry|
-                render Vehicle::MaintenanceCardComponent.new(**entry.merge(variant: :desktop))
+                render Vehicles::MaintenanceCardComponent.new(**entry.merge(variant: :desktop))
               end
             end
           end
@@ -153,7 +153,7 @@ class Vehicle
           section_header(title_key: 'vehicle.refuelings.title',
                          link_text: t('vehicle.refuelings.view_all'),
                          link_path: helpers.new_refueling_path)
-          render Vehicle::RefuelingsTableComponent.new(entries: @payload[:recent_refuelings])
+          render Vehicles::RefuelingsTableComponent.new(entries: @payload[:recent_refuelings])
         end
       end
     end
@@ -162,7 +162,7 @@ class Vehicle
       insight = @payload[:insights].first
       return unless insight
 
-      render Vehicle::InsightCardComponent.new(insight: insight)
+      render Vehicles::InsightCardComponent.new(insight: insight)
     end
 
     def section_header(title_key:, link_text:, link_path:)

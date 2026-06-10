@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Vehicle::MaintenanceCardComponent, type: :component do
+RSpec.describe Vehicles::MaintenanceCardComponent, type: :component do
   let(:vehicle) { create(:vehicle, odometer_km: 48_000) }
   let(:maintenance) { create(:maintenance, vehicle: vehicle, name: 'Troca de óleo', category: 'oil_change') }
 
