@@ -83,8 +83,20 @@ module FormFields
   end
 
   def integer_field(form, attribute, label:, theme: :blue, **options)
+    raw_value = form.object.public_send(attribute)
     field_wrapper(label, theme: theme) do
-      render form.number_field(attribute, step: 1, min: 1, class: input_classes(theme: theme), **options)
+      div(data: { controller: 'integer-field' }) do
+        input(
+          type: 'text',
+          inputmode: 'numeric',
+          autocomplete: 'off',
+          placeholder: '0',
+          class: input_classes(theme: theme),
+          data: { integer_field_target: 'display', action: 'input->integer-field#format' },
+          **options
+        )
+        render form.hidden_field(attribute, value: raw_value, data: { integer_field_target: 'input' })
+      end
     end
   end
 
