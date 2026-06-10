@@ -2,6 +2,7 @@ class Expense < ApplicationRecord
   include MonetaryAmount
 
   belongs_to :user
+  has_one :refueling, dependent: :nullify
 
   CATEGORIES_BY_GROUP = {
     vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],

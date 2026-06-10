@@ -138,6 +138,15 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe 'vehicle association' do
+    it 'has one vehicle and destroys it when user is destroyed' do
+      user = create(:user)
+      create(:vehicle, user: user)
+
+      expect { user.destroy }.to change(Vehicle, :count).by(-1)
+    end
+  end
+
   describe '.find_or_create_from_oauth' do
     let(:auth) do
       OmniAuth::AuthHash.new(

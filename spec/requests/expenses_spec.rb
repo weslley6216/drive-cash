@@ -199,6 +199,42 @@ RSpec.describe 'Expenses', type: :request do
     end
   end
 
+  describe 'POST /expenses with fuel category and refueling params' do
+    let(:vehicle) { create(:vehicle, user: current_user) }
+
+    before { vehicle }
+
+    it 'creates a Refueling linked to the expense' do
+      post expenses_path, params: {
+        expense: { date: Date.current.to_s, amount: '180,50', category: 'fuel', vendor: 'Posto Orense' },
+        refueling: { liters: '32,5', odometer_km: '48230', full_tank: '1' }
+      }, as: :turbo_stream
+
+      expect(Refueling.count).to eq(1)
+      expect(Refueling.last.expense).to eq(Expense.last)
+      expect(Refueling.last.odometer_km).to eq(48_230)
+    end
+
+    it 'creates expense without refueling when fields are blank' do
+      post expenses_path, params: {
+        expense: { date: Date.current.to_s, amount: '180,50', category: 'fuel' },
+        refueling: { liters: '', odometer_km: '' }
+      }, as: :turbo_stream
+
+      expect(Expense.count).to eq(1)
+      expect(Refueling.count).to eq(0)
+    end
+
+    it 'does not create refueling when category is not fuel' do
+      post expenses_path, params: {
+        expense: { date: Date.current.to_s, amount: '50,00', category: 'meals' },
+        refueling: { liters: '32,5', odometer_km: '48230' }
+      }, as: :turbo_stream
+
+      expect(Refueling.count).to eq(0)
+    end
+  end
+
   describe 'DELETE /expenses/:id' do
     it 'destroys the expense' do
       expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 100, category: :fuel)

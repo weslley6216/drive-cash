@@ -9,6 +9,7 @@ class ExpensesController < ApplicationController
     result = create_expense_via_creator(:expense)
 
     if result.success?
+      maybe_create_refueling(result.expenses.first)
       turbo_success(Expenses::CreateView, expense: result.expenses.first)
     else
       turbo_error(Expenses::NewView, expense: result.expense)
@@ -36,5 +37,18 @@ class ExpensesController < ApplicationController
 
   def find_expense
     @expense = current_user.expenses.find(params[:id])
+  end
+
+  def maybe_create_refueling(expense)
+    refueling_data = params[:refueling]
+    return unless refueling_data.present?
+    return unless expense.category_fuel?
+
+    Refuelings::CreatorFromExpense.call(
+      expense: expense,
+      liters: refueling_data[:liters],
+      odometer_km: refueling_data[:odometer_km],
+      full_tank: refueling_data[:full_tank]
+    )
   end
 end
