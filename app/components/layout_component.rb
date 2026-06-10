@@ -30,6 +30,7 @@ class LayoutComponent < ApplicationComponent
       meta(name: 'apple-mobile-web-app-capable', content: 'yes')
       meta(name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent')
       meta(name: 'theme-color', content: '#3b82f6')
+      meta(name: 'turbo-refresh-method', content: 'morph')
 
       # PWA manifest
       link(rel: 'manifest', href: '/manifest.json')
