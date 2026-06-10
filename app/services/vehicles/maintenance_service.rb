@@ -3,6 +3,14 @@ module Vehicles
     RECENT_LIMIT = 5
     PROGRESS_KM_WINDOW = 3000
     MIN_DISTINCT_VENDORS_FOR_INSIGHT = 3
+    EMPTY_PAYLOAD = {
+      vehicle: nil,
+      odometer: { current_km: 0, km_this_month: 0 },
+      metrics: { cost_per_km: 0, revenue_per_km: 0, profit_per_km: 0, km_per_liter: nil },
+      upcoming_maintenances: [],
+      recent_refuelings: [],
+      insights: []
+    }.freeze
 
     def initialize(user:, date: Date.current)
       @user = user
@@ -11,7 +19,7 @@ module Vehicles
 
     def call
       vehicle = @user.vehicle
-      return empty_payload unless vehicle
+      return EMPTY_PAYLOAD unless vehicle
 
       stats = Statistics.new(vehicle: vehicle, date: @date)
 
@@ -31,17 +39,6 @@ module Vehicles
     end
 
     private
-
-    def empty_payload
-      {
-        vehicle: nil,
-        odometer: { current_km: 0, km_this_month: 0 },
-        metrics: { cost_per_km: 0, revenue_per_km: 0, profit_per_km: 0, km_per_liter: nil },
-        upcoming_maintenances: [],
-        recent_refuelings: [],
-        insights: []
-      }
-    end
 
     def build_upcoming_maintenances(vehicle)
       vehicle.maintenances.pending.order(:due_at_date, :due_at_km).map do |maintenance|

@@ -5,7 +5,7 @@ class VehiclesController < ApplicationController
       payload = Vehicles::MaintenanceService.new(user: current_user).call
       render Vehicles::ShowView.new(payload: payload)
     else
-      render Vehicles::ShowView.new(payload: empty_payload, vehicle_form: current_user.build_vehicle)
+      render Vehicles::ShowView.new(payload: Vehicles::MaintenanceService::EMPTY_PAYLOAD, vehicle_form: current_user.build_vehicle)
     end
   end
 
@@ -26,7 +26,7 @@ class VehiclesController < ApplicationController
         format.html { redirect_to vehicle_path }
       end
     else
-      payload = current_user.vehicle ? Vehicles::MaintenanceService.new(user: current_user).call : empty_payload
+      payload = current_user.vehicle ? Vehicles::MaintenanceService.new(user: current_user).call : Vehicles::MaintenanceService::EMPTY_PAYLOAD
       render Vehicles::ShowView.new(payload: payload, vehicle_form: @vehicle), status: :unprocessable_content
     end
   end
@@ -35,16 +35,5 @@ class VehiclesController < ApplicationController
 
   def vehicle_params
     params.require(:vehicle).permit(:brand, :vehicle_model, :year, :license_plate, :odometer_km)
-  end
-
-  def empty_payload
-    {
-      vehicle: nil,
-      odometer: { current_km: 0, km_this_month: 0 },
-      metrics: { cost_per_km: 0, revenue_per_km: 0, profit_per_km: 0, km_per_liter: nil },
-      upcoming_maintenances: [],
-      recent_refuelings: [],
-      insights: []
-    }
   end
 end

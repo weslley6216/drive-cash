@@ -82,5 +82,14 @@ RSpec.describe 'Refuelings', type: :request do
 
       expect(response).to redirect_to(vehicle_path)
     end
+
+    it 'returns 404 for other user refueling' do
+      other = create(:vehicle)
+      foreign = create(:refueling, vehicle: other)
+
+      delete refueling_path(foreign)
+
+      expect(response).to have_http_status(:not_found)
+    end
   end
 end

@@ -47,6 +47,8 @@ class RefuelingsController < ApplicationController
 
   def find_refueling
     @refueling = current_user.vehicle.refuelings.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    head :not_found
   end
 
   def refueling_params
