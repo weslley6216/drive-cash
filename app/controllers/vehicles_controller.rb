@@ -21,7 +21,7 @@ class VehiclesController < ApplicationController
       flash[:notice] = t('vehicle.flash.updated')
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: [turbo_stream.update('modal', ''), turbo_stream.refresh]
+          render turbo_stream: [turbo_stream.update('modal', ''), turbo_stream.refresh(request_id: nil)]
         end
         format.html { redirect_to vehicle_path }
       end
