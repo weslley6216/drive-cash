@@ -23,7 +23,8 @@ class FabComponent < ApplicationComponent
     ) do
       a(
         href: work_session_path,
-        class: 'flex items-center gap-2 bg-sky-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-sky-700 transition-all transform hover:scale-105 cursor-pointer'
+        class: 'flex items-center gap-2 bg-sky-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-sky-700 transition-all transform hover:scale-105 cursor-pointer',
+        data: { turbo_frame: '_top' }
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.start_journey') }
         render PhlexIcons::Lucide::Play.new(class: 'w-4 h-4')
@@ -31,7 +32,8 @@ class FabComponent < ApplicationComponent
 
       a(
         href: chat_root_path,
-        class: 'flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-violet-700 transition-all transform hover:scale-105 cursor-pointer'
+        class: 'flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-violet-700 transition-all transform hover:scale-105 cursor-pointer',
+        data: { turbo_frame: '_top' }
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.ai_chat') }
         render PhlexIcons::Lucide::Sparkles.new(class: 'w-4 h-4')
@@ -39,7 +41,8 @@ class FabComponent < ApplicationComponent
 
       a(
         href: new_record_path(type: 'expense', context: @filters),
-        class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 cursor-pointer'
+        class: 'flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 cursor-pointer',
+        data: { turbo_frame: '_top' }
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_expense') }
         render PhlexIcons::Lucide::Receipt.new(class: 'w-4 h-4')
@@ -47,7 +50,8 @@ class FabComponent < ApplicationComponent
 
       a(
         href: new_record_path(type: 'earning', context: @filters),
-        class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105 cursor-pointer'
+        class: 'flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-all transform hover:scale-105 cursor-pointer',
+        data: { turbo_frame: '_top' }
       ) do
         span(class: 'text-sm font-medium whitespace-nowrap') { t('.new_earning') }
         render PhlexIcons::Lucide::Truck.new(class: 'w-4 h-4')

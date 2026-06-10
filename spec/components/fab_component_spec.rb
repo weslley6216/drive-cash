@@ -58,6 +58,10 @@ RSpec.describe FabComponent, type: :component do
       expect(html).to include('type=earning')
       expect(html).not_to include('context%5Byear%5D=2025')
     end
+
+    it 'sets turbo-frame=_top on all navigation links so they escape the page frame' do
+      expect(html.scan('data-turbo-frame="_top"').size).to eq(4)
+    end
   end
 
   describe 'with bottom_nav: true' do
