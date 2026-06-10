@@ -54,13 +54,31 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('href="/history"')
       expect(html).to include('href="/vehicle"')
     end
+
+    it 'marks the nav as turbo-permanent with a stable id' do
+      expect(html).to include('id="sidebar-nav"')
+      expect(html).to include('data-turbo-permanent')
+    end
+
+    it 'wires nav-active controller with tab targets and active/inactive class data' do
+      expect(html).to include('data-controller="nav-active"')
+      expect(html.scan('data-nav-active-target="tab"').size).to eq(6)
+      expect(html).to include('data-active-classes="bg-blue-50 text-blue-700"')
+      expect(html).to include('data-inactive-classes="text-slate-600 hover:bg-slate-50 hover:text-slate-900"')
+    end
+
+    it 'exposes icon targets so the controller can swap icon color' do
+      expect(html.scan('data-nav-active-target="icon"').size).to eq(6)
+      expect(html).to include('data-active-classes="text-blue-600"')
+      expect(html).to include('data-inactive-classes="text-slate-400"')
+    end
   end
 
   context 'when active: :analysis' do
     let(:active) { :analysis }
 
     it 'highlights only the analysis tab' do
-      expect(html.scan('bg-blue-50').size).to eq(1)
+      expect(html.scan('bg-blue-50').size).to eq(7)
     end
   end
 end
