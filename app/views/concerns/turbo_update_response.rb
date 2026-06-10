@@ -7,12 +7,8 @@ module TurboUpdateResponse
     if record.persisted? && @totals
       detail = detail_service.new(year: @context[:year], month: @context[:month]).call
       modal_stream(detail_view.new(**detail, filters: @context))
-      stats_grid_stream(totals: @totals, month: @totals_context[:month], year: @totals_context[:year])
-      hero_stream(totals: @totals, year: @totals_context[:year], month: @totals_context[:month])
-      today_card_stream
-      recent_activity_stream(year: @totals_context[:year], month: @totals_context[:month])
-      category_breakdown_stream(year: @totals_context[:year], month: @totals_context[:month])
       flash_stream('flash_modal', inline: true)
+      raw '<turbo-stream action="refresh"></turbo-stream>'.html_safe
     else
       modal_stream(edit_view.new(record_key => record, context: @context))
       flash_stream

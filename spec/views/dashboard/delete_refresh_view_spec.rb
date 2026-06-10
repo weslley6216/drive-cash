@@ -9,7 +9,7 @@ RSpec.describe Dashboard::DeleteRefreshView, type: :component do
     create(:expense, user: user, date: Date.new(2026, 1, 10), amount: 40, category: 'fuel', paid: true)
   end
 
-  it 'renders the 7 turbo streams of a delete refresh' do
+  it 'replaces modal with the detail view and triggers morph refresh' do
     filter  = { year: 2026, month: 1 }
     detail  = Dashboard::ExpensesDetailService.new(year: 2026, month: 1).call
     totals  = Dashboard::StatsService.new(year: 2026, month: 1).call
@@ -23,11 +23,8 @@ RSpec.describe Dashboard::DeleteRefreshView, type: :component do
     )
 
     expect(output).to include('target="modal"')
-    expect(output).to include('target="stats_grid"')
-    expect(output).to include('target="hero_profit_card"')
-    expect(output).to include('target="today_card"')
-    expect(output).to include('target="recent_activity"')
-    expect(output).to include('target="category_breakdown"')
-    expect(output).to include('target="flash_modal"')
+    expect(output).to include('action="refresh"')
+    expect(output).not_to include('target="stats_grid"')
+    expect(output).not_to include('target="hero_profit_card"')
   end
 end

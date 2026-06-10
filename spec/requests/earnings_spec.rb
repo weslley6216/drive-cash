@@ -38,17 +38,12 @@ RSpec.describe 'Earnings', type: :request do
       }.to change(Earning, :count).by(1)
     end
 
-    it 'responds with turbo stream updating home cards' do
+    it 'responds with a turbo stream refresh so only changed content updates' do
       post earnings_path, params: valid_params, as: :turbo_stream
 
       expect(response.media_type).to eq Mime[:turbo_stream]
-      expect(response.body).to include('target="stats_grid"')
-      expect(response.body).to include('target="hero_profit_card"')
-      expect(response.body).to include('target="today_card"')
-      expect(response.body).to include('target="recent_activity"')
-      expect(response.body).to include('target="category_breakdown"')
-      expect(response.body).to include('target="dashboard_filters"')
-      expect(response.body).to include('target="flash"')
+      expect(response.body).to include('action="refresh"')
+      expect(response.body).not_to include('target="stats_grid"')
     end
 
     it 'handles validation errors by re-rendering the modal' do
@@ -99,7 +94,7 @@ RSpec.describe 'Earnings', type: :request do
       expect(response.media_type).to eq Mime[:turbo_stream]
       expect(earning.reload.amount).to eq(200.5)
       expect(earning.reload.platform).to eq('uber')
-      expect(response.body).to include('stats_grid')
+      expect(response.body).to include('action="refresh"')
     end
 
     it 'renders the earnings detail list after successful update' do
@@ -113,7 +108,7 @@ RSpec.describe 'Earnings', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
       expect(response.body).not_to include(I18n.t('earnings.edit_view.title'))
-      expect(response.body).to include('stats_grid')
+      expect(response.body).to include('action="refresh"')
     end
 
     it 'handles validation errors on update' do
@@ -125,15 +120,13 @@ RSpec.describe 'Earnings', type: :request do
       expect(response.body).to include(I18n.t('earnings.edit_view.title'))
     end
 
-    it 'refreshes home cards on update' do
+    it 'responds with a turbo stream refresh so only changed content updates' do
       patch earning_path(earning),
             params: { earning: { amount: 200.50 }, context: { year: 2026, month: 1 } },
             as: :turbo_stream
 
-      expect(response.body).to include('target="hero_profit_card"')
-      expect(response.body).to include('target="today_card"')
-      expect(response.body).to include('target="recent_activity"')
-      expect(response.body).to include('target="category_breakdown"')
+      expect(response.body).to include('action="refresh"')
+      expect(response.body).not_to include('target="hero_profit_card"')
     end
   end
 
@@ -170,7 +163,7 @@ RSpec.describe 'Earnings', type: :request do
       }.to change(Earning, :count).by(-1)
     end
 
-    it 're-renders the detail list and home cards after destroy' do
+    it 're-renders the detail list and triggers morph refresh after destroy' do
       earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 100, platform: :shopee)
 
       delete earning_path(earning),
@@ -180,11 +173,8 @@ RSpec.describe 'Earnings', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
-      expect(response.body).to include('target="stats_grid"')
-      expect(response.body).to include('target="hero_profit_card"')
-      expect(response.body).to include('target="today_card"')
-      expect(response.body).to include('target="recent_activity"')
-      expect(response.body).to include('target="category_breakdown"')
+      expect(response.body).to include('action="refresh"')
+      expect(response.body).not_to include('target="stats_grid"')
     end
   end
 end
