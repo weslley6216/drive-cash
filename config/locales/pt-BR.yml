@@ -286,7 +286,7 @@ pt-BR:
       vehicle: "Veículo"
   vehicle:
     title: "Meu veículo"
-    subtitle: "%{brand} %{model_name} · %{year}"
+    subtitle: "%{brand} %{vehicle_model} · %{year}"
     odometer:
       label: "Odômetro"
       unit: "km"
@@ -328,7 +328,7 @@ pt-BR:
       submit: "Salvar"
       labels:
         brand: "Marca"
-        model_name: "Modelo"
+        vehicle_model: "Modelo"
         year: "Ano"
         license_plate: "Placa"
         odometer_km: "Odômetro (km)"

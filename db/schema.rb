@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_09_135101) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_180434) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_135101) do
     t.bigint "user_id", null: false
     t.index ["user_id", "kind", "period_start"], name: "index_goals_on_user_id_and_kind_and_period_start", unique: true
     t.index ["user_id"], name: "index_goals_on_user_id"
+  end
+
+  create_table "maintenances", force: :cascade do |t|
+    t.integer "category", default: 4, null: false
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.date "due_at_date"
+    t.integer "due_at_km"
+    t.decimal "estimated_cost", precision: 10, scale: 2
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "vehicle_id", null: false
+    t.index ["vehicle_id", "completed"], name: "index_maintenances_on_vehicle_id_and_completed"
+    t.index ["vehicle_id"], name: "index_maintenances_on_vehicle_id"
+  end
+
+  create_table "refuelings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.bigint "expense_id"
+    t.boolean "full_tank", default: true, null: false
+    t.decimal "liters", precision: 6, scale: 2, null: false
+    t.integer "odometer_km", null: false
+    t.decimal "price_per_liter", precision: 6, scale: 3
+    t.decimal "total_amount", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "vehicle_id", null: false
+    t.string "vendor"
+    t.index ["expense_id"], name: "index_refuelings_on_expense_id"
+    t.index ["vehicle_id", "date"], name: "index_refuelings_on_vehicle_id_and_date"
+    t.index ["vehicle_id"], name: "index_refuelings_on_vehicle_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -216,9 +247,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_135101) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
+  create_table "vehicles", force: :cascade do |t|
+    t.string "brand", null: false
+    t.datetime "created_at", null: false
+    t.string "license_plate"
+    t.integer "odometer_km", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "vehicle_model", null: false
+    t.integer "year", null: false
+    t.index ["user_id"], name: "index_vehicles_on_user_id", unique: true
+  end
+
   add_foreign_key "earnings", "users"
   add_foreign_key "expenses", "users"
   add_foreign_key "goals", "users"
+  add_foreign_key "maintenances", "vehicles"
+  add_foreign_key "refuelings", "expenses"
+  add_foreign_key "refuelings", "vehicles"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -226,4 +272,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_135101) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "vehicles", "users"
 end

@@ -190,4 +190,15 @@ RSpec.describe Expense, type: :model do
       expect(expense.user).to eq(user)
     end
   end
+
+  describe 'refueling association' do
+    it 'nullifies refueling.expense_id when expense is destroyed' do
+      expense = create(:expense, category: 'fuel')
+      refueling = create(:refueling, expense: expense)
+
+      expense.destroy
+
+      expect(refueling.reload.expense_id).to be_nil
+    end
+  end
 end
