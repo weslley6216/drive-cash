@@ -37,6 +37,7 @@ module Expenses
         category_select(f)
         text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
         text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
+        refueling_extension
 
         render_actions
       end
@@ -59,6 +60,37 @@ module Expenses
     end
 
     def selected_category = nil
+
+    def refueling_extension
+      div(class: 'mt-2') do
+        details(class: 'border border-slate-200 rounded-lg p-3 bg-slate-50') do
+          summary(class: 'text-sm font-medium text-slate-700 cursor-pointer') { t('expenses.refueling_extension.heading') }
+          div(class: 'mt-3 space-y-3') do
+            refueling_label_input(:liters, t('expenses.refueling_extension.labels.liters'), type: 'text', placeholder: '32,5', inputmode: 'decimal')
+            refueling_label_input(:odometer_km, t('expenses.refueling_extension.labels.odometer_km'), type: 'number', placeholder: '48230')
+            refueling_checkbox_input(:full_tank, t('expenses.refueling_extension.labels.full_tank'))
+          end
+        end
+      end
+    end
+
+    def refueling_label_input(field, label_text, **input_options)
+      div do
+        label(class: 'block text-xs font-medium text-slate-600 mb-1') { label_text }
+        input(name: "refueling[#{field}]",
+              class: 'w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm',
+              **input_options)
+      end
+    end
+
+    def refueling_checkbox_input(field, label_text)
+      label(class: 'inline-flex items-center gap-2 text-sm text-slate-700') do
+        input(type: 'hidden', name: "refueling[#{field}]", value: '0')
+        input(type: 'checkbox', name: "refueling[#{field}]", value: '1', checked: true,
+              class: 'rounded border-slate-300 text-red-600 focus:ring-red-500')
+        span { label_text }
+      end
+    end
 
     def render_actions
       div(class: 'flex gap-3 pt-4') do
