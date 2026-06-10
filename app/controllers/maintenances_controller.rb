@@ -57,7 +57,7 @@ class MaintenancesController < ApplicationController
 
   def respond_with_refresh
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+      format.turbo_stream { render turbo_stream: [turbo_stream.update('modal', ''), turbo_stream.refresh(request_id: nil)] }
       format.html { redirect_to vehicle_path }
     end
   end

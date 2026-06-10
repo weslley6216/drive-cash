@@ -65,14 +65,13 @@ RSpec.describe 'Goals', type: :request do
       }
     end
 
-    it 'creates a goal and responds with turbo_stream refresh' do
+    it 'creates a goal and responds with modal clear and turbo_stream refresh' do
       post goals_path, params: valid_params, as: :turbo_stream
 
       expect(Goal.count).to eq(1)
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq(Mime[:turbo_stream])
-      expect(response.body).to include('<turbo-stream')
-      expect(response.body).to include('action="refresh"')
+      expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
     it 'still redirects to /goals for non-turbo (html) submissions' do
@@ -117,13 +116,13 @@ RSpec.describe 'Goals', type: :request do
              period_end: Date.current.end_of_month)
     end
 
-    it 'updates the goal and responds with turbo_stream refresh' do
+    it 'updates the goal and responds with modal clear and turbo_stream refresh' do
       patch goal_path(goal), params: { goal: { target_amount: '9000.00' } }, as: :turbo_stream
 
       expect(goal.reload.target_amount).to eq(9000)
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq(Mime[:turbo_stream])
-      expect(response.body).to include('action="refresh"')
+      expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
     it 'still redirects to /goals for non-turbo (html) updates' do

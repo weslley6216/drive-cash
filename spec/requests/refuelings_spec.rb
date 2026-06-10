@@ -25,11 +25,11 @@ RSpec.describe 'Refuelings', type: :request do
                      full_tank: '1' } }
     end
 
-    it 'creates a refueling and refreshes via turbo_stream' do
+    it 'creates a refueling and responds with modal clear and turbo_stream refresh' do
       post refuelings_path, params: valid_params, as: :turbo_stream
 
       expect(Refueling.count).to eq(1)
-      expect(response.body).to include('action="refresh"')
+      expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
     it 'rerenders form on invalid params' do

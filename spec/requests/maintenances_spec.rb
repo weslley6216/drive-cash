@@ -25,12 +25,12 @@ RSpec.describe 'Maintenances', type: :request do
                        estimated_cost: '180.00' } }
     end
 
-    it 'creates a maintenance and refreshes via turbo_stream' do
+    it 'creates a maintenance and responds with modal clear and turbo_stream refresh' do
       post maintenances_path, params: valid_params, as: :turbo_stream
 
       expect(Maintenance.count).to eq(1)
       expect(response.media_type).to eq(Mime[:turbo_stream])
-      expect(response.body).to include('action="refresh"')
+      expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
     it 'rerenders form on invalid params' do
