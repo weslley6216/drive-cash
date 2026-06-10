@@ -16,12 +16,14 @@ module History
         sidebar_nav: :history,
         app_shell: true
       ) do
-        div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
+        turbo_frame_tag 'page' do
+          div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
-        pinned_header
-        feed_scroll_region
+          pinned_header
+          feed_scroll_region
 
-        render FabComponent.new(filters: filter_context, bottom_nav: true)
+          render FabComponent.new(filters: filter_context, bottom_nav: true)
+        end
         turbo_frame_tag 'modal'
       end
     end

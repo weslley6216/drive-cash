@@ -13,7 +13,11 @@ class SidebarNavComponent < ApplicationComponent
   end
 
   def view_template
-    nav(class: 'hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-30') do
+    nav(
+      id: 'sidebar-nav',
+      class: 'hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-30',
+      data: { turbo_permanent: '', controller: 'nav-active' }
+    ) do
       brand_section
       nav_tabs
       settings_section
@@ -44,9 +48,21 @@ class SidebarNavComponent < ApplicationComponent
     active = tab[:id] == @active
     link_to(
       helpers.public_send(tab[:path_method]),
-      class: "sidebar-tab flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors #{active ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}"
+      class: "sidebar-tab flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors #{active ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}",
+      data: {
+        nav_active_target: 'tab',
+        active_classes: 'bg-blue-50 text-blue-700',
+        inactive_classes: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+      }
     ) do
-      render tab[:icon].new(class: "w-5 h-5 #{active ? 'text-blue-600' : 'text-slate-400'}")
+      render tab[:icon].new(
+        class: "w-5 h-5 #{active ? 'text-blue-600' : 'text-slate-400'}",
+        data: {
+          nav_active_target: 'icon',
+          active_classes: 'text-blue-600',
+          inactive_classes: 'text-slate-400'
+        }
+      )
       span { I18n.t("sidebar_nav_component.tabs.#{tab[:id]}") }
     end
   end

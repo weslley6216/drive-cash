@@ -48,4 +48,8 @@ RSpec.describe History::IndexView, type: :component do
   it 'shows the empty state inside the scroll region when there are no groups' do
     expect(html).to include(I18n.t('history.index.empty'))
   end
+
+  it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
+    expect(html).to include('<turbo-frame id="page">')
+  end
 end

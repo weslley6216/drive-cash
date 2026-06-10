@@ -11,15 +11,17 @@ module Dashboard
 
     def view_template
       render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
+        turbo_frame_tag 'page' do
+          div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 
-        topbar_section
-        primary_grid
-        stats_grid_section
-        monthly_goal_mobile_section
-        secondary_grid
+          topbar_section
+          primary_grid
+          stats_grid_section
+          monthly_goal_mobile_section
+          secondary_grid
 
-        render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
+          render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
+        end
         turbo_frame_tag 'modal'
       end
     end

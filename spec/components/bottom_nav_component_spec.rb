@@ -30,7 +30,7 @@ RSpec.describe BottomNavComponent, type: :component do
     end
 
     it 'dims inactive tabs with text-slate-400' do
-      expect(html.scan('text-slate-400').size).to eq(4)
+      expect(html.scan('text-slate-400').size).to eq(9)
     end
 
     it 'links each tab to its corresponding route' do
@@ -40,13 +40,31 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include('href="/history"')
       expect(html).to include('href="/account"')
     end
+
+    it 'marks the nav as turbo-permanent with a stable id' do
+      expect(html).to include('id="bottom-nav"')
+      expect(html).to include('data-turbo-permanent')
+    end
+
+    it 'wires nav-active controller with tab targets and active/inactive class data' do
+      expect(html).to include('data-controller="nav-active"')
+      expect(html.scan('data-nav-active-target="tab"').size).to eq(5)
+      expect(html).to include('data-active-classes="text-blue-600"')
+      expect(html).to include('data-inactive-classes="text-slate-400"')
+    end
+
+    it 'exposes icon targets so the controller can swap stroke thickness' do
+      expect(html.scan('data-nav-active-target="icon"').size).to eq(5)
+      expect(html).to include('data-active-classes="stroke-[2.4]"')
+      expect(html).to include('data-inactive-classes="stroke-2"')
+    end
   end
 
   context 'when active: :analysis' do
     let(:active) { :analysis }
 
     it 'highlights only the analysis tab' do
-      expect(html.scan('text-blue-600').size).to eq(1)
+      expect(html.scan('text-blue-600').size).to eq(6)
       expect(html).to include('href="/analysis"')
     end
   end
