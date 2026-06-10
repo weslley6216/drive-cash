@@ -19,11 +19,12 @@ module Analysis
         sidebar_nav: :analysis,
         app_shell: true
       ) do
-        div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
+        turbo_frame_tag 'page' do
+          div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
-        pinned_topbar
-        content_scroll_region
-
+          pinned_topbar
+          content_scroll_region
+        end
         turbo_frame_tag 'modal'
       end
     end
