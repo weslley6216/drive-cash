@@ -1,0 +1,5 @@
+pt-BR:
+  refuelings:
+    form_view:
+      placeholders:
+        money: "R$ 0,00"

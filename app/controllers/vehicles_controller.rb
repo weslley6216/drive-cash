@@ -9,6 +9,11 @@ class VehiclesController < ApplicationController
     end
   end
 
+  def edit
+    @vehicle = current_user.vehicle || current_user.build_vehicle
+    render Vehicles::EditView.new(vehicle: @vehicle)
+  end
+
   def update
     @vehicle = current_user.vehicle || current_user.build_vehicle
 

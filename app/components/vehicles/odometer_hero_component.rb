@@ -16,11 +16,9 @@ module Vehicles
               span(class: 'text-base font-medium text-slate-400 ml-1') { t('vehicle.odometer.unit') }
             end
           end
-          button(class: 'text-xs bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-white',
-                 type: 'button',
-                 data: { controller: 'odometer-edit', action: 'click->odometer-edit#open' }) do
-            t('vehicle.odometer.update')
-          end
+          link_to(t('vehicle.odometer.update'), helpers.edit_vehicle_path,
+                  class: 'text-xs bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-white',
+                  data: { turbo_frame: 'modal' })
         end
         delta_row
       end

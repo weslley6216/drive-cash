@@ -75,6 +75,26 @@ RSpec.describe 'Vehicles', type: :request do
     end
   end
 
+  describe 'GET /vehicle/edit' do
+    let(:vehicle) { create(:vehicle, user: current_user) }
+
+    before { vehicle }
+
+    it 'renders the odometer edit modal' do
+      get edit_vehicle_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('vehicle.form.edit_title'))
+      expect(response.body).to include('turbo-frame id="modal"')
+    end
+
+    it 'renders the form even without a vehicle' do
+      get edit_vehicle_path
+
+      expect(response).to have_http_status(:success)
+    end
+  end
+
   describe 'PATCH /vehicle' do
     context 'without an existing vehicle (registration)' do
       it 'creates the vehicle and responds with turbo refresh' do

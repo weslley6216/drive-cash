@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
   resources :goals, only: %i[index new create edit update destroy]
-  resource :vehicle, only: %i[show update]
+  resource :vehicle, only: %i[show edit update]
   resources :maintenances, only: %i[new create edit update destroy]
   resources :refuelings,    only: %i[new create edit update destroy]
 
