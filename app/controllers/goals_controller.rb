@@ -15,7 +15,10 @@ class GoalsController < ApplicationController
     @goal = current_user.goals.new(goal_params)
     if @goal.save
       flash[:notice] = t('goals.index.created')
-      redirect_to goals_path
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+        format.html { redirect_to goals_path }
+      end
     else
       flash.now[:alert] = @goal.errors.full_messages.to_sentence
       render Goals::NewView.new(goal: @goal), status: :unprocessable_content
@@ -29,7 +32,10 @@ class GoalsController < ApplicationController
   def update
     if @goal.update(goal_params)
       flash[:notice] = t('goals.index.updated')
-      redirect_to goals_path
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+        format.html { redirect_to goals_path }
+      end
     else
       flash.now[:alert] = @goal.errors.full_messages.to_sentence
       render Goals::EditView.new(goal: @goal), status: :unprocessable_content

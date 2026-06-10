@@ -66,7 +66,7 @@ module Goals
           end
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider') { t('goals.index.monthly.label') }
-            p(class: 'text-sm font-semibold text-slate-700') { t("goals.index.monthly.sublabel_#{@progress[:goal].metric}") }
+            p(class: 'text-sm font-semibold text-slate-700') { I18n.l(@progress[:goal].period_start, format: '%B') }
           end
         end
         span(class: 'text-xs font-medium text-slate-400') do

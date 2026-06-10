@@ -16,6 +16,7 @@ module Dashboard
         topbar_section
         primary_grid
         stats_grid_section
+        monthly_goal_mobile_section
         secondary_grid
 
         render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
@@ -73,8 +74,13 @@ module Dashboard
         div(class: 'lg:col-span-4 flex flex-col gap-4') do
           render CajuQuickAccessComponent.new
           div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
-          div(id: 'monthly_goal_card') { render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal }
         end
+      end
+    end
+
+    def monthly_goal_mobile_section
+      div(class: 'lg:hidden mb-6') do
+        render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal
       end
     end
 
