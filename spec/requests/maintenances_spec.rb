@@ -47,6 +47,17 @@ RSpec.describe 'Maintenances', type: :request do
     end
   end
 
+  describe 'GET /maintenances/:id/edit' do
+    let(:maintenance) { create(:maintenance, vehicle: vehicle) }
+
+    it 'renders the edit modal form' do
+      get edit_maintenance_path(maintenance)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('maintenances.form.title_edit'))
+    end
+  end
+
   describe 'PATCH /maintenances/:id' do
     let(:maintenance) { create(:maintenance, vehicle: vehicle, completed: false) }
 

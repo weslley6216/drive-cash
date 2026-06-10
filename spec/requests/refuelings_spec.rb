@@ -45,6 +45,17 @@ RSpec.describe 'Refuelings', type: :request do
     end
   end
 
+  describe 'GET /refuelings/:id/edit' do
+    let(:refueling) { create(:refueling, vehicle: vehicle) }
+
+    it 'renders the edit modal form' do
+      get edit_refueling_path(refueling)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('refuelings.form.title_edit'))
+    end
+  end
+
   describe 'PATCH /refuelings/:id' do
     let(:refueling) { create(:refueling, vehicle: vehicle) }
 
@@ -52,6 +63,12 @@ RSpec.describe 'Refuelings', type: :request do
       patch refueling_path(refueling), params: { refueling: { liters: '30,0' } }, as: :turbo_stream
 
       expect(refueling.reload.liters).to eq(30.0)
+    end
+
+    it 'rerenders form on invalid update' do
+      patch refueling_path(refueling), params: { refueling: { liters: '' } }, as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

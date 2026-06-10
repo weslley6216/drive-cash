@@ -5,13 +5,15 @@ RSpec.describe 'Vehicle flow', type: :request do
 
   before { login_as(current_user) }
 
-  it 'registers a vehicle via PATCH and redirects to dashboard' do
-    patch vehicle_path, params: {
-      vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: '2018',
-                 license_plate: 'ABC-1D23', odometer_km: '48230' }
-    }
+  it 'registers a vehicle via PATCH and refreshes via turbo' do
+    patch vehicle_path,
+          params: {
+            vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: '2018',
+                       license_plate: 'ABC-1D23', odometer_km: '48230' }
+          },
+          as: :turbo_stream
 
-    expect(response).to redirect_to(vehicle_path)
+    expect(response.body).to include('action="refresh"')
     expect(current_user.reload.vehicle).to be_present
     expect(current_user.vehicle.brand).to eq('Honda')
     expect(current_user.vehicle.odometer_km).to eq(48_230)

@@ -14,7 +14,10 @@ class VehiclesController < ApplicationController
 
     if @vehicle.update(vehicle_params)
       flash[:notice] = t('vehicle.flash.updated')
-      redirect_to vehicle_path
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.refresh }
+        format.html { redirect_to vehicle_path }
+      end
     else
       payload = current_user.vehicle ? Vehicle::MaintenanceService.new(user: current_user).call : empty_payload
       render Vehicle::ShowView.new(payload: payload, vehicle_form: @vehicle), status: :unprocessable_content
