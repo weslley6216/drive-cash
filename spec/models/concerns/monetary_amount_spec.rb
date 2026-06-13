@@ -90,4 +90,16 @@ RSpec.describe MonetaryAmount, type: :model do
       expect(expense.amount).to eq(BigDecimal('100000'))
     end
   end
+
+  describe '.monetize on attributes other than amount' do
+    it 'normalizes pt-BR decimals on every declared attribute' do
+      refueling = Refueling.new
+
+      refueling.total_amount = '1.180,50'
+      refueling.liters = '32,5'
+
+      expect(refueling.total_amount).to eq(BigDecimal('1180.50'))
+      expect(refueling.liters).to eq(BigDecimal('32.5'))
+    end
+  end
 end

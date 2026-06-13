@@ -1,4 +1,7 @@
 class Refueling < ApplicationRecord
+  include MonetaryAmount
+  monetize :total_amount, :liters
+
   belongs_to :vehicle
   belongs_to :expense, optional: true
 

@@ -52,10 +52,7 @@ class RefuelingsController < ApplicationController
   end
 
   def refueling_params
-    params.require(:refueling).permit(:date, :vendor, :liters, :total_amount, :odometer_km, :full_tank).tap do |permitted|
-      permitted[:liters] = permitted[:liters].to_s.tr(',', '.') if permitted[:liters].present?
-      permitted[:total_amount] = permitted[:total_amount].to_s.tr(',', '.') if permitted[:total_amount].present?
-    end
+    params.require(:refueling).permit(:date, :vendor, :liters, :total_amount, :odometer_km, :full_tank)
   end
 
   def respond_with_refresh

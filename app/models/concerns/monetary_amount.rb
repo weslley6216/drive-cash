@@ -1,10 +1,16 @@
 module MonetaryAmount
   extend ActiveSupport::Concern
 
-  def amount=(value)
-    value = normalize_brazilian_decimal(value) if value.is_a?(String)
+  class_methods do
+    def monetize(*attributes)
+      attributes.each do |attribute|
+        define_method("#{attribute}=") do |value|
+          value = normalize_brazilian_decimal(value) if value.is_a?(String)
 
-    super(value)
+          super(value)
+        end
+      end
+    end
   end
 
   private

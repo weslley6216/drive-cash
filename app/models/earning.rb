@@ -1,5 +1,6 @@
 class Earning < ApplicationRecord
   include MonetaryAmount
+  monetize :amount
 
   belongs_to :user
 

@@ -1,5 +1,6 @@
 class Expense < ApplicationRecord
   include MonetaryAmount
+  monetize :amount
 
   belongs_to :user
   has_one :refueling, dependent: :nullify
