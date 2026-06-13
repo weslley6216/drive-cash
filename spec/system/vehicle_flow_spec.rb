@@ -17,7 +17,7 @@ RSpec.describe 'Vehicle flow', type: :request do
     expect(current_user.reload.vehicle.odometer_km).to eq(160_928)
   end
 
-  it 'drives the tank saldo from a refuel credit down to a negative balance' do
+  it 'credits the tank on refuel then goes negative after fuel expenses' do
     vehicle = create(:vehicle, user: current_user, odometer_km: 160_928)
 
     post refuelings_path,
