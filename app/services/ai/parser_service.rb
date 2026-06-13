@@ -50,22 +50,37 @@ module Ai
     end
 
     def build_preview(tool_name, tool_input)
-      params = tool_input.is_a?(String) ? JSON.parse(tool_input) : tool_input
+      params = parse_params(tool_input)
+      return missing_amount_result(tool_name, params) if invalid_amount?(tool_name, params)
 
-      if %w[create_expense create_earning].include?(tool_name)
-        amount = params['amount'].to_f
-        if amount <= 0
-          Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount: #{params['amount']}"
-          return { type: :text, content: I18n.t('chat.errors.missing_amount') }
-        end
-      end
-
-      summary = Chat::SummaryPresenter.build(tool_name, params)
-      content = I18n.t('chat.history.preview_sent')
-
-      { type: :preview, action: tool_name, params: params, summary: summary, content: content }
+      preview_for(tool_name, params)
     rescue JSON::ParserError
       { type: :text, content: I18n.t('chat.message.fallback') }
+    end
+
+    def parse_params(tool_input)
+      tool_input.is_a?(String) ? JSON.parse(tool_input) : tool_input
+    end
+
+    def invalid_amount?(tool_name, params)
+      return false unless %w[create_expense create_earning].include?(tool_name)
+
+      params['amount'].to_f <= 0
+    end
+
+    def missing_amount_result(tool_name, params)
+      Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount: #{params['amount']}"
+      { type: :text, content: I18n.t('chat.errors.missing_amount') }
+    end
+
+    def preview_for(tool_name, params)
+      {
+        type: :preview,
+        action: tool_name,
+        params: params,
+        summary: Chat::SummaryPresenter.build(tool_name, params),
+        content: I18n.t('chat.history.preview_sent')
+      }
     end
 
     def system_prompt
