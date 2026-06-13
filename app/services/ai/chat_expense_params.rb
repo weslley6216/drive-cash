@@ -22,12 +22,7 @@ module Ai
     private
 
     def coerce_hash(raw)
-      case raw
-      when ActionController::Parameters
-        raw.permit(*PERMITTED_KEYS).to_h.stringify_keys
-      when Hash then raw.stringify_keys.except('user_id')
-      else {}
-      end
+      Chat::Payload.permit(raw, PERMITTED_KEYS)
     end
   end
 end
