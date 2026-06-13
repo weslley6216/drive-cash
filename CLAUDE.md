@@ -174,6 +174,7 @@ rtk docker compose up -d db                                          # sobe o ba
 
 - **Cobertura 100%**: SimpleCov bloqueia PR se cobertura cair. Toda linha nova precisa de spec.
 - **Sem lógica em controllers**: lógica de negócio vai em Services (`app/services/{domínio}/`).
+- **Service devolve payload semântico, não apresentação**: o retorno é estrutura + dados crus (números, chaves de enum, `Data`/hash). Cor/design token, `number_to_currency` e helpers de view ficam no component Phlex (que é Ruby — é o lar natural disso). Rótulo i18n 1:1 (`platforms.#{platform}`) pode ficar no service. Cálculo de domínio nunca convive com formatação no mesmo arquivo — extrair um calculador puro (ex: `Refuelings::VendorEfficiency`, `Dashboard::EarningsCalculator`).
 - **Phlex, não ERB**: views são arquivos `.rb`, herdam de `ApplicationView` ou `ApplicationComponent`.
 - **Turbo Streams**: respostas parciais via `RecordSaveResponse` concern — não redireciona.
 - **Monetário**: sempre `decimal(10,2)`, concern `MonetaryAmount` converte string de input.
