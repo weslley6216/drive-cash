@@ -40,20 +40,13 @@ module Chat
                     vendor: vendor,
                     date: format_date(@params['date']))
 
-      installments = installments_count
-      period = (@params['installments_period'].presence || @params['installment_period']).to_s
-      return base if installments < 2 || !Expense::INSTALLMENT_PERIODS.include?(period)
+      installments = InstallmentInfo.new(@params)
+      return base unless installments.present?
 
-      period_label = I18n.t("expenses.period_labels.#{period}", default: period)
       I18n.t('chat.preview.expense_installments',
              base: base,
-             installments: installments,
-             period: period_label)
-    end
-
-    def installments_count
-      raw_value = @params['installments'] || @params['installment_count']
-      raw_value.respond_to?(:to_i) ? raw_value.to_i : 0
+             installments: installments.count,
+             period: I18n.t("expenses.period_labels.#{installments.period}", default: installments.period))
     end
 
     def format_date(date_str)
