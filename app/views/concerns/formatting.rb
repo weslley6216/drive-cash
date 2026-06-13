@@ -5,6 +5,10 @@ module Formatting
     number_to_currency(value, unit: 'R$ ', format: '%u%n', separator: ',', delimiter: '.', precision: 2)
   end
 
+  def format_currency_short(value)
+    number_to_currency(value, unit: 'R$ ', format: '%u%n', separator: ',', delimiter: '.', precision: 0)
+  end
+
   def format_percentage(value)
     number_with_precision(value, precision: 1)
   end

@@ -46,14 +46,14 @@ RSpec.describe Vehicles::MaintenanceService do
       end
 
       describe 'cheapest_vendor insight' do
-        it 'is returned with title and body when there are at least 3 distinct vendors' do
+        it 'is returned with the winning vendor and its efficiency when there are at least 3 distinct vendors' do
           base_refuelings_for_three_vendors(vehicle: vehicle, reference_date: reference_date)
 
           result = described_class.new(user: user, date: reference_date).call
 
           insight = result[:insights].find { |entry| entry[:type] == :cheapest_vendor }
-          expect(insight[:title]).to include('Posto Orense')
-          expect(insight[:body]).to include('km/L')
+          expect(insight[:winner]).to eq('Posto Orense')
+          expect(insight[:winner_kml]).to be > insight[:runner_up_kml]
         end
 
         it 'is not returned when fewer than 3 distinct vendors exist' do
