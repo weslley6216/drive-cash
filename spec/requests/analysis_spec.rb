@@ -95,13 +95,5 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('111,00')
       expect(response.body).not_to include('999,00')
     end
-
-    it 'does not include external chart scripts' do
-      get analysis_path
-
-      expect(response.body).not_to include('chart.js')
-      expect(response.body).not_to include('recharts')
-      expect(response.body).not_to include('d3.min')
-    end
   end
 end

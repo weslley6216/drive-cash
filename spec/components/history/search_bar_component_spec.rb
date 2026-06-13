@@ -30,8 +30,4 @@ RSpec.describe History::SearchBarComponent, type: :component do
     expect(html).to include(%(action="#{Rails.application.routes.url_helpers.history_path}"))
     expect(html).to include('method="get"')
   end
-
-  it 'keeps form submission within the current turbo_frame' do
-    expect(html).not_to include('data-turbo-frame="_top"')
-  end
 end

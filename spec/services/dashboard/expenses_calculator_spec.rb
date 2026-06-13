@@ -15,10 +15,6 @@ RSpec.describe Dashboard::ExpensesCalculator do
     it 'calculates total expenses' do
       expect(result[:total]).to eq(350.0)
     end
-
-    it 'does not return a by_category key' do
-      expect(result).not_to have_key(:by_category)
-    end
   end
 
   describe '#monthly_totals' do

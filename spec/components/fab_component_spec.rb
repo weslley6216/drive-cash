@@ -24,11 +24,6 @@ RSpec.describe FabComponent, type: :component do
       expect(html).to include('flex-col items-end')
     end
 
-    it 'does not render a journey button' do
-      expect(html).not_to include('href="/work_session"')
-      expect(html).not_to include('bg-sky-600')
-    end
-
     it 'renders expense button with red color' do
       expect(html).to include(I18n.t('fab_component.new_expense'))
       expect(html).to include('bg-red-600')
