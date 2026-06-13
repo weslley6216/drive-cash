@@ -81,6 +81,24 @@ RSpec.describe 'Expenses', type: :request do
       expect(response.body).to include(I18n.t('expenses.new_view.title'))
     end
 
+    it 're-renders the refueling extension visible when the failed expense is fuel' do
+      post expenses_path,
+           params: { expense: { amount: 0, category: 'fuel' } },
+           as: :turbo_stream
+
+      expect(response.body).to include('data-refueling-fields-target="extension"')
+      expect(response.body).to include(I18n.t('expenses.refueling_extension.heading'))
+      expect(response.body).not_to include('class="mt-2 hidden"')
+    end
+
+    it 're-renders the refueling extension hidden when the failed expense is not fuel' do
+      post expenses_path,
+           params: { expense: { amount: 0, category: 'meals' } },
+           as: :turbo_stream
+
+      expect(response.body).to include('class="mt-2 hidden"')
+    end
+
     it 're-renders new expense when installment parameters are invalid' do
       params = {
         expense: {
@@ -116,6 +134,22 @@ RSpec.describe 'Expenses', type: :request do
       expect(response.body).to include(I18n.t('expenses.edit_view.title'))
       expect(response.body).to include('value="2026"')
       expect(response.body).to include('expense[paid]')
+    end
+
+    it 'does not render the refueling extension when editing' do
+      expense = create(:expense, user: current_user, category: 'fuel', amount: 80)
+
+      get edit_expense_path(expense)
+
+      expect(response.body).not_to include(I18n.t('expenses.refueling_extension.heading'))
+    end
+
+    it 'preselects the expense category' do
+      expense = create(:expense, user: current_user, category: 'maintenance', amount: 80)
+
+      get edit_expense_path(expense)
+
+      expect(response.body).to include('selected="selected" value="maintenance"')
     end
   end
 

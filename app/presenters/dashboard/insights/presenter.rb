@@ -62,7 +62,7 @@ module Dashboard
                  pct: payload[:pct],
                  value: format_currency(payload[:amount]),
                  period: I18n.t('date.month_names')[payload[:month]],
-                 previous_year: payload[:previous_year])
+                 previous_period: I18n.t('date.month_names')[payload[:previous_month]])
         else
           I18n.t("#{I18N_SCOPE}.category_spike.description_annual",
                  category: payload[:category],

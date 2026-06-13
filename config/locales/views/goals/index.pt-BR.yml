@@ -59,8 +59,6 @@ pt-BR:
         buttons:
           cancel: "Cancelar"
           save: "Salvar"
-        placeholders:
-          money: "0,00"
       created: "Meta criada com sucesso."
       updated: "Meta atualizada."
       destroyed: "Meta removida."

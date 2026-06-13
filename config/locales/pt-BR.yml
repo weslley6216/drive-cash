@@ -166,6 +166,9 @@ pt-BR:
       header:
         one: 'Não foi possível gravar %{model}: %{count} erro'
         other: 'Não foi possível gravar %{model}: %{count} erros'
+  form_fields:
+    placeholders:
+      money: "R$ 0,00"
   helpers:
     select:
       prompt: Por favor selecione

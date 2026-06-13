@@ -1,6 +1,5 @@
 pt-BR:
   fab_component:
-    start_journey: "Iniciar Jornada"
     new_earning: "Nova Receita"
     ai_chat: "Assistente IA"
     new_expense: "Nova Despesa"

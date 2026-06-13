@@ -44,5 +44,24 @@ RSpec.describe Dashboard::ProfitSeriesService do
       expect(result[9]).to eq(400.0)
       expect(result[0]).to eq(0.0)
     end
+
+    it 'truncates the series at today when the filtered month is the current month' do
+      travel_to Date.new(2026, 6, 12) do
+        create(:earning, user: user, date: '2026-06-10', amount: 300.00)
+
+        result = described_class.new(year: 2026, month: 6, user: user).daily
+
+        expect(result.size).to eq(12)
+        expect(result[9]).to eq(300.0)
+      end
+    end
+
+    it 'keeps the full month for months other than the current one' do
+      travel_to Date.new(2026, 6, 12) do
+        result = described_class.new(year: 2026, month: 5, user: user).daily
+
+        expect(result.size).to eq(31)
+      end
+    end
   end
 end

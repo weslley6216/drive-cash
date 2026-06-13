@@ -51,14 +51,14 @@ module Goals
     def kind_select(form)
       field_wrapper(t('goals.index.form.labels.kind'), theme: @theme) do
         options = Goal::KINDS.map { |kind| [t("goals.index.form.kinds.#{kind}"), kind] }
-        render form.select(:kind, options, {}, { class: "#{input_classes(theme: @theme)} bg-white", required: true })
+        render form.select(:kind, options, {}, { class: "#{input_classes(theme: @theme)} bg-white" })
       end
     end
 
     def metric_select(form)
       field_wrapper(t('goals.index.form.labels.metric'), theme: @theme) do
         options = Goal::METRICS.map { |metric| [t("goals.index.form.metrics.#{metric}"), metric] }
-        render form.select(:metric, options, {}, { class: "#{input_classes(theme: @theme)} bg-white", required: true })
+        render form.select(:metric, options, {}, { class: "#{input_classes(theme: @theme)} bg-white" })
       end
     end
 
