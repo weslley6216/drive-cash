@@ -58,6 +58,24 @@ RSpec.describe 'Maintenances', type: :request do
     end
   end
 
+  describe 'PATCH /maintenances/:id' do
+    let(:maintenance) { create(:maintenance, vehicle: vehicle, interval_km: 5_000) }
+
+    it 'updates the interval and refreshes via turbo' do
+      patch maintenance_path(maintenance), params: { maintenance: { interval_km: 8_000 } }, as: :turbo_stream
+
+      expect(maintenance.reload.interval_km).to eq(8_000)
+      expect(response.body).to include('action="refresh"')
+    end
+
+    it 'rerenders the form on invalid update' do
+      patch maintenance_path(maintenance), params: { maintenance: { interval_km: '' } }, as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('maintenances.form.title_edit'))
+    end
+  end
+
   describe 'PATCH /maintenances/:id/mark_done' do
     let(:maintenance) { create(:maintenance, vehicle: vehicle, last_done_km: 150_000, interval_km: 5_000) }
 

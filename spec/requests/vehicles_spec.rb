@@ -62,6 +62,23 @@ RSpec.describe 'Vehicles', type: :request do
         expect(response.body).to include(I18n.t('vehicle.insight.cheapest.title', vendor: 'PosC'))
       end
     end
+
+    context 'with more maintenances than the mobile limit' do
+      let(:vehicle) { create(:vehicle, user: current_user, odometer_km: 160_928) }
+
+      before do
+        vehicle
+        Maintenance::CATALOG.keys.first(6).each do |kind|
+          create(:maintenance, vehicle: vehicle, category: kind, last_done_km: 159_000, interval_km: 5_000)
+        end
+      end
+
+      it 'shows the hidden on-track counter on the catalog button' do
+        get vehicle_path
+
+        expect(response.body).to include(I18n.t('vehicle.maintenances.hidden_ok', count: 1))
+      end
+    end
   end
 
   describe 'GET /vehicle/edit' do

@@ -29,6 +29,13 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       expect(html).to include('border-red-200')
     end
 
+    it 'falls back to the tank title when the ok state has no recorded fill' do
+      html = view_context.render(described_class.new(balance: 125, full: 260, last_fill: nil))
+
+      expect(html).to include(I18n.t('vehicle.tank.status.ok'))
+      expect(html).to include(I18n.t('vehicle.tank.title'))
+    end
+
     it 'renders the negative state with a minus sign' do
       html = view_context.render(described_class.new(balance: -40, full: 260, last_fill: fill))
 

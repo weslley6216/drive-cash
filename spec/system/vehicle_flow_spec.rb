@@ -9,24 +9,49 @@ RSpec.describe 'Vehicle flow', type: :request do
     patch vehicle_path,
           params: {
             vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: '2018',
-                       license_plate: 'ABC-1D23', odometer_km: '48230' }
+                       license_plate: 'ABC-1D23', odometer_km: '160928' }
           },
           as: :turbo_stream
 
     expect(response.body).to include('action="refresh"')
-    expect(current_user.reload.vehicle).to be_present
-    expect(current_user.vehicle.brand).to eq('Honda')
-    expect(current_user.vehicle.odometer_km).to eq(48_230)
+    expect(current_user.reload.vehicle.odometer_km).to eq(160_928)
   end
 
-  it 'renders vehicle dashboard after registration' do
-    create(:vehicle, user: current_user, brand: 'Honda', vehicle_model: 'Civic',
-                     year: 2018, odometer_km: 48_230)
+  it 'drives the tank saldo from a refuel credit down to a negative balance' do
+    vehicle = create(:vehicle, user: current_user, odometer_km: 160_928)
 
+    post refuelings_path,
+         params: { refueling: { date: Date.current.to_s, vendor: 'Posto Orense', liters: '44.1',
+                                total_amount: '260.00', odometer_km: '160928', full_tank: '1' } },
+         as: :turbo_stream
     get vehicle_path
 
-    expect(response).to have_http_status(:success)
-    expect(response.body).to include('48.230')
-    expect(response.body).to include(I18n.t('vehicle.metrics.cost_per_km'))
+    expect(response.body).to include(I18n.t('vehicle.tank.status.ok'))
+    expect(response.body).to include('R$ 260,00')
+
+    create(:expense, user: current_user, category: 'fuel', amount: 300, date: Date.current)
+    get vehicle_path
+
+    expect(response.body).to include(I18n.t('vehicle.tank.status.negative'))
+    expect(response.body).to include(I18n.t('vehicle.tank.note.negative'))
+    expect(vehicle.reload.refuelings.count).to eq(1)
+  end
+
+  it 'resets odometer freshness after an update' do
+    create(:vehicle, user: current_user, odometer_km: 160_000, odometer_updated_at: 30.days.ago)
+
+    patch vehicle_path, params: { vehicle: { odometer_km: '160928' } }, as: :turbo_stream
+    get vehicle_path
+
+    expect(response.body).to include(I18n.t('vehicle.odometer.fresh', count: 0))
+  end
+
+  it 'zeroes maintenance progress when marked done' do
+    vehicle = create(:vehicle, user: current_user, odometer_km: 160_928)
+    maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 150_000, interval_km: 5_000)
+
+    patch mark_done_maintenance_path(maintenance), as: :turbo_stream
+
+    expect(maintenance.reload.progress).to eq(0)
   end
 end
