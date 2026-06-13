@@ -1,10 +1,78 @@
 require 'rails_helper'
 
 RSpec.describe Maintenance, type: :model do
-  describe 'validations' do
-    subject { build(:maintenance) }
+  describe '#progress' do
+    it 'computes percentage of interval consumed since last done' do
+      vehicle = create(:vehicle, odometer_km: 160_928)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_318, interval_km: 5_000)
 
-    it { is_expected.to validate_presence_of(:name) }
+      expect(maintenance.progress).to be_within(0.01).of(52.2)
+    end
+  end
+
+  describe '#target and #km_until' do
+    it 'returns remaining km to the target' do
+      vehicle = create(:vehicle, odometer_km: 160_928)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_318, interval_km: 5_000)
+
+      expect(maintenance.target).to eq(163_318)
+      expect(maintenance.km_until).to eq(2_390)
+    end
+
+    it 'returns negative when overdue' do
+      vehicle = create(:vehicle, odometer_km: 160_928)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 150_000, interval_km: 5_000)
+
+      expect(maintenance.km_until).to eq(-5_928)
+    end
+  end
+
+  describe '#status_key' do
+    it 'is ok below 80 percent' do
+      vehicle = create(:vehicle, odometer_km: 160_000)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_000, interval_km: 5_000)
+
+      expect(maintenance.status_key).to eq(:ok)
+    end
+
+    it 'is overdue at or beyond the interval' do
+      vehicle = create(:vehicle, odometer_km: 165_000)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_000, interval_km: 5_000)
+
+      expect(maintenance.status_key).to eq(:overdue)
+    end
+  end
+
+  describe '#icon_component' do
+    it 'returns the lucide icon mapped to its category' do
+      maintenance = build(:maintenance, category: 'timing_belt')
+
+      expect(maintenance.icon_component).to eq(PhlexIcons::Lucide::Settings)
+    end
+  end
+
+  describe '.catalog_defaults' do
+    it 'returns interval and cost for a known kind' do
+      defaults = described_class.catalog_defaults('timing_belt')
+
+      expect(defaults[:interval_km]).to eq(60_000)
+      expect(defaults[:estimated_cost]).to eq(900)
+    end
+  end
+
+  describe 'enums' do
+    it 'defines the eight catalog categories' do
+      expect(described_class.categories.keys).to eq(described_class::CATALOG.keys)
+    end
+  end
+
+  describe 'validations' do
+    it 'requires last_done_km and interval_km' do
+      maintenance = described_class.new
+
+      expect(maintenance).not_to be_valid
+      expect(maintenance.errors.attribute_names).to include(:last_done_km, :interval_km)
+    end
 
     it 'allows estimated_cost to be blank' do
       maintenance = build(:maintenance, estimated_cost: nil)
@@ -18,110 +86,6 @@ RSpec.describe Maintenance, type: :model do
       maintenance.valid?
 
       expect(maintenance.errors[:estimated_cost]).to be_present
-    end
-  end
-
-  describe 'enums' do
-    it 'defines category enum' do
-      expect(described_class.categories).to eq(
-        'oil_change' => 0,
-        'brake' => 1,
-        'alignment' => 2,
-        'tires' => 3,
-        'other' => 4
-      )
-    end
-  end
-
-  describe 'scopes' do
-    let(:vehicle) { create(:vehicle, odometer_km: 48_000) }
-
-    describe '.pending' do
-      it 'returns only non-completed maintenances' do
-        pending_one = create(:maintenance, vehicle: vehicle, completed: false)
-        create(:maintenance, vehicle: vehicle, completed: true)
-
-        expect(described_class.pending).to contain_exactly(pending_one)
-      end
-    end
-
-    describe '.due_soon' do
-      it 'returns maintenances within km_threshold' do
-        within = create(:maintenance, vehicle: vehicle, due_at_km: 48_500, due_at_date: nil)
-        create(:maintenance, vehicle: vehicle, due_at_km: 60_000, due_at_date: nil)
-
-        result = described_class.due_soon(odometer_km: vehicle.odometer_km, today: Date.current,
-                                          km_threshold: 1000, day_threshold: 14)
-
-        expect(result).to contain_exactly(within)
-      end
-
-      it 'returns maintenances within day_threshold' do
-        within = create(:maintenance, vehicle: vehicle, due_at_km: nil, due_at_date: Date.current + 5.days)
-        create(:maintenance, vehicle: vehicle, due_at_km: nil, due_at_date: Date.current + 90.days)
-
-        result = described_class.due_soon(odometer_km: vehicle.odometer_km, today: Date.current,
-                                          km_threshold: 1000, day_threshold: 14)
-
-        expect(result).to contain_exactly(within)
-      end
-    end
-  end
-
-  describe '#urgent?' do
-    let(:vehicle) { create(:vehicle, odometer_km: 48_000) }
-
-    it 'is urgent when km_until is under km_threshold' do
-      maintenance = build(:maintenance, vehicle: vehicle, due_at_km: 48_500, due_at_date: nil)
-
-      expect(maintenance.urgent?(km_threshold: 1000, day_threshold: 14)).to be(true)
-    end
-
-    it 'is urgent when days_until is under day_threshold' do
-      maintenance = build(:maintenance, vehicle: vehicle, due_at_km: nil, due_at_date: Date.current + 7.days)
-
-      expect(maintenance.urgent?(km_threshold: 1000, day_threshold: 14)).to be(true)
-    end
-
-    it 'is not urgent when both thresholds are exceeded' do
-      maintenance = build(:maintenance, vehicle: vehicle, due_at_km: 60_000, due_at_date: Date.current + 90.days)
-
-      expect(maintenance.urgent?(km_threshold: 1000, day_threshold: 14)).to be(false)
-    end
-
-    it 'is not urgent when nothing was scheduled (both nil)' do
-      maintenance = build(:maintenance, vehicle: vehicle, due_at_km: nil, due_at_date: nil)
-
-      expect(maintenance.urgent?(km_threshold: 1000, day_threshold: 14)).to be(false)
-    end
-  end
-
-  describe '#km_until' do
-    it 'returns difference between due_at_km and vehicle odometer' do
-      vehicle = create(:vehicle, odometer_km: 48_000)
-      maintenance = build(:maintenance, vehicle: vehicle, due_at_km: 49_500)
-
-      expect(maintenance.km_until).to eq(1500)
-    end
-
-    it 'returns nil when due_at_km is blank' do
-      maintenance = build(:maintenance, due_at_km: nil)
-
-      expect(maintenance.km_until).to be_nil
-    end
-  end
-
-  describe '#days_until' do
-    it 'returns difference in days from today to due_at_date' do
-      maintenance = build(:maintenance, due_at_date: Date.current + 10.days)
-
-      expect(maintenance.days_until(today: Date.current)).to eq(10)
-    end
-
-    it 'returns nil when due_at_date is blank' do
-      maintenance = build(:maintenance, due_at_date: nil)
-
-      expect(maintenance.days_until(today: Date.current)).to be_nil
     end
   end
 end
