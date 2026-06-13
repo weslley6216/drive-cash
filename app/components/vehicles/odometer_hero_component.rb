@@ -76,7 +76,7 @@ module Vehicles
     end
 
     def update_button
-      button(class: button_classes) do
+      link_to(helpers.edit_vehicle_path, class: button_classes, data: { turbo_frame: 'modal' }) do
         render PhlexIcons::Lucide::Camera.new(class: 'w-[18px] h-[18px]')
         plain t('vehicle.odometer.update')
       end
