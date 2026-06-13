@@ -7,6 +7,10 @@ RSpec.describe CajuQuickAccessComponent, type: :component do
     expect(html).to include('href="/chat"')
   end
 
+  it 'escapes the page turbo frame so navigation reaches the chat' do
+    expect(html.scan('data-turbo-frame="_top"').size).to eq(2)
+  end
+
   it 'renders Caju title' do
     expect(html).to include(I18n.t('caju_quick_access_component.title'))
   end

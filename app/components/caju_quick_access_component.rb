@@ -1,7 +1,7 @@
 class CajuQuickAccessComponent < ApplicationComponent
   def view_template
     div(class: 'lg:hidden') do
-      link_to chat_root_path, class: mobile_classes do
+      link_to chat_root_path, class: mobile_classes, data: { turbo_frame: '_top' } do
         div(class: 'w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 flex-shrink-0') do
           render PhlexIcons::Lucide::Sparkles.new(class: 'w-5 h-5')
         end
@@ -14,7 +14,7 @@ class CajuQuickAccessComponent < ApplicationComponent
     end
 
     div(class: 'hidden lg:block h-full') do
-      link_to chat_root_path, class: desktop_classes do
+      link_to chat_root_path, class: desktop_classes, data: { turbo_frame: '_top' } do
         div(class: 'flex items-center justify-between') do
           render PhlexIcons::Lucide::Sparkles.new(class: 'w-7 h-7')
           render PhlexIcons::Lucide::ArrowUpRight.new(class: 'w-5 h-5')
