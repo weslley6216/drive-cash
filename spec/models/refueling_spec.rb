@@ -82,29 +82,4 @@ RSpec.describe Refueling, type: :model do
       expect(described_class.chronological).to eq([newer, older])
     end
   end
-
-  describe '#km_per_liter_to_previous' do
-    it 'returns km/L using previous full_tank refueling' do
-      vehicle = create(:vehicle)
-      create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 1), odometer_km: 47_000, liters: 30, full_tank: true)
-      current = create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), odometer_km: 47_330, liters: 30, full_tank: true)
-
-      expect(current.km_per_liter_to_previous).to eq(11.0)
-    end
-
-    it 'returns nil when there is no previous full_tank refueling' do
-      vehicle = create(:vehicle)
-      refueling = create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), full_tank: true)
-
-      expect(refueling.km_per_liter_to_previous).to be_nil
-    end
-
-    it 'returns nil when current refueling is not full_tank' do
-      vehicle = create(:vehicle)
-      create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 1), full_tank: true)
-      current = create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), full_tank: false)
-
-      expect(current.km_per_liter_to_previous).to be_nil
-    end
-  end
 end

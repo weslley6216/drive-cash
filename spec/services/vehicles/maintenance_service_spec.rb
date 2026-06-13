@@ -10,101 +10,55 @@ RSpec.describe Vehicles::MaintenanceService do
         result = described_class.new(user: user, date: reference_date).call
 
         expect(result[:vehicle]).to be_nil
-        expect(result[:odometer]).to eq(current_km: 0, km_this_month: 0)
-        expect(result[:metrics]).to eq(cost_per_km: 0, revenue_per_km: 0, profit_per_km: 0, km_per_liter: nil)
-        expect(result[:upcoming_maintenances]).to eq([])
-        expect(result[:recent_refuelings]).to eq([])
+        expect(result[:odometer]).to eq(current_km: 0, km_this_month: 0, updated_days_ago: nil)
+        expect(result[:maintenances]).to eq([])
         expect(result[:insights]).to eq([])
       end
     end
 
     context 'when user has a vehicle' do
-      let(:vehicle) { create(:vehicle, user: user, odometer_km: 48_230) }
+      let(:vehicle) { create(:vehicle, user: user, odometer_km: 160_928, odometer_updated_at: 3.days.ago) }
 
       before { vehicle }
 
-      it 'returns vehicle and odometer payload' do
-        create(:refueling, vehicle: vehicle, date: reference_date.beginning_of_month, odometer_km: 46_390)
+      it 'returns vehicle and odometer payload with freshness' do
+        create(:refueling, vehicle: vehicle, date: reference_date.beginning_of_month, odometer_km: 159_088)
 
         result = described_class.new(user: user, date: reference_date).call
 
         expect(result[:vehicle]).to eq(vehicle)
-        expect(result[:odometer][:current_km]).to eq(48_230)
+        expect(result[:odometer][:current_km]).to eq(160_928)
         expect(result[:odometer][:km_this_month]).to eq(1840)
+        expect(result[:odometer][:updated_days_ago]).to eq(3)
       end
 
-      it 'returns metrics from Vehicles::Statistics' do
-        create(:refueling, vehicle: vehicle, date: reference_date - 30.days, odometer_km: 47_000, liters: 30, full_tank: true)
-        create(:refueling, vehicle: vehicle, date: reference_date,           odometer_km: 47_330, liters: 30, full_tank: true)
-        create(:earning, user: user, amount: 610, date: reference_date - 10.days)
-        create(:expense, user: user, category: 'fuel', amount: 270, date: reference_date - 5.days)
+      it 'returns maintenances ordered by progress descending with status_key' do
+        on_track = create(:maintenance, vehicle: vehicle, category: 'timing_belt', last_done_km: 130_000, interval_km: 60_000)
+        overdue = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 150_000, interval_km: 5_000)
 
         result = described_class.new(user: user, date: reference_date).call
 
-        expect(result[:metrics][:km_per_liter]).to be_within(0.1).of(11.0)
-        expect(result[:metrics][:cost_per_km]).to be > 0
-        expect(result[:metrics][:revenue_per_km]).to be > 0
-        expect(result[:metrics][:profit_per_km]).to be_within(0.01).of(result[:metrics][:revenue_per_km] - result[:metrics][:cost_per_km])
-      end
-
-      it 'returns pending maintenances with km_until, days_until, urgent, progress_pct' do
-        maintenance = create(:maintenance, vehicle: vehicle, due_at_km: 48_500,
-                                           due_at_date: reference_date + 8.days)
-
-        result = described_class.new(user: user, date: reference_date).call
-
-        entry = result[:upcoming_maintenances].first
-        expect(entry[:maintenance]).to eq(maintenance)
-        expect(entry[:km_until]).to eq(270)
-        expect(entry[:days_until]).to eq(8)
-        expect(entry[:urgent]).to be(true)
-        expect(entry[:progress_pct]).to be_between(0, 100)
-      end
-
-      it 'excludes completed maintenances' do
-        create(:maintenance, vehicle: vehicle, completed: true)
-
-        result = described_class.new(user: user, date: reference_date).call
-
-        expect(result[:upcoming_maintenances]).to be_empty
-      end
-
-      it 'returns recent refuelings with computed_km_per_liter' do
-        create(:refueling, vehicle: vehicle, date: reference_date - 30.days, odometer_km: 47_000, liters: 30, full_tank: true)
-        last = create(:refueling, vehicle: vehicle, date: reference_date, odometer_km: 47_330, liters: 30, full_tank: true)
-
-        result = described_class.new(user: user, date: reference_date).call
-
-        entry = result[:recent_refuelings].first
-        expect(entry[:refueling]).to eq(last)
-        expect(entry[:computed_km_per_liter]).to be_within(0.05).of(11.0)
-      end
-
-      it 'limits recent refuelings to 5 entries' do
-        7.times do |offset|
-          create(:refueling, vehicle: vehicle, date: reference_date - offset.days,
-                             odometer_km: 47_000 + (offset * 100))
-        end
-
-        result = described_class.new(user: user, date: reference_date).call
-
-        expect(result[:recent_refuelings].size).to eq(5)
+        maintenances = result[:maintenances]
+        expect(maintenances.map { |entry| entry[:maintenance] }).to eq([overdue, on_track])
+        expect(maintenances.first[:status_key]).to eq(:overdue)
+        expect(maintenances.first[:km_until]).to be_negative
+        expect(maintenances.last[:status_key]).to eq(:ok)
       end
 
       describe 'cheapest_vendor insight' do
-        it 'is returned when there are at least 3 distinct vendors with full_tank pairs' do
+        it 'is returned with title and body when there are at least 3 distinct vendors' do
           base_refuelings_for_three_vendors(vehicle: vehicle, reference_date: reference_date)
 
           result = described_class.new(user: user, date: reference_date).call
 
           insight = result[:insights].find { |entry| entry[:type] == :cheapest_vendor }
-          expect(insight).not_to be_nil
           expect(insight[:title]).to include('Posto Orense')
+          expect(insight[:body]).to include('km/L')
         end
 
         it 'is not returned when fewer than 3 distinct vendors exist' do
-          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 30.days, odometer_km: 47_000, full_tank: true)
-          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date,           odometer_km: 47_330, full_tank: true)
+          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 30.days, odometer_km: 159_000, full_tank: true)
+          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date,           odometer_km: 159_330, full_tank: true)
 
           result = described_class.new(user: user, date: reference_date).call
 
@@ -115,11 +69,11 @@ RSpec.describe Vehicles::MaintenanceService do
   end
 
   def base_refuelings_for_three_vendors(vehicle:, reference_date:)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 60.days, odometer_km: 46_000, liters: 30, total_amount: 165, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 30.days, odometer_km: 46_345, liters: 30, total_amount: 165, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 20.days, odometer_km: 46_675, liters: 28, total_amount: 168, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 10.days, odometer_km: 46_983, liters: 28, total_amount: 168, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date - 5.days,  odometer_km: 47_300, liters: 30, total_amount: 175, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date,           odometer_km: 47_620, liters: 30, total_amount: 175, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 60.days, odometer_km: 156_000, liters: 30, total_amount: 165, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 30.days, odometer_km: 156_345, liters: 30, total_amount: 165, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 20.days, odometer_km: 156_675, liters: 28, total_amount: 168, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 10.days, odometer_km: 156_983, liters: 28, total_amount: 168, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date - 5.days,  odometer_km: 157_300, liters: 30, total_amount: 175, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date,           odometer_km: 157_620, liters: 30, total_amount: 175, full_tank: true)
   end
 end

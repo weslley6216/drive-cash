@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Maintenances', type: :request do
   let(:current_user) { create(:user) }
-  let(:vehicle) { create(:vehicle, user: current_user) }
+  let(:vehicle) { create(:vehicle, user: current_user, odometer_km: 160_928) }
 
   before do
     vehicle
@@ -20,9 +20,7 @@ RSpec.describe 'Maintenances', type: :request do
 
   describe 'POST /maintenances' do
     let(:valid_params) do
-      { maintenance: { name: 'Troca de óleo', category: 'oil_change',
-                       due_at_km: 49_000, due_at_date: (Date.current + 18.days).to_s,
-                       estimated_cost: '180.00' } }
+      { maintenance: { category: 'oil_change', last_done_km: 158_318, interval_km: 5_000, estimated_cost: '280.00' } }
     end
 
     it 'creates a maintenance and responds with modal clear and turbo_stream refresh' do
@@ -33,17 +31,19 @@ RSpec.describe 'Maintenances', type: :request do
       expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
+    it 'fills interval and cost from the catalog when left blank' do
+      post maintenances_path, params: { maintenance: { category: 'timing_belt', last_done_km: 110_000 } }, as: :turbo_stream
+
+      maintenance = Maintenance.last
+      expect(maintenance.interval_km).to eq(60_000)
+      expect(maintenance.estimated_cost).to eq(900)
+    end
+
     it 'rerenders form on invalid params' do
-      post maintenances_path, params: { maintenance: { name: '' } }, as: :turbo_stream
+      post maintenances_path, params: { maintenance: { category: 'oil_change', last_done_km: '' } }, as: :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('maintenances.form.title_new'))
-    end
-
-    it 'redirects html to /vehicle' do
-      post maintenances_path, params: valid_params
-
-      expect(response).to redirect_to(vehicle_path)
     end
   end
 
@@ -59,18 +59,32 @@ RSpec.describe 'Maintenances', type: :request do
   end
 
   describe 'PATCH /maintenances/:id' do
-    let(:maintenance) { create(:maintenance, vehicle: vehicle, completed: false) }
+    let(:maintenance) { create(:maintenance, vehicle: vehicle, interval_km: 5_000) }
 
-    it 'marks as completed when params include completed=true' do
-      patch maintenance_path(maintenance), params: { maintenance: { completed: '1' } }, as: :turbo_stream
+    it 'updates the interval and refreshes via turbo' do
+      patch maintenance_path(maintenance), params: { maintenance: { interval_km: 8_000 } }, as: :turbo_stream
 
-      expect(maintenance.reload.completed).to be(true)
+      expect(maintenance.reload.interval_km).to eq(8_000)
+      expect(response.body).to include('action="refresh"')
     end
 
-    it 'rerenders form on invalid update' do
-      patch maintenance_path(maintenance), params: { maintenance: { name: '' } }, as: :turbo_stream
+    it 'rerenders the form on invalid update' do
+      patch maintenance_path(maintenance), params: { maintenance: { interval_km: '' } }, as: :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('maintenances.form.title_edit'))
+    end
+  end
+
+  describe 'PATCH /maintenances/:id/mark_done' do
+    let(:maintenance) { create(:maintenance, vehicle: vehicle, last_done_km: 150_000, interval_km: 5_000) }
+
+    it 'resets last_done_km to the current odometer so progress zeroes out' do
+      patch mark_done_maintenance_path(maintenance), as: :turbo_stream
+
+      expect(maintenance.reload.last_done_km).to eq(160_928)
+      expect(maintenance.progress).to eq(0)
+      expect(response.body).to include('action="refresh"')
     end
   end
 

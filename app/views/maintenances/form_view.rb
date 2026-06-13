@@ -39,19 +39,17 @@ module Maintenances
 
     def render_form
       form_with(model: @maintenance, url: form_url, method: form_method, class: 'p-6 space-y-4') do |form|
-        text_field(form, :name, label: t('maintenances.form.labels.name'), theme: @theme, placeholder: t('maintenances.form.placeholders.name'))
         category_select(form)
-        integer_field(form, :due_at_km, label: t('maintenances.form.labels.due_at_km'), theme: @theme)
-        date_field(form, :due_at_date, label: t('maintenances.form.labels.due_at_date'), theme: @theme)
+        integer_field(form, :last_done_km, label: t('maintenances.form.labels.last_done_km'), theme: @theme)
+        integer_field(form, :interval_km, label: t('maintenances.form.labels.interval_km'), theme: @theme)
         money_field(form, :estimated_cost, label: t('maintenances.form.labels.estimated_cost'), theme: @theme)
-        toggle_field(form, :completed, label: t('maintenances.form.labels.completed'), theme: @theme) if @maintenance.persisted?
         render_actions
       end
     end
 
     def category_select(form)
       field_wrapper(t('maintenances.form.labels.category'), theme: @theme) do
-        options = Maintenance.categories.keys.map { |category| [t("maintenances.form.categories.#{category}"), category] }
+        options = Maintenance.categories.keys.map { |category| [t("vehicle.maintenances.catalog.#{category}"), category] }
         render form.select(:category, options, {}, { class: "#{input_classes(theme: @theme)} bg-white", required: true })
       end
     end

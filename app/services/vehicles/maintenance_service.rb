@@ -1,14 +1,10 @@
 module Vehicles
   class MaintenanceService
-    RECENT_LIMIT = 5
-    PROGRESS_KM_WINDOW = 3000
     MIN_DISTINCT_VENDORS_FOR_INSIGHT = 3
     EMPTY_PAYLOAD = {
       vehicle: nil,
-      odometer: { current_km: 0, km_this_month: 0 },
-      metrics: { cost_per_km: 0, revenue_per_km: 0, profit_per_km: 0, km_per_liter: nil },
-      upcoming_maintenances: [],
-      recent_refuelings: [],
+      odometer: { current_km: 0, km_this_month: 0, updated_days_ago: nil },
+      maintenances: [],
       insights: []
     }.freeze
 
@@ -22,53 +18,34 @@ module Vehicles
       return EMPTY_PAYLOAD unless vehicle
 
       stats = Statistics.new(vehicle: vehicle, date: @date)
-
       {
         vehicle: vehicle,
-        odometer: { current_km: vehicle.odometer_km, km_this_month: stats.km_this_month },
-        metrics: {
-          cost_per_km: stats.cost_per_km,
-          revenue_per_km: stats.revenue_per_km,
-          profit_per_km: stats.profit_per_km,
-          km_per_liter: stats.avg_km_per_liter
+        odometer: {
+          current_km: vehicle.odometer_km,
+          km_this_month: stats.km_this_month,
+          updated_days_ago: vehicle.updated_days_ago
         },
-        upcoming_maintenances: build_upcoming_maintenances(vehicle),
-        recent_refuelings: build_recent_refuelings(vehicle),
+        maintenances: build_maintenances(vehicle),
         insights: build_insights(vehicle)
       }
     end
 
     private
 
-    def build_upcoming_maintenances(vehicle)
-      vehicle.maintenances.pending.order(:due_at_date, :due_at_km).map do |maintenance|
-        km_value = maintenance.km_until
-        days_value = maintenance.days_until(today: @date)
+    def build_maintenances(vehicle)
+      vehicle.maintenances.includes(:vehicle).sort_by { |maintenance| -maintenance.progress }.map do |maintenance|
         {
           maintenance: maintenance,
-          km_until: km_value,
-          days_until: days_value,
-          urgent: maintenance.urgent?(today: @date),
-          progress_pct: progress_pct_for(km_value)
+          progress: maintenance.progress,
+          km_until: maintenance.km_until,
+          target: maintenance.target,
+          status_key: maintenance.status_key
         }
       end
     end
 
-    def progress_pct_for(km_value)
-      return 0 if km_value.nil?
-
-      (100 - [(km_value.to_f / PROGRESS_KM_WINDOW) * 100, 100].min).round
-    end
-
-    def build_recent_refuelings(vehicle)
-      vehicle.refuelings.chronological.limit(RECENT_LIMIT).map do |refueling|
-        { refueling: refueling, computed_km_per_liter: refueling.km_per_liter_to_previous }
-      end
-    end
-
     def build_insights(vehicle)
-      cheapest = cheapest_vendor_insight(vehicle)
-      [cheapest].compact
+      [cheapest_vendor_insight(vehicle)].compact
     end
 
     def cheapest_vendor_insight(vehicle)
@@ -76,24 +53,26 @@ module Vehicles
       vendors = full_tank_scope.distinct.pluck(:vendor)
       return nil if vendors.size < MIN_DISTINCT_VENDORS_FOR_INSIGHT
 
-      by_vendor = vendors.index_with do |vendor|
-        avg_for_vendor(full_tank_scope, vendor)
-      end.compact
-
+      by_vendor = vendors.index_with { |vendor| avg_for_vendor(full_tank_scope, vendor) }.compact
       return nil if by_vendor.size < MIN_DISTINCT_VENDORS_FOR_INSIGHT
 
       winner, winner_kml = by_vendor.max_by { |_vendor, kml| kml }
-      runner_up_kml = by_vendor.except(winner).values.max
-
+      runner_up, runner_up_kml = by_vendor.except(winner).max_by { |_vendor, kml| kml }
       savings = monthly_savings_estimate(vehicle: vehicle, winner_kml: winner_kml, runner_up_kml: runner_up_kml)
 
       {
         type: :cheapest_vendor,
-        title: I18n.t('vehicle.insights.cheapest_vendor.title', vendor: winner),
-        description: I18n.t('vehicle.insights.cheapest_vendor.description',
-                            km_per_l: format('%.1f', winner_kml).tr('.', ','),
-                            savings: format_currency_short(savings))
+        title: I18n.t('vehicle.insight.cheapest.title', vendor: winner),
+        body: I18n.t('vehicle.insight.cheapest.body',
+                     kml: format_kml(winner_kml),
+                     other: format_kml(runner_up_kml),
+                     other_vendor: runner_up,
+                     savings: format_currency_short(savings))
       }
+    end
+
+    def format_kml(value)
+      Kernel.format('%.1f', value).tr('.', ',')
     end
 
     def format_currency_short(value)

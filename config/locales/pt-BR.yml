@@ -290,42 +290,77 @@ pt-BR:
   vehicle:
     title: "Meu veículo"
     subtitle: "%{brand} %{vehicle_model} · %{year}"
+    edit: "Editar"
     odometer:
       label: "Odômetro"
       unit: "km"
-      update: "Atualizar"
-      delta_this_month: "+ %{value} km este mês"
-      not_set: "—"
-    metrics:
-      cost_per_km: "Custo/km"
-      revenue_per_km: "Receita/km"
-      profit_per_km: "Lucro/km"
-      km_per_liter: "Consumo"
-      empty_value: "—"
+      update: "Atualizar km"
+      photo_hint: "Leitura automática por foto"
+      soon: "em breve"
+      fresh:
+        one: "Atualizado há %{count} dia"
+        other: "Atualizado há %{count} dias"
+      stale: "Atualize · há %{count} dias"
+      stale_unknown: "Atualize o km"
+      delta_month: "+%{value} km este mês"
+    tank:
+      title: "Saldo do tanque"
+      of_full: "de %{value} do último tanque"
+      refuel: "Abastecer"
+      auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
+      last_fill: "Último tanque cheio · %{date} · %{vendor}"
+      status:
+        ok: "No tanque"
+        low: "Saldo baixo"
+        empty: "Tanque vazio"
+        negative: "No vermelho"
+      note:
+        low: "Tanque acabando — considere completar."
+        empty: "Saldo zerado — registre um abastecimento."
+        negative: "Você rodou além do último tanque. Abasteça para zerar."
     maintenances:
       title: "Próximas manutenções"
-      add: "+ Adicionar"
-      km_remaining: "em %{value} km"
-      days_remaining: "~%{value} dias"
-      urgent: "Em breve"
+      by_km: "por km rodado"
+      add_from_catalog: "Adicionar do catálogo"
+      hidden_ok:
+        one: "· %{count} em dia oculto"
+        other: "· %{count} em dia ocultos"
+      km_remaining: "faltam %{value} km"
+      at_km: "aos %{value} km"
+      overdue: "venceu há %{value} km"
+      est_cost: "est. %{value}"
       mark_done: "Marcar feita"
       empty: "Nenhuma manutenção cadastrada"
-    refuelings:
-      title: "Abastecimentos"
+      status:
+        ok: "Em dia"
+        soon: "Em breve"
+        overdue: "Vencida"
+      catalog:
+        oil_change: "Troca de óleo"
+        oil_filter: "Filtro de óleo"
+        air_filter: "Filtro de ar"
+        fuel_filter: "Filtro de combustível"
+        tire_rotation: "Rodízio de pneus"
+        brake_pads: "Pastilhas de freio"
+        spark_plugs: "Velas"
+        timing_belt: "Correia dentada"
+    moves:
+      title: "Movimentação do tanque"
       view_all: "Ver tudo →"
-      liters: "%{value} L"
-      km_per_l: "%{value} km/L"
-      empty: "Nenhum abastecimento registrado"
-      table_headers:
-        date: "Data"
-        vendor: "Posto"
-        price_per_liter: "R$/L"
-        km_per_liter: "km/L"
-        total: "Total"
-    insights:
-      cheapest_vendor:
+      full_tank: "Tanque cheio"
+      route: "Rota"
+      fuel_expense: "Combustível"
+      today: "Hoje"
+      yesterday: "Ontem"
+      auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
+    empty:
+      title: "Nenhum veículo cadastrado"
+      body: "Cadastre seu carro pra acompanhar km, manutenções e o saldo do tanque."
+      cta: "Cadastrar veículo"
+    insight:
+      cheapest:
         title: "%{vendor} é o mais econômico"
-        description: "%{km_per_l} km/L em média. Economia estimada: %{savings}/mês."
+        body: "%{kml} km/L em média, contra %{other} do %{other_vendor}. Economia estimada: %{savings}/mês."
     registration:
       title: "Cadastrar veículo"
       submit: "Salvar"
@@ -347,27 +382,18 @@ pt-BR:
       title_new: "Nova manutenção"
       title_edit: "Editar manutenção"
       labels:
-        name: "Nome"
-        category: "Categoria"
-        due_at_km: "Disparo em (km)"
-        due_at_date: "Disparo em (data)"
+        category: "Item"
+        last_done_km: "Última realização (km)"
+        interval_km: "Intervalo (km)"
         estimated_cost: "Custo estimado"
-        completed: "Concluída"
-      placeholders:
-        name: "Troca de óleo"
       buttons:
         save: "Salvar"
         cancel: "Cancelar"
-      categories:
-        oil_change: "Troca de óleo"
-        brake: "Freios"
-        alignment: "Alinhamento"
-        tires: "Pneus"
-        other: "Outra"
     flash:
       created: "Manutenção cadastrada."
       updated: "Manutenção atualizada."
       destroyed: "Manutenção removida."
+      marked_done: "Manutenção marcada como feita."
   refuelings:
     form:
       title_new: "Novo abastecimento"

@@ -12,22 +12,6 @@ class Refueling < ApplicationRecord
 
   before_save :compute_price_per_liter
 
-  def km_per_liter_to_previous
-    return nil unless full_tank
-
-    previous = self.class
-                   .where(vehicle_id: vehicle_id, full_tank: true)
-                   .where('date < ? OR (date = ? AND created_at < ?)', date, date, created_at || Time.current)
-                   .order(date: :desc, created_at: :desc)
-                   .first
-    return nil unless previous
-
-    delta_km = odometer_km - previous.odometer_km
-    return nil if delta_km <= 0 || liters.to_f.zero?
-
-    (delta_km / liters.to_f).round(2)
-  end
-
   private
 
   def compute_price_per_liter

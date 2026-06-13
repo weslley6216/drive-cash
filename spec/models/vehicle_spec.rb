@@ -64,4 +64,18 @@ RSpec.describe Vehicle, type: :model do
       expect(vehicle.display_name).to eq('Honda Civic · 2018')
     end
   end
+
+  describe '#updated_days_ago' do
+    it 'returns days since odometer was updated' do
+      vehicle = build(:vehicle, odometer_updated_at: 3.days.ago)
+
+      expect(vehicle.updated_days_ago).to eq(3)
+    end
+
+    it 'returns nil when never updated' do
+      vehicle = build(:vehicle, odometer_updated_at: nil)
+
+      expect(vehicle.updated_days_ago).to be_nil
+    end
+  end
 end

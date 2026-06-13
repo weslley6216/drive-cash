@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_180434) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_13_073416) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,15 +65,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_180434) do
 
   create_table "maintenances", force: :cascade do |t|
     t.integer "category", default: 4, null: false
-    t.boolean "completed", default: false, null: false
     t.datetime "created_at", null: false
-    t.date "due_at_date"
-    t.integer "due_at_km"
     t.decimal "estimated_cost", precision: 10, scale: 2
-    t.string "name", null: false
+    t.integer "interval_km"
+    t.integer "last_done_km"
     t.datetime "updated_at", null: false
     t.bigint "vehicle_id", null: false
-    t.index ["vehicle_id", "completed"], name: "index_maintenances_on_vehicle_id_and_completed"
     t.index ["vehicle_id"], name: "index_maintenances_on_vehicle_id"
   end
 
@@ -252,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_180434) do
     t.datetime "created_at", null: false
     t.string "license_plate"
     t.integer "odometer_km", default: 0, null: false
+    t.datetime "odometer_updated_at"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "vehicle_model", null: false
