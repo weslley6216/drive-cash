@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['column', 'tooltip', 'label', 'noData', 'values', 'earnValue', 'expValue', 'fill']
+  static targets = ['column', 'tooltip', 'arrow', 'label', 'noData', 'values', 'earnValue', 'expValue', 'fill']
 
   connect() {
     this.active = null
@@ -52,12 +52,27 @@ export default class extends Controller {
       this.expValueTarget.textContent = column.dataset.exp
     }
 
-    const count = this.columnTargets.length
-    const left = Math.min(90, Math.max(10, ((index + 0.5) / count) * 100))
-    this.tooltipTarget.style.left = `${left}%`
     this.tooltipTarget.classList.remove('hidden')
-
+    this.position(index)
     this.highlight(index)
+  }
+
+  position(index) {
+    const count = this.columnTargets.length
+    const containerWidth = this.element.clientWidth
+    const barCenter = ((index + 0.5) / count) * containerWidth
+    const half = this.tooltipTarget.offsetWidth / 2
+    const pad = 4
+    const min = half + pad
+    const max = containerWidth - half - pad
+    const center = max > min ? Math.min(max, Math.max(min, barCenter)) : barCenter
+
+    this.tooltipTarget.style.left = `${center}px`
+
+    if (this.hasArrowTarget) {
+      const offset = Math.max(-half + 8, Math.min(half - 8, barCenter - center))
+      this.arrowTarget.style.transform = `translateX(${offset}px) rotate(45deg)`
+    }
   }
 
   deactivate() {
