@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Goals::AchievementsRowComponent, type: :component do
   let(:achievements) do
     [
-      { icon: 'flame', label: 'Sequência 7 dias', color: '#f97316' },
-      { icon: 'trophy', label: 'Meta semanal batida', color: '#22c55e' },
-      { icon: 'star', label: 'Melhor dia: R$ 800,00', color: '#eab308' }
+      { type: :streak, label: 'Sequência 7 dias' },
+      { type: :goal_completed, label: 'Meta mensal batida' },
+      { type: :best_day, label: 'Melhor dia: R$ 800,00', value: 800 }
     ]
   end
   let(:html) { view_context.render(described_class.new(achievements: achievements)) }
@@ -16,24 +16,26 @@ RSpec.describe Goals::AchievementsRowComponent, type: :component do
 
   it 'renders one item per achievement with its label' do
     expect(html).to include('Sequência 7 dias')
-    expect(html).to include('Meta semanal batida')
+    expect(html).to include('Meta mensal batida')
     expect(html).to include('Melhor dia: R$ 800,00')
   end
 
-  it 'applies the given color as background and text via inline style' do
+  it 'maps each badge type to its palette color via inline style' do
     expect(html).to include('background-color: #f97316')
-    expect(html).to include('background-color: #22c55e')
+    expect(html).to include('background-color: #a855f7')
+    expect(html).to include('background-color: #3b82f6')
   end
 
   it 'renders icon circles with rounded-full' do
     expect(html.scan('rounded-full').size).to eq(achievements.size)
   end
 
-  it 'falls back to Star icon when the icon name is unknown' do
-    unknown = [{ icon: 'unknown-icon-xyz', label: 'Teste', color: '#ff0000' }]
+  it 'falls back to the default palette when the badge type is unknown' do
+    unknown = [{ type: :something_new, label: 'Teste' }]
     output = view_context.render(described_class.new(achievements: unknown))
 
     expect(output).to include('Teste')
+    expect(output).to include('background-color: #64748b')
   end
 
   it 'renders an empty message when no achievements are provided' do
