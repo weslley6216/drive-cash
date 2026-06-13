@@ -48,10 +48,17 @@ class Maintenance < ApplicationRecord
   end
 
   def status_key
-    Vehicles::MaintenanceStatus.for(progress).key
+    Vehicles::MaintenanceStatus.for(progress)
   end
 
   def icon_component
     CATALOG.fetch(category, CATALOG['oil_change'])[:icon]
+  end
+
+  def apply_catalog_defaults
+    defaults = self.class.catalog_defaults(category)
+    self.interval_km ||= defaults[:interval_km]
+    self.estimated_cost ||= defaults[:estimated_cost]
+    self
   end
 end

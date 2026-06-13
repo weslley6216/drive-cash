@@ -8,7 +8,7 @@ class MaintenancesController < ApplicationController
   end
 
   def create
-    @maintenance = current_user.vehicle.maintenances.new(maintenance_params_with_catalog_defaults)
+    @maintenance = current_user.vehicle.maintenances.new(maintenance_params).apply_catalog_defaults
 
     if @maintenance.save
       flash[:notice] = t('maintenances.flash.created')
@@ -59,14 +59,6 @@ class MaintenancesController < ApplicationController
 
   def maintenance_params
     params.require(:maintenance).permit(:category, :last_done_km, :interval_km, :estimated_cost)
-  end
-
-  def maintenance_params_with_catalog_defaults
-    permitted = maintenance_params
-    defaults = Maintenance.catalog_defaults(permitted[:category])
-    permitted[:interval_km] = defaults[:interval_km] if permitted[:interval_km].blank?
-    permitted[:estimated_cost] = defaults[:estimated_cost] if permitted[:estimated_cost].blank?
-    permitted
   end
 
   def respond_with_refresh

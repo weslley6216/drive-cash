@@ -18,7 +18,7 @@ module Vehicles
       {
         balance: balance,
         full: full,
-        status_key: TankStatus.for(balance, full).key,
+        status_key: TankStatus.for(balance, full),
         last_fill: last_fill,
         moves: build_moves(vehicle)
       }

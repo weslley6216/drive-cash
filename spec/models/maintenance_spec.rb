@@ -60,6 +60,34 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
+  describe '#apply_catalog_defaults' do
+    it 'fills interval and cost from the catalog when blank' do
+      vehicle = create(:vehicle)
+      maintenance = vehicle.maintenances.new(category: 'timing_belt', last_done_km: 110_000)
+
+      maintenance.apply_catalog_defaults
+
+      expect(maintenance.interval_km).to eq(60_000)
+      expect(maintenance.estimated_cost).to eq(900)
+    end
+
+    it 'keeps provided values over the catalog defaults' do
+      vehicle = create(:vehicle)
+      maintenance = vehicle.maintenances.new(category: 'timing_belt', last_done_km: 110_000, interval_km: 5_000, estimated_cost: 100)
+
+      maintenance.apply_catalog_defaults
+
+      expect(maintenance.interval_km).to eq(5_000)
+      expect(maintenance.estimated_cost).to eq(100)
+    end
+
+    it 'returns self so it can be chained after new' do
+      maintenance = build(:maintenance)
+
+      expect(maintenance.apply_catalog_defaults).to be(maintenance)
+    end
+  end
+
   describe 'enums' do
     it 'defines the eight catalog categories' do
       expect(described_class.categories.keys).to eq(described_class::CATALOG.keys)
