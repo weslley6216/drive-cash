@@ -13,6 +13,7 @@ module Dashboard
       earnings_total = earnings_data[:total]
       expenses_total = expenses_data[:total]
       days_worked = earnings_data[:days_count]
+      trips = earnings_data[:trips_count]
       profit_value = earnings_total - expenses_total
 
       {
@@ -22,14 +23,8 @@ module Dashboard
         days: days_worked,
         earnings_avg_month: earnings_data[:avg_per_month],
         earnings_avg_day: earnings_data[:avg_per_day],
-        expenses_percent: expenses_percent(earnings_total, expenses_total),
-        profit_per_day: profit_per_day(profit_value, days_worked),
-        days_avg_month: days_avg_month(days_worked),
-        days_avg_week: days_avg_week(days_worked),
-        trips: earnings_data[:trips_count],
-        trips_avg_month: trips_avg_month(earnings_data[:trips_count]),
-        trips_avg_day: trips_avg_day(earnings_data[:trips_count], days_worked)
-      }
+        trips: trips
+      }.merge(derived_metrics(earnings_total, expenses_total, profit_value, days_worked, trips))
     end
 
     def call
@@ -53,19 +48,17 @@ module Dashboard
     end
 
     def earnings_scope
-      @earnings_scope ||= begin
-        scope = @user.earnings.in_period(year, month)
-        scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
-        scope
-      end
+      @earnings_scope ||= scoped(@user.earnings.in_period(year, month))
     end
 
     def expenses_scope
-      @expenses_scope ||= begin
-        scope = @user.expenses.paid_in_period(year, month)
-        scope = scope.where('EXTRACT(MONTH FROM date) <= ?', through_month) if through_month && !month
-        scope
-      end
+      @expenses_scope ||= scoped(@user.expenses.paid_in_period(year, month))
+    end
+
+    def scoped(relation)
+      return relation unless through_month && !month
+
+      relation.where('EXTRACT(MONTH FROM date) <= ?', through_month)
     end
 
     def earnings_calculator
@@ -76,46 +69,21 @@ module Dashboard
       @expenses_calculator ||= ExpensesCalculator.new(expenses_scope)
     end
 
-    def expenses_percent(earnings, expenses)
-      return 0 if earnings.zero?
-      (expenses / earnings * 100).round(1)
-    end
-
-    def profit_per_day(profit_value, days)
-      return 0 if days.zero?
-      profit_value / days
+    def derived_metrics(earnings, expenses, profit, days, trips)
+      DerivedMetrics.new(
+        earnings: earnings,
+        expenses: expenses,
+        profit: profit,
+        days: days,
+        trips: trips,
+        months_count: earnings_months_count,
+        year: year,
+        month: month
+      ).call
     end
 
     def earnings_months_count
       @earnings_months_count ||= ScopeMonthCounter.count_for(earnings_scope)
-    end
-
-    def days_avg_month(days)
-      months = earnings_months_count
-      return 0 if months.zero?
-      (days.to_f / months).round(1)
-    end
-
-    def days_avg_week(days_worked)
-      return 0 if month.blank? || days_worked.zero?
-
-      days_in_month = Time.days_in_month(month.to_i, year.to_i)
-      weeks_count = days_in_month / 7.0
-
-      (days_worked / weeks_count).round
-    end
-
-    def trips_avg_month(trips)
-      months = earnings_months_count
-      return 0 if months.zero?
-
-      (trips.to_f / months).round
-    end
-
-    def trips_avg_day(trips, days)
-      return 0 if days.zero?
-
-      (trips.to_f / days).round
     end
 
     def profit_series
