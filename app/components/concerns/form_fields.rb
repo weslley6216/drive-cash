@@ -53,7 +53,7 @@ module FormFields
           type: 'text',
           inputmode: 'numeric',
           autocomplete: 'off',
-          placeholder: t('.placeholders.money'),
+          placeholder: t('.placeholders.money', default: I18n.t('form_fields.placeholders.money')),
           required: required,
           class: input_classes(theme: theme),
           data: { money_field_target: 'display', action: 'input->money-field#format' }

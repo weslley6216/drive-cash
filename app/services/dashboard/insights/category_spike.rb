@@ -26,7 +26,8 @@ module Dashboard
             pct: pct,
             amount: current_top[:amount].to_f,
             previous_year: @context.previous_year,
-            month: @context.previous_month
+            month: @context.month,
+            previous_month: @context.previous_month
           }
         }
       end

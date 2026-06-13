@@ -40,5 +40,11 @@ class DashboardController < ApplicationController
   end
 
   def available_years = Dashboard::AvailableYears.fetch(user: current_user)
-  def filter_date = @month ? Date.new(@year, @month, 1) : Date.current
+
+  def filter_date
+    return Date.current unless @month
+
+    first_day = Date.new(@year, @month, 1)
+    Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day
+  end
 end

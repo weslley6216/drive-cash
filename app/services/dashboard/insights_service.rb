@@ -62,18 +62,22 @@ module Dashboard
     end
 
     def previous_year
-      year - 1
+      return year - 1 unless month
+
+      month == 1 ? year - 1 : year
     end
 
     def previous_month
-      month
+      return nil unless month
+
+      month == 1 ? 12 : month - 1
     end
 
     def period_context
       if month
         {
           mode: :monthly,
-          previous_month_name: I18n.t('date.abbr_month_names')[month],
+          previous_month_name: I18n.t('date.abbr_month_names')[previous_month],
           previous_year: previous_year
         }
       else

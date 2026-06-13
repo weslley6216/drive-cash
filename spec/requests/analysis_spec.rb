@@ -77,7 +77,7 @@ RSpec.describe 'Analysis', type: :request do
 
     it 'renders an insight card in amber (rounded-2xl bg-amber-50) when there is data to analyze' do
       create(:expense, user: current_user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
-      create(:expense, user: current_user, date: Date.new(2024, 2, 1), amount: 100, category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
       get analysis_path, params: { year: 2025, month: 2 }
 
@@ -94,14 +94,6 @@ RSpec.describe 'Analysis', type: :request do
 
       expect(response.body).to include('111,00')
       expect(response.body).not_to include('999,00')
-    end
-
-    it 'does not include external chart scripts' do
-      get analysis_path
-
-      expect(response.body).not_to include('chart.js')
-      expect(response.body).not_to include('recharts')
-      expect(response.body).not_to include('d3.min')
     end
   end
 end

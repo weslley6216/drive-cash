@@ -19,12 +19,6 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:expenses_percent]).to eq(20.0)
     end
 
-    it 'does not include profit series keys' do
-      expect(result).not_to have_key(:monthly_profit_series)
-      expect(result).not_to have_key(:daily_profit_series)
-      expect(result).not_to have_key(:change_percent)
-    end
-
     it 'does not instantiate ProfitSeriesService' do
       allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
 

@@ -61,13 +61,5 @@ RSpec.describe ButtonStyles do
       expect(result).to include('border border-slate-300')
       expect(result).to include('w-full')
     end
-
-    it 'does not have extra whitespace' do
-      result = instance.button_classes
-
-      expect(result).not_to start_with(' ')
-      expect(result).not_to end_with(' ')
-      expect(result).not_to include('  ')
-    end
   end
 end

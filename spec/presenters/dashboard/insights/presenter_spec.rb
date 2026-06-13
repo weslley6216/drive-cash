@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Dashboard::Insights::Presenter do
   describe '#call' do
-    it 'renders category_spike monthly description with month name and previous year' do
+    it 'renders category_spike monthly description with current and previous month names' do
       raw = {
         type: 'category_spike',
         severity: 'warning',
@@ -11,8 +11,9 @@ RSpec.describe Dashboard::Insights::Presenter do
           category: 'Combustível',
           pct: 120.0,
           amount: 220.0,
-          previous_year: 2024,
-          month: 6
+          previous_year: 2025,
+          month: 6,
+          previous_month: 5
         }
       }
 
@@ -24,7 +25,7 @@ RSpec.describe Dashboard::Insights::Presenter do
       expect(result[:title]).to include('120')
       expect(result[:description]).to include('220,00')
       expect(result[:description]).to include('junho')
-      expect(result[:description]).to include('2024')
+      expect(result[:description]).to include('maio')
     end
 
     it 'renders category_spike annual description without month name' do

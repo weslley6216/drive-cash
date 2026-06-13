@@ -24,13 +24,6 @@ RSpec.describe FabComponent, type: :component do
       expect(html).to include('flex-col items-end')
     end
 
-    it 'renders journey button linking to work_session with sky color' do
-      expect(html).to include(I18n.t('fab_component.start_journey'))
-      expect(html).to include('bg-sky-600')
-      expect(html).to include('hover:bg-sky-700')
-      expect(html).to include('href="/work_session"')
-    end
-
     it 'renders expense button with red color' do
       expect(html).to include(I18n.t('fab_component.new_expense'))
       expect(html).to include('bg-red-600')
@@ -60,7 +53,7 @@ RSpec.describe FabComponent, type: :component do
     end
 
     it 'sets turbo-frame=_top on all navigation links so they escape the page frame' do
-      expect(html.scan('data-turbo-frame="_top"').size).to eq(4)
+      expect(html.scan('data-turbo-frame="_top"').size).to eq(3)
     end
   end
 

@@ -28,7 +28,8 @@ module Expenses
     end
 
     def render_form
-      form_with(model: @expense, url: form_url, method: form_method, class: 'p-6 space-y-4') do |f|
+      form_with(model: @expense, url: form_url, method: form_method, class: 'p-6 space-y-4',
+                data: { controller: 'refueling-fields' }) do |f|
         hidden_context_fields
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
@@ -37,7 +38,7 @@ module Expenses
         category_select(f)
         text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
         text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
-        refueling_extension
+        refueling_extension unless @expense.persisted?
 
         render_actions
       end
@@ -54,15 +55,16 @@ module Expenses
           :category,
           helpers.grouped_options_for_select(helpers.expense_category_options, selected_category),
           { include_blank: t('.placeholders.select') },
-          { class: "#{input_classes(theme: @theme)} bg-white", required: true }
+          { class: "#{input_classes(theme: @theme)} bg-white", required: true,
+            data: { refueling_fields_target: 'category', action: 'change->refueling-fields#toggle' } }
         )
       end
     end
 
-    def selected_category = nil
+    def selected_category = @expense.category
 
     def refueling_extension
-      div(class: 'mt-2') do
+      div(class: class_names('mt-2', ('hidden' unless @expense.category_fuel?)), data: { refueling_fields_target: 'extension' }) do
         details(class: 'border border-slate-200 rounded-lg p-3 bg-slate-50') do
           summary(class: 'text-sm font-medium text-slate-700 cursor-pointer') { t('expenses.refueling_extension.heading') }
           div(class: 'mt-3 space-y-3') do

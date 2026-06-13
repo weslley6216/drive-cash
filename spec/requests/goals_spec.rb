@@ -50,6 +50,21 @@ RSpec.describe 'Goals', type: :request do
       expect(response.body).to include('turbo-frame')
       expect(response.body).to include(I18n.t('goals.index.form.title_new'))
     end
+
+    it 'renders the money placeholder from the form_fields fallback' do
+      get new_goal_path
+
+      expect(response.body).to include('placeholder="R$ 0,00"')
+      expect(response.body).not_to include('translation missing')
+    end
+
+    it 'renders kind and metric selects without a blank option and with defaults selected' do
+      get new_goal_path
+
+      expect(response.body).not_to include('<option value="" label=" "></option>')
+      expect(response.body).to include('selected="selected" value="monthly"')
+      expect(response.body).to include('selected="selected" value="profit"')
+    end
   end
 
   describe 'POST /goals' do

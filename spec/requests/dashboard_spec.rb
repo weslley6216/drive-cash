@@ -157,6 +157,19 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('5.000,00')
     end
 
+    it 'counts days remaining from today when the filtered month is the current month' do
+      travel_to Date.new(2026, 6, 12) do
+        create(:goal, user: current_user, kind: 'monthly',
+                      period_start: Date.new(2026, 6, 1),
+                      period_end: Date.new(2026, 6, 30),
+                      target_amount: 5000)
+
+        get root_path, params: { year: 2026, month: 6 }
+
+        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 18))
+      end
+    end
+
     it 'does not render monthly goal card when filtered month has no active goal' do
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.new(2026, 6, 1),
