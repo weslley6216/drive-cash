@@ -14,4 +14,10 @@ class Vehicle < ApplicationRecord
   def display_name
     "#{brand} #{vehicle_model} · #{year}"
   end
+
+  def updated_days_ago
+    return nil if odometer_updated_at.nil?
+
+    (Date.current - odometer_updated_at.to_date).to_i
+  end
 end
