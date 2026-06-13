@@ -22,6 +22,8 @@ pt-BR:
         legend_earnings: "Receita"
         legend_expenses: "Despesa"
         empty: "Sem dados para o período"
+        tooltip_day_label: "Dia %{day}"
+        tooltip_no_data: "Sem dados"
       categories:
         title: "Despesas por categoria"
         total_annual: "%{value} no ano"
