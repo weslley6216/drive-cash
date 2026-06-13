@@ -301,6 +301,7 @@ pt-BR:
         one: "Atualizado há %{count} dia"
         other: "Atualizado há %{count} dias"
       stale: "Atualize · há %{count} dias"
+      stale_unknown: "Atualize o km"
       delta_month: "+%{value} km este mês"
     tank:
       title: "Saldo do tanque"
@@ -349,6 +350,8 @@ pt-BR:
       full_tank: "Tanque cheio"
       route: "Rota"
       fuel_expense: "Combustível"
+      today: "Hoje"
+      yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
     empty:
       title: "Nenhum veículo cadastrado"

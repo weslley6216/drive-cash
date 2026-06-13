@@ -1,7 +1,7 @@
 module Vehicles
   class TankBalanceService
     MOVES_LIMIT = 8
-    EMPTY = { balance: 0, full: nil, status_key: :empty, moves: [] }.freeze
+    EMPTY = { balance: 0, full: nil, status_key: :empty, last_fill: nil, moves: [] }.freeze
 
     def initialize(user:)
       @user = user
@@ -11,13 +11,15 @@ module Vehicles
       vehicle = @user.vehicle
       return EMPTY unless vehicle
 
-      full = last_full_amount(vehicle)
+      last_fill = vehicle.refuelings.full_tank.chronological.first
+      full = last_fill&.total_amount
       balance = vehicle.refuelings.sum(:total_amount) - debit_expenses.sum(:amount)
 
       {
         balance: balance,
         full: full,
         status_key: TankStatus.for(balance, full).key,
+        last_fill: last_fill,
         moves: build_moves(vehicle)
       }
     end
@@ -26,10 +28,6 @@ module Vehicles
 
     def debit_expenses
       @user.expenses.where(category: :fuel).where.missing(:refueling)
-    end
-
-    def last_full_amount(vehicle)
-      vehicle.refuelings.full_tank.chronological.first&.total_amount
     end
 
     def build_moves(vehicle)

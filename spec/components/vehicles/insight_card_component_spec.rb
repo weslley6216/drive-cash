@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Vehicles::InsightCardComponent, type: :component do
   describe '#view_template' do
-    it 'renders title and description' do
+    it 'renders title and body' do
       html = view_context.render(described_class.new(insight: {
         type: :cheapest_vendor,
         title: 'Posto Orense é o mais econômico',
-        description: '11,5 km/L em média. Economia estimada: R$ 28/mês.'
+        body: '11,5 km/L em média, contra 11,0 do Geladão. Economia estimada: R$ 28/mês.'
       }))
 
       expect(html).to include('Posto Orense é o mais econômico')
@@ -14,7 +14,7 @@ RSpec.describe Vehicles::InsightCardComponent, type: :component do
     end
 
     it 'uses blue tones' do
-      html = view_context.render(described_class.new(insight: { type: :cheapest_vendor, title: 't', description: 'd' }))
+      html = view_context.render(described_class.new(insight: { type: :cheapest_vendor, title: 't', body: 'b' }))
 
       expect(html).to include('bg-blue-50')
       expect(html).to include('border-blue-200')

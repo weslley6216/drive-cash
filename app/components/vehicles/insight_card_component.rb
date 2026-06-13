@@ -11,7 +11,7 @@ module Vehicles
         end
         div(class: 'min-w-0') do
           p(class: 'text-sm font-semibold text-blue-900') { @insight[:title] }
-          p(class: 'text-xs text-blue-800 mt-0.5 leading-relaxed') { @insight[:description] }
+          p(class: 'text-xs text-blue-800 mt-0.5 leading-relaxed') { @insight[:body] }
         end
       end
     end
