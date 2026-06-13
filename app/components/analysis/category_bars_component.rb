@@ -1,5 +1,7 @@
 module Analysis
   class CategoryBarsComponent < ApplicationComponent
+    include CategoryPalette
+
     def initialize(categories:, month: nil)
       @categories = categories
       @month = month
@@ -28,12 +30,13 @@ module Analysis
     end
 
     def category_row(row)
+      color = category_color(row[:id])
       div(data: { category_row: row[:id] }) do
         div(class: 'flex items-center justify-between mb-1') do
           div(class: 'flex items-center gap-2 min-w-0') do
             div(class: 'w-6 h-6 rounded flex items-center justify-center',
-                style: "background: #{row[:color]}20; color: #{row[:color]}") do
-              render row[:icon].new(class: 'w-[13px] h-[13px]')
+                style: "background: #{color}20; color: #{color}") do
+              render category_icon(row[:id]).new(class: 'w-[13px] h-[13px]')
             end
             span(class: 'text-sm text-slate-700') { row[:label] }
           end
@@ -43,7 +46,7 @@ module Analysis
           end
         end
         div(class: 'h-1.5 bg-slate-100 rounded-full overflow-hidden') do
-          div(class: 'h-full rounded-full', style: "width: #{row[:percent]}%; background-color: #{row[:color]}")
+          div(class: 'h-full rounded-full', style: "width: #{row[:percent]}%; background-color: #{color}")
         end
       end
     end

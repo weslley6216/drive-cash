@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe CategoryBreakdownComponent, type: :component do
   let(:categories) do
     [
-      { id: 'fuel',        label: 'Combustível', amount: 300.0, percent: 60.0, color: '#dc2626', icon: PhlexIcons::Lucide::Fuel },
-      { id: 'maintenance', label: 'Manutenção',  amount: 200.0, percent: 40.0, color: '#f97316', icon: PhlexIcons::Lucide::Wrench }
+      { id: 'fuel',        label: 'Combustível', amount: 300.0, percent: 60.0 },
+      { id: 'maintenance', label: 'Manutenção',  amount: 200.0, percent: 40.0 }
     ]
   end
   let(:html) { view_context.render(CategoryBreakdownComponent.new(categories: categories)) }

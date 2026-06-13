@@ -1,4 +1,6 @@
 class CategoryBreakdownComponent < ApplicationComponent
+  include CategoryPalette
+
   def initialize(categories:)
     @categories = categories
   end
@@ -34,7 +36,7 @@ class CategoryBreakdownComponent < ApplicationComponent
     div(class: 'space-y-1', data: { category_row: category[:id] }) do
       div(class: 'flex items-center justify-between text-sm') do
         div(class: 'flex items-center gap-2') do
-          render category[:icon].new(class: 'w-4 h-4', style: "color: #{category[:color]}")
+          render category_icon(category[:id]).new(class: 'w-4 h-4', style: "color: #{category_color(category[:id])}")
           span(class: 'font-medium text-slate-700') { category[:label] }
         end
         div(class: 'flex items-center gap-2 text-xs text-slate-500') do
@@ -45,7 +47,7 @@ class CategoryBreakdownComponent < ApplicationComponent
         end
       end
       div(class: 'h-2 rounded-full bg-slate-100 overflow-hidden') do
-        div(class: 'h-full rounded-full', style: "width: #{category[:percent]}%; background-color: #{category[:color]}")
+        div(class: 'h-full rounded-full', style: "width: #{category[:percent]}%; background-color: #{category_color(category[:id])}")
       end
     end
   end

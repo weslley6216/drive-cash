@@ -35,24 +35,6 @@ RSpec.describe Dashboard::CategoryBreakdownService do
       expect(row[:label]).to eq(I18n.t('activerecord.attributes.expense.categories.fuel'))
     end
 
-    it 'returns the META color and icon for the category' do
-      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
-
-      row = described_class.new(year: 2025, month: 6, user: user).call.first
-
-      expect(row[:color]).to eq('#dc2626')
-      expect(row[:icon]).to eq(PhlexIcons::Lucide::Fuel)
-    end
-
-    it 'falls back to slate color and Package icon for categories without META' do
-      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 100, category: 'other', paid: true)
-
-      row = described_class.new(year: 2025, month: 6, user: user).call.first
-
-      expect(row[:color]).to eq('#94a3b8')
-      expect(row[:icon]).to eq(PhlexIcons::Lucide::Package)
-    end
-
     it 'ignores unpaid expenses' do
       create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 999, category: 'fuel', paid: false)

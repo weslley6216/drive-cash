@@ -1,5 +1,7 @@
 module Analysis
   class PlatformDonutComponent < ApplicationComponent
+    include PlatformPalette
+
     DEFAULT_SIZE = 120
     STROKE_WIDTH = 14
 
@@ -46,7 +48,7 @@ module Analysis
           svg_el.circle(
             cx: @size / 2, cy: @size / 2, r: radius,
             fill: 'none',
-            stroke: platform[:color],
+            stroke: platform_color(platform[:id]),
             stroke_width: STROKE_WIDTH,
             stroke_dasharray: "#{seg_len} #{circumference - seg_len}",
             stroke_dashoffset: -offset
@@ -73,7 +75,7 @@ module Analysis
 
     def legend_row(platform)
       li(class: 'flex items-center gap-2') do
-        span(class: 'w-2.5 h-2.5 rounded-sm shrink-0', style: "background-color: #{platform[:color]}")
+        span(class: 'w-2.5 h-2.5 rounded-sm shrink-0', style: "background-color: #{platform_color(platform[:id])}")
         span(class: 'text-sm text-slate-700 flex-1 truncate') { platform[:label] }
         span(class: 'text-sm font-semibold text-slate-800 whitespace-nowrap') { "#{platform[:percent]}%" }
       end
