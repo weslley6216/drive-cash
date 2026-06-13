@@ -117,9 +117,8 @@ module Analysis
 
     def tooltip_node
       div(class: 'absolute z-20 -translate-x-1/2 -translate-y-full pointer-events-none hidden',
-          style: "top: #{CHART_HEIGHT - 4}px",
           data: { bar_tooltip_target: 'tooltip' }) do
-        div(class: 'bg-slate-900 text-white rounded-lg px-3 py-2 shadow-xl whitespace-nowrap', style: 'min-width: 124px') do
+        div(class: 'relative bg-slate-900 text-white rounded-lg px-3 py-2 shadow-xl whitespace-nowrap', style: 'min-width: 124px') do
           p(class: 'text-[10px] font-semibold text-slate-400 mb-1 uppercase tracking-wide',
             data: { bar_tooltip_target: 'label' })
           p(class: 'text-xs text-slate-400 hidden', data: { bar_tooltip_target: 'noData' }) do
@@ -129,9 +128,8 @@ module Analysis
             tooltip_row('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'), 'earnValue')
             tooltip_row('bg-red-400',     I18n.t('analysis.show_view.bar_chart.legend_expenses'), 'expValue')
           end
+          div(class: 'absolute left-1/2 bottom-0 w-2 h-2 bg-slate-900', style: 'transform: translate(-50%, 50%) rotate(45deg)')
         end
-        div(class: 'w-2 h-2 bg-slate-900 rotate-45 mx-auto', style: 'margin-top: -4px',
-            data: { bar_tooltip_target: 'arrow' })
       end
     end
 

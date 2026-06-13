@@ -103,7 +103,7 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
 
     expect(html).to include('data-bar-tooltip-target="tooltip"')
     expect(html).to include('bg-slate-900')
-    expect(html).to include('rotate-45')
+    expect(html).to include('rotate(45deg)')
     expect(html).to include('bg-emerald-400')
     expect(html).to include('bg-red-400')
     expect(html).to include('hidden')
