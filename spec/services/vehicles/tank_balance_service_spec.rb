@@ -54,6 +54,18 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(moves.last[:kind]).to eq(:credit)
   end
 
+  it 'limits moves to entries since the anchor date' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    fuel_expense(user, 999, Date.new(2024, 6, 1))
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
+    fuel_expense(user, 45, Date.new(2025, 12, 20))
+
+    moves = described_class.new(user: user).call[:moves]
+
+    expect(moves.map { |move| move[:amount] }).to contain_exactly(260, -45)
+  end
+
   it 'accumulates credits minus debits since anchor' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
