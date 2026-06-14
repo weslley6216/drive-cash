@@ -29,15 +29,8 @@ module Chat
       context = { month: @date.month, year: @date.year }
 
       div(class: 'flex flex-wrap gap-2 ml-9 mt-1') do
-        case @action
-        when 'create_earning'
-          action_chip(root_path(context),                        t('chat.confirm.btn_dashboard'), frame: '_top')
-          action_chip(dashboard_earnings_detail_path(context),   t('chat.confirm.btn_earnings'),  frame: 'modal')
-        when 'create_expense'
-          action_chip(dashboard_expenses_detail_path(context),   t('chat.confirm.btn_expenses'),  frame: 'modal')
-          action_chip(root_path(context),                        t('chat.confirm.btn_home'),      frame: '_top')
-        else
-          action_chip(root_path, t('chat.confirm.btn_home'), frame: '_top')
+        ConfirmChips.for(@action).each do |chip|
+          action_chip(public_send(chip.route, context), t(chip.label), frame: chip.frame)
         end
       end
     end
