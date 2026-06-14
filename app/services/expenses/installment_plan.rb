@@ -2,6 +2,13 @@ module Expenses
   class InstallmentPlan
     MAX_INSTALLMENTS = 60
 
+    PERIOD_ADVANCE = {
+      'weekly'   => ->(start, index) { start + index.weeks },
+      'biweekly' => ->(start, index) { start + (2 * index).weeks },
+      'monthly'  => ->(start, index) { start >> index },
+      'annual'   => ->(start, index) { start >> (12 * index) }
+    }.freeze
+
     attr_reader :series_id, :count
 
     def initialize(total_amount:, start_date:, period:, repetitions:)
@@ -55,12 +62,7 @@ module Expenses
     end
 
     def advance_date(start, index)
-      case @period
-      when 'weekly' then start + index.weeks
-      when 'biweekly' then start + (2 * index).weeks
-      when 'monthly' then start >> index
-      when 'annual' then start >> (12 * index)
-      end
+      PERIOD_ADVANCE.fetch(@period).call(start, index)
     end
 
     def parse_date(date_param)

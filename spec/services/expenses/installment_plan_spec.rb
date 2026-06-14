@@ -125,6 +125,36 @@ RSpec.describe Expenses::InstallmentPlan do
       ])
     end
 
+    it 'generates biweekly dates' do
+      plan = described_class.new(
+        total_amount: 300,
+        start_date: '2026-01-10',
+        period: 'biweekly',
+        repetitions: 3
+      )
+
+      expect(plan.dates).to eq([
+        Date.new(2026, 1, 10),
+        Date.new(2026, 1, 24),
+        Date.new(2026, 2, 7)
+      ])
+    end
+
+    it 'generates annual dates' do
+      plan = described_class.new(
+        total_amount: 300,
+        start_date: '2026-01-10',
+        period: 'annual',
+        repetitions: 3
+      )
+
+      expect(plan.dates).to eq([
+        Date.new(2026, 1, 10),
+        Date.new(2027, 1, 10),
+        Date.new(2028, 1, 10)
+      ])
+    end
+
     it 'parses a non-string date via Date.parse' do
       plan = described_class.new(
         total_amount: 300,
@@ -134,6 +164,12 @@ RSpec.describe Expenses::InstallmentPlan do
       )
 
       expect(plan.dates.first).to eq(Date.new(2026, 1, 10))
+    end
+  end
+
+  describe 'PERIOD_ADVANCE' do
+    it 'defines an advance rule for every supported installment period' do
+      expect(described_class::PERIOD_ADVANCE.keys).to match_array(Expense::INSTALLMENT_PERIODS)
     end
   end
 
