@@ -1,9 +1,6 @@
 module Ai
   class ParserService
-    TOOLS = [
-      Ai::Tools::CreateEarning.declaration,
-      Ai::Tools::CreateExpense.declaration
-    ].freeze
+    TOOLS = Ai::Tools::Registry.declarations
 
     PROMPT_PATH = Rails.root.join('app', 'services', 'ai', 'prompts', 'financial_assistant.txt').freeze
 
@@ -50,10 +47,13 @@ module Ai
     end
 
     def build_preview(tool_name, tool_input)
-      params = parse_params(tool_input)
-      return missing_amount_result(tool_name, params) if invalid_amount?(tool_name, params)
+      tool = Ai::Tools::Registry.find(tool_name)
+      return { type: :text, content: I18n.t('chat.message.fallback') } unless tool
 
-      preview_for(tool_name, params)
+      params = parse_params(tool_input)
+      return missing_amount_result(tool.name, params) if invalid_amount?(tool, params)
+
+      preview_for(tool, params)
     rescue JSON::ParserError
       { type: :text, content: I18n.t('chat.message.fallback') }
     end
@@ -62,8 +62,8 @@ module Ai
       tool_input.is_a?(String) ? JSON.parse(tool_input) : tool_input
     end
 
-    def invalid_amount?(tool_name, params)
-      return false unless %w[create_expense create_earning].include?(tool_name)
+    def invalid_amount?(tool, params)
+      return false unless tool.requires_amount
 
       params['amount'].to_f <= 0
     end
@@ -73,12 +73,12 @@ module Ai
       { type: :text, content: I18n.t('chat.errors.missing_amount') }
     end
 
-    def preview_for(tool_name, params)
+    def preview_for(tool, params)
       {
         type: :preview,
-        action: tool_name,
+        action: tool.name,
         params: params,
-        summary: Chat::SummaryPresenter.build(tool_name, params),
+        summary: tool.summary_presenter.new(params).call,
         content: I18n.t('chat.history.preview_sent')
       }
     end

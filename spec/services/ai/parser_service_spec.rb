@@ -94,6 +94,23 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when the LLM returns an unregistered tool' do
+      before do
+        allow(Llm::Client).to receive(:chat).and_return({
+          type: :tool_use,
+          tool_name: 'delete_everything',
+          tool_input: { 'amount' => 10.0 }
+        })
+      end
+
+      it 'returns the fallback message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.message.fallback'))
+      end
+    end
+
     context 'when the LLM returns an invalid JSON tool input' do
       before do
         allow(Llm::Client).to receive(:chat).and_return({

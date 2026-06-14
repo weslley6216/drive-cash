@@ -1,11 +1,6 @@
 class ChatController < ApplicationController
   include ChatSession
 
-  CONFIRM_I18N_KEYS = {
-    'create_earning' => 'chat.confirm.success_earning',
-    'create_expense' => 'chat.confirm.success_expense'
-  }.freeze
-
   def index
     render Chat::IndexView.new(messages: chat_history)
   end
@@ -55,7 +50,7 @@ class ChatController < ApplicationController
   private
 
   def finalize_chat_confirm_success(action:, record:)
-    i18n_key = CONFIRM_I18N_KEYS[action]
+    i18n_key = Ai::Tools::Registry.find(action).confirm_key
 
     add_to_history(Chat::Message.from_result(
       { type: :text, content: t(i18n_key) },

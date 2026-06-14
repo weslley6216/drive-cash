@@ -7,11 +7,10 @@ module Chat
     end
 
     def self.for(action)
-      case action
-      when 'create_expense' then ExpensePersister.new
-      when 'create_earning' then EarningPersister.new
-      else NullPersister.new
-      end
+      tool = Ai::Tools::Registry.find(action)
+      return NullPersister.new unless tool
+
+      tool.persister.new
     end
   end
 end
