@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include DashboardContext
   include RecordParams
   include RecordSaveResponse
+  include ModalRefreshResponse
 
   allow_browser versions: :modern
 

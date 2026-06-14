@@ -1,5 +1,6 @@
 class RefuelingsController < ApplicationController
-  before_action :require_vehicle
+  include RequiresVehicle
+
   before_action :find_refueling, only: %i[edit update destroy]
 
   def new
@@ -12,7 +13,7 @@ class RefuelingsController < ApplicationController
 
     if @refueling.save
       flash[:notice] = t('refuelings.flash.created')
-      respond_with_refresh
+      respond_with_modal_refresh(html_redirect: vehicle_path)
     else
       flash.now[:alert] = @refueling.errors.full_messages.to_sentence
       render Refuelings::FormView.new(refueling: @refueling), status: :unprocessable_content
@@ -26,7 +27,7 @@ class RefuelingsController < ApplicationController
   def update
     if @refueling.update(refueling_params)
       flash[:notice] = t('refuelings.flash.updated')
-      respond_with_refresh
+      respond_with_modal_refresh(html_redirect: vehicle_path)
     else
       flash.now[:alert] = @refueling.errors.full_messages.to_sentence
       render Refuelings::FormView.new(refueling: @refueling), status: :unprocessable_content
@@ -41,10 +42,6 @@ class RefuelingsController < ApplicationController
 
   private
 
-  def require_vehicle
-    redirect_to vehicle_path unless current_user.vehicle
-  end
-
   def find_refueling
     @refueling = current_user.vehicle.refuelings.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -53,12 +50,5 @@ class RefuelingsController < ApplicationController
 
   def refueling_params
     params.require(:refueling).permit(:date, :vendor, :liters, :total_amount, :odometer_km, :full_tank)
-  end
-
-  def respond_with_refresh
-    respond_to do |format|
-      format.turbo_stream { render turbo_stream: [turbo_stream.update('modal', ''), turbo_stream.refresh(request_id: nil)] }
-      format.html { redirect_to vehicle_path }
-    end
   end
 end
