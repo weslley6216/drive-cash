@@ -105,6 +105,8 @@ module Vehicles
         return
       end
 
+      return plain(t('vehicle.tank.title')) unless @last_fill.liters.present?
+
       plain t('vehicle.tank.last_fill', date: helpers.l(@last_fill.date, format: '%d %b'), vendor: @last_fill.vendor)
       span(class: 'text-slate-400') do
         " · #{helpers.number_with_precision(@last_fill.liters, precision: 1, separator: ',', delimiter: '.')} L · #{format_currency(@last_fill.price_per_liter)}/L"

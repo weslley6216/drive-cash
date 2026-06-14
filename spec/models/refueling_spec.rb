@@ -5,9 +5,19 @@ RSpec.describe Refueling, type: :model do
     subject { build(:refueling) }
 
     it { is_expected.to validate_presence_of(:date) }
-    it { is_expected.to validate_presence_of(:liters) }
     it { is_expected.to validate_presence_of(:total_amount) }
-    it { is_expected.to validate_presence_of(:odometer_km) }
+
+    it 'accepts nil liters for imported records' do
+      refueling = build(:refueling, liters: nil)
+
+      expect(refueling).to be_valid
+    end
+
+    it 'accepts nil odometer_km for imported records' do
+      refueling = build(:refueling, odometer_km: nil)
+
+      expect(refueling).to be_valid
+    end
 
     it 'rejects liters equal to zero' do
       refueling = build(:refueling, liters: 0)

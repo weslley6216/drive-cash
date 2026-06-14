@@ -46,6 +46,8 @@ module Refuelings
       return nil if readings.size < MIN_READINGS_PER_VENDOR
 
       ratios = readings.each_cons(2).filter_map do |previous_one, current_one|
+        next if current_one.odometer_km.nil? || previous_one.odometer_km.nil?
+
         delta_km = current_one.odometer_km - previous_one.odometer_km
         liters_value = current_one.liters.to_f
         next if delta_km <= 0 || liters_value.zero?
