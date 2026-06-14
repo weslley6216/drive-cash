@@ -66,7 +66,7 @@ RSpec.describe 'Refuelings', type: :request do
     end
 
     it 'rerenders form on invalid update' do
-      patch refueling_path(refueling), params: { refueling: { liters: '' } }, as: :turbo_stream
+      patch refueling_path(refueling), params: { refueling: { total_amount: '' } }, as: :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
     end
