@@ -4,7 +4,7 @@ RSpec.describe RecentActivityComponent, type: :component do
   let(:rows) do
     [
       { type: :expense, date: Date.new(2025, 6, 12), date_label: '12 de junho', label: 'Combustível', description: 'Posto Shell', amount: 80.0 },
-      { type: :earning, date: Date.new(2025, 6, 10), date_label: '10 de junho', label: 'Uber',        description: '3 corridas',  amount: 200.0 }
+      { type: :earning, date: Date.new(2025, 6, 10), date_label: '10 de junho', label: 'Uber', description: '3 corridas', amount: 200.0 }
     ]
   end
   let(:html) { view_context.render(RecentActivityComponent.new(rows: rows)) }

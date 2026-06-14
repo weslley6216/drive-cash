@@ -138,9 +138,9 @@ RSpec.describe Expense, type: :model do
       expect(result).not_to include(expense_dec_2025)
     end
 
-    let(:paid_jan_2025)   { create(:expense, date: Date.new(2025, 1, 5),  paid: true) }
-    let(:unpaid_jan_2025) { create(:expense, date: Date.new(2025, 1, 6),  paid: false) }
-    let(:paid_jun_2025)   { create(:expense, date: Date.new(2025, 6, 1),  paid: true) }
+    let(:paid_jan_2025) { create(:expense, date: Date.new(2025, 1, 5), paid: true) }
+    let(:unpaid_jan_2025) { create(:expense, date: Date.new(2025, 1, 6), paid: false) }
+    let(:paid_jun_2025) { create(:expense, date: Date.new(2025, 6, 1), paid: true) }
 
     it '.in_period filters by year only when month is nil' do
       paid_jan_2025

@@ -41,7 +41,7 @@ class FlashComponent < ApplicationComponent
   def flash_color(type)
     case type.to_sym
     when :notice, :success then 'bg-green-600'
-    when :alert, :error    then 'bg-red-600'
+    when :alert, :error then 'bg-red-600'
     else 'bg-blue-600'
     end
   end

@@ -21,7 +21,7 @@ RSpec.describe Dashboard::Insights::MarginDrop do
     it 'returns nil when previous margin is zero' do
       context = build_context(
         current_stats:  { profit: 100, earnings: 1000 },
-        previous_stats: { profit: 0,   earnings: 0 }
+        previous_stats: { profit: 0, earnings: 0 }
       )
 
       expect(described_class.new(context).call).to be_nil

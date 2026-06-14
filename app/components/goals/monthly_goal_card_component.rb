@@ -88,7 +88,7 @@ module Goals
 
     def projection_badge(mt: 'mt-3')
       on_track = @progress[:on_track]
-      key    = on_track ? 'goals.index.monthly.on_track_projection' : 'goals.index.monthly.at_risk_projection'
+      key = on_track ? 'goals.index.monthly.on_track_projection' : 'goals.index.monthly.at_risk_projection'
       colors = on_track ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'
 
       div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 #{colors}") do

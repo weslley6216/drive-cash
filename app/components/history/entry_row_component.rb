@@ -1,9 +1,9 @@
 module History
   class EntryRowComponent < ApplicationComponent
     def initialize(record:, context:)
-      @record  = record
+      @record = record
       @context = context
-      @row     = EntryRows.for(record)
+      @row = EntryRows.for(record)
     end
 
     def view_template

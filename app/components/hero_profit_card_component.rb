@@ -1,10 +1,10 @@
 class HeroProfitCardComponent < ApplicationComponent
   Payload = Data.define(:profit, :change_percent, :profit_per_day, :days_count, :series, :year, :month)
 
-  MOBILE_CHART_WIDTH  = 320
+  MOBILE_CHART_WIDTH = 320
   MOBILE_CHART_HEIGHT = 70
 
-  DESKTOP_CHART_WIDTH  = 720
+  DESKTOP_CHART_WIDTH = 720
   DESKTOP_CHART_HEIGHT = 120
 
   MONTHS_PT = %w[Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez].freeze
@@ -144,9 +144,9 @@ class HeroProfitCardComponent < ApplicationComponent
     range = (max - min).nonzero? || max.nonzero? || 1.0
     step = values.size <= 1 ? 0 : width.to_f / (values.size - 1)
 
-    pad_top    = height * 0.08
+    pad_top = height * 0.08
     pad_bottom = height * 0.08
-    usable     = height - pad_top - pad_bottom
+    usable = height - pad_top - pad_bottom
 
     values.each_with_index.map do |value, index|
       x = (index * step).round(2)

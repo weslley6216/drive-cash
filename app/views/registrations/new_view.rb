@@ -50,16 +50,16 @@ class Registrations::NewView < ApplicationView
     form_with(model: @user, url: helpers.registrations_path,
               data: { turbo: false, controller: 'registration-form' },
               class: 'space-y-4 mt-8') do |form|
-      text_input(form, :name,          icon: PhlexIcons::Lucide::User, label: t('.name_label'),                autocomplete: 'name',  autofocus: true)
-      text_input(form, :email_address, icon: PhlexIcons::Lucide::Mail, label: t('.email_label'),               autocomplete: 'email', type: :email)
-      password_input(form, :password,              label: t('.password_label'),              autocomplete: 'new-password')
+      text_input(form, :name, icon: PhlexIcons::Lucide::User, label: t('.name_label'), autocomplete: 'name', autofocus: true)
+      text_input(form, :email_address, icon: PhlexIcons::Lucide::Mail, label: t('.email_label'), autocomplete: 'email', type: :email)
+      password_input(form, :password, label: t('.password_label'), autocomplete: 'new-password')
       password_input(form, :password_confirmation, label: t('.password_confirmation_label'), autocomplete: 'new-password')
       submit_button
     end
   end
 
   def text_input(form, name, icon:, label:, autocomplete:, type: :text, autofocus: false)
-    error  = field_error(name)
+    error = field_error(name)
     target = name.to_s.camelize(:lower)
     div do
       label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: name.to_s) { label }
@@ -96,7 +96,7 @@ class Registrations::NewView < ApplicationView
   end
 
   def password_input(form, name, label:, autocomplete:)
-    error  = field_error(name)
+    error = field_error(name)
     target = name.to_s.camelize(:lower)
     div do
       label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: name.to_s) { label }

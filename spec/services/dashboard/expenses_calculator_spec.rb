@@ -5,7 +5,7 @@ RSpec.describe Dashboard::ExpensesCalculator do
 
   before do
     create(:expense, date: '2025-01-01', amount: 100, vendor: 'Posto Shell')
-    create(:expense, date: '2025-01-01', amount: 50,  vendor: 'Posto Shell')
+    create(:expense, date: '2025-01-01', amount: 50, vendor: 'Posto Shell')
     create(:expense, date: '2025-02-01', amount: 200, vendor: 'Mecânico Zé')
   end
 
@@ -19,7 +19,7 @@ RSpec.describe Dashboard::ExpensesCalculator do
 
   describe '#monthly_totals' do
     it 'returns a 12-month array of paid expense sums' do
-      create(:expense, date: Date.new(2026, 2, 1),  amount: 80, category: 'fuel', paid: true)
+      create(:expense, date: Date.new(2026, 2, 1), amount: 80, category: 'fuel', paid: true)
       create(:expense, date: Date.new(2026, 2, 28), amount: 20, category: 'fuel', paid: true)
       create(:expense, date: Date.new(2026, 7, 10), amount: 50, category: 'fuel', paid: true)
 

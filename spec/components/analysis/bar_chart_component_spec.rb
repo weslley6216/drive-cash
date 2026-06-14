@@ -15,7 +15,7 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
 
   let(:daily_bars) do
     [
-      { unit: :day, key: 5,  label: '5',  earnings: 200.0, expenses: 0.0,  empty: false },
+      { unit: :day, key: 5, label: '5', earnings: 200.0, expenses: 0.0, empty: false },
       { unit: :day, key: 10, label: '10', earnings: 300.0, expenses: 50.0, empty: false }
     ]
   end

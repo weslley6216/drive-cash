@@ -6,8 +6,8 @@ module Ai
 
     def initialize(messages:, today: Date.current, client: Llm::Client)
       @messages = messages
-      @today    = today
-      @client   = client
+      @today = today
+      @client = client
     end
 
     def call
@@ -40,7 +40,7 @@ module Ai
     def process_response(response)
       case response[:type]
       when :tool_use then build_preview(response[:tool_name], response[:tool_input])
-      when :text     then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
+      when :text then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
       else
         Rails.logger.warn "[ParserService] Unexpected response type: #{response.inspect}"
         { type: :text, content: I18n.t('chat.message.not_understood') }

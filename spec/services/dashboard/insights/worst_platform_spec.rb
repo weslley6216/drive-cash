@@ -26,7 +26,7 @@ RSpec.describe Dashboard::Insights::WorstPlatform do
 
     it 'returns nil when the last platform has zero trips' do
       context = build_context(platforms: [
-        { id: 'uber',   label: 'Uber',   amount: 500, trips_count: 5 },
+        { id: 'uber', label: 'Uber', amount: 500, trips_count: 5 },
         { id: 'shopee', label: 'Shopee', amount: 50, trips_count: 0 }
       ])
 
@@ -35,7 +35,7 @@ RSpec.describe Dashboard::Insights::WorstPlatform do
 
     it 'returns a payload with platform label and per_trip computed from amount/trips' do
       context = build_context(platforms: [
-        { id: 'uber',   label: 'Uber',   amount: 500, trips_count: 10 },
+        { id: 'uber', label: 'Uber', amount: 500, trips_count: 10 },
         { id: 'shopee', label: 'Shopee', amount: 100, trips_count: 4 }
       ])
 

@@ -4,8 +4,8 @@ module Llm
       BASE_URL = 'https://generativelanguage.googleapis.com'.freeze
 
       def chat(messages:, tools: [], system: nil)
-        api_key  = ENV.fetch('GEMINI_API_KEY') { raise Llm::ConfigurationError, 'GEMINI_API_KEY is not set.' }
-        model    = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
+        api_key = ENV.fetch('GEMINI_API_KEY') { raise Llm::ConfigurationError, 'GEMINI_API_KEY is not set.' }
+        model = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
         endpoint = "/v1beta/models/#{model}:generateContent?key=#{api_key}"
 
         Rails.logger.info "[Gemini] Requesting #{model}"
@@ -35,7 +35,7 @@ module Llm
       end
 
       def handle_error!(response)
-        body      = response.body || {}
+        body = response.body || {}
         error_msg = body.dig('error', 'message') || "HTTP #{response.status}"
 
         if RATE_LIMIT_STATUSES.include?(response.status) || error_msg.match?(/high demand/i)

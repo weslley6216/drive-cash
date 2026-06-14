@@ -3,8 +3,8 @@ module History
     Filter = Data.define(:earnings, :expense_scope)
 
     FILTERS = {
-      'all'      => Filter.new(earnings: true,  expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
-      'earnings' => Filter.new(earnings: true,  expense_scope: nil),
+      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
+      'earnings' => Filter.new(earnings: true, expense_scope: nil),
       'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
       'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) })
     }.freeze

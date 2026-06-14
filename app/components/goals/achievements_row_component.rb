@@ -2,8 +2,8 @@ module Goals
   class AchievementsRowComponent < ApplicationComponent
     BADGES = {
       streak:         { icon: PhlexIcons::Lucide::Flame, color: '#f97316' },
-      goal_completed: { icon: PhlexIcons::Lucide::Star,  color: '#a855f7' },
-      best_day:       { icon: PhlexIcons::Lucide::Zap,   color: '#3b82f6' }
+      goal_completed: { icon: PhlexIcons::Lucide::Star, color: '#a855f7' },
+      best_day:       { icon: PhlexIcons::Lucide::Zap, color: '#3b82f6' }
     }.freeze
     DEFAULT_BADGE = { icon: PhlexIcons::Lucide::Star, color: '#64748b' }.freeze
 

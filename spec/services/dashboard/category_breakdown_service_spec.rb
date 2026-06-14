@@ -5,11 +5,11 @@ RSpec.describe Dashboard::CategoryBreakdownService do
 
   describe '#call' do
     it 'groups expenses by category and returns top 4 by amount' do
-      create(:expense, user: user, date: Date.new(2025, 6, 1),  amount: 300, category: 'fuel',        paid: true)
-      create(:expense, user: user, date: Date.new(2025, 6, 5),  amount: 200, category: 'maintenance', paid: true)
-      create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 100, category: 'meals',       paid: true)
-      create(:expense, user: user, date: Date.new(2025, 6, 15), amount:  80, category: 'phone',       paid: true)
-      create(:expense, user: user, date: Date.new(2025, 6, 20), amount:  10, category: 'parking',     paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 300, category: 'fuel', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 5), amount: 200, category: 'maintenance', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 100, category: 'meals', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 15), amount: 80, category: 'phone', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 20), amount: 10, category: 'parking', paid: true)
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
@@ -18,12 +18,12 @@ RSpec.describe Dashboard::CategoryBreakdownService do
     end
 
     it 'computes percent of total per category' do
-      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 300, category: 'fuel',  paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 300, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 2), amount: 100, category: 'meals', paid: true)
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
-      expect(result.find { |row| row[:id] == 'fuel'  }[:percent]).to eq(75.0)
+      expect(result.find { |row| row[:id] == 'fuel' }[:percent]).to eq(75.0)
       expect(result.find { |row| row[:id] == 'meals' }[:percent]).to eq(25.0)
     end
 
@@ -51,7 +51,7 @@ RSpec.describe Dashboard::CategoryBreakdownService do
     end
 
     it 'covers the whole year when month is nil' do
-      create(:expense, user: user, date: Date.new(2025, 1, 1),  amount: 100, category: 'fuel', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2025, 12, 1), amount: 200, category: 'fuel', paid: true)
 
       result = described_class.new(year: 2025, user: user).call

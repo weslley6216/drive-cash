@@ -5,7 +5,7 @@ RSpec.describe History::EntryRowComponent, type: :component do
 
   context 'with an earning' do
     let(:earning) { create(:earning, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 3, notes: 'Madrugada') }
-    let(:html)    { view_context.render(described_class.new(record: earning, context: context)) }
+    let(:html) { view_context.render(described_class.new(record: earning, context: context)) }
 
     it 'renders the platform label from i18n' do
       expect(html).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
@@ -36,7 +36,7 @@ RSpec.describe History::EntryRowComponent, type: :component do
 
   context 'with a paid expense' do
     let(:expense) { create(:expense, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true) }
-    let(:html)    { view_context.render(described_class.new(record: expense, context: context)) }
+    let(:html) { view_context.render(described_class.new(record: expense, context: context)) }
 
     it 'renders the category label from i18n' do
       expect(html).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
@@ -67,7 +67,7 @@ RSpec.describe History::EntryRowComponent, type: :component do
 
   context 'with an unpaid expense' do
     let(:expense) { create(:expense, date: Date.new(2025, 6, 12), amount: 120, category: 'maintenance', vendor: 'Pneus', paid: false) }
-    let(:html)    { view_context.render(described_class.new(record: expense, context: context)) }
+    let(:html) { view_context.render(described_class.new(record: expense, context: context)) }
 
     it 'renders the pending badge with amber styling' do
       expect(html).to include(I18n.t('history.index.day_group.unpaid_badge'))

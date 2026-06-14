@@ -16,7 +16,7 @@ RSpec.describe History::FeedService do
     context 'with filter all (default) and mixed records' do
       it 'groups items by date in descending order' do
         create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber', trips_count: 3)
-        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', paid: true)
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 150, platform: 'ifood', trips_count: 2)
 
         result = described_class.new(year: 2025, user: user).call
@@ -27,7 +27,7 @@ RSpec.describe History::FeedService do
 
       it 'returns earnings_total and expenses_total per day' do
         create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber')
-        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, user: user).call
 
@@ -49,7 +49,7 @@ RSpec.describe History::FeedService do
       it 'builds summary totals across all returned items' do
         create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber')
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 150, platform: 'ifood')
-        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, user: user).call
 
@@ -60,7 +60,7 @@ RSpec.describe History::FeedService do
 
       it 'orders items within a day by created_at desc' do
         create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber')
-        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, user: user).call
 
@@ -112,13 +112,13 @@ RSpec.describe History::FeedService do
 
     context 'aggregation contract' do
       it 'returns the same summary numbers regardless of limit' do
-        create(:earning, user: user, date: Date.new(2025, 1, 5),  amount: 100, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 3, 5),  amount: 50,  platform: 'ifood')
-        create(:expense, user: user, date: Date.new(2025, 6, 1),  amount: 30,  category: 'fuel', paid: true)
-        create(:expense, user: user, date: Date.new(2025, 7, 1),  amount: 70,  category: 'meals', paid: false)
+        create(:earning, user: user, date: Date.new(2025, 1, 5), amount: 100, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 3, 5), amount: 50, platform: 'ifood')
+        create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 30, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 7, 1), amount: 70, category: 'meals', paid: false)
 
         capped = described_class.new(year: 2025, limit: 1, user: user).call
-        full   = described_class.new(year: 2025, limit: 999, user: user).call
+        full = described_class.new(year: 2025, limit: 999, user: user).call
 
         expect(capped[:summary]).to eq(full[:summary])
         expect(capped[:summary]).to eq(earnings: 150, expenses: 30, net: 120)
@@ -145,7 +145,7 @@ RSpec.describe History::FeedService do
     context 'with filter earnings' do
       it 'returns only earnings' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, filter: 'earnings', user: user).call
 
@@ -155,7 +155,7 @@ RSpec.describe History::FeedService do
 
       it 'still includes expenses in the summary regardless of chip filter' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, filter: 'earnings', user: user).call
 
@@ -219,7 +219,7 @@ RSpec.describe History::FeedService do
 
     context 'with query parameter' do
       it 'matches expense vendor case-insensitive' do
-        match    = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
+        match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
         no_match = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
 
         result = described_class.new(year: 2025, query: 'orense', user: user).call
@@ -250,7 +250,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'matches expense by category label' do
-        match    = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
+        match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
         no_match = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
 
         result = described_class.new(year: 2025, query: 'Combustível', user: user).call
@@ -261,7 +261,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'matches earning by platform label' do
-        match    = create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', notes: nil)
+        match = create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', notes: nil)
         no_match = create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 100, platform: 'ifood', notes: nil)
 
         result = described_class.new(year: 2025, query: 'uber', user: user).call

@@ -68,7 +68,7 @@ module Dashboard
     end
 
     def format_date(date)
-      return I18n.t('common.today')     if date == @date
+      return I18n.t('common.today') if date == @date
       return I18n.t('common.yesterday') if date == @date - 1
 
       I18n.l(date, format: :short)

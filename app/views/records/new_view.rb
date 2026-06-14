@@ -11,7 +11,7 @@ module Records
       render LayoutComponent.new(title: t('records.new_view.title'), app_shell: true) do
         div(class: 'h-full flex flex-col bg-white max-w-[640px] mx-auto w-full', data: stimulus_data) do
           form_with(url: records_path, method: :post, scope: :record, html: { class: 'h-full flex flex-col' }) do
-            input(type: 'hidden', name: 'context[year]',  value: @context[:year])
+            input(type: 'hidden', name: 'context[year]', value: @context[:year])
             input(type: 'hidden', name: 'context[month]', value: @context[:month])
 
             top_bar

@@ -1,14 +1,14 @@
 class BrandMarkComponent < ApplicationComponent
   SIZES = {
-    sm: { box: 'w-9 h-9 rounded-lg',    title: nil,        gauge: 22, wordmark_default: false },
-    md: { box: 'w-11 h-11 rounded-xl',  title: 'text-xl',  gauge: 30, wordmark_default: true },
+    sm: { box: 'w-9 h-9 rounded-lg', title: nil, gauge: 22, wordmark_default: false },
+    md: { box: 'w-11 h-11 rounded-xl', title: 'text-xl', gauge: 30, wordmark_default: true },
     lg: { box: 'w-14 h-14 rounded-2xl', title: 'text-2xl', gauge: 38, wordmark_default: true }
   }.freeze
 
   def initialize(size: :md, light: false, wordmark: nil)
-    @size     = size
-    @light    = light
-    @config   = SIZES.fetch(size)
+    @size = size
+    @light = light
+    @config = SIZES.fetch(size)
     @wordmark = wordmark.nil? ? @config[:wordmark_default] : wordmark
   end
 

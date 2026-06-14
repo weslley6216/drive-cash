@@ -3,17 +3,17 @@ class Account::ShowView < ApplicationView
     {
       title_key: 'account.groups.account',
       items:     [
-        { icon: PhlexIcons::Lucide::User,       key: 'personal_data', path_name: :coming_soon, badge: false },
-        { icon: PhlexIcons::Lucide::Wallet,     key: 'plan',          path_name: :coming_soon, badge: true  },
-        { icon: PhlexIcons::Lucide::Bell,       key: 'notifications', path_name: :coming_soon, badge: false }
+        { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :coming_soon, badge: false },
+        { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :coming_soon, badge: true },
+        { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :coming_soon, badge: false }
       ]
     },
     {
       title_key: 'account.groups.preferences',
       items:     [
-        { icon: PhlexIcons::Lucide::Truck,      key: 'vehicle',       path_name: :vehicle,     badge: false },
-        { icon: PhlexIcons::Lucide::Download,   key: 'export',        path_name: :coming_soon, badge: false },
-        { icon: PhlexIcons::Lucide::LifeBuoy,   key: 'help',          path_name: :coming_soon, badge: false }
+        { icon: PhlexIcons::Lucide::Truck, key: 'vehicle', path_name: :vehicle, badge: false },
+        { icon: PhlexIcons::Lucide::Download, key: 'export', path_name: :coming_soon, badge: false },
+        { icon: PhlexIcons::Lucide::LifeBuoy, key: 'help', path_name: :coming_soon, badge: false }
       ]
     }
   ].freeze

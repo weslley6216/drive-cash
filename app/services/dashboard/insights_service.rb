@@ -98,9 +98,9 @@ module Dashboard
         margin:     current_calculator.margin,
         change_pct: {
           per_day:  PercentChange.between(current_stats[:profit_per_day], previous_stats[:profit_per_day]),
-          per_trip: PercentChange.between(current_calculator.per_trip,  previous_calculator.per_trip),
-          per_hour: PercentChange.between(current_calculator.per_hour,  previous_calculator.per_hour),
-          margin:   PercentChange.between(current_calculator.margin,    previous_calculator.margin)
+          per_trip: PercentChange.between(current_calculator.per_trip, previous_calculator.per_trip),
+          per_hour: PercentChange.between(current_calculator.per_hour, previous_calculator.per_hour),
+          margin:   PercentChange.between(current_calculator.margin, previous_calculator.margin)
         }
       }
     end

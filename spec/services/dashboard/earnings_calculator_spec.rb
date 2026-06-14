@@ -38,7 +38,7 @@ RSpec.describe Dashboard::EarningsCalculator do
     it 'returns a 12-month array of profit-eligible earnings sums' do
       create(:earning, date: Date.new(2026, 1, 10), amount: 100)
       create(:earning, date: Date.new(2026, 1, 20), amount: 50)
-      create(:earning, date: Date.new(2026, 6, 5),  amount: 200)
+      create(:earning, date: Date.new(2026, 6, 5), amount: 200)
 
       scope = Earning.for_year(2026)
       result = described_class.new(scope).monthly_totals

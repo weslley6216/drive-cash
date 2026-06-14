@@ -103,8 +103,8 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:monthly_bars].map { |bar| bar[:key] }).to eq((1..12).to_a)
 
         march = result[:monthly_bars].find { |bar| bar[:key] == 3 }
-        june  = result[:monthly_bars].find { |bar| bar[:key] == 6 }
-        jan   = result[:monthly_bars].find { |bar| bar[:key] == 1 }
+        june = result[:monthly_bars].find { |bar| bar[:key] == 6 }
+        jan = result[:monthly_bars].find { |bar| bar[:key] == 1 }
 
         expect(march[:empty]).to be false
         expect(june[:empty]).to be false
@@ -130,7 +130,7 @@ RSpec.describe Dashboard::InsightsService do
       end
 
       it 'returns daily bars when month is present, only days with data' do
-        create(:earning, user: user, date: Date.new(2025, 6, 5),  amount: 200)
+        create(:earning, user: user, date: Date.new(2025, 6, 5), amount: 200)
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 300)
         create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 50, category: 'fuel', paid: true)
 
@@ -230,7 +230,7 @@ RSpec.describe Dashboard::InsightsService do
     it 'instantiates CategoryBreakdownService only once per call' do
       %w[fuel maintenance].each_with_index do |category, offset|
         create(:expense, user: user, date: Date.new(2025, 6, offset + 1), amount: 100, category: category, paid: true)
-        create(:expense, user: user, date: Date.new(2024, 6, offset + 1), amount: 50,  category: category, paid: true)
+        create(:expense, user: user, date: Date.new(2024, 6, offset + 1), amount: 50, category: category, paid: true)
       end
 
       allow(Dashboard::CategoryBreakdownService).to receive(:new).and_call_original
@@ -269,7 +269,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:expense, user: user, date: Date.new(2025, 5, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 6, user: user).call
-        spike  = result[:insights].find { |insight| insight[:type] == 'category_spike' }
+        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
 
         expect(spike[:description]).to include('junho')
         expect(spike[:description]).to include('maio')
@@ -280,7 +280,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:expense, user: user, date: Date.new(2024, 1, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: nil, user: user).call
-        spike  = result[:insights].find { |insight| insight[:type] == 'category_spike' }
+        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
 
         expect(spike[:description]).to include('2024')
         expect(spike[:description]).not_to include('mês anterior')
@@ -291,7 +291,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:earning, user: user, date: Date.new(2025, 6, 15), amount: 200, trips_count: 1)
 
         result = described_class.new(year: 2025, month: 6, user: user).call
-        best   = result[:insights].find { |insight| insight[:type] == 'best_day' }
+        best = result[:insights].find { |insight| insight[:type] == 'best_day' }
 
         expect(best).not_to be_nil
         expect(best[:title]).to include('500,00')
@@ -302,7 +302,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 50, trips_count: 5, platform: 'shopee')
 
         result = described_class.new(year: 2025, month: 6, user: user).call
-        worst  = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
+        worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
 
         expect(worst).not_to be_nil
         expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
@@ -310,10 +310,10 @@ RSpec.describe Dashboard::InsightsService do
 
       it 'worst_platform reuses platforms breakdown trips_count for per-trip calculation' do
         create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 10, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 100, trips_count: 4,  platform: 'shopee')
+        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 100, trips_count: 4, platform: 'shopee')
 
         result = described_class.new(year: 2025, month: 6, user: user).call
-        worst  = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
+        worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
 
         expect(worst).not_to be_nil
         expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
@@ -327,7 +327,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2, user: user).call
-        drop   = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
+        drop = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
 
         expect(drop).not_to be_nil
         expect(drop[:severity]).to eq('critical')
@@ -335,8 +335,8 @@ RSpec.describe Dashboard::InsightsService do
 
       it 'returns at most 3 insights ordered by severity (critical first)' do
         create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 1000, trips_count: 1, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 2, 2), amount:  50,  trips_count: 5, platform: 'shopee')
-        create(:expense, user: user, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
+        create(:earning, user: user, date: Date.new(2025, 2, 2), amount: 50, trips_count: 5, platform: 'shopee')
+        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 900, category: 'fuel', paid: true)
         create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 1000, trips_count: 1)
         create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 

@@ -5,11 +5,11 @@ class User < ApplicationRecord
   ].freeze
 
   has_secure_password
-  has_many :sessions,  dependent: :destroy
-  has_many :expenses,  dependent: :destroy
-  has_many :earnings,  dependent: :destroy
-  has_many :goals,     dependent: :destroy
-  has_one :vehicle,    dependent: :destroy
+  has_many :sessions, dependent: :destroy
+  has_many :expenses, dependent: :destroy
+  has_many :earnings, dependent: :destroy
+  has_many :goals, dependent: :destroy
+  has_one :vehicle, dependent: :destroy
 
   generates_token_for :password_reset, expires_in: 15.minutes do
     password_salt.last(10)

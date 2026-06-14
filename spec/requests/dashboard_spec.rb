@@ -35,8 +35,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders hero profit card section' do
-      create(:earning, user: current_user, date: Date.new(2025, 6, 1),  amount: 500, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 2),  amount: 100, category: 'fuel', paid: true)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 1), amount: 500, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2025, 6, 2), amount: 100, category: 'fuel', paid: true)
 
       get root_path, params: { year: 2025 }
 
@@ -339,7 +339,7 @@ RSpec.describe 'Dashboard', type: :request do
 
     it 'shows only the current user earnings even when another user has records' do
       create(:earning, user: current_user, amount: 1_234.00, date: Date.current)
-      create(:earning, user: other_user,   amount: 9_876.00, date: Date.current)
+      create(:earning, user: other_user, amount: 9_876.00, date: Date.current)
 
       get root_path
 

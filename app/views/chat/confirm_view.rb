@@ -3,8 +3,8 @@ module Chat
     def initialize(success:, message:, action: nil, date: nil)
       @success = success
       @message = message
-      @action  = action
-      @date    = date.is_a?(Date) ? date : Date.current
+      @action = action
+      @date = date.is_a?(Date) ? date : Date.current
     end
 
     def view_template

@@ -21,7 +21,7 @@ RSpec.describe 'History', type: :request do
 
     it 'renders all entries of the year grouped by day in desc order' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', trips_count: 3)
-      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 80,  category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
 
       get history_path(year: 2025)
 
@@ -34,7 +34,7 @@ RSpec.describe 'History', type: :request do
 
     it 'renders each day group with earnings and expenses totals' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 10), amount: 80,  category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', paid: true)
 
       get history_path(year: 2025)
 
@@ -46,7 +46,7 @@ RSpec.describe 'History', type: :request do
 
     it 'filters by earnings only' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
 
       get history_path(year: 2025, filter: 'earnings')
 
@@ -56,8 +56,8 @@ RSpec.describe 'History', type: :request do
 
     it 'filters by unpaid expenses only' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', vendor: 'Posto X', paid: true)
-      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40,  category: 'meals', vendor: 'Lanchonete', paid: false)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
       get history_path(year: 2025, filter: 'unpaid')
 
@@ -115,7 +115,7 @@ RSpec.describe 'History', type: :request do
 
     it 'summary always shows full-period totals regardless of chip filter' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
       get history_path(year: 2025, filter: 'expenses')
 
@@ -138,7 +138,7 @@ RSpec.describe 'History', type: :request do
 
     it 'falls back to filter "all" when the param is invalid' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
-      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80,  category: 'fuel', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
       get history_path(year: 2025, filter: 'nonsense')
 

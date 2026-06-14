@@ -1,13 +1,13 @@
 module Analysis
   class BarChartComponent < ApplicationComponent
     CHART_HEIGHT = 130
-    STUB_HEIGHT  = 3
+    STUB_HEIGHT = 3
     MAX_BARS_BEFORE_TIGHT_GAP = 15
 
     def initialize(bars:, month:, year:)
-      @bars  = bars
+      @bars = bars
       @month = month
-      @year  = year
+      @year = year
       @max_value = bars.reject { |row| row[:empty] }
         .flat_map { |row| [row[:earnings], row[:expenses]] }
         .max.to_f
@@ -28,7 +28,7 @@ module Analysis
         unless @bars.empty?
           div(class: 'flex items-center gap-3 text-[11px]') do
             legend_item('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'))
-            legend_item('bg-red-400',     I18n.t('analysis.show_view.bar_chart.legend_expenses'))
+            legend_item('bg-red-400', I18n.t('analysis.show_view.bar_chart.legend_expenses'))
           end
         end
       end
@@ -60,12 +60,12 @@ module Analysis
 
     def data_bar_column(bar_row, index)
       earn_height = bar_height(bar_row[:earnings])
-      exp_height  = bar_height(bar_row[:expenses])
+      exp_height = bar_height(bar_row[:expenses])
 
       div(class: 'flex-1 min-w-0 flex flex-col gap-0.5 cursor-pointer rounded', **column_data(bar_row, index)) do
         div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
           div(class: 'flex-1 min-w-0 rounded-t bg-emerald-500', data: { bar_tooltip_target: 'fill' }, style: "height: #{earn_height}px")
-          div(class: 'flex-1 min-w-0 rounded-t bg-red-500',     data: { bar_tooltip_target: 'fill' }, style: "height: #{exp_height}px")
+          div(class: 'flex-1 min-w-0 rounded-t bg-red-500', data: { bar_tooltip_target: 'fill' }, style: "height: #{exp_height}px")
         end
         span(class: 'block overflow-hidden text-center text-[10px] text-slate-500 font-medium') { bar_row[:label] }
       end
@@ -127,7 +127,7 @@ module Analysis
           end
           div(class: 'space-y-1', data: { bar_tooltip_target: 'values' }) do
             tooltip_row('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'), 'earnValue')
-            tooltip_row('bg-red-400',     I18n.t('analysis.show_view.bar_chart.legend_expenses'), 'expValue')
+            tooltip_row('bg-red-400', I18n.t('analysis.show_view.bar_chart.legend_expenses'), 'expValue')
           end
           div(class: 'absolute left-1/2 bottom-0 w-2 h-2 bg-slate-900', style: 'transform: translate(-50%, 50%) rotate(45deg)')
         end

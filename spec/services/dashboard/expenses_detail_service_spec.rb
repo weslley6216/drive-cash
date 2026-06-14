@@ -29,7 +29,7 @@ RSpec.describe Dashboard::ExpensesDetailService do
     context 'without month filter' do
       it 'returns expenses grouped by month and total' do
         create(:expense, user: user, date: Date.new(2025, 1, 10), amount: 100, category: 'fuel')
-        create(:expense, user: user, date: Date.new(2025, 2, 5),  amount: 50,  category: 'meals')
+        create(:expense, user: user, date: Date.new(2025, 2, 5), amount: 50, category: 'meals')
         create(:expense, user: user, date: Date.new(2025, 2, 20), amount: 150, category: 'maintenance')
 
         result = described_class.new(year: 2025, month: nil, user: user).call

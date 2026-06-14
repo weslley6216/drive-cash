@@ -97,7 +97,7 @@ module Dashboard
     def change_percent
       return nil unless month
 
-      current_index  = month.to_i - 1
+      current_index = month.to_i - 1
       previous_index = current_index - 1
       return nil if previous_index.negative?
 

@@ -12,9 +12,9 @@ module Dashboard
     end
 
     def initialize(profit:, trips:, days:, earnings:)
-      @profit   = profit.to_f
-      @trips    = trips.to_i
-      @days     = days.to_i
+      @profit = profit.to_f
+      @trips = trips.to_i
+      @days = days.to_i
       @earnings = earnings.to_f
     end
 

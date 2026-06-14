@@ -1,7 +1,7 @@
 module History
   class DayGroupComponent < ApplicationComponent
     def initialize(group:, context:)
-      @group   = group
+      @group = group
       @context = context
     end
 
@@ -45,7 +45,7 @@ module History
     end
 
     def date_label
-      return I18n.t('common.today')     if @group[:date] == Date.current
+      return I18n.t('common.today') if @group[:date] == Date.current
       return I18n.t('common.yesterday') if @group[:date] == Date.current - 1
 
       I18n.l(@group[:date], format: :short)

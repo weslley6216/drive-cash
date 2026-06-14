@@ -1,17 +1,17 @@
 module Records
   class CategoryPickerComponent < ApplicationComponent
     CATEGORIES = [
-      { id: 'fuel',          label: 'Combustível',    icon: 'Fuel' },
-      { id: 'maintenance',   label: 'Manutenção',     icon: 'Wrench' },
-      { id: 'car_wash',      label: 'Lavagem',        icon: 'Sparkles' },
-      { id: 'toll',          label: 'Pedágio',        icon: 'Route' },
-      { id: 'parking',       label: 'Estacionamento', icon: 'CircleParking' },
-      { id: 'documentation', label: 'Documentação',   icon: 'FileText' },
-      { id: 'insurance',     label: 'Seguro',         icon: 'Shield' },
-      { id: 'fine',          label: 'Multa',          icon: 'TriangleAlert' },
-      { id: 'meals',         label: 'Refeições',      icon: 'Utensils' },
-      { id: 'phone',         label: 'Telefone',       icon: 'Phone' },
-      { id: 'other',         label: 'Outros',         icon: 'Package' }
+      { id: 'fuel', label: 'Combustível', icon: 'Fuel' },
+      { id: 'maintenance', label: 'Manutenção', icon: 'Wrench' },
+      { id: 'car_wash', label: 'Lavagem', icon: 'Sparkles' },
+      { id: 'toll', label: 'Pedágio', icon: 'Route' },
+      { id: 'parking', label: 'Estacionamento', icon: 'CircleParking' },
+      { id: 'documentation', label: 'Documentação', icon: 'FileText' },
+      { id: 'insurance', label: 'Seguro', icon: 'Shield' },
+      { id: 'fine', label: 'Multa', icon: 'TriangleAlert' },
+      { id: 'meals', label: 'Refeições', icon: 'Utensils' },
+      { id: 'phone', label: 'Telefone', icon: 'Phone' },
+      { id: 'other', label: 'Outros', icon: 'Package' }
     ].freeze
 
     def initialize(selected: nil)

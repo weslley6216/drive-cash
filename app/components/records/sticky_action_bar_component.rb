@@ -1,7 +1,7 @@
 module Records
   class StickyActionBarComponent < ApplicationComponent
     THEMES = {
-      red:     { bg: 'bg-red-600',     shadow: 'shadow-red-600/20',     label_key: 'records.new_view.save_expense' },
+      red:     { bg: 'bg-red-600', shadow: 'shadow-red-600/20', label_key: 'records.new_view.save_expense' },
       emerald: { bg: 'bg-emerald-600', shadow: 'shadow-emerald-600/20', label_key: 'records.new_view.save_earning' }
     }.freeze
 

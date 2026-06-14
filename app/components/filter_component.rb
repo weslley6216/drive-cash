@@ -39,7 +39,7 @@ class FilterComponent < ApplicationComponent
           class: 'flex flex-col gap-3',
           data: { controller: 'filter' }
         ) do
-          popover_field(t('.year'),  :year,  action: 'change->filter#handleYearChange') { year_options }
+          popover_field(t('.year'), :year, action: 'change->filter#handleYearChange') { year_options }
           popover_field(t('.month'), :month, action: 'change->filter#submit') { month_options }
         end
       end

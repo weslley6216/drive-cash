@@ -50,7 +50,7 @@ RSpec.describe Dashboard::Insights::Presenters do
 
     it 'renders best_day with formatted amount in the title and localized date in description' do
       date = Date.new(2025, 6, 10)
-      raw  = { type: 'best_day', severity: 'info', payload: { date: date, amount: 500.0 } }
+      raw = { type: 'best_day', severity: 'info', payload: { date: date, amount: 500.0 } }
 
       result = described_class.present(raw)
 

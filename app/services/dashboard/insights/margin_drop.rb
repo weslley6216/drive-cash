@@ -8,7 +8,7 @@ module Dashboard
       end
 
       def call
-        current_margin  = MetricsCalculator.from_stats(@context.current_stats).margin
+        current_margin = MetricsCalculator.from_stats(@context.current_stats).margin
         previous_margin = MetricsCalculator.from_stats(@context.previous_stats).margin
         pp_diff = (current_margin - previous_margin).round(1)
         return nil if previous_margin.zero? || pp_diff >= -THRESHOLD

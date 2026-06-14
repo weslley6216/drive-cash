@@ -1,6 +1,6 @@
 module Records
   class AmountInputComponent < ApplicationComponent
-    THEME_TEXT        = { red: 'text-red-700',             emerald: 'text-emerald-700' }.freeze
+    THEME_TEXT = { red: 'text-red-700', emerald: 'text-emerald-700' }.freeze
     THEME_PLACEHOLDER = { red: 'placeholder:text-red-700', emerald: 'placeholder:text-emerald-700' }.freeze
 
     def initialize(amount:, theme:)

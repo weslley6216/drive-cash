@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Llm::Client do
-  let(:messages)      { [{ role: 'user', content: 'Hello' }] }
-  let(:groq_adapter)  { instance_double(Llm::Adapters::Groq) }
+  let(:messages) { [{ role: 'user', content: 'Hello' }] }
+  let(:groq_adapter) { instance_double(Llm::Adapters::Groq) }
   let(:gemini_adapter) { instance_double(Llm::Adapters::Gemini) }
 
   before do

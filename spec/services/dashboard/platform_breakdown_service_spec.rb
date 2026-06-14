@@ -5,12 +5,12 @@ RSpec.describe Dashboard::PlatformBreakdownService do
 
   describe '#call' do
     it 'groups earnings by platform and returns top 5 by amount' do
-      create(:earning, user: user, date: Date.new(2025, 6, 1),  amount: 800, platform: 'uber')
-      create(:earning, user: user, date: Date.new(2025, 6, 2),  amount: 500, platform: 'ifood')
-      create(:earning, user: user, date: Date.new(2025, 6, 3),  amount: 300, platform: 'rappi')
-      create(:earning, user: user, date: Date.new(2025, 6, 4),  amount: 200, platform: 'shopee')
-      create(:earning, user: user, date: Date.new(2025, 6, 5),  amount: 100, platform: 'amazon')
-      create(:earning, user: user, date: Date.new(2025, 6, 6),  amount: 50, platform: 'nine_nine')
+      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 800, platform: 'uber')
+      create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 500, platform: 'ifood')
+      create(:earning, user: user, date: Date.new(2025, 6, 3), amount: 300, platform: 'rappi')
+      create(:earning, user: user, date: Date.new(2025, 6, 4), amount: 200, platform: 'shopee')
+      create(:earning, user: user, date: Date.new(2025, 6, 5), amount: 100, platform: 'amazon')
+      create(:earning, user: user, date: Date.new(2025, 6, 6), amount: 50, platform: 'nine_nine')
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
@@ -24,7 +24,7 @@ RSpec.describe Dashboard::PlatformBreakdownService do
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
-      expect(result.find { |row| row[:id] == 'uber'  }[:percent]).to eq(75.0)
+      expect(result.find { |row| row[:id] == 'uber' }[:percent]).to eq(75.0)
       expect(result.find { |row| row[:id] == 'ifood' }[:percent]).to eq(25.0)
     end
 
@@ -43,7 +43,7 @@ RSpec.describe Dashboard::PlatformBreakdownService do
     end
 
     it 'covers the whole year when month is nil' do
-      create(:earning, user: user, date: Date.new(2025, 1, 1),  amount: 100, platform: 'uber')
+      create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 100, platform: 'uber')
       create(:earning, user: user, date: Date.new(2025, 12, 1), amount: 200, platform: 'uber')
 
       result = described_class.new(year: 2025, user: user).call
@@ -68,7 +68,7 @@ RSpec.describe Dashboard::PlatformBreakdownService do
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
-      uber_row  = result.find { |row| row[:id] == 'uber' }
+      uber_row = result.find { |row| row[:id] == 'uber' }
       ifood_row = result.find { |row| row[:id] == 'ifood' }
 
       expect(uber_row[:trips_count]).to eq(15)

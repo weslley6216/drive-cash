@@ -1,11 +1,11 @@
 class SidebarNavComponent < ApplicationComponent
   TABS = [
-    { id: :home,     icon: PhlexIcons::Lucide::House,       path_method: :root_path },
+    { id: :home, icon: PhlexIcons::Lucide::House, path_method: :root_path },
     { id: :analysis, icon: PhlexIcons::Lucide::ChartColumn, path_method: :analysis_path },
-    { id: :goals,    icon: PhlexIcons::Lucide::Target,      path_method: :goals_path },
-    { id: :journey,  icon: PhlexIcons::Lucide::Play,        path_method: :work_session_path },
-    { id: :history,  icon: PhlexIcons::Lucide::List,        path_method: :history_path },
-    { id: :vehicle,  icon: PhlexIcons::Lucide::Truck,       path_method: :vehicle_path }
+    { id: :goals, icon: PhlexIcons::Lucide::Target, path_method: :goals_path },
+    { id: :journey, icon: PhlexIcons::Lucide::Play, path_method: :work_session_path },
+    { id: :history, icon: PhlexIcons::Lucide::List, path_method: :history_path },
+    { id: :vehicle, icon: PhlexIcons::Lucide::Truck, path_method: :vehicle_path }
   ].freeze
 
   def initialize(active:)

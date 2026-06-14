@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe History::IndexView, type: :component do
   let(:summary) { { earnings: 200.0, expenses: 80.0, net: 120.0 } }
-  let(:feed)    { { groups: [], summary: summary } }
+  let(:feed) { { groups: [], summary: summary } }
   let(:html) do
     view_context.render(
       described_class.new(

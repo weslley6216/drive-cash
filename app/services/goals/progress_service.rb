@@ -64,8 +64,8 @@ module Goals
 
       range.map do |day|
         earned = earnings_by_day.fetch(day, 0)
-        spent  = expenses_by_day.fetch(day, 0)
-        value  = goal.metric_profit? ? earned - spent : earned
+        spent = expenses_by_day.fetch(day, 0)
+        value = goal.metric_profit? ? earned - spent : earned
         { date: day, today: day == @date, done: day < @date, value: value }
       end
     end

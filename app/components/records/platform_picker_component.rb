@@ -1,14 +1,14 @@
 module Records
   class PlatformPickerComponent < ApplicationComponent
     PLATFORMS = [
-      { id: 'uber',          label: 'Uber',          color: '#000000', tw_fg: 'text-white' },
-      { id: 'nine_nine',     label: '99',            color: '#fbbf24', tw_fg: 'text-black' },
-      { id: 'ifood',         label: 'iFood',         color: '#ef4444', tw_fg: 'text-white' },
-      { id: 'rappi',         label: 'Rappi',         color: '#dc2626', tw_fg: 'text-white' },
-      { id: 'shopee',        label: 'Shopee',        color: '#f97316', tw_fg: 'text-white' },
-      { id: 'amazon',        label: 'Amazon',        color: '#1e293b', tw_fg: 'text-white' },
+      { id: 'uber', label: 'Uber', color: '#000000', tw_fg: 'text-white' },
+      { id: 'nine_nine', label: '99', color: '#fbbf24', tw_fg: 'text-black' },
+      { id: 'ifood', label: 'iFood', color: '#ef4444', tw_fg: 'text-white' },
+      { id: 'rappi', label: 'Rappi', color: '#dc2626', tw_fg: 'text-white' },
+      { id: 'shopee', label: 'Shopee', color: '#f97316', tw_fg: 'text-white' },
+      { id: 'amazon', label: 'Amazon', color: '#1e293b', tw_fg: 'text-white' },
       { id: 'mercado_livre', label: 'Mercado Livre', color: '#fef08a', tw_fg: 'text-black' },
-      { id: 'other',         label: 'Outras',        color: '#cbd5e1', tw_fg: 'text-slate-900' }
+      { id: 'other', label: 'Outras', color: '#cbd5e1', tw_fg: 'text-slate-900' }
     ].freeze
 
     def initialize(selected: nil)

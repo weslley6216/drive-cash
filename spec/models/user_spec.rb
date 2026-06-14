@@ -118,7 +118,7 @@ RSpec.describe User, type: :model do
     end
 
     it 'invalidates previous tokens when the password changes' do
-      user  = create(:user)
+      user = create(:user)
       token = user.password_reset_token
 
       user.update!(password: 'newpassword123', password_confirmation: 'newpassword123')
@@ -128,7 +128,7 @@ RSpec.describe User, type: :model do
     end
 
     it 'expires the token after 15 minutes' do
-      user  = create(:user)
+      user = create(:user)
       token = user.password_reset_token
 
       travel_to 16.minutes.from_now do

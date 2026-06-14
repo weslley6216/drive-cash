@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Ai::ParserService do
   let(:messages) { [{ role: 'user', content: 'user input' }] }
-  let(:client)   { class_double(Llm::Client) }
-  let(:service)  { described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client) }
+  let(:client) { class_double(Llm::Client) }
+  let(:service) { described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client) }
 
   describe '#call' do
     context 'when the LLM returns plain text' do
@@ -196,7 +196,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the tool_input amount comes as an Integer (Gemini-shaped) and as a Float (legacy Groq-shaped)' do
       let(:integer_input) { { 'amount' => 45, 'category' => 'fuel', 'date' => '2026-04-21' } }
-      let(:float_input)   { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' } }
+      let(:float_input) { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' } }
 
       it 'produces the same preview regardless of the numeric type' do
         allow(client).to receive(:chat).and_return(
@@ -205,7 +205,7 @@ RSpec.describe Ai::ParserService do
         )
 
         preview_with_integer = described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client).call
-        preview_with_float   = described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client).call
+        preview_with_float = described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client).call
 
         expect(preview_with_integer[:type]).to eq(:preview)
         expect(preview_with_integer[:summary]).to eq(preview_with_float[:summary])

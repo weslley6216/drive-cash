@@ -1,8 +1,8 @@
 class HistoryController < ApplicationController
   def index
-    @year   = params[:year].presence&.to_i || Date.current.year
-    @month  = params[:month].presence&.to_i
-    @query  = params[:q].to_s.strip.presence
+    @year = params[:year].presence&.to_i || Date.current.year
+    @month = params[:month].presence&.to_i
+    @query = params[:q].to_s.strip.presence
     @filter = History::FeedService.filter_names.include?(params[:filter]) ? params[:filter] : 'all'
 
     @feed = History::FeedService.new(

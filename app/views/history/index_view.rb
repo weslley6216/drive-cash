@@ -1,11 +1,11 @@
 module History
   class IndexView < ApplicationComponent
     def initialize(feed:, year:, month:, query:, filter:, available_years:)
-      @feed            = feed
-      @year            = year
-      @month           = month
-      @query           = query
-      @filter          = filter
+      @feed = feed
+      @year = year
+      @month = month
+      @query = query
+      @filter = filter
       @available_years = available_years
     end
 

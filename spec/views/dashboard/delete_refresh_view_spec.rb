@@ -10,9 +10,9 @@ RSpec.describe Dashboard::DeleteRefreshView, type: :component do
   end
 
   it 'replaces modal with the detail view and triggers morph refresh' do
-    filter  = { year: 2026, month: 1 }
-    detail  = Dashboard::ExpensesDetailService.new(year: 2026, month: 1).call
-    totals  = Dashboard::StatsService.new(year: 2026, month: 1).call
+    filter = { year: 2026, month: 1 }
+    detail = Dashboard::ExpensesDetailService.new(year: 2026, month: 1).call
+    totals = Dashboard::StatsService.new(year: 2026, month: 1).call
 
     output = view_context.render(
       described_class.new(

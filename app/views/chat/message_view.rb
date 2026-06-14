@@ -4,7 +4,7 @@ module Chat
 
     def initialize(user_text:, result:)
       @user_text = user_text
-      @result    = result
+      @result = result
     end
 
     def view_template
@@ -15,7 +15,7 @@ module Chat
 
     def ai_response
       case @result[:type]
-      when :text    then text_bubble(@result[:content])
+      when :text then text_bubble(@result[:content])
       when :preview then preview_card
       else
         text_bubble(t('chat.errors.unexpected'))
@@ -55,7 +55,7 @@ module Chat
     end
 
     def confirm_form
-      action  = @result[:action]
+      action = @result[:action]
       rparams = @result[:params] || {}
 
       form_with(url: chat_confirm_path, data: { turbo_stream: true, action: 'submit->chat#confirmSubmission' }) do |f|

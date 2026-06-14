@@ -19,7 +19,7 @@ module Dashboard
 
       earn_by_day = @user.earnings.in_period(year, month)
         .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
-      exp_by_day  = @user.expenses.paid_in_period(year, month)
+      exp_by_day = @user.expenses.paid_in_period(year, month)
         .group(Arel.sql('EXTRACT(DAY FROM date)::int')).sum(:amount)
 
       (1..last_plotted_day).map { |day| (earn_by_day[day].to_f - exp_by_day[day].to_f).round(2) }

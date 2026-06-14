@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe History::PeriodSummaryComponent, type: :component do
   let(:summary) { { earnings: 1200.0, expenses: 450.0, net: 750.0 } }
-  let(:html)    { view_context.render(described_class.new(summary: summary)) }
+  let(:html) { view_context.render(described_class.new(summary: summary)) }
 
   it 'renders the three card labels from i18n' do
     expect(html).to include(I18n.t('history.index.summary.earnings'))

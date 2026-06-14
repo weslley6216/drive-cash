@@ -1,10 +1,10 @@
 module Vehicles
   class TankBalanceCardComponent < ApplicationComponent
     STATUS_STYLES = {
-      negative: { bar_class: 'bg-red-500',   num_class: 'text-red-700',   chip_class: 'text-red-700 bg-red-100 border-red-200' },
-      empty:    { bar_class: 'bg-red-500',   num_class: 'text-red-700',   chip_class: 'text-red-700 bg-red-100 border-red-200' },
+      negative: { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200' },
+      empty:    { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200' },
       low:      { bar_class: 'bg-amber-500', num_class: 'text-amber-700', chip_class: 'text-amber-700 bg-amber-100 border-amber-200' },
-      ok:       { bar_class: 'bg-blue-500',  num_class: 'text-slate-900', chip_class: 'text-blue-700 bg-blue-50 border-blue-200' }
+      ok:       { bar_class: 'bg-blue-500', num_class: 'text-slate-900', chip_class: 'text-blue-700 bg-blue-50 border-blue-200' }
     }.freeze
 
     def initialize(balance:, full:, last_fill:, variant: :mobile)

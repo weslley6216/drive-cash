@@ -15,7 +15,7 @@ class TodayCardComponent < ApplicationComponent
 
       div(class: 'flex items-center gap-3 text-xs mt-2 flex-wrap') do
         span(class: 'text-emerald-600 font-medium tabular-nums') { "+#{format_currency(@earnings)}" }
-        span(class: 'text-red-600 font-medium tabular-nums')     { "−#{format_currency(@expenses)}" }
+        span(class: 'text-red-600 font-medium tabular-nums') { "−#{format_currency(@expenses)}" }
         span(class: 'text-slate-400 ml-auto') { detail_text } if detail_text.present?
       end
     end

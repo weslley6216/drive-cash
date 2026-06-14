@@ -84,7 +84,7 @@ class LayoutComponent < ApplicationComponent
 
     classes = []
     classes << 'lg:ml-64' if @sidebar_nav
-    classes << 'h-full'   if @app_shell
+    classes << 'h-full' if @app_shell
     classes.presence&.join(' ')
   end
 

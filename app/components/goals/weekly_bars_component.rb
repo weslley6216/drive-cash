@@ -46,8 +46,8 @@ module Goals
     def bar_classes(state)
       base = 'w-full rounded'
       case state
-      when :done   then "#{base} bg-emerald-500"
-      when :today  then "#{base} bg-blue-200 border-2 border-blue-500 border-dashed"
+      when :done then "#{base} bg-emerald-500"
+      when :today then "#{base} bg-blue-200 border-2 border-blue-500 border-dashed"
       when :future then "#{base} bg-slate-100"
       end
     end

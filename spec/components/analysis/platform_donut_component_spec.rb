@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Analysis::PlatformDonutComponent, type: :component do
   let(:platforms) do
     [
-      { id: 'uber',  label: 'Uber',  amount: 750.0, percent: 75.0 },
+      { id: 'uber', label: 'Uber', amount: 750.0, percent: 75.0 },
       { id: 'ifood', label: 'iFood', amount: 250.0, percent: 25.0 }
     ]
   end

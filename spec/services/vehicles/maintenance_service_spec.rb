@@ -58,7 +58,7 @@ RSpec.describe Vehicles::MaintenanceService do
 
         it 'is not returned when fewer than 3 distinct vendors exist' do
           create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 30.days, odometer_km: 159_000, full_tank: true)
-          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date,           odometer_km: 159_330, full_tank: true)
+          create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date, odometer_km: 159_330, full_tank: true)
 
           result = described_class.new(user: user, date: reference_date).call
 
@@ -69,11 +69,11 @@ RSpec.describe Vehicles::MaintenanceService do
   end
 
   def base_refuelings_for_three_vendors(vehicle:, reference_date:)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 60.days, odometer_km: 156_000, liters: 30, total_amount: 165, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense',  date: reference_date - 30.days, odometer_km: 156_345, liters: 30, total_amount: 165, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 60.days, odometer_km: 156_000, liters: 30, total_amount: 165, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 30.days, odometer_km: 156_345, liters: 30, total_amount: 165, full_tank: true)
     create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 20.days, odometer_km: 156_675, liters: 28, total_amount: 168, full_tank: true)
     create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 10.days, odometer_km: 156_983, liters: 28, total_amount: 168, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date - 5.days,  odometer_km: 157_300, liters: 30, total_amount: 175, full_tank: true)
-    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell',   date: reference_date,           odometer_km: 157_620, liters: 30, total_amount: 175, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell', date: reference_date - 5.days, odometer_km: 157_300, liters: 30, total_amount: 175, full_tank: true)
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Shell', date: reference_date, odometer_km: 157_620, liters: 30, total_amount: 175, full_tank: true)
   end
 end

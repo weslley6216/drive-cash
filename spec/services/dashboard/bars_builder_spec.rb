@@ -22,7 +22,7 @@ RSpec.describe Dashboard::BarsBuilder do
 
         result = described_class.new(user: user, year: 2025, month: nil).call
         january = result.find { |bar| bar[:key] == 1 }
-        march   = result.find { |bar| bar[:key] == 3 }
+        march = result.find { |bar| bar[:key] == 3 }
 
         expect(january[:empty]).to be true
         expect(march[:empty]).to be false
@@ -37,7 +37,7 @@ RSpec.describe Dashboard::BarsBuilder do
 
     context 'when month is present (daily mode)' do
       it 'returns one entry per day that has data with unit :day' do
-        create(:earning, user: user, date: Date.new(2025, 6, 5),  amount: 200)
+        create(:earning, user: user, date: Date.new(2025, 6, 5), amount: 200)
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 300)
         create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 50, category: 'fuel', paid: true)
 

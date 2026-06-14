@@ -13,7 +13,7 @@ module CategoryPalette
   }.freeze
 
   DEFAULT_COLOR = '#94a3b8'
-  DEFAULT_ICON  = PhlexIcons::Lucide::Package
+  DEFAULT_ICON = PhlexIcons::Lucide::Package
 
   def category_color(category)
     CATEGORY_META.dig(category, :color) || DEFAULT_COLOR

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe History::SearchBarComponent, type: :component do
-  let(:html)  { view_context.render(described_class.new(query: nil, filter: 'all')) }
+  let(:html) { view_context.render(described_class.new(query: nil, filter: 'all')) }
 
   it 'renders a search input with the i18n placeholder' do
     expect(html).to include(%(name="q"))

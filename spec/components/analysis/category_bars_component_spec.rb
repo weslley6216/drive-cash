@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe Analysis::CategoryBarsComponent, type: :component do
   let(:categories) do
     [
-      { id: 'fuel',        label: 'Combustível', amount: 300.0, percent: 60.0 },
-      { id: 'maintenance', label: 'Manutenção',  amount: 200.0, percent: 40.0 }
+      { id: 'fuel', label: 'Combustível', amount: 300.0, percent: 60.0 },
+      { id: 'maintenance', label: 'Manutenção', amount: 200.0, percent: 40.0 }
     ]
   end
 

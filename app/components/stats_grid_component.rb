@@ -8,10 +8,10 @@ class StatsGridComponent < ApplicationComponent
   }.freeze
 
   TILES = [
-    { key: :earnings, color: :green,  icon: :dollar_sign,    detail: :dashboard_earnings_detail_path },
-    { key: :expenses, color: :red,    icon: :triangle_alert, detail: :dashboard_expenses_detail_path },
-    { key: :days,     color: :yellow, icon: :calendar,       detail: nil },
-    { key: :trips,    color: :purple, icon: :package,        detail: nil }
+    { key: :earnings, color: :green, icon: :dollar_sign, detail: :dashboard_earnings_detail_path },
+    { key: :expenses, color: :red, icon: :triangle_alert, detail: :dashboard_expenses_detail_path },
+    { key: :days, color: :yellow, icon: :calendar, detail: nil },
+    { key: :trips, color: :purple, icon: :package, detail: nil }
   ].freeze
 
   def initialize(totals:, month: nil, year: Date.current.year)

@@ -1,7 +1,7 @@
 module History
   class SearchBarComponent < ApplicationComponent
     def initialize(query:, filter:)
-      @query  = query
+      @query = query
       @filter = filter
     end
 
