@@ -14,11 +14,11 @@ module Dashboard
     def call
       {
         expenses_percent: expenses_percent,
-        profit_per_day: profit_per_day,
-        days_avg_month: days_avg_month,
-        days_avg_week: days_avg_week,
-        trips_avg_month: trips_avg_month,
-        trips_avg_day: trips_avg_day
+        profit_per_day:   profit_per_day,
+        days_avg_month:   days_avg_month,
+        days_avg_week:    days_avg_week,
+        trips_avg_month:  trips_avg_month,
+        trips_avg_day:    trips_avg_day
       }
     end
 

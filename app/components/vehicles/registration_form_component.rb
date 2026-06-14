@@ -37,7 +37,7 @@ module Vehicles
       div do
         label(class: 'block text-sm font-medium text-slate-700 mb-1') { t("vehicle.registration.labels.#{attribute}") }
         render form.text_field(attribute, required: required,
-                                          class: 'w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500')
+                                          class:    'w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500')
       end
     end
 

@@ -11,7 +11,7 @@ RSpec.describe 'Vehicle flow', type: :request do
             vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: '2018',
                        license_plate: 'ABC-1D23', odometer_km: '160928' }
           },
-          as: :turbo_stream
+          as:     :turbo_stream
 
     expect(response.body).to include('action="refresh"')
     expect(current_user.reload.vehicle.odometer_km).to eq(160_928)
@@ -23,7 +23,7 @@ RSpec.describe 'Vehicle flow', type: :request do
     post refuelings_path,
          params: { refueling: { date: Date.current.to_s, vendor: 'Posto Orense', liters: '44.1',
                                 total_amount: '260.00', odometer_km: '160928', full_tank: '1' } },
-         as: :turbo_stream
+         as:     :turbo_stream
     get vehicle_path
 
     expect(response.body).to include(I18n.t('vehicle.tank.status.ok'))

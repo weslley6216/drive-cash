@@ -7,7 +7,7 @@ module Vehicles
         end
         p(class: 'text-base font-semibold text-slate-800') { t('vehicle.empty.title') }
         p(class: 'text-sm text-slate-500 mt-1 max-w-[260px] mx-auto leading-relaxed') { t('vehicle.empty.body') }
-        a(href: '#vehicle-registration',
+        a(href:  '#vehicle-registration',
           class: 'mt-4 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold') do
           render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
           plain t('vehicle.empty.cta')

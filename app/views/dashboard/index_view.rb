@@ -37,13 +37,13 @@ module Dashboard
 
         div(class: 'flex items-center gap-2 flex-wrap') do
           render FilterComponent.new(
-            selected_year: @filters[:year],
-            selected_month: @filters[:month],
+            selected_year:   @filters[:year],
+            selected_month:  @filters[:month],
             available_years: @filters[:available_years],
-            variant: :compact
+            variant:         :compact
           )
           link_to(new_earning_path,
-                  data: { turbo_frame: 'modal' },
+                  data:  { turbo_frame: 'modal' },
                   class: new_record_button_classes) do
             render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
             plain t('.new_record')
@@ -73,13 +73,13 @@ module Dashboard
     def hero_payload
       monthly_view = @filters[:month].present?
       HeroProfitCardComponent::Payload.new(
-        profit: @totals[:profit],
+        profit:         @totals[:profit],
         change_percent: @totals[:change_percent],
         profit_per_day: @totals[:profit_per_day],
-        days_count: @totals[:days],
-        series: monthly_view ? @totals[:daily_profit_series] : @totals[:monthly_profit_series],
-        year: @filters[:year],
-        month: @filters[:month]
+        days_count:     @totals[:days],
+        series:         monthly_view ? @totals[:daily_profit_series] : @totals[:monthly_profit_series],
+        year:           @filters[:year],
+        month:          @filters[:month]
       )
     end
 
@@ -92,8 +92,8 @@ module Dashboard
     def stats_grid_section
       render StatsGridComponent.new(
         totals: @totals,
-        month: @filters[:month],
-        year: @filters[:year]
+        month:  @filters[:month],
+        year:   @filters[:year]
       )
     end
 

@@ -35,7 +35,7 @@ module Goals
         end
         link_to(
           helpers.new_goal_path,
-          data: { turbo_frame: 'modal' },
+          data:  { turbo_frame: 'modal' },
           class: 'inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold'
         ) do
           render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')

@@ -30,7 +30,7 @@ class VehiclesController < ApplicationController
 
   def dashboard_payload
     Vehicles::MaintenanceService.new(user: current_user).call
-                                .merge(tank: Vehicles::TankBalanceService.new(user: current_user).call)
+      .merge(tank: Vehicles::TankBalanceService.new(user: current_user).call)
   end
 
   def empty_payload

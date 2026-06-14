@@ -23,9 +23,9 @@ RSpec.describe 'Earnings', type: :request do
     let(:valid_params) do
       {
         earning: {
-          date: '2026-01-23',
-          amount: 200.00,
-          platform: 'uber',
+          date:        '2026-01-23',
+          amount:      200.00,
+          platform:    'uber',
           trips_count: 2
         },
         context: { year: 2026 }
@@ -49,7 +49,7 @@ RSpec.describe 'Earnings', type: :request do
     it 'handles validation errors by re-rendering the modal' do
       post earnings_path,
            params: { earning: { amount: 0, platform: 'uber' }, context: { year: 2026 } },
-           as: :turbo_stream
+           as:     :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('earnings.new_view.title'))
@@ -81,14 +81,14 @@ RSpec.describe 'Earnings', type: :request do
       patch earning_path(earning),
             params: {
               earning: {
-                date: '2026-01-12',
-                amount: 200.50,
+                date:     '2026-01-12',
+                amount:   200.50,
                 platform: 'uber',
-                notes: 'Ajuste manual'
+                notes:    'Ajuste manual'
               },
               context: { year: 2026, month: 1 }
             },
-            as: :turbo_stream
+            as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
@@ -103,7 +103,7 @@ RSpec.describe 'Earnings', type: :request do
               earning: { amount: 300.00, platform: 'uber' },
               context: { year: 2026, month: 1 }
             },
-            as: :turbo_stream
+            as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
@@ -114,7 +114,7 @@ RSpec.describe 'Earnings', type: :request do
     it 'handles validation errors on update' do
       patch earning_path(earning),
             params: { earning: { amount: 0 }, context: { year: 2026, month: 1 } },
-            as: :turbo_stream
+            as:     :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('earnings.edit_view.title'))
@@ -123,7 +123,7 @@ RSpec.describe 'Earnings', type: :request do
     it 'responds with a turbo stream refresh so only changed content updates' do
       patch earning_path(earning),
             params: { earning: { amount: 200.50 }, context: { year: 2026, month: 1 } },
-            as: :turbo_stream
+            as:     :turbo_stream
 
       expect(response.body).to include('action="refresh"')
       expect(response.body).not_to include('target="hero_profit_card"')
@@ -146,7 +146,7 @@ RSpec.describe 'Earnings', type: :request do
              earning: { date: '2026-01-23', amount: 200.00, platform: 'uber', trips_count: 2 },
              context: { year: 2026 }
            },
-           as: :turbo_stream
+           as:     :turbo_stream
 
       expect(Earning.last.user).to eq(current_user)
     end
@@ -159,7 +159,7 @@ RSpec.describe 'Earnings', type: :request do
       expect {
         delete earning_path(earning),
                params: { context: { year: 2026, month: 1 } },
-               as: :turbo_stream
+               as:     :turbo_stream
       }.to change(Earning, :count).by(-1)
     end
 
@@ -168,7 +168,7 @@ RSpec.describe 'Earnings', type: :request do
 
       delete earning_path(earning),
              params: { context: { year: 2026, month: 1 } },
-             as: :turbo_stream
+             as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]

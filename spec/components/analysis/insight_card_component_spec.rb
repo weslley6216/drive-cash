@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Analysis::InsightCardComponent, type: :component do
   let(:insight) do
     {
-      type: 'category_spike',
-      severity: 'warning',
-      title: 'Combustível subiu 15%',
+      type:        'category_spike',
+      severity:    'warning',
+      title:       'Combustível subiu 15%',
       description: 'Você gastou R$ 600,00 em Combustível.'
     }
   end

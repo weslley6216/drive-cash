@@ -11,22 +11,22 @@ module Records
         end
         div(class: 'flex items-center justify-between') do
           button(
-            type: 'button',
+            type:  'button',
             class: 'w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-base font-bold cursor-pointer',
-            data: { action: 'click->record-form#decrementTrips' }
+            data:  { action: 'click->record-form#decrementTrips' }
           ) { '−' }
           span(class: 'text-xl font-bold text-slate-800', data: { record_form_target: 'tripsValue' }) { @value.to_s }
           button(
-            type: 'button',
+            type:  'button',
             class: 'w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-base font-bold cursor-pointer',
-            data: { action: 'click->record-form#incrementTrips' }
+            data:  { action: 'click->record-form#incrementTrips' }
           ) { '+' }
         end
         input(
-          type: 'hidden',
-          name: 'record[trips_count]',
+          type:  'hidden',
+          name:  'record[trips_count]',
           value: @value,
-          data: { record_form_target: 'tripsInput' }
+          data:  { record_form_target: 'tripsInput' }
         )
       end
     end

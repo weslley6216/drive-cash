@@ -17,21 +17,21 @@ module Dashboard
       profit_value = earnings_total - expenses_total
 
       {
-        earnings: earnings_total,
-        expenses: expenses_total,
-        profit: profit_value,
-        days: days_worked,
+        earnings:           earnings_total,
+        expenses:           expenses_total,
+        profit:             profit_value,
+        days:               days_worked,
         earnings_avg_month: earnings_data[:avg_per_month],
-        earnings_avg_day: earnings_data[:avg_per_day],
-        trips: trips
+        earnings_avg_day:   earnings_data[:avg_per_day],
+        trips:              trips
       }.merge(derived_metrics(earnings_total, expenses_total, profit_value, days_worked, trips))
     end
 
     def call
       metrics.merge(
         monthly_profit_series: profit_series.monthly,
-        daily_profit_series: profit_series.daily,
-        change_percent: change_percent
+        daily_profit_series:   profit_series.daily,
+        change_percent:        change_percent
       )
     end
 
@@ -75,14 +75,14 @@ module Dashboard
 
     def derived_metrics(earnings, expenses, profit, days, trips)
       DerivedMetrics.new(
-        earnings: earnings,
-        expenses: expenses,
-        profit: profit,
-        days: days,
-        trips: trips,
+        earnings:     earnings,
+        expenses:     expenses,
+        profit:       profit,
+        days:         days,
+        trips:        trips,
         months_count: earnings_months_count,
-        year: year,
-        month: month
+        year:         year,
+        month:        month
       ).call
     end
 

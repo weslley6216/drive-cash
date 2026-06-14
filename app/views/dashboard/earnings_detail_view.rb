@@ -53,7 +53,7 @@ module Dashboard
                 td(colspan: 2, class: 'p-0') do
                   link_to(
                     dashboard_earnings_detail_path(year: @filters[:year], month: row[:month]),
-                    data: { turbo_frame: 'modal' },
+                    data:  { turbo_frame: 'modal' },
                     class: 'flex justify-between items-center w-full py-2.5 px-0 text-left text-slate-800 capitalize hover:bg-slate-50 transition-colors'
                   ) do
                     span { row[:month_name].to_s }
@@ -70,10 +70,10 @@ module Dashboard
                   div(class: 'flex items-center gap-2 flex-shrink-0 group justify-end') do
                     span(class: 'font-medium text-green-700') { format_currency(earning.amount) }
                     render_record_actions(
-                      edit_path: edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
+                      edit_path:   edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: earning_path(earning, context: @filters),
-                      edit_hover: 'hover:text-blue-600',
-                      labels: { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
+                      edit_hover:  'hover:text-blue-600',
+                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
                     )
                   end
                 end
@@ -86,15 +86,15 @@ module Dashboard
 
     def fixed_footer
       render_detail_footer(
-        annual: @annual,
-        show_total: has_rows?,
-        total: @total,
-        total_class: 'text-green-800',
-        back_path: dashboard_earnings_detail_path(year: @filters[:year]),
-        labels: {
+        annual:          @annual,
+        show_total:      has_rows?,
+        total:           @total,
+        total_class:     'text-green-800',
+        back_path:       dashboard_earnings_detail_path(year: @filters[:year]),
+        labels:          {
           total: t('.total'),
           close: t('.close'),
-          back: t('.back')
+          back:  t('.back')
         },
         padding_classes: 'px-6'
       )

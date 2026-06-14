@@ -17,8 +17,8 @@ RSpec.describe Dashboard::DeleteRefreshView, type: :component do
     output = view_context.render(
       described_class.new(
         detail_view: Dashboard::ExpensesDetailView.new(**detail, filters: filter),
-        filter: filter,
-        totals: totals
+        filter:      filter,
+        totals:      totals
       )
     )
 

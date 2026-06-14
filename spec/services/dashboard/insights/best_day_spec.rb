@@ -5,15 +5,15 @@ RSpec.describe Dashboard::Insights::BestDay do
 
   def build_context(year:, month:)
     Dashboard::Insights::Context.new(
-      user: user,
-      year: year,
-      month: month,
-      previous_year: year - 1,
+      user:           user,
+      year:           year,
+      month:          month,
+      previous_year:  year - 1,
       previous_month: month,
-      current_stats: {},
+      current_stats:  {},
       previous_stats: {},
-      categories: [],
-      platforms: []
+      categories:     [],
+      platforms:      []
     )
   end
 

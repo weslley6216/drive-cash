@@ -27,9 +27,9 @@ module Expenses
     def build_plan
       InstallmentPlan.new(
         total_amount: @base_attrs['amount'],
-        start_date: @base_attrs['date'],
-        period: @installment_attrs[:period],
-        repetitions: @installment_attrs[:repetitions].to_i
+        start_date:   @base_attrs['date'],
+        period:       @installment_attrs[:period],
+        repetitions:  @installment_attrs[:repetitions].to_i
       )
     end
 

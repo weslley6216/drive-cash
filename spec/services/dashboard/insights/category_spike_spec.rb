@@ -5,15 +5,15 @@ RSpec.describe Dashboard::Insights::CategorySpike do
 
   def build_context(year:, month:, categories:)
     Dashboard::Insights::Context.new(
-      user: user,
-      year: year,
-      month: month,
-      previous_year: month ? year : year - 1,
+      user:           user,
+      year:           year,
+      month:          month,
+      previous_year:  month ? year : year - 1,
       previous_month: month ? month - 1 : nil,
-      current_stats: {},
+      current_stats:  {},
       previous_stats: {},
-      categories: categories,
-      platforms: []
+      categories:     categories,
+      platforms:      []
     )
   end
 

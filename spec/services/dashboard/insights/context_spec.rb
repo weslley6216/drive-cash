@@ -5,15 +5,15 @@ RSpec.describe Dashboard::Insights::Context do
     it 'exposes all fields passed in' do
       user = create(:user)
       context = described_class.new(
-        user: user,
-        year: 2025,
-        month: 6,
-        previous_year: 2024,
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2024,
         previous_month: 6,
-        current_stats: { profit: 100 },
+        current_stats:  { profit: 100 },
         previous_stats: { profit: 50 },
-        categories: [{ id: 'fuel', amount: 200 }],
-        platforms:  [{ id: 'uber', amount: 500 }]
+        categories:     [{ id: 'fuel', amount: 200 }],
+        platforms:      [{ id: 'uber', amount: 500 }]
       )
 
       expect(context.user).to eq(user)

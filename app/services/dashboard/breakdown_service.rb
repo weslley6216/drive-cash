@@ -11,8 +11,8 @@ module Dashboard
       return [] if total.zero?
 
       rows.sort_by { |row| -row[:amount] }
-          .first(@limit)
-          .map { |row| build_row(row) }
+        .first(@limit)
+        .map { |row| build_row(row) }
     end
 
     private

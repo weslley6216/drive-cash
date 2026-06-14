@@ -5,39 +5,39 @@ class StatCardComponent < ApplicationComponent
   }.freeze
 
   COLORS = {
-    green: {
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      title: 'text-green-700',
-      value: 'text-green-900',
+    green:  {
+      bg:       'bg-green-50',
+      border:   'border-green-200',
+      title:    'text-green-700',
+      value:    'text-green-900',
       subtitle: 'text-green-600'
     },
-    red: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      title: 'text-red-700',
-      value: 'text-red-900',
+    red:    {
+      bg:       'bg-red-50',
+      border:   'border-red-200',
+      title:    'text-red-700',
+      value:    'text-red-900',
       subtitle: 'text-red-600'
     },
-    blue: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      title: 'text-blue-700',
-      value: 'text-blue-900',
+    blue:   {
+      bg:       'bg-blue-50',
+      border:   'border-blue-200',
+      title:    'text-blue-700',
+      value:    'text-blue-900',
       subtitle: 'text-blue-600'
     },
     yellow: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-      title: 'text-yellow-700',
-      value: 'text-yellow-900',
+      bg:       'bg-yellow-50',
+      border:   'border-yellow-200',
+      title:    'text-yellow-700',
+      value:    'text-yellow-900',
       subtitle: 'text-yellow-600'
     },
     purple: {
-      bg: 'bg-purple-50',
-      border: 'border-purple-200',
-      title: 'text-purple-700',
-      value: 'text-purple-900',
+      bg:       'bg-purple-50',
+      border:   'border-purple-200',
+      title:    'text-purple-700',
+      value:    'text-purple-900',
       subtitle: 'text-purple-600'
     }
   }.freeze
@@ -101,10 +101,10 @@ class StatCardComponent < ApplicationComponent
 
   def default_colors
     {
-      bg: 'bg-white',
-      border: 'border-slate-200',
-      title: 'text-slate-600',
-      value: 'text-slate-900',
+      bg:       'bg-white',
+      border:   'border-slate-200',
+      title:    'text-slate-600',
+      value:    'text-slate-900',
       subtitle: 'text-slate-500'
     }
   end

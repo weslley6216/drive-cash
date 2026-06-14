@@ -7,10 +7,10 @@ RSpec.describe Expenses::Creator do
     context 'when not creating installments' do
       let(:expense_params) do
         {
-          date: '2026-01-10',
-          amount: 100.00,
+          date:     '2026-01-10',
+          amount:   100.00,
           category: 'fuel',
-          vendor: 'Shell'
+          vendor:   'Shell'
         }
       end
 
@@ -41,10 +41,10 @@ RSpec.describe Expenses::Creator do
     context 'when creating installments' do
       let(:expense_params) do
         {
-          date: '2026-01-10',
-          amount: 300.00,
+          date:     '2026-01-10',
+          amount:   300.00,
           category: 'maintenance',
-          vendor: 'Oficina'
+          vendor:   'Oficina'
         }
       end
 

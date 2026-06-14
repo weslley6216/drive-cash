@@ -5,9 +5,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is valid with correct parameters' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.valid?).to be true
@@ -16,9 +16,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is invalid with less than 2 repetitions' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 1
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  1
       )
 
       expect(plan.valid?).to be false
@@ -27,9 +27,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is invalid with unknown period' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'invalid',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'invalid',
+        repetitions:  3
       )
 
       expect(plan.valid?).to be false
@@ -38,9 +38,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is valid at the MAX_INSTALLMENTS boundary' do
       plan = described_class.new(
         total_amount: 600,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: Expense::MAX_INSTALLMENTS
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  Expense::MAX_INSTALLMENTS
       )
 
       expect(plan.valid?).to be true
@@ -49,9 +49,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is invalid when count exceeds MAX_INSTALLMENTS' do
       plan = described_class.new(
         total_amount: 600,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: Expense::MAX_INSTALLMENTS + 1
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  Expense::MAX_INSTALLMENTS + 1
       )
 
       expect(plan.valid?).to be false
@@ -60,9 +60,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'is invalid when total_amount is not positive' do
       plan = described_class.new(
         total_amount: 0,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.valid?).to be false
@@ -73,9 +73,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'splits amount equally when divisible' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.amounts).to eq([BigDecimal('100'), BigDecimal('100'), BigDecimal('100')])
@@ -84,9 +84,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'distributes remainder across first installments' do
       plan = described_class.new(
         total_amount: 100,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.amounts.sum).to eq(BigDecimal('100'))
@@ -98,9 +98,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'generates monthly dates' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.dates).to eq([
@@ -113,9 +113,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'generates weekly dates' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'weekly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'weekly',
+        repetitions:  3
       )
 
       expect(plan.dates).to eq([
@@ -128,9 +128,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'generates biweekly dates' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'biweekly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'biweekly',
+        repetitions:  3
       )
 
       expect(plan.dates).to eq([
@@ -143,9 +143,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'generates annual dates' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'annual',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'annual',
+        repetitions:  3
       )
 
       expect(plan.dates).to eq([
@@ -158,9 +158,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'parses a non-string date via Date.parse' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: 20_260_110,
-        period: 'monthly',
-        repetitions: 3
+        start_date:   20_260_110,
+        period:       'monthly',
+        repetitions:  3
       )
 
       expect(plan.dates.first).to eq(Date.new(2026, 1, 10))
@@ -177,9 +177,9 @@ RSpec.describe Expenses::InstallmentPlan do
     it 'returns merged attributes for given index' do
       plan = described_class.new(
         total_amount: 300,
-        start_date: '2026-01-10',
-        period: 'monthly',
-        repetitions: 3
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  3
       )
 
       attrs = plan.installment_attributes(1)

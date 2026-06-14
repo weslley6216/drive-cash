@@ -30,12 +30,12 @@ RSpec.describe Goals::IndexView, type: :component do
     end
     let(:progress) do
       {
-        weekly: nil,
-        monthly: {
+        weekly:       nil,
+        monthly:      {
           goal: goal, current: 1500, target: 6000, percent: 25,
           projection: 3000, on_track: false, remaining_per_day: 300, days_remaining: 15
         },
-        annual: nil,
+        annual:       nil,
         achievements: []
       }
     end
@@ -65,14 +65,14 @@ RSpec.describe Goals::IndexView, type: :component do
     end
     let(:progress) do
       {
-        weekly: {
+        weekly:       {
           goal: weekly_goal, current: 500, target: 1400, percent: 35,
           days: (Date.new(2026, 6, 8)..Date.new(2026, 6, 14)).map { |day|
             { date: day, value: 100, done: day < Date.new(2026, 6, 10), today: day == Date.new(2026, 6, 10) }
           }
         },
-        monthly: nil,
-        annual: {
+        monthly:      nil,
+        annual:       {
           goal: annual_goal, current: 20_000, target: 80_000, percent: 25,
           projection: 40_000, on_track: false, remaining_per_day: 200, days_remaining: 199
         },

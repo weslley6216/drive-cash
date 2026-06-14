@@ -128,7 +128,7 @@ RSpec.describe Llm::Adapters::Groq do
     context 'when tools are provided' do
       let(:tools) do
         [{
-          name: 'test_tool',
+          name:       'test_tool',
           parameters: { type: 'OBJECT', properties: { amount: { type: 'STRING' } } }
         }]
       end
@@ -141,9 +141,9 @@ RSpec.describe Llm::Adapters::Groq do
           'chat/completions',
           hash_including(
             tools: [{
-              type: 'function',
+              type:     'function',
               function: {
-                name: 'test_tool',
+                name:       'test_tool',
                 parameters: { type: 'object', properties: { amount: { type: 'string' } } }
               }
             }]

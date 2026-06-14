@@ -9,10 +9,10 @@ module History
     def view_template
       link_to(
         public_send(@row.edit_route, @record, context: @context),
-        data: { turbo_frame: 'modal' },
-        class: 'flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors',
+        data:       { turbo_frame: 'modal' },
+        class:      'flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors',
         aria_label: @row.edit_label,
-        title: @row.edit_label
+        title:      @row.edit_label
       ) do
         icon_block
         body_block

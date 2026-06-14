@@ -75,7 +75,7 @@ module Vehicles
         end
         link_to(helpers.edit_vehicle_path,
                 class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600',
-                data: { turbo_frame: 'modal' }) do
+                data:  { turbo_frame: 'modal' }) do
           render PhlexIcons::Lucide::Pencil.new(class: 'w-[18px] h-[18px]')
         end
       end
@@ -110,7 +110,7 @@ module Vehicles
     def catalog_button(hidden:)
       link_to(helpers.new_maintenance_path,
               class: 'w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white/60 py-3 text-sm font-medium text-slate-600 hover:bg-white',
-              data: { turbo_frame: 'modal' }) do
+              data:  { turbo_frame: 'modal' }) do
         render PhlexIcons::Lucide::CirclePlus.new(class: 'w-[17px] h-[17px]')
         plain t('vehicle.maintenances.add_from_catalog')
         if hidden.positive?
@@ -168,10 +168,10 @@ module Vehicles
         div(class: 'flex items-center gap-2') do
           link_to(t('vehicle.edit'), helpers.edit_vehicle_path,
                   class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
-                  data: { turbo_frame: 'modal' })
+                  data:  { turbo_frame: 'modal' })
           link_to(t('vehicle.maintenances.add_from_catalog'), helpers.new_maintenance_path,
                   class: 'flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold',
-                  data: { turbo_frame: 'modal' })
+                  data:  { turbo_frame: 'modal' })
         end
       end
     end

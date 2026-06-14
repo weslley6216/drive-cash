@@ -33,12 +33,12 @@ RSpec.describe Goals::AchievementsService do
 
     it 'returns goal_completed badge when most recent past monthly goal was beaten' do
       create(:goal,
-             user: user,
-             kind: 'monthly',
+             user:          user,
+             kind:          'monthly',
              target_amount: 5000,
-             period_start: Date.new(2026, 5, 1),
-             period_end: Date.new(2026, 5, 31),
-             metric: 'profit')
+             period_start:  Date.new(2026, 5, 1),
+             period_end:    Date.new(2026, 5, 31),
+             metric:        'profit')
       create(:earning, user: user, date: Date.new(2026, 5, 10), amount: 6000)
 
       result = described_class.new(user: user, date: reference_date).call
@@ -65,12 +65,12 @@ RSpec.describe Goals::AchievementsService do
 
     it 'does not return goal_completed badge when no past monthly goal was beaten' do
       create(:goal,
-             user: user,
-             kind: 'monthly',
+             user:          user,
+             kind:          'monthly',
              target_amount: 10_000,
-             period_start: Date.new(2026, 5, 1),
-             period_end: Date.new(2026, 5, 31),
-             metric: 'profit')
+             period_start:  Date.new(2026, 5, 1),
+             period_end:    Date.new(2026, 5, 31),
+             metric:        'profit')
       create(:earning, user: user, date: Date.new(2026, 5, 10), amount: 1000)
 
       result = described_class.new(user: user, date: reference_date).call

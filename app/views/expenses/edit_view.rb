@@ -8,9 +8,9 @@ module Expenses
       toggle_field(
         form,
         :paid,
-        label: t('.labels.paid'),
-        theme: @theme,
-        on_label: t('.paid_states.on'),
+        label:     t('.labels.paid'),
+        theme:     @theme,
+        on_label:  t('.paid_states.on'),
         off_label: t('.paid_states.off')
       )
     end

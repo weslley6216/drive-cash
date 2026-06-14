@@ -5,15 +5,15 @@ RSpec.describe Dashboard::Insights::WorstPlatform do
 
   def build_context(platforms:)
     Dashboard::Insights::Context.new(
-      user: user,
-      year: 2025,
-      month: 6,
-      previous_year: 2024,
+      user:           user,
+      year:           2025,
+      month:          6,
+      previous_year:  2024,
       previous_month: 6,
-      current_stats: {},
+      current_stats:  {},
       previous_stats: {},
-      categories: [],
-      platforms: platforms
+      categories:     [],
+      platforms:      platforms
     )
   end
 
@@ -27,7 +27,7 @@ RSpec.describe Dashboard::Insights::WorstPlatform do
     it 'returns nil when the last platform has zero trips' do
       context = build_context(platforms: [
         { id: 'uber',   label: 'Uber',   amount: 500, trips_count: 5 },
-        { id: 'shopee', label: 'Shopee', amount:  50, trips_count: 0 }
+        { id: 'shopee', label: 'Shopee', amount: 50, trips_count: 0 }
       ])
 
       expect(described_class.new(context).call).to be_nil

@@ -14,10 +14,10 @@ module Analysis
 
     def view_template
       render LayoutComponent.new(
-        title: t('.title'),
-        bottom_nav: :analysis,
+        title:       t('.title'),
+        bottom_nav:  :analysis,
         sidebar_nav: :analysis,
-        app_shell: true
+        app_shell:   true
       ) do
         turbo_frame_tag 'page' do
           div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
@@ -52,11 +52,11 @@ module Analysis
         end
 
         render FilterComponent.new(
-          selected_year: @filters[:year],
-          selected_month: @filters[:month],
+          selected_year:   @filters[:year],
+          selected_month:  @filters[:month],
           available_years: @filters[:available_years],
-          variant: :popover,
-          action_path: helpers.analysis_path
+          variant:         :popover,
+          action_path:     helpers.analysis_path
         )
       end
     end
@@ -81,12 +81,12 @@ module Analysis
 
     def metric_card(key, value, hint: nil, pp: false)
       render Analysis::MetricCardComponent.new(
-        label: t(".metrics.#{key}"),
-        icon: METRIC_ICONS[key],
-        value: value,
-        hint: hint,
-        change_pct: metrics[:change_pct][key],
-        pp: pp,
+        label:        t(".metrics.#{key}"),
+        icon:         METRIC_ICONS[key],
+        value:        value,
+        hint:         hint,
+        change_pct:   metrics[:change_pct][key],
+        pp:           pp,
         period_label: period_label_for(pp)
       )
     end
@@ -98,11 +98,11 @@ module Analysis
       if period_context[:mode] == :monthly
         I18n.t('analysis.show_view.metrics.vs_period_monthly',
                month: period_context[:previous_month_name],
-               year: period_context[:previous_year])
+               year:  period_context[:previous_year])
       elsif period_context[:cutoff_month_name]
         I18n.t('analysis.show_view.metrics.vs_period_annual_ytd',
                month: period_context[:cutoff_month_name],
-               year: period_context[:previous_year])
+               year:  period_context[:previous_year])
       else
         I18n.t('analysis.show_view.metrics.vs_period_annual', year: period_context[:previous_year])
       end
@@ -111,9 +111,9 @@ module Analysis
     def bar_chart_section
       div(class: 'mb-6') do
         render Analysis::BarChartComponent.new(
-          bars: @insights[:monthly_bars],
+          bars:  @insights[:monthly_bars],
           month: @filters[:month],
-          year: @filters[:year]
+          year:  @filters[:year]
         )
       end
     end
@@ -124,8 +124,8 @@ module Analysis
         div do
           render Analysis::PlatformDonutComponent.new(
             platforms: @insights[:platforms],
-            total: platforms_total,
-            month: @filters[:month]
+            total:     platforms_total,
+            month:     @filters[:month]
           )
         end
       end

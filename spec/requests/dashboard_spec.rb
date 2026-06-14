@@ -266,15 +266,15 @@ RSpec.describe 'Dashboard', type: :request do
 
     it 'shows installment subtitle for paid parcels' do
       create(:expense,
-             user: current_user,
-             date: Date.new(2025, 1, 18),
-             amount: 120,
-             category: 'maintenance',
-             vendor: 'Pneus',
-             paid: true,
+             user:                  current_user,
+             date:                  Date.new(2025, 1, 18),
+             amount:                120,
+             category:              'maintenance',
+             vendor:                'Pneus',
+             paid:                  true,
              installment_series_id: SecureRandom.uuid,
-             installment_number: 1,
-             installment_count: 3)
+             installment_number:    1,
+             installment_count:     3)
 
       get dashboard_expenses_detail_path(year: 2025, month: 1)
 

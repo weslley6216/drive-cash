@@ -6,8 +6,8 @@ RSpec.describe FilterComponent, type: :component do
   describe '#view_template' do
     it 'renders the available year options' do
       component = FilterComponent.new(
-        selected_year: 2024,
-        selected_month: nil,
+        selected_year:   2024,
+        selected_month:  nil,
         available_years: available_years
       )
 
@@ -19,8 +19,8 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'selects the correct year' do
       component = FilterComponent.new(
-        selected_year: 2024,
-        selected_month: nil,
+        selected_year:   2024,
+        selected_month:  nil,
         available_years: available_years
       )
 
@@ -32,8 +32,8 @@ RSpec.describe FilterComponent, type: :component do
 
     it "selects 'TODOS' when month is nil" do
       component = FilterComponent.new(
-        selected_year: 2024,
-        selected_month: nil,
+        selected_year:   2024,
+        selected_month:  nil,
         available_years: available_years
       )
 
@@ -44,8 +44,8 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'selects a specific month correctly' do
       component = FilterComponent.new(
-        selected_year: 2024,
-        selected_month: 5,
+        selected_year:   2024,
+        selected_month:  5,
         available_years: available_years
       )
 
@@ -58,10 +58,10 @@ RSpec.describe FilterComponent, type: :component do
   context 'when variant: :popover' do
     let(:component) do
       FilterComponent.new(
-        selected_year: 2025,
-        selected_month: 3,
+        selected_year:   2025,
+        selected_month:  3,
         available_years: available_years,
-        variant: :popover
+        variant:         :popover
       )
     end
     let(:html) { view_context.render(component) }
@@ -113,11 +113,11 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'uses the provided action_path when given' do
       component = FilterComponent.new(
-        selected_year: 2025,
-        selected_month: nil,
+        selected_year:   2025,
+        selected_month:  nil,
         available_years: available_years,
-        variant: :popover,
-        action_path: '/analysis'
+        variant:         :popover,
+        action_path:     '/analysis'
       )
 
       expect(view_context.render(component)).to include('action="/analysis"')
@@ -131,10 +131,10 @@ RSpec.describe FilterComponent, type: :component do
   context 'when variant: :compact' do
     let(:component) do
       FilterComponent.new(
-        selected_year: 2025,
-        selected_month: 5,
+        selected_year:   2025,
+        selected_month:  5,
         available_years: available_years,
-        variant: :compact
+        variant:         :compact
       )
     end
     let(:html) { view_context.render(component) }
@@ -166,11 +166,11 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'uses the provided action_path when given' do
       component = FilterComponent.new(
-        selected_year: 2025,
-        selected_month: nil,
+        selected_year:   2025,
+        selected_month:  nil,
         available_years: available_years,
-        variant: :compact,
-        action_path: '/history'
+        variant:         :compact,
+        action_path:     '/history'
       )
 
       expect(view_context.render(component)).to include('action="/history"')

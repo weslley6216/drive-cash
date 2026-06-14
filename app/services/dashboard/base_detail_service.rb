@@ -31,8 +31,8 @@ module Dashboard
 
     def annual_detail
       by_month = totals_scope(base_scope.for_year(year))
-                 .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
-                 .sum(:amount)
+        .group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+        .sum(:amount)
 
       monthly_rows = by_month.sort_by { |month_number, _| month_number }.map do |month_number, total|
         { month: month_number, month_name: month_names[month_number], total: total }

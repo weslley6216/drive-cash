@@ -1,7 +1,7 @@
 module Vehicles
   class MaintenanceRowComponent < ApplicationComponent
     STATUS_STYLES = {
-      overdue: { color: '#dc2626', badge_class: 'text-red-700 bg-red-100 border-red-200',     tint_class: 'border-red-200 bg-red-50/60' },
+      overdue: { color: '#dc2626', badge_class: 'text-red-700 bg-red-100 border-red-200', tint_class: 'border-red-200 bg-red-50/60' },
       soon:    { color: '#f59e0b', badge_class: 'text-amber-700 bg-amber-100 border-amber-200', tint_class: 'border-amber-200 bg-amber-50/50' },
       ok:      { color: '#10b981', badge_class: 'text-slate-500 bg-slate-100 border-slate-200', tint_class: '' }
     }.freeze
@@ -69,7 +69,7 @@ module Vehicles
     def mark_done_button
       link_to(t('vehicle.maintenances.mark_done'), helpers.mark_done_maintenance_path(@maintenance),
               class: 'text-xs font-medium text-slate-600 border border-slate-200 rounded-lg px-3 py-1.5 hover:bg-slate-50 flex-shrink-0',
-              data: { turbo_method: :patch })
+              data:  { turbo_method: :patch })
     end
 
     def progress_bar

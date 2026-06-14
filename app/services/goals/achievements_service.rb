@@ -28,10 +28,10 @@ module Goals
 
     def goal_completed_badge
       @user.goals.for_kind('monthly')
-           .where('period_end < ?', @date)
-           .order(period_end: :desc)
-           .limit(RECENT_GOALS_LIMIT)
-           .each do |goal|
+        .where('period_end < ?', @date)
+        .order(period_end: :desc)
+        .limit(RECENT_GOALS_LIMIT)
+        .each do |goal|
         next if metric_for(goal) < goal.target_amount
 
         period_label = I18n.l(goal.period_start, format: '%B').capitalize

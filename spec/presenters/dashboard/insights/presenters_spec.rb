@@ -4,15 +4,15 @@ RSpec.describe Dashboard::Insights::Presenters do
   describe '.present' do
     it 'renders category_spike monthly description with current and previous month names' do
       raw = {
-        type: 'category_spike',
+        type:     'category_spike',
         severity: 'warning',
-        payload: {
-          mode: :monthly,
-          category: 'Combustível',
-          pct: 120.0,
-          amount: 220.0,
-          previous_year: 2025,
-          month: 6,
+        payload:  {
+          mode:           :monthly,
+          category:       'Combustível',
+          pct:            120.0,
+          amount:         220.0,
+          previous_year:  2025,
+          month:          6,
           previous_month: 5
         }
       }
@@ -30,15 +30,15 @@ RSpec.describe Dashboard::Insights::Presenters do
 
     it 'renders category_spike annual description without month name' do
       raw = {
-        type: 'category_spike',
+        type:     'category_spike',
         severity: 'warning',
-        payload: {
-          mode: :annual,
-          category: 'Combustível',
-          pct: 30.0,
-          amount: 220.0,
+        payload:  {
+          mode:          :annual,
+          category:      'Combustível',
+          pct:           30.0,
+          amount:        220.0,
           previous_year: 2024,
-          month: nil
+          month:         nil
         }
       }
 

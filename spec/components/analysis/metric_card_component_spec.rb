@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Analysis::MetricCardComponent, type: :component do
   let(:component) do
     Analysis::MetricCardComponent.new(
-      label: 'R$ / dia',
-      icon: PhlexIcons::Lucide::Zap,
-      value: 'R$ 250,00',
+      label:      'R$ / dia',
+      icon:       PhlexIcons::Lucide::Zap,
+      value:      'R$ 250,00',
       change_pct: 12.5
     )
   end

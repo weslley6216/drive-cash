@@ -24,10 +24,10 @@ module Vehicles
 
     def body
       t('vehicle.insight.cheapest.body',
-        kml: format_kml(@insight[:winner_kml]),
-        other: format_kml(@insight[:runner_up_kml]),
+        kml:          format_kml(@insight[:winner_kml]),
+        other:        format_kml(@insight[:runner_up_kml]),
         other_vendor: @insight[:runner_up],
-        savings: format_currency_short(@insight[:savings]))
+        savings:      format_currency_short(@insight[:savings]))
     end
 
     def format_kml(value)

@@ -22,8 +22,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns the create_expense tool' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'create_expense',
+          type:       :tool_use,
+          tool_name:  'create_expense',
           tool_input: { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' }
         })
       end
@@ -43,8 +43,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns the create_earning tool' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'create_earning',
+          type:       :tool_use,
+          tool_name:  'create_earning',
           tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => '2026-04-21' }
         })
       end
@@ -64,8 +64,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns the create_earning tool with an invalid date' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'create_earning',
+          type:       :tool_use,
+          tool_name:  'create_earning',
           tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => 'not-a-date' }
         })
       end
@@ -81,8 +81,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns the create_expense tool with an invalid amount' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'create_expense',
+          type:       :tool_use,
+          tool_name:  'create_expense',
           tool_input: { 'amount' => 0.0, 'category' => 'fuel', 'date' => '2026-04-21' }
         })
       end
@@ -98,8 +98,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns an unregistered tool' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'delete_everything',
+          type:       :tool_use,
+          tool_name:  'delete_everything',
           tool_input: { 'amount' => 10.0 }
         })
       end
@@ -115,8 +115,8 @@ RSpec.describe Ai::ParserService do
     context 'when the LLM returns an invalid JSON tool input' do
       before do
         allow(client).to receive(:chat).and_return({
-          type: :tool_use,
-          tool_name: 'create_expense',
+          type:       :tool_use,
+          tool_name:  'create_expense',
           tool_input: '{ amount: 50, category: }'
         })
       end

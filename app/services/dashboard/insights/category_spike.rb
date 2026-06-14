@@ -18,15 +18,15 @@ module Dashboard
         return nil if pct <= THRESHOLD
 
         {
-          type: 'category_spike',
+          type:     'category_spike',
           severity: 'warning',
-          payload: {
-            mode: @context.month ? :monthly : :annual,
-            category: current_top[:label],
-            pct: pct,
-            amount: current_top[:amount].to_f,
-            previous_year: @context.previous_year,
-            month: @context.month,
+          payload:  {
+            mode:           @context.month ? :monthly : :annual,
+            category:       current_top[:label],
+            pct:            pct,
+            amount:         current_top[:amount].to_f,
+            previous_year:  @context.previous_year,
+            month:          @context.month,
             previous_month: @context.previous_month
           }
         }
@@ -38,10 +38,10 @@ module Dashboard
         return 0 unless category_id
 
         @context.user.expenses
-                .paid_in_period(@context.previous_year, @context.previous_month)
-                .where(category: category_id)
-                .sum(:amount)
-                .to_f
+          .paid_in_period(@context.previous_year, @context.previous_month)
+          .where(category: category_id)
+          .sum(:amount)
+          .to_f
       end
     end
   end

@@ -11,10 +11,10 @@ module Expenses
 
     def view_template
       render_turbo_streams(
-        record: @expense,
-        edit_view: Expenses::EditView,
-        record_key: :expense,
-        detail: @detail,
+        record:      @expense,
+        edit_view:   Expenses::EditView,
+        record_key:  :expense,
+        detail:      @detail,
         detail_view: Dashboard::ExpensesDetailView
       )
     end

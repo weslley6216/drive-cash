@@ -23,11 +23,11 @@ RSpec.describe Chat::Summaries::Expense do
 
     it 'includes installment info when the params describe a valid plan' do
       params = {
-        'amount' => 300.0,
-        'category' => 'maintenance',
-        'vendor' => 'Oficina',
-        'date' => '2026-04-24',
-        'installments' => 3,
+        'amount'              => 300.0,
+        'category'            => 'maintenance',
+        'vendor'              => 'Oficina',
+        'date'                => '2026-04-24',
+        'installments'        => 3,
         'installments_period' => 'monthly'
       }
 

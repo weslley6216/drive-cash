@@ -13,9 +13,9 @@ module Dashboard
         return nil if trips.zero?
 
         {
-          type: 'worst_platform',
+          type:     'worst_platform',
           severity: 'info',
-          payload: {
+          payload:  {
             platform: worst[:label],
             per_trip: (worst[:amount].to_f / trips).round(2)
           }

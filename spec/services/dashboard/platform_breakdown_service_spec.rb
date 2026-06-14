@@ -10,7 +10,7 @@ RSpec.describe Dashboard::PlatformBreakdownService do
       create(:earning, user: user, date: Date.new(2025, 6, 3),  amount: 300, platform: 'rappi')
       create(:earning, user: user, date: Date.new(2025, 6, 4),  amount: 200, platform: 'shopee')
       create(:earning, user: user, date: Date.new(2025, 6, 5),  amount: 100, platform: 'amazon')
-      create(:earning, user: user, date: Date.new(2025, 6, 6),  amount:  50, platform: 'nine_nine')
+      create(:earning, user: user, date: Date.new(2025, 6, 6),  amount: 50, platform: 'nine_nine')
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 

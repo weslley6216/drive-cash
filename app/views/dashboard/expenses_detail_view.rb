@@ -35,15 +35,15 @@ module Dashboard
 
     def fixed_footer
       render_detail_footer(
-        annual: @annual,
-        show_total: has_rows?,
-        total: @total,
-        total_class: 'text-red-800',
-        back_path: dashboard_expenses_detail_path(year: @filters[:year]),
-        labels: {
+        annual:          @annual,
+        show_total:      has_rows?,
+        total:           @total,
+        total_class:     'text-red-800',
+        back_path:       dashboard_expenses_detail_path(year: @filters[:year]),
+        labels:          {
           total: t('.total'),
           close: t('.close'),
-          back: t('.back')
+          back:  t('.back')
         },
         padding_classes: 'px-4 sm:px-6'
       )
@@ -55,7 +55,7 @@ module Dashboard
           @expenses_by_month.each do |row|
             link_to(
               dashboard_expenses_detail_path(year: @filters[:year], month: row[:month]),
-              data: { turbo_frame: 'modal' },
+              data:  { turbo_frame: 'modal' },
               class: 'flex justify-between items-center py-3 border-b border-slate-100 text-slate-800 capitalize hover:bg-slate-50 transition-colors active:bg-slate-100 rounded'
             ) do
               span { row[:month_name].to_s }
@@ -78,10 +78,10 @@ module Dashboard
                   div(class: 'flex items-center gap-2 flex-shrink-0 group') do
                     span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
                     render_record_actions(
-                      edit_path: edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
+                      edit_path:   edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: expense_path(expense, context: @filters),
-                      edit_hover: 'hover:text-red-600',
-                      labels: { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
+                      edit_hover:  'hover:text-red-600',
+                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
                     )
                   end
                 end

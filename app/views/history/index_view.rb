@@ -11,10 +11,10 @@ module History
 
     def view_template
       render LayoutComponent.new(
-        title: t('history.index.title'),
-        bottom_nav: :history,
+        title:       t('history.index.title'),
+        bottom_nav:  :history,
         sidebar_nav: :history,
-        app_shell: true
+        app_shell:   true
       ) do
         turbo_frame_tag 'page' do
           div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
@@ -56,11 +56,11 @@ module History
           p(class: 'text-sm text-slate-500') { t('history.index.subtitle') }
         end
         render FilterComponent.new(
-          selected_year: @year,
-          selected_month: @month,
+          selected_year:   @year,
+          selected_month:  @month,
           available_years: @available_years,
-          variant: :compact,
-          action_path: history_path
+          variant:         :compact,
+          action_path:     history_path
         )
       end
     end

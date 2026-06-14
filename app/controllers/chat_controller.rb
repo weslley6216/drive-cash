@@ -60,8 +60,8 @@ class ChatController < ApplicationController
     render Chat::ConfirmView.new(
       success: true,
       message: t(i18n_key),
-      action: action,
-      date: record.date
+      action:  action,
+      date:    record.date
     )
   end
 end

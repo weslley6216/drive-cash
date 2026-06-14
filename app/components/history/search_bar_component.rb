@@ -9,8 +9,8 @@ module History
       form(
         action: history_path,
         method: 'get',
-        class: 'relative',
-        data: { controller: 'history-search' }
+        class:  'relative',
+        data:   { controller: 'history-search' }
       ) do
         input(type: 'hidden', name: 'filter', value: @filter)
 
@@ -19,13 +19,13 @@ module History
             class: 'w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
           )
           input(
-            type: 'search',
-            name: 'q',
-            value: @query,
-            placeholder: t('history.index.search_placeholder'),
+            type:         'search',
+            name:         'q',
+            value:        @query,
+            placeholder:  t('history.index.search_placeholder'),
             autocomplete: 'off',
-            class: input_classes,
-            data: { action: 'input->history-search#debounce' }
+            class:        input_classes,
+            data:         { action: 'input->history-search#debounce' }
           )
         end
       end

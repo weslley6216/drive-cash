@@ -20,11 +20,11 @@ module Dashboard
 
     def call
       {
-        metrics: metrics,
-        monthly_bars: monthly_bars,
-        categories: categories,
-        platforms: platforms,
-        insights: insights,
+        metrics:        metrics,
+        monthly_bars:   monthly_bars,
+        categories:     categories,
+        platforms:      platforms,
+        insights:       insights,
         period_context: period_context
       }
     end
@@ -39,10 +39,10 @@ module Dashboard
 
     def previous_stats
       @previous_stats ||= StatsService.new(
-        year: previous_year,
-        month: previous_month,
+        year:          previous_year,
+        month:         previous_month,
         through_month: ytd_cutoff,
-        user: @user
+        user:          @user
       ).metrics
     end
 
@@ -76,26 +76,26 @@ module Dashboard
     def period_context
       if month
         {
-          mode: :monthly,
+          mode:                :monthly,
           previous_month_name: I18n.t('date.abbr_month_names')[previous_month],
-          previous_year: previous_year
+          previous_year:       previous_year
         }
       else
         cutoff = ytd_cutoff
         {
-          mode: :annual,
+          mode:              :annual,
           cutoff_month_name: cutoff ? I18n.t('date.abbr_month_names')[cutoff] : nil,
-          previous_year: previous_year
+          previous_year:     previous_year
         }
       end
     end
 
     def metrics
       {
-        per_day: current_stats[:profit_per_day],
-        per_trip: current_calculator.per_trip,
-        per_hour: current_calculator.per_hour,
-        margin: current_calculator.margin,
+        per_day:    current_stats[:profit_per_day],
+        per_trip:   current_calculator.per_trip,
+        per_hour:   current_calculator.per_hour,
+        margin:     current_calculator.margin,
         change_pct: {
           per_day:  PercentChange.between(current_stats[:profit_per_day], previous_stats[:profit_per_day]),
           per_trip: PercentChange.between(current_calculator.per_trip,  previous_calculator.per_trip),
@@ -119,23 +119,23 @@ module Dashboard
 
     def insight_context
       @insight_context ||= Insights::Context.new(
-        user: @user,
-        year: year,
-        month: month,
-        previous_year: previous_year,
+        user:           @user,
+        year:           year,
+        month:          month,
+        previous_year:  previous_year,
         previous_month: previous_month,
-        current_stats: current_stats,
+        current_stats:  current_stats,
         previous_stats: previous_stats,
-        categories: categories,
-        platforms: platforms
+        categories:     categories,
+        platforms:      platforms
       )
     end
 
     def insights
       INSIGHT_RULES.filter_map { |rule| rule.new(insight_context).call }
-                   .sort_by { |raw| SEVERITY_ORDER.fetch(raw[:severity], 99) }
-                   .first(MAX_INSIGHTS)
-                   .map { |raw| Insights::Presenters.present(raw) }
+        .sort_by { |raw| SEVERITY_ORDER.fetch(raw[:severity], 99) }
+        .first(MAX_INSIGHTS)
+        .map { |raw| Insights::Presenters.present(raw) }
     end
   end
 end

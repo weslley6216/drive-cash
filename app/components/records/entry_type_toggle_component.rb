@@ -22,12 +22,12 @@ module Records
 
       label(class: label_classes, data: { record_form_target: "#{value}Toggle" }) do
         input(
-          type: 'radio',
-          name: 'type',
-          value: value,
+          type:    'radio',
+          name:    'type',
+          value:   value,
           checked: is_active,
-          class: 'sr-only',
-          data: { record_form_target: 'typeInput', action: 'change->record-form#switch' }
+          class:   'sr-only',
+          data:    { record_form_target: 'typeInput', action: 'change->record-form#switch' }
         )
         render PhlexIcons::Lucide.const_get(icon.to_s.camelize).new(class: 'w-4 h-4')
         plain label

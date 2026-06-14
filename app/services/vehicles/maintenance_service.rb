@@ -3,10 +3,10 @@ module Vehicles
     Row = Data.define(:maintenance, :progress, :km_until, :target, :status_key)
 
     EMPTY_PAYLOAD = {
-      vehicle: nil,
-      odometer: { current_km: 0, km_this_month: 0, updated_days_ago: nil },
+      vehicle:      nil,
+      odometer:     { current_km: 0, km_this_month: 0, updated_days_ago: nil },
       maintenances: [],
-      insights: []
+      insights:     []
     }.freeze
 
     def initialize(user:, date: Date.current)
@@ -20,14 +20,14 @@ module Vehicles
 
       stats = Statistics.new(vehicle: vehicle, date: @date)
       {
-        vehicle: vehicle,
-        odometer: {
-          current_km: vehicle.odometer_km,
-          km_this_month: stats.km_this_month,
+        vehicle:      vehicle,
+        odometer:     {
+          current_km:       vehicle.odometer_km,
+          km_this_month:    stats.km_this_month,
           updated_days_ago: vehicle.updated_days_ago
         },
         maintenances: build_maintenances(vehicle),
-        insights: build_insights(vehicle)
+        insights:     build_insights(vehicle)
       }
     end
 
@@ -37,10 +37,10 @@ module Vehicles
       vehicle.maintenances.includes(:vehicle).sort_by { |maintenance| -maintenance.progress }.map do |maintenance|
         Row.new(
           maintenance: maintenance,
-          progress: maintenance.progress,
-          km_until: maintenance.km_until,
-          target: maintenance.target,
-          status_key: maintenance.status_key
+          progress:    maintenance.progress,
+          km_until:    maintenance.km_until,
+          target:      maintenance.target,
+          status_key:  maintenance.status_key
         )
       end
     end

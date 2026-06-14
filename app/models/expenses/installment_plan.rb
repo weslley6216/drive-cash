@@ -33,12 +33,12 @@ module Expenses
 
     def installment_attributes(index)
       {
-        'amount' => amounts[index],
-        'date' => dates[index],
-        'paid' => false,
+        'amount'                => amounts[index],
+        'date'                  => dates[index],
+        'paid'                  => false,
         'installment_series_id' => series_id,
-        'installment_number' => index + 1,
-        'installment_count' => count
+        'installment_number'    => index + 1,
+        'installment_count'     => count
       }
     end
 

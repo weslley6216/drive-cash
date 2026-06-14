@@ -12,7 +12,7 @@ module RecordSaveResponse
       format.turbo_stream do
         render view_class.new(
           **kwargs,
-          totals: totals,
+          totals:  totals,
           context: context,
           **extra
         )
@@ -41,8 +41,8 @@ module RecordSaveResponse
       format.turbo_stream do
         render Dashboard::DeleteRefreshView.new(
           detail_view: detail_view.new(**detail, filters: filter),
-          filter: filter,
-          totals: totals
+          filter:      filter,
+          totals:      totals
         )
       end
     end

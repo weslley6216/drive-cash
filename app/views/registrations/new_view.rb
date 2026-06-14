@@ -69,28 +69,28 @@ class Registrations::NewView < ApplicationView
         end
         helper_method = type == :email ? :email_field : :text_field
         raw form.public_send(helper_method, name,
-                             id: name.to_s,
-                             required: true,
+                             id:           name.to_s,
+                             required:     true,
                              autocomplete: autocomplete,
-                             autofocus: autofocus,
-                             data: {
+                             autofocus:    autofocus,
+                             data:         {
                                'registration-form-target': "#{target}Field",
-                               'registration-form-field': name.to_s,
-                               action: 'blur->registration-form#validate input->registration-form#validate'
+                               'registration-form-field':  name.to_s,
+                               action:                     'blur->registration-form#validate input->registration-form#validate'
                              },
-                             class: input_classes(error: error, trailing: true)).to_s
+                             class:        input_classes(error: error, trailing: true)).to_s
         span(
           class: 'absolute right-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-green-500 hidden',
-          data: { 'registration-form-target': "#{target}ValidIcon" }
+          data:  { 'registration-form-target': "#{target}ValidIcon" }
         ) { plain '✓' }
         span(
           class: "absolute right-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-red-500 #{error ? '' : 'hidden'}",
-          data: { 'registration-form-target': "#{target}ErrorIcon" }
+          data:  { 'registration-form-target': "#{target}ErrorIcon" }
         ) { plain '✕' }
       end
       p(
         class: "text-xs text-red-500 mt-1 #{error ? '' : 'hidden'}",
-        data: { 'registration-form-target': "#{target}Error" }
+        data:  { 'registration-form-target': "#{target}Error" }
       ) { plain error || '' }
     end
   end
@@ -105,20 +105,20 @@ class Registrations::NewView < ApplicationView
           render PhlexIcons::Lucide::Shield.new(class: 'w-[18px] h-[18px]')
         end
         raw form.password_field(name,
-                                id: name.to_s,
-                                required: true,
+                                id:           name.to_s,
+                                required:     true,
                                 autocomplete: autocomplete,
-                                data: {
-                                  'password-toggle-target': 'input',
+                                data:         {
+                                  'password-toggle-target':   'input',
                                   'registration-form-target': "#{target}Field",
-                                  'registration-form-field': name.to_s,
-                                  action: 'blur->registration-form#validate input->registration-form#validate'
+                                  'registration-form-field':  name.to_s,
+                                  action:                     'blur->registration-form#validate input->registration-form#validate'
                                 },
-                                class: input_classes(trailing: true, error: error)).to_s
+                                class:        input_classes(trailing: true, error: error)).to_s
         button(
-          type: 'button',
+          type:  'button',
           class: 'absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer',
-          data: { action: 'click->password-toggle#toggle' }
+          data:  { action: 'click->password-toggle#toggle' }
         ) do
           span(data: { 'password-toggle-target': 'eye' }) do
             render PhlexIcons::Lucide::Eye.new(class: 'w-[18px] h-[18px]')
@@ -130,17 +130,17 @@ class Registrations::NewView < ApplicationView
       end
       p(
         class: "text-xs text-red-500 mt-1 #{error ? '' : 'hidden'}",
-        data: { 'registration-form-target': "#{target}Error" }
+        data:  { 'registration-form-target': "#{target}Error" }
       ) { plain error || '' }
     end
   end
 
   def submit_button
     button(
-      type: 'submit',
+      type:     'submit',
       disabled: true,
-      data: { 'registration-form-target': 'submitButton' },
-      class: 'w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
+      data:     { 'registration-form-target': 'submitButton' },
+      class:    'w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
     ) do
       plain t('.submit')
       render PhlexIcons::Lucide::ArrowRight.new(class: 'w-4 h-4 stroke-[2.4]')

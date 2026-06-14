@@ -75,7 +75,7 @@ module History
       {
         earnings: earnings_total,
         expenses: expenses_total,
-        net: earnings_total - expenses_total
+        net:      earnings_total - expenses_total
       }
     end
 
@@ -92,8 +92,8 @@ module History
       day_expenses = day_items.select { |record| record.is_a?(Expense) }.sum(&:amount)
 
       {
-        date: date,
-        items: day_items.sort_by(&:created_at).reverse,
+        date:           date,
+        items:          day_items.sort_by(&:created_at).reverse,
         earnings_total: day_earnings,
         expenses_total: day_expenses
       }

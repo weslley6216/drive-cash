@@ -242,7 +242,7 @@ RSpec.describe Dashboard::InsightsService do
 
     it 'instantiates PlatformBreakdownService only once per call' do
       create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
-      create(:earning, user: user, date: Date.new(2025, 6, 2), amount:  50, trips_count: 5, platform: 'shopee')
+      create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 50, trips_count: 5, platform: 'shopee')
 
       allow(Dashboard::PlatformBreakdownService).to receive(:new).and_call_original
 
@@ -299,7 +299,7 @@ RSpec.describe Dashboard::InsightsService do
 
       it 'emits worst_platform when more than one platform has earnings in the period' do
         create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 6, 2), amount:  50, trips_count: 5, platform: 'shopee')
+        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 50, trips_count: 5, platform: 'shopee')
 
         result = described_class.new(year: 2025, month: 6, user: user).call
         worst  = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
@@ -322,9 +322,9 @@ RSpec.describe Dashboard::InsightsService do
 
       it 'emits margin_drop with critical severity when margin fell more than 5 pp' do
         create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 1000)
-        create(:expense, user: user, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 900, category: 'fuel', paid: true)
         create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 1000)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount:  100, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2, user: user).call
         drop   = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
@@ -338,7 +338,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:earning, user: user, date: Date.new(2025, 2, 2), amount:  50,  trips_count: 5, platform: 'shopee')
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount:  900, category: 'fuel', paid: true)
         create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 1000, trips_count: 1)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount:  100, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2, user: user).call
 

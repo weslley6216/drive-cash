@@ -3,13 +3,13 @@ require 'rails_helper'
 RSpec.describe HeroProfitCardComponent, type: :component do
   def payload(**overrides)
     defaults = {
-      profit: 950.0,
+      profit:         950.0,
       change_percent: 12.5,
       profit_per_day: 47.5,
-      days_count: 20,
-      series: [100.0, 200.0, -50.0, 300.0, 400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-      year: 2025,
-      month: nil
+      days_count:     20,
+      series:         [100.0, 200.0, -50.0, 300.0, 400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+      year:           2025,
+      month:          nil
     }
     HeroProfitCardComponent::Payload.new(**defaults.merge(overrides))
   end

@@ -5,10 +5,10 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
     maintenance = build(:maintenance, vehicle: vehicle, **overrides)
     Vehicles::MaintenanceService::Row.new(
       maintenance: maintenance,
-      progress: maintenance.progress,
-      km_until: maintenance.km_until,
-      target: maintenance.target,
-      status_key: maintenance.status_key
+      progress:    maintenance.progress,
+      km_until:    maintenance.km_until,
+      target:      maintenance.target,
+      status_key:  maintenance.status_key
     )
   end
 
@@ -40,10 +40,10 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
       maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 158_000, interval_km: 5_000)
       row = Vehicles::MaintenanceService::Row.new(
         maintenance: maintenance,
-        progress: maintenance.progress,
-        km_until: maintenance.km_until,
-        target: maintenance.target,
-        status_key: maintenance.status_key
+        progress:    maintenance.progress,
+        km_until:    maintenance.km_until,
+        target:      maintenance.target,
+        status_key:  maintenance.status_key
       )
 
       html = view_context.render(described_class.new(row: row, variant: :desktop))

@@ -107,7 +107,7 @@ RSpec.describe 'Vehicles', type: :request do
         patch vehicle_path,
               params: { vehicle: { brand: 'Honda', vehicle_model: 'Civic', year: 2018,
                                    license_plate: 'ABC-1D23', odometer_km: 48_230 } },
-              as: :turbo_stream
+              as:     :turbo_stream
 
         expect(current_user.reload.vehicle).to be_present
         expect(response.body).to include('action="update"').and include('action="refresh"')

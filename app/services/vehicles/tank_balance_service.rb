@@ -16,11 +16,11 @@ module Vehicles
       balance = vehicle.refuelings.sum(:total_amount) - debit_expenses.sum(:amount)
 
       {
-        balance: balance,
-        full: full,
+        balance:    balance,
+        full:       full,
         status_key: TankStatus.for(balance, full),
-        last_fill: last_fill,
-        moves: build_moves(vehicle)
+        last_fill:  last_fill,
+        moves:      build_moves(vehicle)
       }
     end
 

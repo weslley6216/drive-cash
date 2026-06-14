@@ -16,18 +16,18 @@ module Records
         div(class: "flex items-baseline justify-center gap-1 #{THEME_TEXT.fetch(@theme)}", data: { record_form_target: 'amountTheme' }) do
           span(class: 'text-2xl font-medium opacity-60') { 'R$' }
           input(
-            type: 'text',
-            inputmode: 'numeric',
-            placeholder: '0,00',
+            type:         'text',
+            inputmode:    'numeric',
+            placeholder:  '0,00',
             autocomplete: 'off',
-            class: "text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{THEME_TEXT.fetch(@theme)} #{THEME_PLACEHOLDER.fetch(@theme)}",
-            data: { record_form_target: 'amountDisplay', action: 'input->record-form#formatAmount' }
+            class:        "text-6xl font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{THEME_TEXT.fetch(@theme)} #{THEME_PLACEHOLDER.fetch(@theme)}",
+            data:         { record_form_target: 'amountDisplay', action: 'input->record-form#formatAmount' }
           )
           input(
-            type: 'hidden',
-            name: 'record[amount]',
+            type:  'hidden',
+            name:  'record[amount]',
             value: @amount,
-            data: { record_form_target: 'amountInput' }
+            data:  { record_form_target: 'amountInput' }
           )
         end
       end

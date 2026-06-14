@@ -43,7 +43,7 @@ module Records
         end
         p(class: 'text-sm font-semibold text-slate-700') { t('records.new_view.title') }
         button(
-          type: 'submit',
+          type:  'submit',
           class: 'text-sm font-semibold text-blue-600 cursor-pointer'
         ) { t('records.new_view.save') }
       end
@@ -78,8 +78,8 @@ module Records
           plain t('records.new_view.today')
         end
         input(
-          type: 'date',
-          name: 'record[date]',
+          type:  'date',
+          name:  'record[date]',
           value: shared_date.to_s,
           class: 'w-full text-sm text-slate-700 bg-transparent border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400'
         )
@@ -163,7 +163,7 @@ module Records
     def installment_section
       div(
         class: 'rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3',
-        data: { controller: 'expense-installment', action: 'change->expense-installment#toggle' }
+        data:  { controller: 'expense-installment', action: 'change->expense-installment#toggle' }
       ) do
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-2') do
           t('records.new_view.recurring_toggle.title')
@@ -189,8 +189,8 @@ module Records
             raw helpers.number_field_tag(
               'installment[repetitions]',
               3,
-              min: 2,
-              step: 1,
+              min:   2,
+              step:  1,
               class: 'w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all border-slate-300 text-slate-900 focus:ring-red-500 focus:border-red-500'
             )
           end

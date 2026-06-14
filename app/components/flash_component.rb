@@ -28,7 +28,7 @@ class FlashComponent < ApplicationComponent
   def flash_message(type, message)
     div(
       class: flash_classes(type),
-      data: { controller: 'flash' },
+      data:  { controller: 'flash' },
       style: 'transition: opacity 0.6s ease, transform 0.6s ease;'
     ) { message }
   end

@@ -11,7 +11,7 @@ module Chat
         div(
           class: 'flex flex-col',
           style: 'height: calc(100dvh - 4rem)',
-          data: { controller: 'chat speech' }
+          data:  { controller: 'chat speech' }
         ) do
           header_section
           messages_section
@@ -40,7 +40,7 @@ module Chat
 
         link_to(
           chat_clear_path,
-          data: { turbo_method: :delete },
+          data:  { turbo_method: :delete },
           class: 'text-xs text-slate-400 hover:text-red-500 transition-colors'
         ) { t('chat.index.clear') }
       end
@@ -48,9 +48,9 @@ module Chat
 
     def messages_section
       div(
-        id: 'chat_messages',
+        id:    'chat_messages',
         class: 'flex-1 overflow-y-auto space-y-4 pb-4',
-        data: { chat_target: 'messages', controller: 'autoscroll' }
+        data:  { chat_target: 'messages', controller: 'autoscroll' }
       ) do
         @messages.empty? ? empty_state : render_history
       end
@@ -99,31 +99,31 @@ module Chat
     def input_section
       div(class: 'flex-shrink-0 pt-4 border-t border-slate-200') do
         form_with(
-          url: chat_message_path,
+          url:  chat_message_path,
           data: { action: 'submit->chat#send turbo:submit-end->chat#clearInput' }
         ) do |f|
           div(class: 'flex gap-2 items-end') do
             div(class: 'flex-1 relative') do
               textarea(
-                name: 'message',
-                placeholder: t('chat.index.placeholder'),
-                rows: 1,
+                name:         'message',
+                placeholder:  t('chat.index.placeholder'),
+                rows:         1,
                 autocomplete: 'off',
-                class: 'w-full px-4 py-3 pr-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
-                data: { chat_target: 'input', speech_target: 'input', action: 'keydown.enter->chat#handleEnter' }
+                class:        'w-full px-4 py-3 pr-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
+                data:         { chat_target: 'input', speech_target: 'input', action: 'keydown.enter->chat#handleEnter' }
               )
               button(
-                type: 'button',
+                type:  'button',
                 class: 'absolute right-3 bottom-[0.9rem] text-slate-400 hover:text-violet-600 transition-colors cursor-pointer',
                 title: t('chat.index.btn_speak'),
-                data: { action: 'click->speech#toggle', speech_target: 'mic' }
+                data:  { action: 'click->speech#toggle', speech_target: 'mic' }
               ) { render PhlexIcons::Lucide::Mic.new(class: 'w-4 h-4') }
             end
 
             button(
-              type: 'submit',
+              type:  'submit',
               class: 'flex items-center justify-center w-11 h-11 bg-violet-600 text-white rounded-full hover:bg-violet-700 active:scale-95 transition-all cursor-pointer flex-shrink-0',
-              data: { chat_target: 'submit' }
+              data:  { chat_target: 'submit' }
             ) { render PhlexIcons::Lucide::Send.new(class: 'w-4 h-4') }
           end
         end

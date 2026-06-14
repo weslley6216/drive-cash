@@ -1,24 +1,24 @@
 module FormFields
   FIELD_THEMES = {
     blue: {
-      text: 'text-slate-900',
-      label: 'text-slate-700',
-      border: 'border-slate-300',
-      ring: 'focus:ring-blue-500 focus:border-blue-500',
-      title: 'text-blue-700',
-      modal_border: 'border-slate-200',
+      text:          'text-slate-900',
+      label:         'text-slate-700',
+      border:        'border-slate-300',
+      ring:          'focus:ring-blue-500 focus:border-blue-500',
+      title:         'text-blue-700',
+      modal_border:  'border-slate-200',
       header_border: 'border-slate-100',
-      close_button: 'text-slate-400 hover:text-blue-600'
+      close_button:  'text-slate-400 hover:text-blue-600'
     },
-    red: {
-      text: 'text-slate-900',
-      label: 'text-slate-700',
-      border: 'border-slate-300',
-      ring: 'focus:ring-red-500 focus:border-red-500',
-      title: 'text-red-700',
-      modal_border: 'border-red-200',
+    red:  {
+      text:          'text-slate-900',
+      label:         'text-slate-700',
+      border:        'border-slate-300',
+      ring:          'focus:ring-red-500 focus:border-red-500',
+      title:         'text-red-700',
+      modal_border:  'border-red-200',
       header_border: 'border-red-200',
-      close_button: 'text-slate-400 hover:text-red-600'
+      close_button:  'text-slate-400 hover:text-red-600'
     }
   }.freeze
 
@@ -50,13 +50,13 @@ module FormFields
     field_wrapper(label, theme: theme) do
       div(data: { controller: 'money-field' }) do
         input(
-          type: 'text',
-          inputmode: 'numeric',
+          type:         'text',
+          inputmode:    'numeric',
           autocomplete: 'off',
-          placeholder: t('.placeholders.money', default: I18n.t('form_fields.placeholders.money')),
-          required: required,
-          class: input_classes(theme: theme),
-          data: { money_field_target: 'display', action: 'input->money-field#format' }
+          placeholder:  t('.placeholders.money', default: I18n.t('form_fields.placeholders.money')),
+          required:     required,
+          class:        input_classes(theme: theme),
+          data:         { money_field_target: 'display', action: 'input->money-field#format' }
         )
         render form.hidden_field(attribute, value: raw_value, data: { money_field_target: 'input' })
       end
@@ -87,12 +87,12 @@ module FormFields
     field_wrapper(label, theme: theme) do
       div(data: { controller: 'integer-field' }) do
         input(
-          type: 'text',
-          inputmode: 'numeric',
+          type:         'text',
+          inputmode:    'numeric',
           autocomplete: 'off',
-          placeholder: '0',
-          class: input_classes(theme: theme),
-          data: { integer_field_target: 'display', action: 'input->integer-field#format' },
+          placeholder:  '0',
+          class:        input_classes(theme: theme),
+          data:         { integer_field_target: 'display', action: 'input->integer-field#format' },
           **options
         )
         render form.hidden_field(attribute, value: raw_value, data: { integer_field_target: 'input' })

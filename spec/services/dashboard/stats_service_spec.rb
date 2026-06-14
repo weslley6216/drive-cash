@@ -114,8 +114,8 @@ RSpec.describe Dashboard::StatsService do
       service.call
 
       earnings_scope_calls = Dashboard::ScopeMonthCounter
-                             .singleton_class
-                             .ancestors
+        .singleton_class
+        .ancestors
       expect(Dashboard::ScopeMonthCounter).to have_received(:count_for).at_most(:twice)
     end
 

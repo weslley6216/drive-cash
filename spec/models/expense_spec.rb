@@ -27,17 +27,17 @@ RSpec.describe Expense, type: :model do
   describe 'enums' do
     it {
       should define_enum_for(:category).with_values(
-        car_wash: 0,
+        car_wash:      0,
         documentation: 1,
-        fine: 2,
-        fuel: 3,
-        insurance: 4,
-        maintenance: 5,
-        meals: 6,
-        parking: 7,
-        phone: 8,
-        toll: 9,
-        other: 10
+        fine:          2,
+        fuel:          3,
+        insurance:     4,
+        maintenance:   5,
+        meals:         6,
+        parking:       7,
+        phone:         8,
+        toll:          9,
+        other:         10
       ).with_prefix.backed_by_column_of_type(:integer)
     }
   end
@@ -64,8 +64,8 @@ RSpec.describe Expense, type: :model do
       expense = build(
         :expense,
         installment_series_id: SecureRandom.uuid,
-        installment_number: nil,
-        installment_count: 3
+        installment_number:    nil,
+        installment_count:     3
       )
 
       expect(expense).not_to be_valid
@@ -75,8 +75,8 @@ RSpec.describe Expense, type: :model do
       expense = build(
         :expense,
         installment_series_id: SecureRandom.uuid,
-        installment_number: 4,
-        installment_count: 3
+        installment_number:    4,
+        installment_count:     3
       )
 
       expect(expense).not_to be_valid
@@ -86,8 +86,8 @@ RSpec.describe Expense, type: :model do
       expense = build(
         :expense,
         installment_series_id: SecureRandom.uuid,
-        installment_number: 1,
-        installment_count: Expense::MAX_INSTALLMENTS + 1
+        installment_number:    1,
+        installment_count:     Expense::MAX_INSTALLMENTS + 1
       )
 
       expect(expense).not_to be_valid
@@ -97,8 +97,8 @@ RSpec.describe Expense, type: :model do
       expense = build(
         :expense,
         installment_series_id: SecureRandom.uuid,
-        installment_number: 1,
-        installment_count: Expense::MAX_INSTALLMENTS
+        installment_number:    1,
+        installment_count:     Expense::MAX_INSTALLMENTS
       )
 
       expect(expense).to be_valid

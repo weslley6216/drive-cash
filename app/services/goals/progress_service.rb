@@ -7,9 +7,9 @@ module Goals
 
     def call
       {
-        weekly: progress_for('weekly'),
-        monthly: progress_for('monthly'),
-        annual: progress_for('annual'),
+        weekly:       progress_for('weekly'),
+        monthly:      progress_for('monthly'),
+        annual:       progress_for('annual'),
         achievements: AchievementsService.new(user: @user, date: @date).call
       }
     end
@@ -29,9 +29,9 @@ module Goals
       target = goal.target_amount
 
       {
-        goal: goal,
+        goal:    goal,
         current: current,
-        target: target,
+        target:  target,
         percent: target.zero? ? 0 : (current / target * 100)
       }
     end
@@ -44,10 +44,10 @@ module Goals
       projection = current * (total_days.to_f / days_elapsed)
 
       {
-        projection: projection,
-        on_track: projection >= target,
+        projection:        projection,
+        on_track:          projection >= target,
         remaining_per_day: days_remaining.zero? ? 0 : (target - current) / days_remaining,
-        days_remaining: days_remaining
+        days_remaining:    days_remaining
       }
     end
 

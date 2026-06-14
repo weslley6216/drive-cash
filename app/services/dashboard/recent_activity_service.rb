@@ -10,9 +10,9 @@ module Dashboard
 
     def call
       merged = (earning_rows + expense_rows)
-               .sort_by { |row| [row[:date], row[:created_at]] }
-               .reverse
-               .first(@limit)
+        .sort_by { |row| [row[:date], row[:created_at]] }
+        .reverse
+        .first(@limit)
 
       merged.map { |row| build_row(row) }
     end
@@ -44,10 +44,10 @@ module Dashboard
     def build_row(row)
       record = row[:record]
       base = {
-        type: row[:type],
-        date: record.date,
+        type:       row[:type],
+        date:       record.date,
         date_label: format_date(record.date),
-        amount: record.amount.to_f
+        amount:     record.amount.to_f
       }
 
       row[:type] == :earning ? base.merge(earning_fields(record)) : base.merge(expense_fields(record))
@@ -55,14 +55,14 @@ module Dashboard
 
     def earning_fields(record)
       {
-        label: I18n.t("activerecord.attributes.earning.platforms.#{record.platform}"),
+        label:       I18n.t("activerecord.attributes.earning.platforms.#{record.platform}"),
         description: I18n.t('common.trips', count: record.trips_count)
       }
     end
 
     def expense_fields(record)
       {
-        label: I18n.t("activerecord.attributes.expense.categories.#{record.category}"),
+        label:       I18n.t("activerecord.attributes.expense.categories.#{record.category}"),
         description: record.vendor.presence || record.description.to_s
       }
     end

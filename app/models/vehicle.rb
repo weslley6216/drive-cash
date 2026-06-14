@@ -6,9 +6,9 @@ class Vehicle < ApplicationRecord
   validates :brand, :vehicle_model, :year, presence: true
   validates :odometer_km, presence: true, numericality: { greater_than_or_equal_to: 0, only_integer: true }
   validates :year, numericality: {
-    only_integer: true,
+    only_integer:             true,
     greater_than_or_equal_to: 1900,
-    less_than_or_equal_to: ->(_record) { Date.current.year + 1 }
+    less_than_or_equal_to:    ->(_record) { Date.current.year + 1 }
   }
 
   def updated_days_ago

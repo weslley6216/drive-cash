@@ -79,7 +79,7 @@ module Expenses
     def refueling_label_input(field, label_text, **input_options)
       div do
         label(class: 'block text-xs font-medium text-slate-600 mb-1') { label_text }
-        input(name: "refueling[#{field}]",
+        input(name:  "refueling[#{field}]",
               class: 'w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm',
               **input_options)
       end

@@ -5,15 +5,15 @@ RSpec.describe Dashboard::Insights::MarginDrop do
 
   def build_context(current_stats:, previous_stats:)
     Dashboard::Insights::Context.new(
-      user: user,
-      year: 2025,
-      month: 2,
-      previous_year: 2024,
+      user:           user,
+      year:           2025,
+      month:          2,
+      previous_year:  2024,
       previous_month: 2,
-      current_stats: current_stats,
+      current_stats:  current_stats,
       previous_stats: previous_stats,
-      categories: [],
-      platforms: []
+      categories:     [],
+      platforms:      []
     )
   end
 

@@ -9,8 +9,8 @@ module Analysis
       @month = month
       @year  = year
       @max_value = bars.reject { |row| row[:empty] }
-                       .flat_map { |row| [row[:earnings], row[:expenses]] }
-                       .max.to_f
+        .flat_map { |row| [row[:earnings], row[:expenses]] }
+        .max.to_f
     end
 
     def view_template
@@ -83,17 +83,17 @@ module Analysis
 
     def column_data(bar_row, index)
       {
-        role: 'button',
-        tabindex: '0',
+        role:       'button',
+        tabindex:   '0',
         aria_label: column_aria_label(bar_row),
-        data: {
+        data:       {
           bar_tooltip_target: 'column',
-          index: index,
-          label_text: tooltip_label(bar_row),
-          earn: brl(bar_row[:earnings]),
-          exp: brl(bar_row[:expenses]),
-          muted: bar_row[:empty].to_s,
-          action: 'mouseenter->bar-tooltip#show mouseleave->bar-tooltip#hide ' \
+          index:              index,
+          label_text:         tooltip_label(bar_row),
+          earn:               brl(bar_row[:earnings]),
+          exp:                brl(bar_row[:expenses]),
+          muted:              bar_row[:empty].to_s,
+          action:             'mouseenter->bar-tooltip#show mouseleave->bar-tooltip#hide ' \
                   'click->bar-tooltip#toggle keydown.enter->bar-tooltip#toggle'
         }
       }
@@ -118,10 +118,10 @@ module Analysis
 
     def tooltip_node
       div(class: 'absolute z-20 -translate-x-1/2 -translate-y-full pointer-events-none hidden',
-          data: { bar_tooltip_target: 'tooltip' }) do
+          data:  { bar_tooltip_target: 'tooltip' }) do
         div(class: 'relative bg-slate-900 text-white rounded-lg px-3 py-2 shadow-xl whitespace-nowrap', style: 'min-width: 124px') do
           p(class: 'text-[10px] font-semibold text-slate-400 mb-1 uppercase tracking-wide',
-            data: { bar_tooltip_target: 'label' })
+            data:  { bar_tooltip_target: 'label' })
           p(class: 'text-xs text-slate-400 hidden', data: { bar_tooltip_target: 'noData' }) do
             I18n.t('analysis.show_view.bar_chart.tooltip_no_data')
           end

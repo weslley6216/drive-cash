@@ -7,8 +7,8 @@ RSpec.describe History::DayGroupComponent, type: :component do
 
   let(:group) do
     {
-      date: Date.new(2025, 6, 12),
-      items: [earning, expense],
+      date:           Date.new(2025, 6, 12),
+      items:          [earning, expense],
       earnings_total: 200,
       expenses_total: 80
     }

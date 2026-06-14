@@ -22,7 +22,7 @@ module Goals
       div(class: 'flex flex-col items-center gap-1') do
         div(class: 'w-full flex items-end justify-center', style: 'height: 60px') do
           div(
-            data: { day_bar: day_data[:date].iso8601 },
+            data:  { day_bar: day_data[:date].iso8601 },
             class: bar_classes(state),
             style: height_style
           )

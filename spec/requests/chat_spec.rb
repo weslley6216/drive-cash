@@ -145,7 +145,7 @@ RSpec.describe 'Chats', type: :request do
       it 'associates the expense to current_user' do
         post chat_confirm_path,
              params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(Expense.last.user).to eq(current_user)
       end
@@ -155,7 +155,7 @@ RSpec.describe 'Chats', type: :request do
       it 'associates the earning to current_user' do
         post chat_confirm_path,
              params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22' } },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(Earning.last.user).to eq(current_user)
       end
@@ -176,12 +176,12 @@ RSpec.describe 'Chats', type: :request do
       let(:params) do
         {
           record_action: 'create_expense',
-          record: {
-            amount: 300,
-            category: 'maintenance',
-            date: '2026-06-05',
-            vendor: 'Oficina',
-            installments: 3,
+          record:        {
+            amount:              300,
+            category:            'maintenance',
+            date:                '2026-06-05',
+            vendor:              'Oficina',
+            installments:        3,
             installments_period: 'monthly'
           }
         }
@@ -201,12 +201,12 @@ RSpec.describe 'Chats', type: :request do
       let(:params) do
         {
           record_action: 'create_expense',
-          record: {
-            amount: 300,
-            category: 'maintenance',
-            date: '2026-06-05',
-            vendor: 'Oficina',
-            installments: 3,
+          record:        {
+            amount:              300,
+            category:            'maintenance',
+            date:                '2026-06-05',
+            vendor:              'Oficina',
+            installments:        3,
             installments_period: ''
           }
         }
@@ -247,9 +247,9 @@ RSpec.describe 'Chats', type: :request do
         post chat_confirm_path,
              params: {
                record_action: 'create_earning',
-               record: { amount: '', platform: 'uber', date: '2026-04-22' }
+               record:        { amount: '', platform: 'uber', date: '2026-04-22' }
              },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
       end
@@ -278,7 +278,7 @@ RSpec.describe 'Chats', type: :request do
       it 'renders a failure message via turbo stream' do
         post chat_confirm_path,
              params: { record_action: 'unknown_action', record: {} },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
@@ -291,7 +291,7 @@ RSpec.describe 'Chats', type: :request do
       it 'persists the expense owned by current_user' do
         post chat_confirm_path,
              params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', user_id: other.id } },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(Expense.last.user).to eq(current_user)
       end
@@ -303,7 +303,7 @@ RSpec.describe 'Chats', type: :request do
       it 'persists the earning owned by current_user' do
         post chat_confirm_path,
              params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22', user_id: other.id } },
-             as: :turbo_stream
+             as:     :turbo_stream
 
         expect(Earning.last.user).to eq(current_user)
       end
@@ -313,12 +313,12 @@ RSpec.describe 'Chats', type: :request do
       let(:params) do
         {
           record_action: 'create_expense',
-          record: {
-            amount: 300,
-            category: 'maintenance',
-            date: '2026-06-05',
-            vendor: 'Oficina',
-            installments: Expense::MAX_INSTALLMENTS + 1,
+          record:        {
+            amount:              300,
+            category:            'maintenance',
+            date:                '2026-06-05',
+            vendor:              'Oficina',
+            installments:        Expense::MAX_INSTALLMENTS + 1,
             installments_period: 'monthly'
           }
         }

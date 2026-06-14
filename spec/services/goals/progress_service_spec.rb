@@ -19,12 +19,12 @@ RSpec.describe Goals::ProgressService do
     context 'with a monthly profit goal' do
       let(:goal) do
         create(:goal,
-               user: user,
-               kind: 'monthly',
+               user:          user,
+               kind:          'monthly',
                target_amount: 6000,
-               period_start: Date.new(2026, 6, 1),
-               period_end: Date.new(2026, 6, 30),
-               metric: 'profit')
+               period_start:  Date.new(2026, 6, 1),
+               period_end:    Date.new(2026, 6, 30),
+               metric:        'profit')
       end
 
       before do
@@ -76,12 +76,12 @@ RSpec.describe Goals::ProgressService do
     context 'with a weekly goal' do
       let(:goal) do
         create(:goal,
-               user: user,
-               kind: 'weekly',
+               user:          user,
+               kind:          'weekly',
                target_amount: 1400,
-               period_start: Date.new(2026, 6, 8),
-               period_end: Date.new(2026, 6, 14),
-               metric: 'earnings')
+               period_start:  Date.new(2026, 6, 8),
+               period_end:    Date.new(2026, 6, 14),
+               metric:        'earnings')
       end
 
       before do
@@ -112,12 +112,12 @@ RSpec.describe Goals::ProgressService do
     context 'with an annual goal' do
       let(:goal) do
         create(:goal,
-               user: user,
-               kind: 'annual',
+               user:          user,
+               kind:          'annual',
                target_amount: 80_000,
-               period_start: Date.new(2026, 1, 1),
-               period_end: Date.new(2026, 12, 31),
-               metric: 'profit')
+               period_start:  Date.new(2026, 1, 1),
+               period_end:    Date.new(2026, 12, 31),
+               metric:        'profit')
       end
 
       before { goal }

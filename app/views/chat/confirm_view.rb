@@ -37,8 +37,8 @@ module Chat
 
     def action_chip(url, label, frame:)
       a(
-        href: url,
-        data: { turbo_frame: frame },
+        href:  url,
+        data:  { turbo_frame: frame },
         class: 'px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium rounded-full hover:bg-white hover:border-violet-300 hover:text-violet-600 transition-all shadow-sm active:scale-95 cursor-pointer'
       ) { label }
     end

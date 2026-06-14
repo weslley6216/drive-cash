@@ -6,7 +6,7 @@ module Dashboard
       turbo_frame_tag 'modal' do
         div(
           class: modal_backdrop_classes,
-          data: { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }
+          data:  { controller: 'modal', action: 'mousedown->modal#handleBackgroundClick' }
         ) do
           div(class: "#{modal_content_classes} #{modal_theme_classes(theme: theme)} max-w-lg flex flex-col max-h-[90vh] relative") do
             div(id: 'flash_modal')
@@ -39,9 +39,9 @@ module Dashboard
           end
 
           button(
-            type: 'button',
-            data: { action: 'modal#close' },
-            class: 'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer',
+            type:       'button',
+            data:       { action: 'modal#close' },
+            class:      'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer',
             aria_label: labels[:close]
           ) { labels[:close] }
         end
@@ -51,20 +51,20 @@ module Dashboard
     def render_record_actions(edit_path:, delete_path:, edit_hover:, labels:)
       link_to(
         edit_path,
-        data: { turbo_frame: 'modal' },
-        class: "text-slate-400 #{edit_hover} transition-colors",
+        data:       { turbo_frame: 'modal' },
+        class:      "text-slate-400 #{edit_hover} transition-colors",
         aria_label: labels[:edit],
-        title: labels[:edit]
+        title:      labels[:edit]
       ) do
         render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
       end
       link_to(
         delete_path,
-        data: { turbo_method: :delete, turbo_confirm: labels[:confirm] },
-        class: 'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
-        form: { class: 'contents' },
+        data:       { turbo_method: :delete, turbo_confirm: labels[:confirm] },
+        class:      'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
+        form:       { class: 'contents' },
         aria_label: labels[:delete],
-        title: labels[:delete]
+        title:      labels[:delete]
       ) do
         render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
       end
@@ -73,10 +73,10 @@ module Dashboard
     def render_back_link(path:, label:)
       link_to(
         path,
-        data: { turbo_frame: 'modal' },
-        class: 'text-slate-400 hover:text-slate-600 transition-colors p-2 -ml-2 rounded-full hover:bg-slate-100',
+        data:       { turbo_frame: 'modal' },
+        class:      'text-slate-400 hover:text-slate-600 transition-colors p-2 -ml-2 rounded-full hover:bg-slate-100',
         aria_label: label,
-        title: label
+        title:      label
       ) do
         render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-6 h-6')
       end

@@ -27,14 +27,14 @@ RSpec.describe Earning, type: :model do
   describe 'enums' do
     it {
       should define_enum_for(:platform).with_values(
-        amazon: 0,
-        ifood: 1,
+        amazon:        0,
+        ifood:         1,
         mercado_livre: 2,
-        nine_nine: 3,
-        rappi: 4,
-        shopee: 5,
-        uber: 6,
-        other: 7
+        nine_nine:     3,
+        rappi:         4,
+        shopee:        5,
+        uber:          6,
+        other:         7
       ).with_prefix.backed_by_column_of_type(:integer)
     }
   end

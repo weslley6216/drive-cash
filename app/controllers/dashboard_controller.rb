@@ -9,12 +9,12 @@ class DashboardController < ApplicationController
     @monthly_goal = Goals::ProgressService.new(user: current_user, date: filter_date).call[:monthly]
 
     render Dashboard::IndexView.new(
-      totals: @totals,
-      filters: @filters,
+      totals:          @totals,
+      filters:         @filters,
       recent_activity: @recent_activity,
-      categories: @categories,
-      today: @today,
-      monthly_goal: @monthly_goal
+      categories:      @categories,
+      today:           @today,
+      monthly_goal:    @monthly_goal
     )
   end
 

@@ -17,11 +17,11 @@ module Refuelings
       runner_up, runner_up_kml = averages_by_vendor.except(winner).max_by { |_vendor, kml| kml }
 
       Comparison.new(
-        winner: winner,
-        winner_kml: winner_kml,
-        runner_up: runner_up,
+        winner:        winner,
+        winner_kml:    winner_kml,
+        runner_up:     runner_up,
         runner_up_kml: runner_up_kml,
-        savings: monthly_savings_estimate(winner_kml: winner_kml, runner_up_kml: runner_up_kml)
+        savings:       monthly_savings_estimate(winner_kml: winner_kml, runner_up_kml: runner_up_kml)
       )
     end
 
@@ -76,8 +76,8 @@ module Refuelings
 
     def average_price_per_liter
       @average_price_per_liter ||= @vehicle.refuelings.full_tank
-                                           .where(date: (@date - 90.days)..@date)
-                                           .average(:price_per_liter).to_f
+        .where(date: (@date - 90.days)..@date)
+        .average(:price_per_liter).to_f
     end
   end
 end

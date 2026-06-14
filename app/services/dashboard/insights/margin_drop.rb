@@ -14,9 +14,9 @@ module Dashboard
         return nil if previous_margin.zero? || pp_diff >= -THRESHOLD
 
         {
-          type: 'margin_drop',
+          type:     'margin_drop',
           severity: 'critical',
-          payload: { pp: pp_diff.abs, current_margin: current_margin }
+          payload:  { pp: pp_diff.abs, current_margin: current_margin }
         }
       end
     end

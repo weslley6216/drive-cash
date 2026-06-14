@@ -8,11 +8,11 @@ module Dashboard
 
     def call
       {
-        total: total_earnings,
+        total:         total_earnings,
         avg_per_month: avg_per_month,
-        avg_per_day: avg_per_day,
-        days_count: days_count,
-        trips_count: total_trips
+        avg_per_day:   avg_per_day,
+        days_count:    days_count,
+        trips_count:   total_trips
       }
     end
 

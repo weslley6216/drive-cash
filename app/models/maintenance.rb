@@ -2,28 +2,28 @@ class Maintenance < ApplicationRecord
   belongs_to :vehicle
 
   enum :category, {
-    oil_change: 0,
-    oil_filter: 1,
-    air_filter: 2,
-    fuel_filter: 3,
+    oil_change:    0,
+    oil_filter:    1,
+    air_filter:    2,
+    fuel_filter:   3,
     tire_rotation: 4,
-    brake_pads: 5,
-    spark_plugs: 6,
-    timing_belt: 7
+    brake_pads:    5,
+    spark_plugs:   6,
+    timing_belt:   7
   }, prefix: true
 
   CATALOG = {
-    'oil_change' => { interval_km: 5_000, estimated_cost: 280, icon: PhlexIcons::Lucide::Wrench },
-    'oil_filter' => { interval_km: 10_000, estimated_cost: 45, icon: PhlexIcons::Lucide::Wind },
-    'air_filter' => { interval_km: 10_000, estimated_cost: 70, icon: PhlexIcons::Lucide::Wind },
-    'fuel_filter' => { interval_km: 20_000, estimated_cost: 90, icon: PhlexIcons::Lucide::Wind },
+    'oil_change'    => { interval_km: 5_000, estimated_cost: 280, icon: PhlexIcons::Lucide::Wrench },
+    'oil_filter'    => { interval_km: 10_000, estimated_cost: 45, icon: PhlexIcons::Lucide::Wind },
+    'air_filter'    => { interval_km: 10_000, estimated_cost: 70, icon: PhlexIcons::Lucide::Wind },
+    'fuel_filter'   => { interval_km: 20_000, estimated_cost: 90, icon: PhlexIcons::Lucide::Wind },
     'tire_rotation' => { interval_km: 10_000, estimated_cost: 60, icon: PhlexIcons::Lucide::Disc },
-    'brake_pads' => { interval_km: 30_000, estimated_cost: 400, icon: PhlexIcons::Lucide::Shield },
-    'spark_plugs' => { interval_km: 40_000, estimated_cost: 240, icon: PhlexIcons::Lucide::Zap },
-    'timing_belt' => { interval_km: 60_000, estimated_cost: 900, icon: PhlexIcons::Lucide::Settings }
+    'brake_pads'    => { interval_km: 30_000, estimated_cost: 400, icon: PhlexIcons::Lucide::Shield },
+    'spark_plugs'   => { interval_km: 40_000, estimated_cost: 240, icon: PhlexIcons::Lucide::Zap },
+    'timing_belt'   => { interval_km: 60_000, estimated_cost: 900, icon: PhlexIcons::Lucide::Settings }
   }.freeze
 
-  validates :last_done_km, :interval_km, presence: true,
+  validates :last_done_km, :interval_km, presence:     true,
                                          numericality: { greater_than: 0, only_integer: true }
   validates :estimated_cost, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 

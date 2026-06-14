@@ -28,11 +28,11 @@ RSpec.describe 'Goals', type: :request do
 
     it 'renders monthly hero when a monthly goal exists' do
       create(:goal,
-             user: current_user,
-             kind: 'monthly',
+             user:          current_user,
+             kind:          'monthly',
              target_amount: 6000,
-             period_start: Date.current.beginning_of_month,
-             period_end: Date.current.end_of_month)
+             period_start:  Date.current.beginning_of_month,
+             period_end:    Date.current.end_of_month)
       create(:earning, user: current_user, date: Date.current, amount: 1500)
 
       get goals_path
@@ -71,11 +71,11 @@ RSpec.describe 'Goals', type: :request do
     let(:valid_params) do
       {
         goal: {
-          kind: 'monthly',
+          kind:          'monthly',
           target_amount: '6000.00',
-          period_start: Date.current.beginning_of_month.to_s,
-          period_end: Date.current.end_of_month.to_s,
-          metric: 'profit'
+          period_start:  Date.current.beginning_of_month.to_s,
+          period_end:    Date.current.end_of_month.to_s,
+          metric:        'profit'
         }
       }
     end
@@ -106,11 +106,11 @@ RSpec.describe 'Goals', type: :request do
   describe 'GET /goals/:id/edit' do
     let(:goal) do
       create(:goal,
-             user: current_user,
-             kind: 'monthly',
+             user:          current_user,
+             kind:          'monthly',
              target_amount: 5000,
-             period_start: Date.current.beginning_of_month,
-             period_end: Date.current.end_of_month)
+             period_start:  Date.current.beginning_of_month,
+             period_end:    Date.current.end_of_month)
     end
 
     it 'renders the edit modal form' do
@@ -124,11 +124,11 @@ RSpec.describe 'Goals', type: :request do
   describe 'PATCH /goals/:id' do
     let(:goal) do
       create(:goal,
-             user: current_user,
-             kind: 'monthly',
+             user:          current_user,
+             kind:          'monthly',
              target_amount: 5000,
-             period_start: Date.current.beginning_of_month,
-             period_end: Date.current.end_of_month)
+             period_start:  Date.current.beginning_of_month,
+             period_end:    Date.current.end_of_month)
     end
 
     it 'updates the goal and responds with modal clear and turbo_stream refresh' do
@@ -158,11 +158,11 @@ RSpec.describe 'Goals', type: :request do
   describe 'DELETE /goals/:id' do
     let(:goal) do
       create(:goal,
-             user: current_user,
-             kind: 'monthly',
+             user:          current_user,
+             kind:          'monthly',
              target_amount: 5000,
-             period_start: Date.current.beginning_of_month,
-             period_end: Date.current.end_of_month)
+             period_start:  Date.current.beginning_of_month,
+             period_end:    Date.current.end_of_month)
     end
 
     before { goal }
@@ -177,10 +177,10 @@ RSpec.describe 'Goals', type: :request do
 
     it 'scopes find to current user (404 for other users goals)' do
       other_user = create(:user)
-      other_goal = create(:goal, user: other_user,
-                                 kind: 'weekly',
+      other_goal = create(:goal, user:         other_user,
+                                 kind:         'weekly',
                                  period_start: Date.current.beginning_of_week,
-                                 period_end: Date.current.end_of_week)
+                                 period_end:   Date.current.end_of_week)
 
       delete goal_path(other_goal)
 

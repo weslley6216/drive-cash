@@ -63,7 +63,7 @@ module Chat
         rparams.each { |key, value| input(type: 'hidden', name: "record[#{key}]", value: value) }
 
         f.button(
-          type: 'submit',
+          type:  'submit',
           class: 'flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors cursor-pointer'
         ) do
           render PhlexIcons::Lucide::Check.new(class: 'w-3.5 h-3.5')
@@ -74,9 +74,9 @@ module Chat
 
     def cancel_button
       button(
-        type: 'button',
+        type:  'button',
         class: 'px-3 py-1.5 text-slate-500 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer',
-        data: { action: 'click->chat#cancelPreview' }
+        data:  { action: 'click->chat#cancelPreview' }
       ) { t('chat.message.btn_cancel') }
     end
   end

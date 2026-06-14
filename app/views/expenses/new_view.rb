@@ -13,7 +13,7 @@ module Expenses
     def installment_section
       div(
         class: 'rounded-lg border border-slate-200 bg-slate-50/80 p-4 space-y-3',
-        data: { controller: 'expense-installment', action: 'change->expense-installment#toggle' }
+        data:  { controller: 'expense-installment', action: 'change->expense-installment#toggle' }
       ) do
         div(class: 'flex items-start gap-3') do
           raw helpers.check_box_tag('installment[repeat]', '1', false, id: 'installment_repeat', class: 'mt-1 rounded border-slate-300 text-red-600 focus:ring-red-500')
@@ -32,8 +32,8 @@ module Expenses
             raw helpers.number_field_tag(
               'installment[repetitions]',
               3,
-              min: 2,
-              step: 1,
+              min:   2,
+              step:  1,
               class: input_classes(theme: @theme)
             )
           end

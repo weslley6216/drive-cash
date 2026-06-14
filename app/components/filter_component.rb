@@ -16,15 +16,15 @@ class FilterComponent < ApplicationComponent
   def popover_view
     div(
       class: 'relative',
-      data: { controller: 'filter-popover', action: 'click@window->filter-popover#closeOnOutsideClick' }
+      data:  { controller: 'filter-popover', action: 'click@window->filter-popover#closeOnOutsideClick' }
     ) do
       button(
-        type: 'button',
+        type:  'button',
         class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm ' \
                'flex items-center justify-center text-slate-600 hover:bg-slate-50 ' \
                'focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
         title: t('.title'),
-        data: { action: 'click->filter-popover#toggle' }
+        data:  { action: 'click->filter-popover#toggle' }
       ) do
         render PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]')
       end
@@ -32,7 +32,7 @@ class FilterComponent < ApplicationComponent
       div(
         class: 'hidden absolute right-0 mt-2 z-20 w-56 bg-white border border-slate-200 ' \
                'rounded-xl shadow-lg p-3',
-        data: { filter_popover_target: 'panel' }
+        data:  { filter_popover_target: 'panel' }
       ) do
         form(
           action: @action_path || root_path, method: 'get',
@@ -88,21 +88,21 @@ class FilterComponent < ApplicationComponent
     target_url = helpers.url_for(controller: 'dashboard', action: 'index', **current_params)
 
     div(
-      id: 'dashboard_filters',
+      id:    'dashboard_filters',
       class: 'bg-white rounded-lg shadow-md p-4 mb-8 inline-block w-full',
-      data: {
-        controller: 'url-sync',
+      data:  {
+        controller:         'url-sync',
         url_sync_url_value: target_url
       }
     ) do
       form(
         action: root_path,
         method: 'get',
-        data: {
+        data:   {
           controller: 'filter',
-          action: 'change->filter#submit'
+          action:     'change->filter#submit'
         },
-        class: 'flex items-center gap-4'
+        class:  'flex items-center gap-4'
       ) do
         filter_header
         year_field
@@ -122,12 +122,12 @@ class FilterComponent < ApplicationComponent
     div(class: 'flex items-center gap-2') do
       label(for: 'year_select', class: 'text-sm text-slate-600') { t('.year') }
       select(
-        name: 'year',
-        id: 'year_select',
+        name:  'year',
+        id:    'year_select',
         class: select_classes,
-        data: {
+        data:  {
           filter_target: 'year',
-          action: 'change->filter#handleYearChange'
+          action:        'change->filter#handleYearChange'
         }
       ) do
         year_options
@@ -139,10 +139,10 @@ class FilterComponent < ApplicationComponent
     div(class: 'flex items-center gap-2') do
       label(for: 'month_select', class: 'text-sm text-slate-600') { t('.month') }
       select(
-        name: 'month',
-        id: 'month_select',
+        name:  'month',
+        id:    'month_select',
         class: select_classes,
-        data: { filter_target: 'month' }
+        data:  { filter_target: 'month' }
       ) do
         month_options
       end

@@ -19,10 +19,10 @@ class Passwords::NewView < ApplicationView
       div do
         label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: 'email_address') { t('.email') }
         raw form.email_field(:email_address,
-                             id: 'email_address',
-                             required: true,
+                             id:           'email_address',
+                             required:     true,
                              autocomplete: 'email',
-                             class: 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
+                             class:        'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
       end
       raw form.submit(t('.submit'),
                       class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25').to_s

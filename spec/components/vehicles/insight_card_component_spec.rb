@@ -3,12 +3,12 @@ require 'rails_helper'
 RSpec.describe Vehicles::InsightCardComponent, type: :component do
   let(:insight) do
     {
-      type: :cheapest_vendor,
-      winner: 'Posto Orense',
-      winner_kml: 11.5,
-      runner_up: 'Posto Geladão',
+      type:          :cheapest_vendor,
+      winner:        'Posto Orense',
+      winner_kml:    11.5,
+      runner_up:     'Posto Geladão',
       runner_up_kml: 11.0,
-      savings: 28
+      savings:       28
     }
   end
 

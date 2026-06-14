@@ -1,8 +1,8 @@
 module ButtonStyles
   BUTTON_VARIANTS = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    primary:   'bg-blue-600 text-white hover:bg-blue-700',
     secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
-    danger: 'bg-red-600 text-white hover:bg-red-700'
+    danger:    'bg-red-600 text-white hover:bg-red-700'
   }.freeze
 
   def button_classes(variant: :primary, full_width: false)

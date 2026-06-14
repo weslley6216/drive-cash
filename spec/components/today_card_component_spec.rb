@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe TodayCardComponent, type: :component do
   let(:component) do
     TodayCardComponent.new(
-      earnings: 150.0,
-      expenses: 40.0,
-      net: 110.0,
+      earnings:    150.0,
+      expenses:    40.0,
+      net:         110.0,
       trips_count: 5
     )
   end

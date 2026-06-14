@@ -1,10 +1,10 @@
 class StatsGridComponent < ApplicationComponent
   ICONS = {
-    dollar_sign: PhlexIcons::Lucide::DollarSign,
+    dollar_sign:    PhlexIcons::Lucide::DollarSign,
     triangle_alert: PhlexIcons::Lucide::TriangleAlert,
-    trending_up: PhlexIcons::Lucide::TrendingUp,
-    calendar: PhlexIcons::Lucide::Calendar,
-    package: PhlexIcons::Lucide::Package
+    trending_up:    PhlexIcons::Lucide::TrendingUp,
+    calendar:       PhlexIcons::Lucide::Calendar,
+    package:        PhlexIcons::Lucide::Package
   }.freeze
 
   TILES = [
@@ -32,11 +32,11 @@ class StatsGridComponent < ApplicationComponent
 
   def render_card(tile)
     config = {
-      title: t("dashboard.index_view.stats.#{tile[:key]}.title"),
-      value: send("#{tile[:key]}_value"),
+      title:    t("dashboard.index_view.stats.#{tile[:key]}.title"),
+      value:    send("#{tile[:key]}_value"),
       subtitle: send("#{tile[:key]}_subtitle"),
-      color: tile[:color],
-      icon: ICONS[tile[:icon]]
+      color:    tile[:color],
+      icon:     ICONS[tile[:icon]]
     }
     config[:href] = send(tile[:detail], year: @year, month: @month) if tile[:detail]
 

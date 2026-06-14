@@ -15,9 +15,9 @@ module Dashboard
       expenses_sum = expenses_today.sum(:amount)
 
       {
-        earnings: earnings_sum,
-        expenses: expenses_sum,
-        net: earnings_sum - expenses_sum,
+        earnings:    earnings_sum,
+        expenses:    expenses_sum,
+        net:         earnings_sum - expenses_sum,
         trips_count: earnings_today.sum(:trips_count)
       }
     end

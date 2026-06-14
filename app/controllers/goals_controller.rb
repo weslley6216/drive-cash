@@ -55,10 +55,10 @@ class GoalsController < ApplicationController
   def default_attributes
     today = Date.current
     {
-      kind: 'monthly',
-      metric: 'profit',
+      kind:         'monthly',
+      metric:       'profit',
       period_start: today.beginning_of_month,
-      period_end: today.end_of_month
+      period_end:   today.end_of_month
     }
   end
 

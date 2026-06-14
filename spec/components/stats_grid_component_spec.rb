@@ -3,17 +3,17 @@ require 'rails_helper'
 RSpec.describe StatsGridComponent, type: :component do
   let(:totals) do
     {
-      earnings: 1000.0,
-      expenses: 300.0,
-      days: 20,
+      earnings:           1000.0,
+      expenses:           300.0,
+      days:               20,
       earnings_avg_month: 500.0,
-      expenses_percent: 30.0,
-      days_avg_month: 10.0,
-      earnings_avg_day: 50.0,
-      days_avg_week: 0,
-      trips: 25,
-      trips_avg_month: 25,
-      trips_avg_day: 25
+      expenses_percent:   30.0,
+      days_avg_month:     10.0,
+      earnings_avg_day:   50.0,
+      days_avg_week:      0,
+      trips:              25,
+      trips_avg_month:    25,
+      trips_avg_day:      25
     }
   end
 

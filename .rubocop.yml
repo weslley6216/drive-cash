@@ -34,3 +34,26 @@ Layout/SpaceInsideArrayLiteralBrackets:
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: single_quotes
+
+# Mechanical writing design — enforced layout (omakase leaves these off)
+Layout/HashAlignment:
+  Enabled: true
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Layout/ExtraSpacing:
+  Enabled: true
+  AllowForAlignment: true
+  AllowBeforeTrailingComments: true
+
+Layout/ArgumentAlignment:
+  Enabled: true
+  EnforcedStyle: with_first_argument
+
+Layout/FirstHashElementIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented

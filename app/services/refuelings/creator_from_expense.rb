@@ -15,14 +15,14 @@ module Refuelings
       return nil unless eligible?
 
       Refueling.create(
-        vehicle: @expense.user.vehicle,
-        expense: @expense,
-        date: @expense.date,
-        vendor: @expense.vendor,
-        liters: normalize_decimal(@liters),
-        odometer_km: @odometer_km.to_i,
+        vehicle:      @expense.user.vehicle,
+        expense:      @expense,
+        date:         @expense.date,
+        vendor:       @expense.vendor,
+        liters:       normalize_decimal(@liters),
+        odometer_km:  @odometer_km.to_i,
         total_amount: @expense.amount,
-        full_tank: ActiveModel::Type::Boolean.new.cast(@full_tank)
+        full_tank:    ActiveModel::Type::Boolean.new.cast(@full_tank)
       )
     end
 

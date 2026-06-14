@@ -83,11 +83,11 @@ class Sessions::NewView < ApplicationView
           render PhlexIcons::Lucide::User.new(class: 'w-[18px] h-[18px]')
         end
         raw form.email_field(:email_address,
-                             id: 'email_address',
-                             required: true,
+                             id:           'email_address',
+                             required:     true,
                              autocomplete: 'email',
-                             autofocus: true,
-                             class: input_classes(icon: true)).to_s
+                             autofocus:    true,
+                             class:        input_classes(icon: true)).to_s
       end
     end
   end
@@ -103,15 +103,15 @@ class Sessions::NewView < ApplicationView
           render PhlexIcons::Lucide::Shield.new(class: 'w-[18px] h-[18px]')
         end
         raw form.password_field(:password,
-                                id: 'password',
-                                required: true,
+                                id:           'password',
+                                required:     true,
                                 autocomplete: 'current-password',
-                                data: { 'password-toggle-target': 'input' },
-                                class: input_classes(icon: true, trailing: true)).to_s
+                                data:         { 'password-toggle-target': 'input' },
+                                class:        input_classes(icon: true, trailing: true)).to_s
         button(
-          type: 'button',
+          type:  'button',
           class: 'absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer',
-          data: { action: 'click->password-toggle#toggle' }
+          data:  { action: 'click->password-toggle#toggle' }
         ) do
           span(data: { 'password-toggle-target': 'eye' }) do
             render PhlexIcons::Lucide::Eye.new(class: 'w-[18px] h-[18px]')
@@ -128,10 +128,10 @@ class Sessions::NewView < ApplicationView
     div(class: 'flex items-center gap-2.5 pt-1') do
       input(type: 'hidden', name: 'remember_me', value: '0')
       input(
-        type: 'checkbox',
-        name: 'remember_me',
+        type:  'checkbox',
+        name:  'remember_me',
         value: '1',
-        id: 'remember_me',
+        id:    'remember_me',
         class: 'w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer'
       )
       label(for: 'remember_me', class: 'text-sm text-slate-600 cursor-pointer') { t('.remember_me') }
@@ -140,7 +140,7 @@ class Sessions::NewView < ApplicationView
 
   def submit_button
     button(
-      type: 'submit',
+      type:  'submit',
       class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
     ) do
       plain t('.sign_in')
@@ -160,7 +160,7 @@ class Sessions::NewView < ApplicationView
     form(action: '/auth/google_oauth2', method: 'post', data: { turbo: 'false' }) do
       raw helpers.hidden_field_tag(:authenticity_token, helpers.form_authenticity_token)
       button(
-        type: 'submit',
+        type:  'submit',
         class: 'w-full flex items-center justify-center gap-2.5 bg-white border border-slate-200 rounded-xl py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer'
       ) do
         span(class: 'w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 via-emerald-500 to-amber-500 flex items-center justify-center text-white text-[11px] font-bold') { 'G' }

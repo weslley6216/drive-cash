@@ -30,10 +30,10 @@ class Passwords::EditView < ApplicationView
     div do
       label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: name.to_s) { t(".#{label_key}") }
       raw form.password_field(name,
-                              id: name.to_s,
-                              required: true,
+                              id:           name.to_s,
+                              required:     true,
                               autocomplete: autocomplete,
-                              class: 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
+                              class:        'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
     end
   end
 end

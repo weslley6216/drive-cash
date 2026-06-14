@@ -1,18 +1,18 @@
 class RecentActivityComponent < ApplicationComponent
   STYLES = {
     earning: {
-      icon: PhlexIcons::Lucide::Truck,
-      icon_bg: 'bg-emerald-50',
-      icon_color: 'text-emerald-600',
+      icon:         PhlexIcons::Lucide::Truck,
+      icon_bg:      'bg-emerald-50',
+      icon_color:   'text-emerald-600',
       amount_color: 'text-emerald-700',
-      sign: '+'
+      sign:         '+'
     },
     expense: {
-      icon: PhlexIcons::Lucide::Receipt,
-      icon_bg: 'bg-red-50',
-      icon_color: 'text-red-600',
+      icon:         PhlexIcons::Lucide::Receipt,
+      icon_bg:      'bg-red-50',
+      icon_color:   'text-red-600',
       amount_color: 'text-red-700',
-      sign: '-'
+      sign:         '-'
     }
   }.freeze
 

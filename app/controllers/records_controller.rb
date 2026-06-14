@@ -7,7 +7,7 @@ class RecordsController < ApplicationController
     @expense = Expense.new(date: Date.current)
 
     render Records::NewView.new(
-      type: @type,
+      type:    @type,
       earning: @earning,
       expense: @expense,
       context: params[:context]
@@ -30,7 +30,7 @@ class RecordsController < ApplicationController
       redirect_to root_path, notice: t('records.create.success')
     else
       render Records::NewView.new(
-        type: 'earning',
+        type:    'earning',
         earning: earning,
         expense: Expense.new(date: Date.current),
         context: params[:context]
@@ -45,7 +45,7 @@ class RecordsController < ApplicationController
       redirect_to root_path, notice: t('records.create.success')
     else
       render Records::NewView.new(
-        type: 'expense',
+        type:    'expense',
         earning: Earning.new(date: Date.current),
         expense: result.expense,
         context: params[:context]

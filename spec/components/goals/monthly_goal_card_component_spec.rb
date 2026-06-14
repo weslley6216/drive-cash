@@ -3,21 +3,21 @@ require 'rails_helper'
 RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
   let(:goal) do
     build_stubbed(:goal,
-                  kind: 'monthly',
+                  kind:          'monthly',
                   target_amount: 6000,
-                  period_start: Date.new(2026, 6, 1),
-                  period_end: Date.new(2026, 6, 30))
+                  period_start:  Date.new(2026, 6, 1),
+                  period_end:    Date.new(2026, 6, 30))
   end
   let(:progress) do
     {
-      goal: goal,
-      current: 1500,
-      target: 6000,
-      percent: 25,
-      projection: 3000,
-      on_track: false,
+      goal:              goal,
+      current:           1500,
+      target:            6000,
+      percent:           25,
+      projection:        3000,
+      on_track:          false,
       remaining_per_day: 300,
-      days_remaining: 15
+      days_remaining:    15
     }
   end
 

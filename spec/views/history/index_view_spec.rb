@@ -6,11 +6,11 @@ RSpec.describe History::IndexView, type: :component do
   let(:html) do
     view_context.render(
       described_class.new(
-        feed: feed,
-        year: 2025,
-        month: nil,
-        query: nil,
-        filter: 'all',
+        feed:            feed,
+        year:            2025,
+        month:           nil,
+        query:           nil,
+        filter:          'all',
         available_years: [2025]
       )
     )

@@ -73,7 +73,7 @@ module Vehicles
       tone = danger? ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
       link_to(helpers.new_refueling_path,
               class: "flex-shrink-0 flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white #{tone}",
-              data: { turbo_frame: 'modal' }) do
+              data:  { turbo_frame: 'modal' }) do
         render PhlexIcons::Lucide::Plus.new(class: 'w-[15px] h-[15px]')
         plain t('vehicle.tank.refuel')
       end

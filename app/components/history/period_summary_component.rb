@@ -10,22 +10,22 @@ module History
           title: t('history.index.summary.earnings'),
           value: format_currency(@summary[:earnings]),
           color: :green,
-          icon: PhlexIcons::Lucide::TrendingUp,
-          size: :sm
+          icon:  PhlexIcons::Lucide::TrendingUp,
+          size:  :sm
         )
         render StatCardComponent.new(
           title: t('history.index.summary.expenses'),
           value: format_currency(@summary[:expenses]),
           color: :red,
-          icon: PhlexIcons::Lucide::TrendingDown,
-          size: :sm
+          icon:  PhlexIcons::Lucide::TrendingDown,
+          size:  :sm
         )
         render StatCardComponent.new(
           title: t('history.index.summary.net'),
           value: format_currency(@summary[:net]),
           color: :blue,
-          icon: PhlexIcons::Lucide::Wallet,
-          size: :sm
+          icon:  PhlexIcons::Lucide::Wallet,
+          size:  :sm
         )
       end
     end

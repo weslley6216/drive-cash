@@ -88,7 +88,7 @@ RSpec.describe 'Records', type: :request do
     context 'when type is earning' do
       let(:valid_params) do
         {
-          type: 'earning',
+          type:   'earning',
           record: { date: '2026-05-22', amount: '245.00', platform: 'uber', notes: 'x', trips_count: 7 }
         }
       end
@@ -121,7 +121,7 @@ RSpec.describe 'Records', type: :request do
     context 'when type is expense' do
       let(:valid_params) do
         {
-          type: 'expense',
+          type:   'expense',
           record: { date: '2026-05-22', amount: '60.00', category: 'fuel', vendor: 'Posto Orense', description: '', paid: '1' }
         }
       end

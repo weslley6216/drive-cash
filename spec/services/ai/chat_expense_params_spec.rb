@@ -3,10 +3,10 @@ require 'rails_helper'
 RSpec.describe Ai::ChatExpenseParams do
   let(:base) do
     {
-      'date' => '2026-01-10',
-      'amount' => '90.00',
-      'category' => 'maintenance',
-      'vendor' => 'Pneus',
+      'date'        => '2026-01-10',
+      'amount'      => '90.00',
+      'category'    => 'maintenance',
+      'vendor'      => 'Pneus',
       'description' => 'Pneus'
     }
   end

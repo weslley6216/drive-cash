@@ -4,22 +4,22 @@ class Expense < ApplicationRecord
   has_one :refueling, dependent: :nullify
 
   CATEGORIES_BY_GROUP = {
-    vehicle: %w[fuel maintenance car_wash toll parking documentation insurance fine],
+    vehicle:             %w[fuel maintenance car_wash toll parking documentation insurance fine],
     personal_operations: %w[meals phone other]
   }.freeze
 
   enum :category, {
-    car_wash: 0,
+    car_wash:      0,
     documentation: 1,
-    fine: 2,
-    fuel: 3,
-    insurance: 4,
-    maintenance: 5,
-    meals: 6,
-    parking: 7,
-    phone: 8,
-    toll: 9,
-    other: 10
+    fine:          2,
+    fuel:          3,
+    insurance:     4,
+    maintenance:   5,
+    meals:         6,
+    parking:       7,
+    phone:         8,
+    toll:          9,
+    other:         10
   }, prefix: true
 
   INSTALLMENT_PERIODS = %w[weekly biweekly monthly annual].freeze
@@ -28,7 +28,7 @@ class Expense < ApplicationRecord
   validates :category, presence: true
   validates :installment_count,
             numericality: { greater_than_or_equal_to: 2, less_than_or_equal_to: MAX_INSTALLMENTS },
-            allow_nil: true
+            allow_nil:    true
   validate :installment_fields_consistent
 
   scope :paid_only, -> { where(paid: true) }

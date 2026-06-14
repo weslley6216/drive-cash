@@ -45,10 +45,10 @@ class ExpensesController < ApplicationController
     return unless expense.category_fuel?
 
     Refuelings::CreatorFromExpense.call(
-      expense: expense,
-      liters: refueling_data[:liters],
+      expense:     expense,
+      liters:      refueling_data[:liters],
       odometer_km: refueling_data[:odometer_km],
-      full_tank: refueling_data[:full_tank]
+      full_tank:   refueling_data[:full_tank]
     )
   end
 end
