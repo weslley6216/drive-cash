@@ -20,7 +20,13 @@ RSpec.describe Dashboard::AvailableYears do
       expect(result).to include(2022)
     end
 
-    it 'always includes the current year' do
+    it 'always includes the reference year' do
+      result = described_class.fetch(user: user, date: Date.new(2027, 5, 1))
+
+      expect(result).to include(2027)
+    end
+
+    it 'defaults the reference year to the current year' do
       result = described_class.fetch(user: user)
 
       expect(result).to include(Date.current.year)

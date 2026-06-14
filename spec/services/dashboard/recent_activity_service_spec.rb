@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::RecentActivityService do
-  include ActiveSupport::Testing::TimeHelpers
-
   let(:user) { create(:user) }
 
   describe '#call' do
@@ -78,22 +76,30 @@ RSpec.describe Dashboard::RecentActivityService do
     end
 
     context 'with date labels' do
-      it 'labels today as Hoje' do
+      it 'labels the reference date as Hoje' do
+        reference = Date.new(2026, 6, 15)
+        create(:earning, user: user, date: reference, amount: 100, platform: 'uber')
+
+        row = described_class.new(year: 2026, month: 6, user: user, date: reference).call.first
+
+        expect(row[:date_label]).to eq(I18n.t('common.today'))
+      end
+
+      it 'labels the day before the reference date as Ontem' do
+        reference = Date.new(2026, 6, 15)
+        create(:earning, user: user, date: reference - 1, amount: 100, platform: 'uber')
+
+        row = described_class.new(year: 2026, month: 6, user: user, date: reference).call.first
+
+        expect(row[:date_label]).to eq(I18n.t('common.yesterday'))
+      end
+
+      it 'defaults the reference date to today' do
         create(:earning, user: user, date: Date.current, amount: 100, platform: 'uber')
 
         row = described_class.new(year: Date.current.year, month: Date.current.month, user: user).call.first
 
         expect(row[:date_label]).to eq(I18n.t('common.today'))
-      end
-
-      it 'labels yesterday as Ontem' do
-        travel_to Date.new(2026, 6, 15) do
-          create(:earning, user: user, date: Date.current - 1, amount: 100, platform: 'uber')
-
-          row = described_class.new(year: Date.current.year, month: Date.current.month, user: user).call.first
-
-          expect(row[:date_label]).to eq(I18n.t('common.yesterday'))
-        end
       end
 
       it 'labels other dates using :short format' do

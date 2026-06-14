@@ -1,10 +1,11 @@
 module Dashboard
   class RecentActivityService
-    def initialize(year:, month: nil, limit: 5, user: Current.user)
+    def initialize(year:, month: nil, limit: 5, user: Current.user, date: Date.current)
       @year = year
       @month = month
       @limit = limit
       @user = user
+      @date = date
     end
 
     def call
@@ -67,8 +68,8 @@ module Dashboard
     end
 
     def format_date(date)
-      return I18n.t('common.today')     if date == Date.current
-      return I18n.t('common.yesterday') if date == Date.current - 1
+      return I18n.t('common.today')     if date == @date
+      return I18n.t('common.yesterday') if date == @date - 1
 
       I18n.l(date, format: :short)
     end
