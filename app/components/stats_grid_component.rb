@@ -7,6 +7,13 @@ class StatsGridComponent < ApplicationComponent
     package: PhlexIcons::Lucide::Package
   }.freeze
 
+  TILES = [
+    { key: :earnings, color: :green,  icon: :dollar_sign,    detail: :dashboard_earnings_detail_path },
+    { key: :expenses, color: :red,    icon: :triangle_alert, detail: :dashboard_expenses_detail_path },
+    { key: :days,     color: :yellow, icon: :calendar,       detail: nil },
+    { key: :trips,    color: :purple, icon: :package,        detail: nil }
+  ].freeze
+
   def initialize(totals:, month: nil, year: Date.current.year)
     @totals = totals
     @month = month
@@ -15,10 +22,7 @@ class StatsGridComponent < ApplicationComponent
 
   def view_template
     div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
-      render_card(:earnings)
-      render_card(:expenses)
-      render_card(:days)
-      render_card(:trips)
+      TILES.each { |tile| render_card(tile) }
     end
   end
 
@@ -26,48 +30,23 @@ class StatsGridComponent < ApplicationComponent
 
   def annual_view? = @month.blank?
 
-  def render_card(type)
-    render StatCardComponent.new(**card_config(type))
+  def render_card(tile)
+    config = {
+      title: t("dashboard.index_view.stats.#{tile[:key]}.title"),
+      value: send("#{tile[:key]}_value"),
+      subtitle: send("#{tile[:key]}_subtitle"),
+      color: tile[:color],
+      icon: ICONS[tile[:icon]]
+    }
+    config[:href] = send(tile[:detail], year: @year, month: @month) if tile[:detail]
+
+    render StatCardComponent.new(**config)
   end
 
-  def card_config(type)
-    case type
-    when :earnings
-      {
-        title: t('dashboard.index_view.stats.earnings.title'),
-        value: format_currency(@totals[:earnings]),
-        subtitle: earnings_subtitle,
-        color: :green,
-        icon: ICONS[:dollar_sign],
-        href: dashboard_earnings_detail_path(year: @year, month: @month)
-      }
-    when :expenses
-      {
-        title: t('dashboard.index_view.stats.expenses.title'),
-        value: format_currency(@totals[:expenses]),
-        subtitle: expenses_subtitle,
-        color: :red,
-        icon: ICONS[:triangle_alert],
-        href: dashboard_expenses_detail_path(year: @year, month: @month)
-      }
-    when :days
-      {
-        title: t('dashboard.index_view.stats.days.title'),
-        value: @totals[:days].to_s,
-        subtitle: days_subtitle,
-        color: :yellow,
-        icon: ICONS[:calendar]
-      }
-    when :trips
-      {
-        title: t('dashboard.index_view.stats.trips.title'),
-        value: @totals[:trips].to_s,
-        subtitle: trips_subtitle,
-        color: :purple,
-        icon: ICONS[:package]
-      }
-    end
-  end
+  def earnings_value = format_currency(@totals[:earnings])
+  def expenses_value = format_currency(@totals[:expenses])
+  def days_value = @totals[:days].to_s
+  def trips_value = @totals[:trips].to_s
 
   def earnings_subtitle
     key = annual_view? ? 'subtitle_annual' : 'subtitle_monthly'
