@@ -1,6 +1,6 @@
 module Records
   class NewView < ApplicationView
-    def initialize(type:, earning: nil, expense: nil, context: nil, totals: nil, totals_context: nil)
+    def initialize(type:, earning: nil, expense: nil, context: nil)
       @type = type.to_s
       @earning = earning || Earning.new(date: Date.current)
       @expense = expense || Expense.new(date: Date.current)

@@ -2,11 +2,10 @@ module Expenses
   class UpdateView < ApplicationView
     include TurboUpdateResponse
 
-    def initialize(expense:, totals:, context: {}, totals_context: {})
+    def initialize(expense:, totals:, context: {})
       @expense = expense
       @totals = totals
       @context = context || {}
-      @totals_context = totals_context || {}
     end
 
     def view_template

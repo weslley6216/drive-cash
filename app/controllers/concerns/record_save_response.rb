@@ -12,8 +12,7 @@ module RecordSaveResponse
         render view_class.new(
           **kwargs,
           totals: totals,
-          context: context,
-          totals_context: dashboard_context
+          context: context
         )
       end
     end
