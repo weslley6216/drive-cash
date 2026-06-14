@@ -11,6 +11,7 @@ module Vehicles
         .order(:date, :created_at)
         .first
       return 0 unless first
+      return 0 unless first.odometer_km
 
       [@vehicle.odometer_km - first.odometer_km, 0].max
     end

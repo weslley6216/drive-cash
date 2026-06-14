@@ -19,5 +19,13 @@ RSpec.describe Vehicles::Statistics do
 
       expect(result).to eq(0)
     end
+
+    it 'returns 0 when the first refueling of the month has nil odometer_km' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), odometer_km: nil)
+
+      result = described_class.new(vehicle: vehicle, date: reference_date).km_this_month
+
+      expect(result).to eq(0)
+    end
   end
 end
