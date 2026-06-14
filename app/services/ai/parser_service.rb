@@ -4,15 +4,16 @@ module Ai
 
     PROMPT_PATH = Rails.root.join('app', 'services', 'ai', 'prompts', 'financial_assistant.txt').freeze
 
-    def initialize(messages:, today: Date.current)
+    def initialize(messages:, today: Date.current, client: Llm::Client)
       @messages = messages
       @today    = today
+      @client   = client
     end
 
     def call
       Rails.logger.debug "[ParserService] Starting processing for #{@messages.size} message(s)"
 
-      response = Llm::Client.chat(
+      response = @client.chat(
         messages: @messages,
         tools:    TOOLS,
         system:   system_prompt

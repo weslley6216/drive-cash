@@ -2,12 +2,13 @@ require 'rails_helper'
 
 RSpec.describe Ai::ParserService do
   let(:messages) { [{ role: 'user', content: 'user input' }] }
-  let(:service)  { described_class.new(messages: messages, today: Date.new(2026, 4, 21)) }
+  let(:client)   { class_double(Llm::Client) }
+  let(:service)  { described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client) }
 
   describe '#call' do
     context 'when the LLM returns plain text' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({ type: :text, content: 'All good!' })
+        allow(client).to receive(:chat).and_return({ type: :text, content: 'All good!' })
       end
 
       it 'passes the text response through' do
@@ -20,7 +21,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns the create_expense tool' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'create_expense',
           tool_input: { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' }
@@ -41,7 +42,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns the create_earning tool' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'create_earning',
           tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => '2026-04-21' }
@@ -62,7 +63,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns the create_earning tool with an invalid date' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'create_earning',
           tool_input: { 'amount' => 100.0, 'platform' => 'uber', 'date' => 'not-a-date' }
@@ -79,7 +80,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns the create_expense tool with an invalid amount' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'create_expense',
           tool_input: { 'amount' => 0.0, 'category' => 'fuel', 'date' => '2026-04-21' }
@@ -96,7 +97,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns an unregistered tool' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'delete_everything',
           tool_input: { 'amount' => 10.0 }
@@ -113,7 +114,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns an invalid JSON tool input' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({
+        allow(client).to receive(:chat).and_return({
           type: :tool_use,
           tool_name: 'create_expense',
           tool_input: '{ amount: 50, category: }'
@@ -130,7 +131,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM returns an unknown response type' do
       before do
-        allow(Llm::Client).to receive(:chat).and_return({ type: :unknown, content: '???' })
+        allow(client).to receive(:chat).and_return({ type: :unknown, content: '???' })
       end
 
       it 'returns the not_understood fallback' do
@@ -143,7 +144,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM raises a RateLimitError' do
       before do
-        allow(Llm::Client).to receive(:chat).and_raise(Llm::RateLimitError.new('busy'))
+        allow(client).to receive(:chat).and_raise(Llm::RateLimitError.new('busy'))
       end
 
       it 'returns the rate limit message' do
@@ -156,7 +157,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM raises a ConfigurationError' do
       before do
-        allow(Llm::Client).to receive(:chat).and_raise(Llm::ConfigurationError.new('no key'))
+        allow(client).to receive(:chat).and_raise(Llm::ConfigurationError.new('no key'))
       end
 
       it 'returns the misconfiguration message as a text response' do
@@ -169,7 +170,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when the LLM raises a generic API error' do
       before do
-        allow(Llm::Client).to receive(:chat).and_raise(Llm::Error.new('bad gateway'))
+        allow(client).to receive(:chat).and_raise(Llm::Error.new('bad gateway'))
       end
 
       it 'returns the api error message as a text response' do
@@ -182,7 +183,7 @@ RSpec.describe Ai::ParserService do
 
     context 'when an unexpected StandardError is raised' do
       before do
-        allow(Llm::Client).to receive(:chat).and_raise(StandardError.new('disk full'))
+        allow(client).to receive(:chat).and_raise(StandardError.new('disk full'))
       end
 
       it 'returns the generic unexpected error message as a text response' do
@@ -198,13 +199,13 @@ RSpec.describe Ai::ParserService do
       let(:float_input)   { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' } }
 
       it 'produces the same preview regardless of the numeric type' do
-        allow(Llm::Client).to receive(:chat).and_return(
+        allow(client).to receive(:chat).and_return(
           { type: :tool_use, tool_name: 'create_expense', tool_input: integer_input },
           { type: :tool_use, tool_name: 'create_expense', tool_input: float_input }
         )
 
-        preview_with_integer = described_class.new(messages: messages, today: Date.new(2026, 4, 21)).call
-        preview_with_float   = described_class.new(messages: messages, today: Date.new(2026, 4, 21)).call
+        preview_with_integer = described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client).call
+        preview_with_float   = described_class.new(messages: messages, today: Date.new(2026, 4, 21), client: client).call
 
         expect(preview_with_integer[:type]).to eq(:preview)
         expect(preview_with_integer[:summary]).to eq(preview_with_float[:summary])
