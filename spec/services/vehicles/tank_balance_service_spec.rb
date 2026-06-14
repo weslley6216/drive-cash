@@ -54,6 +54,32 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(moves.last[:kind]).to eq(:credit)
   end
 
+  it 'accumulates credits minus debits since anchor' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 1, 5))
+    fuel_expense(user, 45, Date.new(2025, 12, 20))
+    fuel_expense(user, 45, Date.new(2026, 1, 4))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:balance]).to eq(430)
+  end
+
+  it 'ignores fuel expenses before the anchor date' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
+    fuel_expense(user, 1000, Date.new(2024, 6, 1))
+    fuel_expense(user, 500, Date.new(2025, 12, 18))
+    fuel_expense(user, 45, Date.new(2025, 12, 20))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:balance]).to eq(215)
+  end
+
   it 'returns empty payload without a vehicle' do
     user = create(:user)
 
@@ -61,5 +87,14 @@ RSpec.describe Vehicles::TankBalanceService do
 
     expect(result[:balance]).to eq(0)
     expect(result[:moves]).to eq([])
+  end
+
+  it 'returns EMPTY when vehicle has no refuelings' do
+    user = create(:user)
+    create(:vehicle, user: user)
+
+    result = described_class.new(user: user).call
+
+    expect(result).to eq(described_class::EMPTY)
   end
 end
