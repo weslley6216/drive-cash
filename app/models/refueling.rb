@@ -5,7 +5,7 @@ class Refueling < ApplicationRecord
   belongs_to :vehicle
   belongs_to :expense, optional: true
 
-  validates :date, :liters, :total_amount, :odometer_km, presence: true
+  validates :date, :total_amount, presence: true
   validates :liters, numericality: { greater_than: 0, allow_blank: true }
   validates :total_amount, numericality: { greater_than: 0, allow_blank: true }
   validates :odometer_km, numericality: { greater_than_or_equal_to: 0, only_integer: true, allow_blank: true }
