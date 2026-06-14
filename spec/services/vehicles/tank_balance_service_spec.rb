@@ -29,7 +29,7 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(result[:balance]).to eq(260)
   end
 
-  it 'reports negative when consumption exceeds the last tank' do
+  it 'reports negative when consumption exceeds credits' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
