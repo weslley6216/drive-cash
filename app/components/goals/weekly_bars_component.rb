@@ -17,7 +17,7 @@ module Goals
       ratio = @target.to_f.positive? ? (day_data[:value].to_f / @target).clamp(0, 1) : 0
       height_pct = (ratio * 100).round
       height_style = height_pct.positive? ? "height: #{height_pct}%" : 'height: 8px'
-      state = day_data[:today] ? :today : (day_data[:done] ? :done : :future)
+      state = bar_state(day_data)
 
       div(class: 'flex flex-col items-center gap-1') do
         div(class: 'w-full flex items-end justify-center', style: 'height: 60px') do
@@ -34,6 +34,13 @@ module Goals
           plain I18n.l(day_data[:date], format: '%a').capitalize.first(3)
         end
       end
+    end
+
+    def bar_state(day_data)
+      return :today if day_data[:today]
+      return :done if day_data[:done]
+
+      :future
     end
 
     def bar_classes(state)

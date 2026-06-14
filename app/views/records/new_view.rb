@@ -25,12 +25,15 @@ module Records
 
     private
 
+    def earning? = @type == 'earning'
+    def expense? = @type == 'expense'
+
     def stimulus_data
       { controller: 'record-form', record_form_type_value: @type }
     end
 
     def cta_theme
-      @type == 'earning' ? :emerald : :red
+      earning? ? :emerald : :red
     end
 
     def top_bar
@@ -84,15 +87,15 @@ module Records
     end
 
     def shared_amount
-      (@type == 'earning' ? @earning.amount : @expense.amount)
+      (earning? ? @earning.amount : @expense.amount)
     end
 
     def shared_date
-      (@type == 'earning' ? @earning.date : @expense.date) || Date.current
+      (earning? ? @earning.date : @expense.date) || Date.current
     end
 
     def earning_block
-      div(class: (@type == 'earning' ? '' : 'hidden'), data: { record_form_target: 'earningFields' }) do
+      div(class: (earning? ? '' : 'hidden'), data: { record_form_target: 'earningFields' }) do
         render Records::PlatformPickerComponent.new(selected: @earning.platform)
         details_section do
           render Records::TripsStepperComponent.new(value: @earning.trips_count || 1)
@@ -102,7 +105,7 @@ module Records
     end
 
     def expense_block
-      div(class: (@type == 'expense' ? '' : 'hidden'), data: { record_form_target: 'expenseFields' }) do
+      div(class: (expense? ? '' : 'hidden'), data: { record_form_target: 'expenseFields' }) do
         render Records::CategoryPickerComponent.new(selected: @expense.category)
         details_section do
           vendor_card
@@ -197,7 +200,7 @@ module Records
     end
 
     def flash_errors
-      record = @type == 'earning' ? @earning : @expense
+      record = earning? ? @earning : @expense
       return unless record.errors.any?
 
       div(class: 'rounded-xl border border-red-300 bg-red-50 text-red-700 text-sm px-4 py-3') do

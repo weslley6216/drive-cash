@@ -19,9 +19,13 @@ module Dashboard
 
     private
 
+    def has_rows?
+      @annual ? @expenses_by_month&.any? : @expenses.any?
+    end
+
     def scrollable_content
       div(class: 'flex-1 overflow-y-auto p-4 sm:p-6 pt-4') do
-        if @annual ? @expenses_by_month&.any? : @expenses.any?
+        if has_rows?
           expense_list
         else
           p(class: 'text-slate-500 text-center py-8') { t('.empty') }
@@ -32,7 +36,7 @@ module Dashboard
     def fixed_footer
       render_detail_footer(
         annual: @annual,
-        show_total: @annual ? @expenses_by_month&.any? : @expenses.any?,
+        show_total: has_rows?,
         total: @total,
         total_class: 'text-red-800',
         back_path: dashboard_expenses_detail_path(year: @filters[:year]),

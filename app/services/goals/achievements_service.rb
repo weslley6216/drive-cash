@@ -52,7 +52,7 @@ module Goals
     def metric_for(goal)
       earnings = @user.earnings.where(date: goal.period_start..goal.period_end).sum(:amount)
       expenses = @user.expenses.where(date: goal.period_start..goal.period_end).sum(:amount)
-      goal.metric == 'profit' ? earnings - expenses : earnings
+      goal.metric_profit? ? earnings - expenses : earnings
     end
   end
 end

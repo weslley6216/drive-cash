@@ -2,6 +2,7 @@ module Analysis
   class BarChartComponent < ApplicationComponent
     CHART_HEIGHT = 130
     STUB_HEIGHT  = 3
+    MAX_BARS_BEFORE_TIGHT_GAP = 15
 
     def initialize(bars:, month:, year:)
       @bars  = bars
@@ -44,7 +45,7 @@ module Analysis
     end
 
     def chart
-      gap = @bars.size > 15 ? 'gap-1' : 'gap-2'
+      gap = @bars.size > MAX_BARS_BEFORE_TIGHT_GAP ? 'gap-1' : 'gap-2'
       div(class: 'relative', data: { controller: 'bar-tooltip' }) do
         tooltip_node
         div(class: "flex items-end #{gap}", style: 'height: 140px') do

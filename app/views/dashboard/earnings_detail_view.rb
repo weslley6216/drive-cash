@@ -19,9 +19,13 @@ module Dashboard
 
     private
 
+    def has_rows?
+      @annual ? @earnings_by_month&.any? : @earnings.any?
+    end
+
     def scrollable_content
       div(class: 'flex-1 overflow-y-auto p-6 pt-4') do
-        if @annual ? @earnings_by_month&.any? : @earnings.any?
+        if has_rows?
           earnings_table
         else
           p(class: 'text-slate-500 text-center py-8') { t('.empty') }
@@ -83,7 +87,7 @@ module Dashboard
     def fixed_footer
       render_detail_footer(
         annual: @annual,
-        show_total: @annual ? @earnings_by_month&.any? : @earnings.any?,
+        show_total: has_rows?,
         total: @total,
         total_class: 'text-green-800',
         back_path: dashboard_earnings_detail_path(year: @filters[:year]),
