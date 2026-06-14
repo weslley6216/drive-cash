@@ -73,28 +73,12 @@ module Dashboard
                   end
                   div(class: 'flex items-center gap-2 flex-shrink-0 group') do
                     span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
-                    link_to(
-                      edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
-                      data: { turbo_frame: 'modal' },
-                      class: 'text-slate-400 hover:text-red-600 transition-colors',
-                      aria_label: t('.edit'),
-                      title: t('.edit')
-                    ) do
-                      render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
-                    end
-                    link_to(
-                      expense_path(expense, context: @filters),
-                      data: {
-                        turbo_method: :delete,
-                        turbo_confirm: t('.confirm_delete')
-                      },
-                      class: 'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
-                      form: { class: 'contents' },
-                      aria_label: t('.delete'),
-                      title: t('.delete')
-                    ) do
-                      render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
-                    end
+                    render_record_actions(
+                      edit_path: edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
+                      delete_path: expense_path(expense, context: @filters),
+                      edit_hover: 'hover:text-red-600',
+                      labels: { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
+                    )
                   end
                 end
               end

@@ -48,6 +48,28 @@ module Dashboard
       end
     end
 
+    def render_record_actions(edit_path:, delete_path:, edit_hover:, labels:)
+      link_to(
+        edit_path,
+        data: { turbo_frame: 'modal' },
+        class: "text-slate-400 #{edit_hover} transition-colors",
+        aria_label: labels[:edit],
+        title: labels[:edit]
+      ) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
+      end
+      link_to(
+        delete_path,
+        data: { turbo_method: :delete, turbo_confirm: labels[:confirm] },
+        class: 'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
+        form: { class: 'contents' },
+        aria_label: labels[:delete],
+        title: labels[:delete]
+      ) do
+        render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
+      end
+    end
+
     def render_back_link(path:, label:)
       link_to(
         path,
