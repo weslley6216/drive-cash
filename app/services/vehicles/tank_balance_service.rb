@@ -16,7 +16,7 @@ module Vehicles
 
       last_fill = vehicle.refuelings.full_tank.chronological.first
       full = last_fill&.total_amount
-      balance = vehicle.refuelings.sum(:total_amount) - debit_expenses_since(anchor).sum(:amount)
+      balance = vehicle.refuelings.where('refuelings.date >= ?', anchor).sum(:total_amount) - debit_expenses_since(anchor).sum(:amount)
 
       {
         balance:    balance,
