@@ -5,7 +5,7 @@ RSpec.describe Vehicles::TankBalanceService do
     create(:expense, user: user, category: 'fuel', amount: amount, date: date)
   end
 
-  it 'computes balance as refuelings minus standalone fuel expenses' do
+  it 'accumulates refueling credits minus standalone fuel expenses since the anchor' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
