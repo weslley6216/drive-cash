@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_13_073416) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_15_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,8 +79,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_13_073416) do
     t.date "date", null: false
     t.bigint "expense_id"
     t.boolean "full_tank", default: true, null: false
-    t.decimal "liters", precision: 6, scale: 2, null: false
-    t.integer "odometer_km", null: false
+    t.decimal "liters", precision: 6, scale: 2
+    t.integer "odometer_km"
     t.decimal "price_per_liter", precision: 6, scale: 3
     t.decimal "total_amount", precision: 10, scale: 2, null: false
     t.datetime "updated_at", null: false
