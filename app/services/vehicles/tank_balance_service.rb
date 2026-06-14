@@ -11,31 +11,34 @@ module Vehicles
       vehicle = @user.vehicle
       return EMPTY unless vehicle
 
+      anchor = vehicle.refuelings.minimum(:date)
+      return EMPTY unless anchor
+
       last_fill = vehicle.refuelings.full_tank.chronological.first
       full = last_fill&.total_amount
-      balance = vehicle.refuelings.sum(:total_amount) - debit_expenses.sum(:amount)
+      balance = vehicle.refuelings.where('refuelings.date >= ?', anchor).sum(:total_amount) - debit_expenses_since(anchor).sum(:amount)
 
       {
         balance:    balance,
         full:       full,
         status_key: TankStatus.for(balance, full),
         last_fill:  last_fill,
-        moves:      build_moves(vehicle)
+        moves:      build_moves(vehicle, anchor)
       }
     end
 
     private
 
-    def debit_expenses
-      @user.expenses.where(category: :fuel).where.missing(:refueling)
+    def debit_expenses_since(anchor)
+      @user.expenses.where(category: :fuel).where.missing(:refueling).where('expenses.date >= ?', anchor)
     end
 
-    def build_moves(vehicle)
+    def build_moves(vehicle, anchor)
       credits = vehicle.refuelings.chronological.map do |refueling|
         { kind: :credit, date: refueling.date, amount: refueling.total_amount,
           vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter }
       end
-      debits = debit_expenses.chronological.map do |expense|
+      debits = debit_expenses_since(anchor).chronological.map do |expense|
         { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }
       end
 
