@@ -175,6 +175,7 @@ rtk docker compose up -d db                                          # sobe o ba
 - **Cobertura 100%**: SimpleCov bloqueia PR se cobertura cair. Toda linha nova precisa de spec.
 - **Sem lógica em controllers**: lógica de negócio vai em Services (`app/services/{domínio}/`).
 - **Service devolve payload semântico, não apresentação**: o retorno é estrutura + dados crus (números, chaves de enum, `Data`/hash). Cor/design token, `number_to_currency` e helpers de view ficam no component Phlex (que é Ruby — é o lar natural disso). Rótulo i18n 1:1 (`platforms.#{platform}`) pode ficar no service. Cálculo de domínio nunca convive com formatação no mesmo arquivo — extrair um calculador puro (ex: `Refuelings::VendorEfficiency`, `Dashboard::EarningsCalculator`).
+- **Onde a lógica mora (Service vs Value Object vs Model)**: *Service* orquestra e tem efeito colateral (persiste, transação, API) — `services/`. *Value Object* de domínio recebe dados, calcula e responde, imutável e sem banco — se nomeia um conceito do domínio e carrega invariante, vive em `models/{domínio}/` (ex: `Expenses::InstallmentPlan`); calculador puro de passo sem invariante (ex: `Dashboard::PercentChange`, `MaintenanceStatus`) pode seguir em `services/`. **Limite de negócio (`MAX_*`, `MIN_*`) é invariante do model AR**: o limite e a `validates` correspondente moram no model (ex: `Expense::MAX_INSTALLMENTS` + `validates :installment_count`), e o value object referencia a constante do model — nunca só no value object/service, senão dá pra criar registro inválido direto pelo model.
 - **Phlex, não ERB**: views são arquivos `.rb`, herdam de `ApplicationView` ou `ApplicationComponent`.
 - **Turbo Streams via concern, nunca inline no controller**: toda resposta Turbo padronizada vive num concern, não repetida em cada action. Dois padrões: (1) render parcial de view Phlex com totais — `RecordSaveResponse` (`turbo_success`/`turbo_error`/`turbo_render_list`); (2) fecha modal + refresh de página inteira (Turbo morphing) — `ModalRefreshResponse#respond_with_modal_refresh(html_redirect:)`, usado pela família de veículo/goals. Guard `before_action` compartilhado entre controllers da mesma família também vira concern (ex: `RequiresVehicle`). Nunca montar `render turbo_stream: [...]` à mão dentro de uma action.
 - **Monetário**: sempre `decimal(10,2)`, concern `MonetaryAmount` converte string de input.
@@ -191,8 +192,10 @@ app/services/
 ├── dashboard/   # StatsService, calculators, scope counters
 ├── ai/          # ParserService, ExpenseFromChat, SummaryBuilder, Tools/
 ├── chat/        # RecordPersister, ExpensePersister, EarningPersister
-└── expenses/    # Creator, InstallmentCreator, InstallmentPlan
+└── expenses/    # Creator, InstallmentCreator
 ```
+
+Value objects de domínio (sem persistência, sem efeito colateral, com invariante própria) vivem em `app/models/{domínio}/`, não em `app/services/`. Ex: `Expenses::InstallmentPlan` (`app/models/expenses/`).
 
 ## Modelos e enums
 

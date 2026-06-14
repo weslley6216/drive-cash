@@ -1,7 +1,5 @@
 module Expenses
   class InstallmentPlan
-    MAX_INSTALLMENTS = 60
-
     PERIOD_ADVANCE = {
       'weekly'   => ->(start, index) { start + index.weeks },
       'biweekly' => ->(start, index) { start + (2 * index).weeks },
@@ -20,7 +18,7 @@ module Expenses
     end
 
     def valid?
-      @count.between?(2, MAX_INSTALLMENTS) &&
+      @count.between?(2, Expense::MAX_INSTALLMENTS) &&
         Expense::INSTALLMENT_PERIODS.include?(@period) &&
         @total_amount.positive?
     end

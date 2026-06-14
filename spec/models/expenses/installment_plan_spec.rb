@@ -40,7 +40,7 @@ RSpec.describe Expenses::InstallmentPlan do
         total_amount: 600,
         start_date: '2026-01-10',
         period: 'monthly',
-        repetitions: described_class::MAX_INSTALLMENTS
+        repetitions: Expense::MAX_INSTALLMENTS
       )
 
       expect(plan.valid?).to be true
@@ -51,7 +51,7 @@ RSpec.describe Expenses::InstallmentPlan do
         total_amount: 600,
         start_date: '2026-01-10',
         period: 'monthly',
-        repetitions: described_class::MAX_INSTALLMENTS + 1
+        repetitions: Expense::MAX_INSTALLMENTS + 1
       )
 
       expect(plan.valid?).to be false

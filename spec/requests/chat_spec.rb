@@ -318,7 +318,7 @@ RSpec.describe 'Chats', type: :request do
             category: 'maintenance',
             date: '2026-06-05',
             vendor: 'Oficina',
-            installments: Expenses::InstallmentPlan::MAX_INSTALLMENTS + 1,
+            installments: Expense::MAX_INSTALLMENTS + 1,
             installments_period: 'monthly'
           }
         }

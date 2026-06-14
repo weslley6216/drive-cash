@@ -62,7 +62,7 @@ RSpec.describe Expenses::InstallmentCreator do
 
     it 'returns failure with max error when count exceeds MAX_INSTALLMENTS without creating rows' do
       expect {
-        @result = described_class.call(base, { period: 'monthly', repetitions: Expenses::InstallmentPlan::MAX_INSTALLMENTS + 1 }, user: user)
+        @result = described_class.call(base, { period: 'monthly', repetitions: Expense::MAX_INSTALLMENTS + 1 }, user: user)
       }.not_to change(Expense, :count)
 
       expect(@result.success?).to be(false)

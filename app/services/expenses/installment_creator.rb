@@ -58,7 +58,7 @@ module Expenses
     end
 
     def invalid_plan_i18n_key(plan)
-      if plan.count > InstallmentPlan::MAX_INSTALLMENTS
+      if plan.count > Expense::MAX_INSTALLMENTS
         'expenses.installments.errors.invalid_repeat_max'
       else
         'expenses.installments.errors.invalid_repeat'
