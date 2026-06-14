@@ -21,7 +21,7 @@ module Goals
       return nil unless goal
 
       base = base_progress(goal)
-      kind == 'weekly' ? base.merge(days: days_breakdown(goal)) : base.merge(projection_for(goal, base[:current]))
+      goal.kind_weekly? ? base.merge(days: days_breakdown(goal)) : base.merge(projection_for(goal, base[:current]))
     end
 
     def base_progress(goal)

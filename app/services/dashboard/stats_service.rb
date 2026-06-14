@@ -56,9 +56,13 @@ module Dashboard
     end
 
     def scoped(relation)
-      return relation unless through_month && !month
+      return relation unless year_to_date?
 
       relation.where('EXTRACT(MONTH FROM date) <= ?', through_month)
+    end
+
+    def year_to_date?
+      through_month.present? && month.nil?
     end
 
     def earnings_calculator

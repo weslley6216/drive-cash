@@ -92,19 +92,19 @@ module Analysis
     end
 
     def period_label_for(_pp)
-      ctx = @insights[:period_context]
-      return nil unless ctx
+      period_context = @insights[:period_context]
+      return nil unless period_context
 
-      if ctx[:mode] == :monthly
+      if period_context[:mode] == :monthly
         I18n.t('analysis.show_view.metrics.vs_period_monthly',
-               month: ctx[:previous_month_name],
-               year: ctx[:previous_year])
-      elsif ctx[:cutoff_month_name]
+               month: period_context[:previous_month_name],
+               year: period_context[:previous_year])
+      elsif period_context[:cutoff_month_name]
         I18n.t('analysis.show_view.metrics.vs_period_annual_ytd',
-               month: ctx[:cutoff_month_name],
-               year: ctx[:previous_year])
+               month: period_context[:cutoff_month_name],
+               year: period_context[:previous_year])
       else
-        I18n.t('analysis.show_view.metrics.vs_period_annual', year: ctx[:previous_year])
+        I18n.t('analysis.show_view.metrics.vs_period_annual', year: period_context[:previous_year])
       end
     end
 

@@ -1,5 +1,7 @@
 module Goals
   class AnnualBarComponent < ApplicationComponent
+    DAYS_PER_MONTH = 30
+
     def initialize(progress:)
       @progress = progress
     end
@@ -37,7 +39,7 @@ module Goals
     end
 
     def months_remaining
-      (@progress[:days_remaining].to_f / 30).round
+      (@progress[:days_remaining].to_f / DAYS_PER_MONTH).round
     end
   end
 end

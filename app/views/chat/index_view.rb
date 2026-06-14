@@ -68,14 +68,16 @@ module Chat
     end
 
     def render_history
-      @messages.each do |msg|
-        if msg[:role].to_s == 'user'
-          user_bubble(msg[:content])
+      @messages.each do |message|
+        if from_user?(message)
+          user_bubble(message[:content])
         else
-          ai_bubble(msg[:summary].presence || msg[:content])
+          ai_bubble(message[:summary].presence || message[:content])
         end
       end
     end
+
+    def from_user?(message) = message[:role].to_s == 'user'
 
     def user_bubble(text)
       div(class: 'flex justify-end') do
