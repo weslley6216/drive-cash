@@ -36,17 +36,16 @@ module Refuelings
     end
 
     def compute_averages_by_vendor
-      vendors = full_tank_scope.distinct.pluck(:vendor)
-      return {} if vendors.size < MIN_DISTINCT_VENDORS
+      readings_by_vendor = full_tank_scope.order(:vendor, :date, :created_at).to_a.group_by(&:vendor)
+      return {} if readings_by_vendor.size < MIN_DISTINCT_VENDORS
 
-      vendors.index_with { |vendor| average_kml_for(vendor) }.compact
+      readings_by_vendor.transform_values { |readings| average_kml_for(readings) }.compact
     end
 
-    def average_kml_for(vendor)
-      records = full_tank_scope.where(vendor: vendor).order(:date, :created_at).to_a
-      return nil if records.size < MIN_READINGS_PER_VENDOR
+    def average_kml_for(readings)
+      return nil if readings.size < MIN_READINGS_PER_VENDOR
 
-      ratios = records.each_cons(2).filter_map do |previous_one, current_one|
+      ratios = readings.each_cons(2).filter_map do |previous_one, current_one|
         delta_km = current_one.odometer_km - previous_one.odometer_km
         liters_value = current_one.liters.to_f
         next if delta_km <= 0 || liters_value.zero?
