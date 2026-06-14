@@ -33,6 +33,30 @@ RSpec.describe Llm::Adapters::Groq do
       end
     end
 
+    context 'when the text response leaks function syntax' do
+      before { allow(response_mock).to receive(:status).and_return(200) }
+
+      it 'strips XML-style function tags from the content' do
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{ 'message' => { 'content' => 'Hello <function name="test">body</function> world' } }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:content]).to eq('Hello  world')
+      end
+
+      it 'strips JSON-style field leaks from the content' do
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{ 'message' => { 'content' => 'Done. {"amount": 50.0} ok' } }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:content]).to eq('Done.  ok')
+      end
+    end
+
     context 'when the API returns a tool call' do
       before do
         allow(response_mock).to receive(:status).and_return(200)

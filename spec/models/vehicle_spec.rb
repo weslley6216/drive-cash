@@ -57,14 +57,6 @@ RSpec.describe Vehicle, type: :model do
     end
   end
 
-  describe '#display_name' do
-    it 'concatenates brand, model_name and year' do
-      vehicle = build(:vehicle, brand: 'Honda', vehicle_model: 'Civic', year: 2018)
-
-      expect(vehicle.display_name).to eq('Honda Civic · 2018')
-    end
-  end
-
   describe '#updated_days_ago' do
     it 'returns days since odometer was updated' do
       vehicle = build(:vehicle, odometer_updated_at: 3.days.ago)
