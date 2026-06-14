@@ -6,14 +6,14 @@ module Vehicles
       ok:      { color: '#10b981', badge_class: 'text-slate-500 bg-slate-100 border-slate-200', tint_class: '' }
     }.freeze
 
-    def initialize(maintenance:, progress:, km_until:, target:, status_key:, variant: :mobile)
-      @maintenance = maintenance
-      @progress = progress
-      @km_until = km_until
-      @target = target
+    def initialize(row:, variant: :mobile)
+      @maintenance = row.maintenance
+      @progress = row.progress
+      @km_until = row.km_until
+      @target = row.target
+      @status_key = row.status_key
       @variant = variant
-      @status_key = status_key
-      @style = STATUS_STYLES.fetch(status_key)
+      @style = STATUS_STYLES.fetch(@status_key)
     end
 
     def view_template

@@ -1,17 +1,14 @@
 class FilterComponent < ApplicationComponent
-  def initialize(selected_year:, selected_month:, available_years: [], compact: false, popover: false, action_path: nil)
+  def initialize(selected_year:, selected_month:, available_years: [], variant: :full, action_path: nil)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
-    @compact = compact
-    @popover = popover
+    @variant = variant
     @action_path = action_path
   end
 
   def view_template
-    return popover_view if @popover
-
-    @compact ? compact_view : full_view
+    send("#{@variant}_view")
   end
 
   private

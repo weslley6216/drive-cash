@@ -39,10 +39,10 @@ RSpec.describe Vehicles::MaintenanceService do
         result = described_class.new(user: user, date: reference_date).call
 
         maintenances = result[:maintenances]
-        expect(maintenances.map { |entry| entry[:maintenance] }).to eq([overdue, on_track])
-        expect(maintenances.first[:status_key]).to eq(:overdue)
-        expect(maintenances.first[:km_until]).to be_negative
-        expect(maintenances.last[:status_key]).to eq(:ok)
+        expect(maintenances.map(&:maintenance)).to eq([overdue, on_track])
+        expect(maintenances.first.status_key).to eq(:overdue)
+        expect(maintenances.first.km_until).to be_negative
+        expect(maintenances.last.status_key).to eq(:ok)
       end
 
       describe 'cheapest_vendor insight' do

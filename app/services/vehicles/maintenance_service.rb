@@ -1,5 +1,7 @@
 module Vehicles
   class MaintenanceService
+    Row = Data.define(:maintenance, :progress, :km_until, :target, :status_key)
+
     EMPTY_PAYLOAD = {
       vehicle: nil,
       odometer: { current_km: 0, km_this_month: 0, updated_days_ago: nil },
@@ -33,13 +35,13 @@ module Vehicles
 
     def build_maintenances(vehicle)
       vehicle.maintenances.includes(:vehicle).sort_by { |maintenance| -maintenance.progress }.map do |maintenance|
-        {
+        Row.new(
           maintenance: maintenance,
           progress: maintenance.progress,
           km_until: maintenance.km_until,
           target: maintenance.target,
           status_key: maintenance.status_key
-        }
+        )
       end
     end
 

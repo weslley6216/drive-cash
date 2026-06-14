@@ -3,9 +3,8 @@ module TurboUpdateResponse
 
   private
 
-  def render_turbo_streams(record:, edit_view:, record_key:, detail_service:, detail_view:)
+  def render_turbo_streams(record:, edit_view:, record_key:, detail:, detail_view:)
     if record.persisted? && @totals
-      detail = detail_service.new(year: @context[:year], month: @context[:month]).call
       modal_stream(detail_view.new(**detail, filters: @context))
       flash_stream('flash_modal', inline: true)
       raw '<turbo-stream action="refresh"></turbo-stream>'.html_safe

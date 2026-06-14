@@ -21,7 +21,7 @@ class EarningsController < ApplicationController
 
   def update
     if @earning.update(earning_attributes(:earning))
-      turbo_success(Earnings::UpdateView, earning: @earning)
+      turbo_success(Earnings::UpdateView, detail_service: Dashboard::EarningsDetailService, earning: @earning)
     else
       turbo_error(Earnings::UpdateView, earning: @earning)
     end

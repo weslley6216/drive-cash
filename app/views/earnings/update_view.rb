@@ -2,10 +2,11 @@ module Earnings
   class UpdateView < ApplicationView
     include TurboUpdateResponse
 
-    def initialize(earning:, totals:, context: {})
+    def initialize(earning:, totals:, context: {}, detail: nil)
       @earning = earning
       @totals = totals
       @context = context || {}
+      @detail = detail
     end
 
     def view_template
@@ -13,7 +14,7 @@ module Earnings
         record: @earning,
         edit_view: Earnings::EditView,
         record_key: :earning,
-        detail_service: Dashboard::EarningsDetailService,
+        detail: @detail,
         detail_view: Dashboard::EarningsDetailView
       )
     end

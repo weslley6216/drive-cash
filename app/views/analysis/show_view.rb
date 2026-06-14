@@ -55,7 +55,7 @@ module Analysis
           selected_year: @filters[:year],
           selected_month: @filters[:month],
           available_years: @filters[:available_years],
-          popover: true,
+          variant: :popover,
           action_path: helpers.analysis_path
         )
       end

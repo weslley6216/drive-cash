@@ -40,7 +40,7 @@ module Dashboard
             selected_year: @filters[:year],
             selected_month: @filters[:month],
             available_years: @filters[:available_years],
-            compact: true
+            variant: :compact
           )
           link_to(new_earning_path,
                   data: { turbo_frame: 'modal' },
@@ -60,17 +60,7 @@ module Dashboard
     def primary_grid
       div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
         div(id: 'hero_profit_card', class: 'lg:col-span-8') do
-          monthly_view = @filters[:month].present?
-          render HeroProfitCardComponent.new(
-            profit: @totals[:profit],
-            change_percent: @totals[:change_percent],
-            profit_per_day: @totals[:profit_per_day],
-            days_count: @totals[:days],
-            monthly_series: monthly_view ? @totals[:daily_profit_series] : @totals[:monthly_profit_series],
-            year: @filters[:year],
-            month: @filters[:month],
-            daily_mode: monthly_view
-          )
+          render HeroProfitCardComponent.new(hero: hero_payload)
         end
 
         div(class: 'lg:col-span-4 flex flex-col gap-4') do
@@ -78,6 +68,19 @@ module Dashboard
           div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
         end
       end
+    end
+
+    def hero_payload
+      monthly_view = @filters[:month].present?
+      HeroProfitCardComponent::Payload.new(
+        profit: @totals[:profit],
+        change_percent: @totals[:change_percent],
+        profit_per_day: @totals[:profit_per_day],
+        days_count: @totals[:days],
+        series: monthly_view ? @totals[:daily_profit_series] : @totals[:monthly_profit_series],
+        year: @filters[:year],
+        month: @filters[:month]
+      )
     end
 
     def monthly_goal_mobile_section

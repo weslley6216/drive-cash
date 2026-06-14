@@ -22,7 +22,7 @@ class ExpensesController < ApplicationController
 
   def update
     if @expense.update(expense_attributes(:expense))
-      turbo_success(Expenses::UpdateView, expense: @expense)
+      turbo_success(Expenses::UpdateView, detail_service: Dashboard::ExpensesDetailService, expense: @expense)
     else
       turbo_error(Expenses::UpdateView, expense: @expense)
     end

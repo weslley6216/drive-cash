@@ -1,18 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe HeroProfitCardComponent, type: :component do
-  let(:series) { [100.0, 200.0, -50.0, 300.0, 400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
-  let(:component) do
-    HeroProfitCardComponent.new(
+  def payload(**overrides)
+    defaults = {
       profit: 950.0,
       change_percent: 12.5,
       profit_per_day: 47.5,
       days_count: 20,
-      monthly_series: series,
+      series: [100.0, 200.0, -50.0, 300.0, 400.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
       year: 2025,
       month: nil
-    )
+    }
+    HeroProfitCardComponent::Payload.new(**defaults.merge(overrides))
   end
+
+  let(:component) { HeroProfitCardComponent.new(hero: payload) }
   let(:html) { view_context.render(component) }
 
   it 'renders a pastel blue card with rounded corners' do
@@ -30,10 +32,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'renders the month/year label when month is present' do
-    monthly = HeroProfitCardComponent.new(
-      profit: 500.0, change_percent: nil, profit_per_day: 25.0, days_count: 20,
-      monthly_series: series, year: 2025, month: 6
-    )
+    monthly = HeroProfitCardComponent.new(hero: payload(profit: 500.0, change_percent: nil, profit_per_day: 25.0, month: 6))
 
     month_name = I18n.t('date.month_names')[6]
     expect(view_context.render(monthly)).to include(
@@ -47,10 +46,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'renders negative change badge in red when change_percent is negative' do
-    negative = HeroProfitCardComponent.new(
-      profit: 100, change_percent: -8.0, profit_per_day: 5, days_count: 20,
-      monthly_series: series, year: 2025, month: 6
-    )
+    negative = HeroProfitCardComponent.new(hero: payload(profit: 100, change_percent: -8.0, profit_per_day: 5, month: 6))
 
     rendered = view_context.render(negative)
 
@@ -59,10 +55,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'does not render a change badge when change_percent is nil' do
-    no_change = HeroProfitCardComponent.new(
-      profit: 100, change_percent: nil, profit_per_day: 5, days_count: 20,
-      monthly_series: series, year: 2025, month: nil
-    )
+    no_change = HeroProfitCardComponent.new(hero: payload(profit: 100, change_percent: nil, profit_per_day: 5))
 
     rendered = view_context.render(no_change)
 
@@ -76,10 +69,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'renders zero-days message when days_count is zero' do
-    zero = HeroProfitCardComponent.new(
-      profit: 0, change_percent: nil, profit_per_day: 0, days_count: 0,
-      monthly_series: series, year: 2025, month: 6
-    )
+    zero = HeroProfitCardComponent.new(hero: payload(profit: 0, change_percent: nil, profit_per_day: 0, days_count: 0, month: 6))
 
     expect(view_context.render(zero)).to include(I18n.t('hero_profit_card_component.per_day_zero'))
   end
@@ -120,22 +110,17 @@ RSpec.describe HeroProfitCardComponent, type: :component do
   end
 
   it 'renders month labels trimming leading zeros' do
-    series_with_leading = [0.0, 0.0, 100.0, 200.0, 300.0]
-    comp = HeroProfitCardComponent.new(
-      profit: 600, change_percent: nil, profit_per_day: 30, days_count: 20,
-      monthly_series: series_with_leading, year: 2025, month: nil
-    )
+    comp = HeroProfitCardComponent.new(hero: payload(profit: 600, change_percent: nil, profit_per_day: 30, series: [0.0, 0.0, 100.0, 200.0, 300.0]))
+
     rendered = view_context.render(comp)
+
     expect(rendered).not_to include('>Jan<')
     expect(rendered).not_to include('>Fev<')
     expect(rendered).to include('Mar')
   end
 
   it 'omits the SVG path when all series values are zero' do
-    flat = HeroProfitCardComponent.new(
-      profit: 0, change_percent: nil, profit_per_day: 0, days_count: 0,
-      monthly_series: [0.0] * 12, year: 2025, month: nil
-    )
+    flat = HeroProfitCardComponent.new(hero: payload(profit: 0, change_percent: nil, profit_per_day: 0, days_count: 0, series: [0.0] * 12))
 
     expect(view_context.render(flat)).not_to include('<path')
   end
@@ -146,13 +131,10 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(html).to include('Mar')
   end
 
-  context 'when daily_mode: true' do
+  context 'when a month is selected (daily mode)' do
     let(:daily_series) { [0.0] * 9 + [400.0, 0.0, 80.0] + [0.0] * 19 }
     let(:component) do
-      HeroProfitCardComponent.new(
-        profit: 480, change_percent: nil, profit_per_day: 160, days_count: 2,
-        monthly_series: daily_series, year: 2025, month: 1, daily_mode: true
-      )
+      HeroProfitCardComponent.new(hero: payload(profit: 480, change_percent: nil, profit_per_day: 160, days_count: 2, series: daily_series, month: 1))
     end
     let(:html) { view_context.render(component) }
 

@@ -55,13 +55,13 @@ RSpec.describe FilterComponent, type: :component do
     end
   end
 
-  context 'when popover: true' do
+  context 'when variant: :popover' do
     let(:component) do
       FilterComponent.new(
         selected_year: 2025,
         selected_month: 3,
         available_years: available_years,
-        popover: true
+        variant: :popover
       )
     end
     let(:html) { view_context.render(component) }
@@ -116,7 +116,7 @@ RSpec.describe FilterComponent, type: :component do
         selected_year: 2025,
         selected_month: nil,
         available_years: available_years,
-        popover: true,
+        variant: :popover,
         action_path: '/analysis'
       )
 
@@ -128,13 +128,13 @@ RSpec.describe FilterComponent, type: :component do
     end
   end
 
-  context 'when compact: true' do
+  context 'when variant: :compact' do
     let(:component) do
       FilterComponent.new(
         selected_year: 2025,
         selected_month: 5,
         available_years: available_years,
-        compact: true
+        variant: :compact
       )
     end
     let(:html) { view_context.render(component) }
@@ -169,7 +169,7 @@ RSpec.describe FilterComponent, type: :component do
         selected_year: 2025,
         selected_month: nil,
         available_years: available_years,
-        compact: true,
+        variant: :compact,
         action_path: '/history'
       )
 

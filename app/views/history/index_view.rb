@@ -59,7 +59,7 @@ module History
           selected_year: @year,
           selected_month: @month,
           available_years: @available_years,
-          compact: true,
+          variant: :compact,
           action_path: history_path
         )
       end

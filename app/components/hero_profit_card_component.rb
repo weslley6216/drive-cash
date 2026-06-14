@@ -1,4 +1,6 @@
 class HeroProfitCardComponent < ApplicationComponent
+  Payload = Data.define(:profit, :change_percent, :profit_per_day, :days_count, :series, :year, :month)
+
   MOBILE_CHART_WIDTH  = 320
   MOBILE_CHART_HEIGHT = 70
 
@@ -7,15 +9,14 @@ class HeroProfitCardComponent < ApplicationComponent
 
   MONTHS_PT = %w[Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez].freeze
 
-  def initialize(profit:, change_percent:, profit_per_day:, days_count:, monthly_series:, year:, month: nil, daily_mode: false)
-    @profit = profit
-    @change_percent = change_percent
-    @profit_per_day = profit_per_day
-    @days_count = days_count
-    @series = (monthly_series || []).map(&:to_f)
-    @year = year
-    @month = month
-    @daily_mode = daily_mode
+  def initialize(hero:)
+    @profit = hero.profit
+    @change_percent = hero.change_percent
+    @profit_per_day = hero.profit_per_day
+    @days_count = hero.days_count
+    @series = (hero.series || []).map(&:to_f)
+    @year = hero.year
+    @month = hero.month
   end
 
   def view_template
@@ -128,8 +129,10 @@ class HeroProfitCardComponent < ApplicationComponent
     @leading_zeros_count ||= @series.take_while(&:zero?).size
   end
 
+  def daily_mode? = @month.present?
+
   def plot_values
-    @daily_mode ? @series : series_to_plot
+    daily_mode? ? @series : series_to_plot
   end
 
   def compute_points(width:, height:)
@@ -137,7 +140,7 @@ class HeroProfitCardComponent < ApplicationComponent
     return [] if values.empty?
 
     max = values.max
-    min = @daily_mode ? [values.min, 0].min : values.min
+    min = daily_mode? ? [values.min, 0].min : values.min
     range = (max - min).nonzero? || max.nonzero? || 1.0
     step = values.size <= 1 ? 0 : width.to_f / (values.size - 1)
 
@@ -182,7 +185,7 @@ class HeroProfitCardComponent < ApplicationComponent
   end
 
   def chart_labels
-    return [] if @daily_mode
+    return [] if daily_mode?
 
     MONTHS_PT[leading_zeros_count, series_to_plot.size] || []
   end

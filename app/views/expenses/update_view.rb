@@ -2,10 +2,11 @@ module Expenses
   class UpdateView < ApplicationView
     include TurboUpdateResponse
 
-    def initialize(expense:, totals:, context: {})
+    def initialize(expense:, totals:, context: {}, detail: nil)
       @expense = expense
       @totals = totals
       @context = context || {}
+      @detail = detail
     end
 
     def view_template
@@ -13,7 +14,7 @@ module Expenses
         record: @expense,
         edit_view: Expenses::EditView,
         record_key: :expense,
-        detail_service: Dashboard::ExpensesDetailService,
+        detail: @detail,
         detail_view: Dashboard::ExpensesDetailView
       )
     end

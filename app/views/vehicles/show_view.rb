@@ -101,7 +101,7 @@ module Vehicles
         if maintenances.empty?
           empty_row(t('vehicle.maintenances.empty'))
         else
-          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(**entry.merge(variant: variant)) }
+          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry, variant: variant) }
         end
         catalog_button(hidden: maintenances.size - shown.size)
       end
