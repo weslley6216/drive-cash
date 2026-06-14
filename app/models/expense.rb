@@ -1,8 +1,6 @@
 class Expense < ApplicationRecord
-  include MonetaryAmount
-  monetize :amount
+  include FinancialEntry
 
-  belongs_to :user
   has_one :refueling, dependent: :nullify
 
   CATEGORIES_BY_GROUP = {
@@ -26,30 +24,10 @@ class Expense < ApplicationRecord
 
   INSTALLMENT_PERIODS = %w[weekly biweekly monthly annual].freeze
 
-  validates :date, :amount, :category, presence: true
-  validates :amount, numericality: { greater_than: 0, allow_blank: true }
+  validates :category, presence: true
   validate :installment_fields_consistent
 
-  scope :chronological, -> { order(date: :desc, created_at: :desc) }
   scope :paid_only, -> { where(paid: true) }
-  scope :for_year, lambda { |year|
-    next all if year.blank?
-
-    start_of_year = Date.new(year.to_i, 1, 1)
-    where(date: start_of_year..start_of_year.end_of_year)
-  }
-
-  scope :for_month, lambda { |month|
-    next all if month.blank?
-
-    where('EXTRACT(MONTH FROM date) = ?', month)
-  }
-
-  scope :in_period, lambda { |year, month = nil|
-    relation = for_year(year)
-    month ? relation.for_month(month) : relation
-  }
-
   scope :paid_in_period, lambda { |year, month = nil|
     relation = paid_only.for_year(year)
     month ? relation.for_month(month) : relation
