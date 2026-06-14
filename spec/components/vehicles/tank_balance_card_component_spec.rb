@@ -36,6 +36,16 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       expect(html).to include(I18n.t('vehicle.tank.title'))
     end
 
+    it 'falls back to the tank title when the last fill has no liters' do
+      fill_without_liters = create(:refueling, liters: nil, vendor: 'Posto Geladão')
+
+      html = view_context.render(described_class.new(balance: 125, full: 260, last_fill: fill_without_liters))
+
+      expect(html).to include(I18n.t('vehicle.tank.status.ok'))
+      expect(html).to include(I18n.t('vehicle.tank.title'))
+      expect(html).not_to include('L ·')
+    end
+
     it 'renders the negative state with a minus sign' do
       html = view_context.render(described_class.new(balance: -40, full: 260, last_fill: fill))
 
