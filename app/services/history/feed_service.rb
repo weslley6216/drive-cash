@@ -1,6 +1,15 @@
 module History
   class FeedService
-    FILTERS = %w[all earnings expenses unpaid].freeze
+    Filter = Data.define(:earnings, :expense_scope)
+
+    FILTERS = {
+      'all'      => Filter.new(earnings: true,  expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
+      'earnings' => Filter.new(earnings: true,  expense_scope: nil),
+      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
+      'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) })
+    }.freeze
+
+    def self.filter_names = FILTERS.keys
 
     def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', limit: 100, user: Current.user)
       @year = year
@@ -39,9 +48,12 @@ module History
     end
 
     def filtered_expenses
-      base = filter == 'unpaid' ? @user.expenses.in_period(year, month).where(paid: false)
-                                : @user.expenses.paid_in_period(year, month)
+      base = filter_config.expense_scope.call(@user, year, month)
       search.expenses(base)
+    end
+
+    def filter_config
+      @filter_config ||= FILTERS.fetch(filter, FILTERS.fetch('all'))
     end
 
     def search
@@ -68,11 +80,11 @@ module History
     end
 
     def include_earnings?
-      %w[all earnings].include?(filter)
+      filter_config.earnings
     end
 
     def include_expenses?
-      %w[all expenses unpaid].include?(filter)
+      !filter_config.expense_scope.nil?
     end
 
     def build_group(date, day_items)

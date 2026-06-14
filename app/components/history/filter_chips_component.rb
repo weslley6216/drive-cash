@@ -1,6 +1,6 @@
 module History
   class FilterChipsComponent < ApplicationComponent
-    FILTERS = History::FeedService::FILTERS
+    FILTERS = History::FeedService.filter_names
 
     def initialize(current_filter:, query:, year: nil, month: nil)
       @current_filter = current_filter
