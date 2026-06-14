@@ -135,7 +135,7 @@ module Dashboard
       INSIGHT_RULES.filter_map { |rule| rule.new(insight_context).call }
                    .sort_by { |raw| SEVERITY_ORDER.fetch(raw[:severity], 99) }
                    .first(MAX_INSIGHTS)
-                   .map { |raw| Insights::Presenter.new(raw).call }
+                   .map { |raw| Insights::Presenters.present(raw) }
     end
   end
 end
