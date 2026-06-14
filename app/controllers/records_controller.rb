@@ -1,4 +1,6 @@
 class RecordsController < ApplicationController
+  CREATORS = { 'earning' => :create_earning, 'expense' => :create_expense }.freeze
+
   def new
     @type = (params[:type].presence || 'earning')
     @earning = Earning.new(date: Date.current)
@@ -13,11 +15,10 @@ class RecordsController < ApplicationController
   end
 
   def create
-    case params[:type]
-    when 'earning' then create_earning
-    when 'expense' then create_expense
-    else head :bad_request
-    end
+    creator = CREATORS[params[:type]]
+    return head :bad_request unless creator
+
+    send(creator)
   end
 
   private
