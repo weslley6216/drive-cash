@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   connect() {
     this.showHandler = () => this.show()
-    this.hideHandler = () => this.hide()
+    this.hideHandler = () => this.scheduleHide()
 
     document.addEventListener("turbo:submit-start", this.showHandler)
     document.addEventListener("turbo:before-visit", this.showHandler)
@@ -19,13 +19,20 @@ export default class extends Controller {
   }
 
   show() {
+    clearTimeout(this.hideTimeout)
     clearTimeout(this.safetyNet)
     this.element.classList.remove("hidden")
-    this.safetyNet = setTimeout(() => this.hide(), 5000)
+    this.safetyNet = setTimeout(() => this.forceHide(), 5000)
   }
 
-  hide() {
+  // Defer hiding so a turbo:before-visit following submit-end can cancel it
+  scheduleHide() {
+    this.hideTimeout = setTimeout(() => this.forceHide(), 80)
+  }
+
+  forceHide() {
     clearTimeout(this.safetyNet)
+    clearTimeout(this.hideTimeout)
     this.element.classList.add("hidden")
   }
 }
