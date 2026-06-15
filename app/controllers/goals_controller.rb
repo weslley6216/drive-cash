@@ -2,8 +2,12 @@ class GoalsController < ApplicationController
   before_action :find_goal, only: %i[edit update destroy]
 
   def index
-    progress = Goals::ProgressService.new(user: current_user).call
-    render Goals::IndexView.new(progress: progress, filters: dashboard_filters)
+    filters = dashboard_filters
+    reference_date = Date.new(filters[:year], filters[:month], 1).end_of_month
+    service = Goals::ProgressService.new(user: current_user, date: reference_date)
+    progress = service.call
+    past_monthly = service.past_goals('monthly')
+    render Goals::IndexView.new(progress: progress, filters: filters, past_monthly: past_monthly)
   end
 
   def new

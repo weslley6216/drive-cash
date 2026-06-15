@@ -4,6 +4,13 @@ pt-BR:
       title: "Metas"
       subtitle: "%{month_name} · %{year}"
       edit_aria: "Editar meta"
+      past_goals:
+        title: "Metas anteriores"
+        empty: "Nenhuma meta passada ainda."
+        target_label: "Alvo"
+        achieved_label: "Atingido"
+        achieved_yes: "✅ batida"
+        achieved_no: "❌ %{percent}%%"
       monthly:
         label: "Meta do mês"
         sublabel: "Lucro líquido"

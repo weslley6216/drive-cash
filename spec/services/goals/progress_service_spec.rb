@@ -168,4 +168,45 @@ RSpec.describe Goals::ProgressService do
       expect(result[:achievements].map { |badge| badge[:type] }).to include(:streak)
     end
   end
+
+  describe '#past_goals' do
+    let(:user) { create(:user) }
+    let(:reference_date) { Date.new(2026, 6, 30) }
+
+    it 'returns past goals of the kind sorted by recency with achievement flag' do
+      achieved_goal = create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+                             period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
+      missed_goal = create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+                           period_start: Date.new(2026, 5, 1), period_end: Date.new(2026, 5, 31))
+      create(:earning, user: user, date: Date.new(2026, 4, 15), amount: 6000)
+      create(:earning, user: user, date: Date.new(2026, 5, 10), amount: 3000)
+
+      result = described_class.new(user: user, date: reference_date).past_goals('monthly')
+
+      expect(result.map { |row| row[:goal] }).to eq([missed_goal, achieved_goal])
+      expect(result.find { |row| row[:goal] == achieved_goal }[:achieved]).to be(true)
+      expect(result.find { |row| row[:goal] == missed_goal }[:achieved]).to be(false)
+    end
+
+    it 'excludes goals whose period_end is greater than or equal to date' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+
+      result = described_class.new(user: user, date: reference_date).past_goals('monthly')
+
+      expect(result).to be_empty
+    end
+
+    it 'limits to the configured count' do
+      7.times do |offset|
+        month = Date.new(2025, 11, 1) + offset.months
+        create(:goal, user: user, kind: 'monthly', target_amount: 1000,
+               period_start: month.beginning_of_month, period_end: month.end_of_month)
+      end
+
+      result = described_class.new(user: user, date: reference_date).past_goals('monthly', limit: 3)
+
+      expect(result.size).to eq(3)
+    end
+  end
 end

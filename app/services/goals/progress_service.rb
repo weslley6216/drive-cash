@@ -16,7 +16,17 @@ module Goals
       }
     end
 
+    def past_goals(kind, limit: 12)
+      @user.goals.for_kind(kind).where('period_end < ?', @date)
+        .order(period_end: :desc).limit(limit)
+        .map { |goal| base_progress(goal).merge(achieved: metric_for(goal) >= goal.target_amount) }
+    end
+
     private
+
+    def metric_for(goal)
+      compute_metric_for_period(goal)
+    end
 
     def progress_for(kind)
       goal = @user.goals.for_kind(kind).active_at(@date).first
