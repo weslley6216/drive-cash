@@ -9,6 +9,47 @@ RSpec.describe 'Refuelings', type: :request do
     login_as(current_user)
   end
 
+  describe 'GET /refuelings' do
+    it 'renders the tank moves page with credits and debits' do
+      create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', full_tank: true,
+                         date: Date.new(2026, 6, 1), total_amount: 260)
+      create(:expense, user: current_user, category: 'fuel', amount: 45,
+                       date: Date.new(2026, 6, 5), description: 'Rota IFood')
+
+      get refuelings_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('vehicle.moves.page_title'))
+      expect(response.body).to include('Posto Orense')
+      expect(response.body).to include('Rota IFood')
+    end
+
+    it 'renders cadence when at least two full_tank refuelings exist' do
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 1), total_amount: 200)
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 11), total_amount: 200)
+
+      get refuelings_path
+
+      expect(response.body).to include(I18n.t('vehicle.moves.cadence', count: 10))
+    end
+
+    it 'renders the empty state when there are no moves' do
+      get refuelings_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(I18n.t('vehicle.moves.empty'))
+    end
+
+    it 'redirects to vehicle page when user has no vehicle' do
+      other = create(:user)
+      login_as(other)
+
+      get refuelings_path
+
+      expect(response).to redirect_to(vehicle_path)
+    end
+  end
+
   describe 'GET /refuelings/new' do
     it 'renders the modal form' do
       get new_refueling_path

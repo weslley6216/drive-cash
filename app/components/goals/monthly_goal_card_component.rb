@@ -28,9 +28,12 @@ module Goals
             render Goals::ProgressRingComponent.new(percent: @progress[:percent], size: 200, color: '#2563eb')
           end
           div(class: 'col-span-12 lg:col-span-5') do
-            div(class: 'flex items-center gap-2 text-blue-700 mb-2') do
-              render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
-              span(class: 'text-xs font-bold uppercase tracking-wider') { t('goals.index.monthly.label') }
+            div(class: 'flex items-center justify-between mb-2') do
+              div(class: 'flex items-center gap-2 text-blue-700') do
+                render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
+                span(class: 'text-xs font-bold uppercase tracking-wider') { t('goals.index.monthly.label') }
+              end
+              edit_link
             end
             p(class: 'text-4xl font-bold text-slate-900 tracking-tight tabular-nums') { format_currency(@progress[:current]) }
             p(class: 'text-sm text-slate-500 mt-1') { t('goals.index.monthly.of_target', target: format_currency(@progress[:target])) }
@@ -69,9 +72,21 @@ module Goals
             p(class: 'text-sm font-semibold text-slate-700') { I18n.l(@progress[:goal].period_start, format: '%B') }
           end
         end
-        span(class: 'text-xs font-medium text-slate-400') do
-          plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+        div(class: 'flex items-center gap-2') do
+          span(class: 'text-xs font-medium text-slate-400') do
+            plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+          end
+          edit_link
         end
+      end
+    end
+
+    def edit_link
+      link_to(helpers.edit_goal_path(@progress[:goal]),
+              class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+              aria_label: t('goals.index.edit_aria'),
+              data:       { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
       end
     end
 
@@ -87,6 +102,27 @@ module Goals
     end
 
     def projection_badge(mt: 'mt-3')
+      return reached_badge(mt) if @progress[:reached]
+      return tracking_badge(mt) if @progress[:tracking]
+
+      classic_projection_badge(mt)
+    end
+
+    def reached_badge(mt)
+      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-emerald-50 border-emerald-200 text-emerald-700") do
+        render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3', 'stroke-width': '2.5')
+        span(class: 'text-xs font-medium') { t('goals.index.monthly.reached', surplus: format_currency(@progress[:surplus])) }
+      end
+    end
+
+    def tracking_badge(mt)
+      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-slate-50 border-slate-200 text-slate-600") do
+        render PhlexIcons::Lucide::Clock.new(class: 'w-3 h-3', 'stroke-width': '2.5')
+        span(class: 'text-xs font-medium') { t('goals.index.monthly.tracking') }
+      end
+    end
+
+    def classic_projection_badge(mt)
       on_track = @progress[:on_track]
       key = on_track ? 'goals.index.monthly.on_track_projection' : 'goals.index.monthly.at_risk_projection'
       colors = on_track ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'
@@ -114,9 +150,7 @@ module Goals
     end
 
     def pace
-      goal = @progress[:goal]
-      total_days = (goal.period_end - goal.period_start).to_i + 1
-      total_days.zero? ? 0 : @progress[:current] / total_days
+      @progress[:daily_pace] || 0
     end
   end
 end

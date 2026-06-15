@@ -3,6 +3,14 @@ pt-BR:
     index:
       title: "Metas"
       subtitle: "%{month_name} · %{year}"
+      edit_aria: "Editar meta"
+      past_goals:
+        title: "Metas anteriores"
+        empty: "Nenhuma meta passada ainda."
+        target_label: "Alvo"
+        achieved_label: "Atingido"
+        achieved_yes: "✅ batida"
+        achieved_no: "❌ %{percent}%%"
       monthly:
         label: "Meta do mês"
         sublabel: "Lucro líquido"
@@ -15,6 +23,8 @@ pt-BR:
           other: "%{count} dias restantes"
         on_track_projection: "Vai bater · projeção %{value}"
         at_risk_projection: "Em risco · projeção %{value}"
+        reached: "✅ Meta batida · +%{surplus} acima da meta"
+        tracking: "Acompanhando…"
         remaining: "Faltam"
         per_day: "Por dia"
         current_pace: "Ritmo atual"

@@ -98,5 +98,27 @@ RSpec.describe Goals::IndexView, type: :component do
     it 'renders annual bar section' do
       expect(html).to include('width: 25%')
     end
+
+    it 'renders edit links for all visible goals' do
+      expect(html).to include("href=\"#{view_context.edit_goal_path(weekly_goal)}\"")
+    end
+  end
+
+  context 'when past monthly goals include a missed one' do
+    let(:missed_goal) do
+      create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+                    period_start: Date.new(2026, 5, 1), period_end: Date.new(2026, 5, 31))
+    end
+    let(:past_monthly) do
+      [{ goal: missed_goal, current: 3000, target: 5000, percent: 60, achieved: false }]
+    end
+    let(:progress) { { weekly: nil, monthly: nil, annual: nil, achievements: [] } }
+    let(:html) do
+      view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: past_monthly))
+    end
+
+    it 'renders the missed chip with percentage' do
+      expect(html).to include(I18n.t('goals.index.past_goals.achieved_no', percent: 60))
+    end
   end
 end

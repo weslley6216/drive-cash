@@ -40,6 +40,28 @@ RSpec.describe 'Goals', type: :request do
       expect(response.body).to include(I18n.t('goals.index.monthly.label'))
       expect(response.body).to include('R$ 1.500,00')
     end
+
+    it 'renders past monthly goals when they exist' do
+      travel_to Date.new(2026, 6, 15) do
+        create(:goal, user: current_user, kind: 'monthly', target_amount: 5000,
+               period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
+        create(:earning, user: current_user, date: Date.new(2026, 4, 15), amount: 6000)
+
+        get goals_path
+
+        expect(response.body).to include(I18n.t('goals.index.past_goals.title'))
+        expect(response.body).to include(I18n.t('goals.index.past_goals.achieved_yes'))
+      end
+    end
+
+    it 'renders the subtitle with the selected month and year' do
+      travel_to Date.new(2026, 6, 15) do
+        get goals_path, params: { year: 2026, month: 4 }
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(I18n.t('goals.index.subtitle', month_name: 'Abril', year: 2026))
+      end
+    end
   end
 
   describe 'GET /goals/new' do

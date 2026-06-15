@@ -1,10 +1,12 @@
 module Vehicles
   class TankBalanceCardComponent < ApplicationComponent
     STATUS_STYLES = {
-      negative: { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200' },
-      empty:    { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200' },
-      low:      { bar_class: 'bg-amber-500', num_class: 'text-amber-700', chip_class: 'text-amber-700 bg-amber-100 border-amber-200' },
-      ok:       { bar_class: 'bg-blue-500', num_class: 'text-slate-900', chip_class: 'text-blue-700 bg-blue-50 border-blue-200' }
+      negative: { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200', border_class: 'border-red-200' },
+      empty:    { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200', border_class: 'border-red-200' },
+      critical: { bar_class: 'bg-red-500', num_class: 'text-red-700', chip_class: 'text-red-700 bg-red-100 border-red-200', border_class: 'border-red-200' },
+      low:      { bar_class: 'bg-orange-500', num_class: 'text-orange-700', chip_class: 'text-orange-700 bg-orange-100 border-orange-200', border_class: 'border-orange-200' },
+      mid:      { bar_class: 'bg-amber-500', num_class: 'text-amber-700', chip_class: 'text-amber-700 bg-amber-100 border-amber-200', border_class: 'border-amber-200' },
+      ok:       { bar_class: 'bg-blue-500', num_class: 'text-slate-900', chip_class: 'text-blue-700 bg-blue-50 border-blue-200', border_class: 'border-slate-100' }
     }.freeze
 
     def initialize(balance:, full:, last_fill:, variant: :mobile)
@@ -28,16 +30,11 @@ module Vehicles
     private
 
     def danger?
-      %i[empty negative].include?(@status_key)
+      %i[empty negative critical].include?(@status_key)
     end
 
     def card_classes
-      border = if danger?
-                 'border-red-200'
-      else
-                 @status_key == :low ? 'border-amber-200' : 'border-slate-100'
-      end
-      "bg-white rounded-2xl border #{border} p-4"
+      "bg-white rounded-2xl border #{@style[:border_class]} p-4"
     end
 
     def header_row
@@ -83,6 +80,13 @@ module Vehicles
       div(class: 'h-2 bg-slate-100 rounded-full overflow-hidden mt-3') do
         div(class: "h-full rounded-full #{@style[:bar_class]}", style: "width: #{remain_pct}%")
       end
+      level_line
+    end
+
+    def level_line
+      key = @full.to_f.positive? ? 'vehicle.tank.level_label' : 'vehicle.tank.level_label_empty'
+      params = @full.to_f.positive? ? { percent: remain_pct, remaining: format_currency([@balance, 0].max) } : {}
+      p(class: 'text-[11px] text-slate-500 mt-1.5') { t(key, **params) }
     end
 
     def remain_pct
@@ -94,7 +98,7 @@ module Vehicles
     def note_line
       if @status_key == :ok
         p(class: 'text-xs mt-2.5 text-slate-500') { last_fill_text }
-      else
+      elsif I18n.exists?("vehicle.tank.note.#{@status_key}")
         p(class: "text-xs mt-2.5 #{@style[:num_class]}") { t("vehicle.tank.note.#{@status_key}") }
       end
     end

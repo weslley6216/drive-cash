@@ -16,6 +16,10 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
       percent:           25,
       projection:        3000,
       on_track:          false,
+      reached:           false,
+      tracking:          false,
+      surplus:           0,
+      daily_pace:        100,
       remaining_per_day: 300,
       days_remaining:    15
     }
@@ -79,6 +83,51 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
 
       expect(html).to include(I18n.t('goals.index.monthly.on_track_projection', value: 'R$ 7.000,00'))
       expect(html).to include('bg-emerald-50')
+    end
+  end
+
+  context 'when reached' do
+    let(:reached_progress) do
+      progress.merge(reached: true, surplus: 57.08, on_track: true,
+                     remaining_per_day: 0, current: 5057.08)
+    end
+
+    it 'shows the reached badge with surplus and emerald colors' do
+      html = view_context.render(described_class.new(progress: reached_progress))
+
+      expect(html).to include(I18n.t('goals.index.monthly.reached', surplus: 'R$ 57,08'))
+      expect(html).to include('bg-emerald-50')
+    end
+
+    it 'omits the projection text when reached' do
+      html = view_context.render(described_class.new(progress: reached_progress))
+
+      expect(html).not_to include(I18n.t('goals.index.monthly.on_track_projection', value: 'R$ 3.000,00'))
+    end
+  end
+
+  context 'when tracking (insufficient days)' do
+    let(:tracking_progress) { progress.merge(tracking: true, projection: nil) }
+
+    it 'shows the tracking placeholder' do
+      html = view_context.render(described_class.new(progress: tracking_progress))
+
+      expect(html).to include(I18n.t('goals.index.monthly.tracking'))
+    end
+  end
+
+  it 'uses daily_pace for the current_pace metric' do
+    html = view_context.render(described_class.new(progress: progress))
+
+    expect(html).to include('R$ 100,00')
+  end
+
+  context 'edit pencil' do
+    it 'renders an edit link pointing to edit_goal_path inside a modal frame' do
+      html = view_context.render(described_class.new(progress: progress))
+
+      expect(html).to include("href=\"#{view_context.edit_goal_path(goal)}\"")
+      expect(html).to include('turbo-frame="modal"')
     end
   end
 end

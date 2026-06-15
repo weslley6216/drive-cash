@@ -10,14 +10,17 @@ module Goals
       width = @progress[:percent].to_f.clamp(0, 100).round
 
       div(class: 'bg-white rounded-xl border border-slate-200 p-5') do
-        div(class: 'flex items-center gap-3 mb-4') do
-          div(class: 'w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600') do
-            render PhlexIcons::Lucide::Star.new(class: 'w-4 h-4')
+        div(class: 'flex items-center justify-between mb-4') do
+          div(class: 'flex items-center gap-3') do
+            div(class: 'w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600') do
+              render PhlexIcons::Lucide::Star.new(class: 'w-4 h-4')
+            end
+            div do
+              p(class: 'text-sm font-semibold text-slate-800') { t('goals.index.annual.label') }
+              p(class: 'text-xs text-slate-500') { year_label }
+            end
           end
-          div do
-            p(class: 'text-sm font-semibold text-slate-800') { t('goals.index.annual.label') }
-            p(class: 'text-xs text-slate-500') { year_label }
-          end
+          edit_link
         end
         p(class: 'text-2xl font-bold text-slate-900 tabular-nums') { format_currency(@progress[:current]) }
         p(class: 'text-xs text-slate-500 mt-0.5') { t('goals.index.annual.of_target', target: format_currency(@progress[:target])) }
@@ -32,6 +35,18 @@ module Goals
     end
 
     private
+
+    def edit_link
+      goal = @progress[:goal]
+      return unless goal
+
+      link_to(helpers.edit_goal_path(goal),
+              class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+              aria_label: t('goals.index.edit_aria'),
+              data:       { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
+      end
+    end
 
     def year_label
       goal = @progress[:goal]

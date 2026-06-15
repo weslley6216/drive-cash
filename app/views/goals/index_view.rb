@@ -1,8 +1,9 @@
 module Goals
   class IndexView < ApplicationComponent
-    def initialize(progress:, filters: {})
+    def initialize(progress:, filters: {}, past_monthly: [])
       @progress = progress
       @filters = filters
+      @past_monthly = past_monthly
     end
 
     def view_template
@@ -16,6 +17,8 @@ module Goals
         else
           render Goals::EmptyStateComponent.new
         end
+
+        past_goals_section
 
         turbo_frame_tag 'modal'
       end
@@ -90,8 +93,16 @@ module Goals
               end
             end
           end
-          span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full') do
-            plain "#{weekly[:percent].to_f.round(1)}%"
+          div(class: 'flex items-center gap-2') do
+            span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full') do
+              plain "#{weekly[:percent].to_f.round(1)}%"
+            end
+            link_to(helpers.edit_goal_path(goal),
+                    class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+                    aria_label: t('goals.index.edit_aria'),
+                    data:       { turbo_frame: 'modal' }) do
+              render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
+            end
           end
         end
         render Goals::WeeklyBarsComponent.new(days: weekly[:days], target: weekly[:target])
@@ -124,6 +135,55 @@ module Goals
       start_day = I18n.l(goal.period_start, format: '%-d')
       end_label = I18n.l(goal.period_end, format: t('goals.index.weekly.date_format'))
       t('goals.index.weekly.period_range', start: start_day, end: end_label)
+    end
+
+    def past_goals_section
+      div(class: 'mt-8') do
+        h2(class: 'text-lg font-semibold text-slate-800 mb-3') { t('goals.index.past_goals.title') }
+        if @past_monthly.empty?
+          div(class: 'bg-white rounded-2xl border border-slate-100 p-6 text-center text-sm text-slate-500') do
+            plain t('goals.index.past_goals.empty')
+          end
+        else
+          div(class: 'bg-white rounded-2xl border border-slate-100 overflow-hidden divide-y divide-slate-100') do
+            @past_monthly.each { |row| past_goal_row(row) }
+          end
+        end
+      end
+    end
+
+    def past_goal_row(row)
+      goal = row[:goal]
+      div(class: 'flex items-center justify-between gap-4 px-4 py-3') do
+        div(class: 'min-w-0') do
+          p(class: 'text-sm font-semibold text-slate-800') { I18n.l(goal.period_start, format: '%B %Y').capitalize }
+          p(class: 'text-xs text-slate-500') do
+            plain "#{t('goals.index.past_goals.target_label')} #{format_currency(goal.target_amount)} · "
+            plain "#{t('goals.index.past_goals.achieved_label')} #{format_currency(row[:current])}"
+          end
+        end
+        div(class: 'flex items-center gap-3') do
+          result_chip(row)
+          link_to(helpers.edit_goal_path(goal),
+                  class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500',
+                  aria_label: t('goals.index.edit_aria'),
+                  data:       { turbo_frame: 'modal' }) do
+            render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
+          end
+        end
+      end
+    end
+
+    def result_chip(row)
+      if row[:achieved]
+        span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full') do
+          t('goals.index.past_goals.achieved_yes')
+        end
+      else
+        span(class: 'text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded-full') do
+          t('goals.index.past_goals.achieved_no', percent: row[:percent].to_f.round(0))
+        end
+      end
     end
   end
 end

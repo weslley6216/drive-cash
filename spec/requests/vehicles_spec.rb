@@ -29,6 +29,13 @@ RSpec.describe 'Vehicles', type: :request do
         expect(response.body).to include(I18n.t('vehicle.tank.title'))
         expect(response.body).to include(I18n.t('vehicle.moves.title'))
       end
+
+      it 'points the moves view_all link to refuelings_path without modal frame' do
+        get vehicle_path
+
+        expect(response.body).to include("href=\"#{refuelings_path}\"")
+        expect(response.body).not_to match(/href="#{Regexp.escape(refuelings_path)}"[^>]*turbo-frame="modal"/)
+      end
     end
 
     context 'with maintenances, refuelings and insights' do
