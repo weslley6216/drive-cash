@@ -72,7 +72,7 @@ class LayoutComponent < ApplicationComponent
 
   def loading_overlay
     div(id:    'loading-overlay',
-        class: 'hidden fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm',
+        class: 'hidden fixed inset-0 lg:left-64 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm',
         data:  { turbo_permanent: true, controller: 'loading' }) do
       div(class: 'bg-white rounded-2xl shadow-xl p-6 flex items-center justify-center') do
         div(class: 'w-10 h-10 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')

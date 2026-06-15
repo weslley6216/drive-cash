@@ -44,3 +44,7 @@
     display: flex;
   }
 }
+
+input[type="search"]::-webkit-search-cancel-button {
+  cursor: pointer;
+}
