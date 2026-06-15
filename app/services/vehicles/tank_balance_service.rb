@@ -16,8 +16,7 @@ module Vehicles
 
       last_fill = vehicle.refuelings.full_tank.chronological.first
       full = last_fill&.total_amount
-      balance_anchor = last_fill&.date || anchor
-      balance = compute_balance(vehicle, balance_anchor)
+      balance = compute_balance(vehicle, anchor)
 
       {
         balance:    balance,

@@ -66,7 +66,7 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(moves.map { |move| move[:amount] }).to contain_exactly(260, -45)
   end
 
-  it 'uses the last full_tank as ceiling and only debits posterior to it' do
+  it 'accumulates all credits and debits and uses the last full_tank amount as the ceiling' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 200, full_tank: true, date: Date.new(2025, 12, 19))
@@ -77,7 +77,7 @@ RSpec.describe Vehicles::TankBalanceService do
     result = described_class.new(user: user).call
 
     expect(result[:full]).to eq(260)
-    expect(result[:balance]).to eq(230)
+    expect(result[:balance]).to eq(385)
   end
 
   it 'adds partial refuelings to the balance without resetting the ceiling' do
@@ -93,7 +93,7 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(result[:balance]).to eq(210)
   end
 
-  it 'ignores fuel expenses before the last full_tank date' do
+  it 'ignores fuel expenses before the first refueling anchor date' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))

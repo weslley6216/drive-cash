@@ -162,15 +162,7 @@ module Goals
             plain "#{t('goals.index.past_goals.achieved_label')} #{format_currency(row[:current])}"
           end
         end
-        div(class: 'flex items-center gap-3') do
-          result_chip(row)
-          link_to(helpers.edit_goal_path(goal),
-                  class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500',
-                  aria_label: t('goals.index.edit_aria'),
-                  data:       { turbo_frame: 'modal' }) do
-            render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
-          end
-        end
+        result_chip(row)
       end
     end
 
