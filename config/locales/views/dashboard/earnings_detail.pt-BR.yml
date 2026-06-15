@@ -12,4 +12,6 @@ pt-BR:
       close: "Fechar"
       back: "Voltar"
       delete: "Excluir receita"
-      confirm_delete: "Tem certeza que deseja excluir esta receita?"
+      confirm_delete: "Excluir receita?"
+      confirm_delete_description: "Essa ação não poderá ser desfeita."
+      confirm_delete_cancel: "Cancelar"

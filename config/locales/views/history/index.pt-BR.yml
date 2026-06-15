@@ -4,6 +4,7 @@ pt-BR:
       title: "Histórico"
       subtitle: "Todos os lançamentos"
       search_placeholder: "Buscar por descrição, posto, plataforma..."
+      search_clear: "Limpar busca"
       filters:
         all: "Todos"
         earnings: "Receitas"

@@ -50,6 +50,6 @@ RSpec.describe History::IndexView, type: :component do
   end
 
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
-    expect(html).to include('<turbo-frame id="page">')
+    expect(html).to include('id="page"')
   end
 end

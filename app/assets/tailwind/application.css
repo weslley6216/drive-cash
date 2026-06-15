@@ -22,6 +22,25 @@
   }
 
   .animate-slide-up {
-    animation: slide-up 0.25s ease-out both;
+    animation: slide-up 0.25s ease-out backwards;
+  }
+
+  .feed-loading-region {
+    position: relative;
+  }
+
+  .feed-loading-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(248, 250, 252, 0.75);
+    backdrop-filter: blur(1px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  turbo-frame#page[busy] .feed-loading-overlay {
+    display: flex;
   }
 }

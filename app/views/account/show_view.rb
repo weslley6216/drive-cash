@@ -26,11 +26,8 @@ class Account::ShowView < ApplicationView
 
   def view_template
     render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-      div(data: { controller: 'logout-confirm' }) do
-        mobile_layout
-        desktop_layout
-        logout_overlay
-      end
+      mobile_layout
+      desktop_layout
     end
   end
 
@@ -44,7 +41,7 @@ class Account::ShowView < ApplicationView
       div(class: 'px-5 pb-10 space-y-5') do
         profile_card_mobile
         GROUPS.each { |group| group_block_mobile(group) }
-        sign_out_button_mobile
+        sign_out_block_mobile
         p(class: 'text-center text-[11px] text-slate-400') { t('.version_label', version: APP_VERSION) }
       end
     end
@@ -135,14 +132,16 @@ class Account::ShowView < ApplicationView
     end
   end
 
-  def sign_out_button_mobile
-    button(
-      type:  'button',
-      class: 'w-full flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 rounded-2xl py-3.5 text-sm font-semibold shadow-sm cursor-pointer',
-      data:  { action: 'click->logout-confirm#open' }
-    ) do
-      render PhlexIcons::Lucide::LogOut.new(class: 'w-[18px] h-[18px]')
-      plain t('.sign_out_button')
+  def sign_out_block_mobile
+    render ConfirmActionComponent.new(**logout_component_options) do
+      button(
+        type:  'button',
+        class: 'w-full flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 rounded-2xl py-3.5 text-sm font-semibold shadow-sm cursor-pointer',
+        data:  { action: 'click->confirm-action#open' }
+      ) do
+        render PhlexIcons::Lucide::LogOut.new(class: 'w-[18px] h-[18px]')
+        plain t('.sign_out_button')
+      end
     end
   end
 
@@ -152,78 +151,29 @@ class Account::ShowView < ApplicationView
         p(class: 'text-sm font-semibold text-slate-800') { t('.session_label') }
         p(class: 'text-xs text-slate-500 mt-0.5') { t('.session_description') }
       end
-      button(
-        type:  'button',
-        class: 'flex items-center gap-2 bg-white border border-red-200 text-red-600 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-red-50 cursor-pointer',
-        data:  { action: 'click->logout-confirm#open' }
-      ) do
-        render PhlexIcons::Lucide::LogOut.new(class: 'w-4 h-4')
-        plain t('.sign_out_short')
-      end
-    end
-  end
-
-  def logout_overlay
-    div(
-      class: 'fixed inset-0 z-40 hidden',
-      data:  { 'logout-confirm-target': 'overlay' }
-    ) do
-      div(class: 'absolute inset-0 bg-slate-900/40', data: { action: 'click->logout-confirm#dismiss' })
-      logout_sheet_mobile
-      logout_modal_desktop
-    end
-  end
-
-  def logout_sheet_mobile
-    div(class: 'absolute left-0 right-0 bottom-0 bg-white rounded-t-3xl px-6 pt-3 pb-9 shadow-2xl lg:hidden') do
-      div(class: 'w-10 h-1 rounded-full bg-slate-200 mx-auto mb-5')
-      div(class: 'w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto') do
-        render PhlexIcons::Lucide::LogOut.new(class: 'w-6 h-6')
-      end
-      h2(class: 'text-xl font-bold text-slate-900 text-center mt-4') { t('.logout_modal.headline') }
-      p(class: 'text-sm text-slate-500 text-center mt-2 leading-relaxed') { t('.logout_modal.description') }
-      logout_buttons('w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold cursor-pointer', 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold mt-2.5 cursor-pointer')
-    end
-  end
-
-  def logout_modal_desktop
-    div(class: 'absolute inset-0 hidden lg:flex items-center justify-center p-8') do
-      div(class: 'bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6') do
-        div(class: 'w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center') do
-          render PhlexIcons::Lucide::LogOut.new(class: 'w-6 h-6')
-        end
-        h2(class: 'text-xl font-bold text-slate-900 mt-4') { t('.logout_modal.headline') }
-        p(class: 'text-sm text-slate-500 mt-2 leading-relaxed') { t('.logout_modal.description') }
-        div(class: 'flex items-center justify-end gap-3 mt-6') do
-          button(
-            type:  'button',
-            class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
-            data:  { action: 'click->logout-confirm#dismiss' }
-          ) { t('.logout_modal.cancel') }
-          inline_logout_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer', t('.logout_modal.confirm'))
+      render ConfirmActionComponent.new(**logout_component_options) do
+        button(
+          type:  'button',
+          class: 'flex items-center gap-2 bg-white border border-red-200 text-red-600 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-red-50 cursor-pointer',
+          data:  { action: 'click->confirm-action#open' }
+        ) do
+          render PhlexIcons::Lucide::LogOut.new(class: 'w-4 h-4')
+          plain t('.sign_out_short')
         end
       end
     end
   end
 
-  def logout_buttons(confirm_class, cancel_class)
-    div(class: 'space-y-2.5 mt-6') do
-      inline_logout_form(confirm_class, t('.logout_modal.confirm'))
-      button(
-        type:  'button',
-        class: cancel_class,
-        data:  { action: 'click->logout-confirm#dismiss' }
-      ) { t('.logout_modal.cancel') }
-    end
-  end
-
-  def inline_logout_form(button_class, label)
-    raw helpers.button_to(
-      label,
-      helpers.session_path,
-      method: :delete,
-      form:   { data: { turbo: false } },
-      class:  button_class
-    ).to_s
+  def logout_component_options
+    {
+      title:          t('.logout_modal.headline'),
+      icon:           PhlexIcons::Lucide::LogOut,
+      confirm_path:   helpers.session_path,
+      confirm_method: :delete,
+      confirm_label:  t('.logout_modal.confirm'),
+      cancel_label:   t('.logout_modal.cancel'),
+      description:    t('.logout_modal.description'),
+      turbo:          false
+    }
   end
 end

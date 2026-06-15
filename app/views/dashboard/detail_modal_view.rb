@@ -58,15 +58,25 @@ module Dashboard
       ) do
         render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
       end
-      link_to(
-        delete_path,
-        data:       { turbo_method: :delete, turbo_confirm: labels[:confirm] },
-        class:      'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
-        form:       { class: 'contents' },
-        aria_label: labels[:delete],
-        title:      labels[:delete]
+
+      render ConfirmActionComponent.new(
+        title:          labels[:confirm],
+        icon:           PhlexIcons::Lucide::Trash2,
+        confirm_path:   delete_path,
+        confirm_method: :delete,
+        confirm_label:  labels[:delete],
+        cancel_label:   labels[:cancel],
+        description:    labels[:description]
       ) do
-        render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
+        button(
+          type:       'button',
+          class:      'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
+          data:       { action: 'click->confirm-action#open' },
+          aria_label: labels[:delete],
+          title:      labels[:delete]
+        ) do
+          render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
+        end
       end
     end
 

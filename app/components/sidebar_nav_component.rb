@@ -79,13 +79,22 @@ class SidebarNavComponent < ApplicationComponent
         span { I18n.t('sidebar_nav_component.settings') }
       end
 
-      raw helpers.button_to(
-        I18n.t('sessions.sign_out'),
-        helpers.session_path,
-        method: :delete,
-        form:   { data: { turbo_confirm: I18n.t('sessions.sign_out') } },
-        class:  'w-full text-left px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-      )
+      render ConfirmActionComponent.new(
+        title:          I18n.t('account.show_view.logout_modal.headline'),
+        icon:           PhlexIcons::Lucide::LogOut,
+        confirm_path:   helpers.session_path,
+        confirm_method: :delete,
+        confirm_label:  I18n.t('account.show_view.logout_modal.confirm'),
+        cancel_label:   I18n.t('account.show_view.logout_modal.cancel'),
+        description:    I18n.t('account.show_view.logout_modal.description'),
+        turbo:          false
+      ) do
+        button(
+          type:  'button',
+          class: 'w-full cursor-pointer text-left px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900',
+          data:  { action: 'click->confirm-action#open' }
+        ) { plain I18n.t('sessions.sign_out') }
+      end
     end
   end
 end

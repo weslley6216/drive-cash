@@ -16,11 +16,11 @@ module History
         sidebar_nav: :history,
         app_shell:   true
       ) do
-        turbo_frame_tag 'page' do
+        turbo_frame_tag 'page', class: 'flex-1 flex flex-col min-h-0' do
           div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
-          pinned_header
-          feed_scroll_region
+          static_header
+          filterable_region
 
           render FabComponent.new(filters: filter_context, bottom_nav: true)
         end
@@ -30,22 +30,25 @@ module History
 
     private
 
-    def pinned_header
+    def static_header
       div(class: 'flex-none px-4 sm:px-6 pt-4 space-y-4') do
         header_section
         render History::PeriodSummaryComponent.new(summary: @feed[:summary])
-        div do
-          render History::SearchBarComponent.new(query: @query, filter: @filter)
-          div(class: 'mt-3') do
-            render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
-          end
-        end
       end
     end
 
-    def feed_scroll_region
-      div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
-        feed_section
+    def filterable_region
+      div(class: 'feed-loading-region flex-1 flex flex-col min-h-0') do
+        div(class: 'feed-loading-overlay') do
+          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+        end
+        div(class: 'flex-none px-4 sm:px-6 pt-4 pb-2 space-y-3') do
+          render History::SearchBarComponent.new(query: @query, filter: @filter)
+          render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
+        end
+        div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
+          feed_section
+        end
       end
     end
 

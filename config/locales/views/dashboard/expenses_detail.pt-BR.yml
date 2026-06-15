@@ -14,5 +14,7 @@ pt-BR:
       close: "Fechar"
       back: "Voltar"
       delete: "Excluir despesa"
-      confirm_delete: "Tem certeza que deseja excluir esta despesa?"
+      confirm_delete: "Excluir despesa?"
+      confirm_delete_description: "Essa ação não poderá ser desfeita."
+      confirm_delete_cancel: "Cancelar"
       installment_of: "Parcela %{current} de %{total}"

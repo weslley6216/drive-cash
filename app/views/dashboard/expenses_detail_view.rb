@@ -81,7 +81,7 @@ module Dashboard
                       edit_path:   edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: expense_path(expense, context: @filters),
                       edit_hover:  'hover:text-red-600',
-                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete') }
+                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description'), cancel: t('.confirm_delete_cancel') }
                     )
                   end
                 end
