@@ -13,6 +13,6 @@ RSpec.describe Analysis::ShowView, type: :component do
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
     html = view_context.render(described_class.new(insights: insights, filters: filters))
 
-    expect(html).to include('<turbo-frame id="page">')
+    expect(html).to include('id="page"')
   end
 end

@@ -44,8 +44,13 @@ module History
     end
 
     def feed_scroll_region
-      div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
-        feed_section
+      div(class: 'feed-loading-region flex-1 flex flex-col min-h-0') do
+        div(class: 'feed-loading-overlay') do
+          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+        end
+        div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
+          feed_section
+        end
       end
     end
 
