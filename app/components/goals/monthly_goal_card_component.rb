@@ -87,6 +87,27 @@ module Goals
     end
 
     def projection_badge(mt: 'mt-3')
+      return reached_badge(mt) if @progress[:reached]
+      return tracking_badge(mt) if @progress[:tracking]
+
+      classic_projection_badge(mt)
+    end
+
+    def reached_badge(mt)
+      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-emerald-50 border-emerald-200 text-emerald-700") do
+        render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3', 'stroke-width': '2.5')
+        span(class: 'text-xs font-medium') { t('goals.index.monthly.reached', surplus: format_currency(@progress[:surplus])) }
+      end
+    end
+
+    def tracking_badge(mt)
+      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-slate-50 border-slate-200 text-slate-600") do
+        render PhlexIcons::Lucide::Clock.new(class: 'w-3 h-3', 'stroke-width': '2.5')
+        span(class: 'text-xs font-medium') { t('goals.index.monthly.tracking') }
+      end
+    end
+
+    def classic_projection_badge(mt)
       on_track = @progress[:on_track]
       key = on_track ? 'goals.index.monthly.on_track_projection' : 'goals.index.monthly.at_risk_projection'
       colors = on_track ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'
@@ -114,9 +135,7 @@ module Goals
     end
 
     def pace
-      goal = @progress[:goal]
-      total_days = (goal.period_end - goal.period_start).to_i + 1
-      total_days.zero? ? 0 : @progress[:current] / total_days
+      @progress[:daily_pace] || 0
     end
   end
 end
