@@ -41,6 +41,17 @@ RSpec.describe 'Goals', type: :request do
       expect(response.body).to include('R$ 1.500,00')
     end
 
+    it 'uses Date.current as reference so days_remaining reflects today, not end of month' do
+      travel_to Date.new(2026, 6, 15) do
+        create(:goal, user: current_user, kind: 'monthly', target_amount: 6000,
+               period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+
+        get goals_path
+
+        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 15))
+      end
+    end
+
     it 'renders past monthly goals when they exist' do
       travel_to Date.new(2026, 6, 15) do
         create(:goal, user: current_user, kind: 'monthly', target_amount: 5000,

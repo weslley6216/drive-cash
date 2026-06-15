@@ -3,7 +3,8 @@ class GoalsController < ApplicationController
 
   def index
     filters = dashboard_filters
-    reference_date = Date.new(filters[:year], filters[:month], 1).end_of_month
+    first_day = Date.new(filters[:year], filters[:month], 1)
+    reference_date = Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day.end_of_month
     service = Goals::ProgressService.new(user: current_user, date: reference_date)
     progress = service.call
     past_monthly = service.past_goals('monthly')
