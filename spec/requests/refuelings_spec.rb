@@ -24,6 +24,15 @@ RSpec.describe 'Refuelings', type: :request do
       expect(response.body).to include('Rota IFood')
     end
 
+    it 'renders cadence when at least two full_tank refuelings exist' do
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 1), total_amount: 200)
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 11), total_amount: 200)
+
+      get refuelings_path
+
+      expect(response.body).to include(I18n.t('vehicle.moves.cadence', count: 10))
+    end
+
     it 'renders the empty state when there are no moves' do
       get refuelings_path
 
