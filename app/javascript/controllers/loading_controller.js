@@ -2,7 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
-    this.showHandler = () => this.show()
+    this.showHandler = (event) => {
+      if (event.type === "turbo:submit-start" && event.target.closest("turbo-frame")?.id === "page") return
+      this.show()
+    }
     this.hideHandler = () => this.scheduleHide()
 
     document.addEventListener("turbo:submit-start", this.showHandler)
