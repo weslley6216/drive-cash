@@ -310,14 +310,20 @@ pt-BR:
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
       last_fill: "Último tanque cheio · %{date} · %{vendor}"
       status:
-        ok: "No tanque"
-        low: "Saldo baixo"
+        ok: "Tanque cheio"
+        mid: "Meio tanque"
+        low: "Reserva"
+        critical: "Crítico"
         empty: "Tanque vazio"
         negative: "No vermelho"
       note:
+        mid: "Metade do tanque restante."
         low: "Tanque acabando — considere completar."
+        critical: "Reserva crítica — abasteça em breve."
         empty: "Saldo zerado — registre um abastecimento."
         negative: "Você rodou além do último tanque. Abasteça para zerar."
+      level_label: "Nível do tanque · %{percent}%% · ~%{remaining} até vazio"
+      level_label_empty: "Nível do tanque · sem teto definido"
     maintenances:
       title: "Próximas manutenções"
       by_km: "por km rodado"
