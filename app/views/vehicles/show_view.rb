@@ -123,7 +123,7 @@ module Vehicles
       div do
         div(class: 'flex items-center justify-between mb-2 px-1') do
           h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.moves.title') }
-          link_to(t('vehicle.moves.view_all'), helpers.new_refueling_path, class: 'text-xs font-medium text-blue-600', data: { turbo_frame: 'modal' })
+          link_to(t('vehicle.moves.view_all'), helpers.refuelings_path, class: 'text-xs font-medium text-blue-600')
         end
         moves_card
         p(class: 'text-[11px] text-slate-400 mt-1.5 px-1') { t('vehicle.moves.auto_debit') }
