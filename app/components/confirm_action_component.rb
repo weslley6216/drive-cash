@@ -35,13 +35,15 @@ class ConfirmActionComponent < ApplicationComponent
       icon_circle(centered: true)
       h2(class: 'text-xl font-bold text-slate-900 text-center mt-4') { @title }
       p(class: 'text-sm text-slate-500 text-center mt-2 leading-relaxed') { @description } if @description
-      div(class: 'space-y-2.5 mt-6') do
-        confirm_form('w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold cursor-pointer')
-        button(
-          type:  'button',
-          class: 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold cursor-pointer',
-          data:  { action: 'click->confirm-action#dismiss' }
-        ) { @cancel_label }
+      action_form do
+        div(class: 'space-y-2.5 mt-6') do
+          button(type: 'submit', class: 'w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold cursor-pointer') { @confirm_label }
+          button(
+            type:  'button',
+            class: 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold cursor-pointer',
+            data:  { action: 'click->confirm-action#dismiss' }
+          ) { @cancel_label }
+        end
       end
     end
   end
@@ -53,13 +55,18 @@ class ConfirmActionComponent < ApplicationComponent
         icon_circle(centered: false)
         h2(class: 'text-xl font-bold text-slate-900 mt-4') { @title }
         p(class: 'text-sm text-slate-500 mt-2 leading-relaxed') { @description } if @description
-        div(class: 'flex items-center justify-end gap-3 mt-6') do
-          button(
-            type:  'button',
-            class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
-            data:  { action: 'click->confirm-action#dismiss' }
-          ) { @cancel_label }
-          desktop_confirm_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer')
+        action_form do
+          div(class: 'flex items-center justify-end gap-3 mt-6') do
+            button(
+              type:  'button',
+              class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
+              data:  { action: 'click->confirm-action#dismiss' }
+            ) { @cancel_label }
+            button(type: 'submit', class: 'px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer') do
+              render @icon.new(class: 'w-4 h-4')
+              plain @confirm_label
+            end
+          end
         end
       end
     end
@@ -81,24 +88,14 @@ class ConfirmActionComponent < ApplicationComponent
     end
   end
 
-  def confirm_form(button_class)
-    form_options = { class: 'contents' }
-    form_options[:data] = { turbo: false } unless @turbo
-    raw helpers.button_to(@confirm_label, @confirm_path, method: @confirm_method,
-                          form: form_options, class: button_class)
-  end
-
-  def desktop_confirm_form(button_class)
-    form_attrs = { action: @confirm_path, method: 'post', class: 'contents' }
-    form_attrs[:data] = { turbo: false } unless @turbo
+  def action_form(&block)
+    form_attrs = { action: @confirm_path, method: 'post' }
+    form_attrs[:data] = { turbo: 'false' } unless @turbo
 
     form(**form_attrs) do
       input(type: 'hidden', name: 'authenticity_token', value: helpers.form_authenticity_token, autocomplete: 'off')
       input(type: 'hidden', name: '_method', value: @confirm_method.to_s, autocomplete: 'off') unless @confirm_method == :post
-      button(type: 'submit', class: button_class) do
-        render @icon.new(class: 'w-4 h-4')
-        plain @confirm_label
-      end
+      yield
     end
   end
 end
