@@ -23,7 +23,7 @@ class ConfirmActionComponent < ApplicationComponent
 
   def overlay
     div(class: 'fixed inset-0 z-[60] hidden', data: { 'confirm-action-target': 'overlay' }) do
-      div(class: 'absolute inset-0 bg-slate-900/40', data: { action: 'click->confirm-action#dismiss' })
+      div(class: 'absolute inset-0 bg-slate-900/40 lg:hidden', data: { action: 'click->confirm-action#dismiss' })
       mobile_sheet
       desktop_modal
     end
@@ -48,7 +48,8 @@ class ConfirmActionComponent < ApplicationComponent
 
   def desktop_modal
     div(class: 'absolute inset-0 hidden lg:flex items-center justify-center p-8') do
-      div(class: 'bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6') do
+      div(class: 'absolute inset-0 bg-black/30', data: { action: 'click->confirm-action#dismiss' })
+      div(class: 'relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6') do
         icon_circle(centered: false)
         h2(class: 'text-xl font-bold text-slate-900 mt-4') { @title }
         p(class: 'text-sm text-slate-500 mt-2 leading-relaxed') { @description } if @description
@@ -58,7 +59,7 @@ class ConfirmActionComponent < ApplicationComponent
             class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
             data:  { action: 'click->confirm-action#dismiss' }
           ) { @cancel_label }
-          confirm_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer')
+          desktop_confirm_form('px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer')
         end
       end
     end
@@ -85,5 +86,19 @@ class ConfirmActionComponent < ApplicationComponent
     form_options[:data] = { turbo: false } unless @turbo
     raw helpers.button_to(@confirm_label, @confirm_path, method: @confirm_method,
                           form: form_options, class: button_class)
+  end
+
+  def desktop_confirm_form(button_class)
+    form_attrs = { action: @confirm_path, method: 'post', class: 'contents' }
+    form_attrs[:data] = { turbo: false } unless @turbo
+
+    form(**form_attrs) do
+      input(type: 'hidden', name: 'authenticity_token', value: helpers.form_authenticity_token, autocomplete: 'off')
+      input(type: 'hidden', name: '_method', value: @confirm_method.to_s, autocomplete: 'off') unless @confirm_method == :post
+      button(type: 'submit', class: button_class) do
+        render @icon.new(class: 'w-4 h-4')
+        plain @confirm_label
+      end
+    end
   end
 end

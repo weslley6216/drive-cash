@@ -116,6 +116,33 @@ RSpec.describe ConfirmActionComponent, type: :component do
     end
   end
 
+  it 'renders the desktop backdrop with bg-black/30' do
+    expect(html).to include('bg-black/30')
+  end
+
+  it 'renders the desktop confirm button with the icon' do
+    expect(html).to include('w-4 h-4')
+  end
+
+  context 'when confirm_method is :post' do
+    let(:html) do
+      view_context.render(
+        described_class.new(
+          title:          'Confirmar',
+          icon:           PhlexIcons::Lucide::Check,
+          confirm_path:   '/something',
+          confirm_method: :post,
+          confirm_label:  'Confirmar',
+          cancel_label:   'Cancelar'
+        )
+      )
+    end
+
+    it 'does not render any _method hidden input' do
+      expect(html).not_to include('name="_method"')
+    end
+  end
+
   context 'when turbo is disabled' do
     let(:html) do
       view_context.render(

@@ -65,7 +65,8 @@ module Dashboard
         confirm_path:   delete_path,
         confirm_method: :delete,
         confirm_label:  labels[:delete],
-        cancel_label:   t('ui.cancel')
+        cancel_label:   t('ui.cancel'),
+        description:    labels[:description]
       ) do
         button(
           type:       'button',
