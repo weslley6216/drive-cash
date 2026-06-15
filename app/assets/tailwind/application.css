@@ -22,7 +22,7 @@
   }
 
   .animate-slide-up {
-    animation: slide-up 0.25s ease-out both;
+    animation: slide-up 0.25s ease-out backwards;
   }
 
   .feed-loading-region {

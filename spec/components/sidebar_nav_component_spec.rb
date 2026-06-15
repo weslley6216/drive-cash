@@ -55,6 +55,12 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('href="/vehicle"')
     end
 
+    it 'renders the sign-out button with confirm-action controller' do
+      expect(html).to include(I18n.t('sessions.sign_out'))
+      expect(html).to include('data-controller="confirm-action"')
+      expect(html).to include('data-action="click->confirm-action#open"')
+    end
+
     it 'marks the nav as turbo-permanent with a stable id' do
       expect(html).to include('id="sidebar-nav"')
       expect(html).to include('data-turbo-permanent')
