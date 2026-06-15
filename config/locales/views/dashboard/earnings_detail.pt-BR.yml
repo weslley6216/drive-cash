@@ -14,3 +14,4 @@ pt-BR:
       delete: "Excluir receita"
       confirm_delete: "Excluir receita?"
       confirm_delete_description: "Essa ação não poderá ser desfeita."
+      confirm_delete_cancel: "Cancelar"

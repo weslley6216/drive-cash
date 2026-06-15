@@ -73,7 +73,7 @@ module Dashboard
                       edit_path:   edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: earning_path(earning, context: @filters),
                       edit_hover:  'hover:text-blue-600',
-                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description') }
+                      labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description'), cancel: t('.confirm_delete_cancel') }
                     )
                   end
                 end

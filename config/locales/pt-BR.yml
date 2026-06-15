@@ -429,5 +429,3 @@ pt-BR:
       created: "Abastecimento registrado."
       updated: "Abastecimento atualizado."
       destroyed: "Abastecimento removido."
-  ui:
-    cancel: "Cancelar"

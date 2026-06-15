@@ -16,4 +16,5 @@ pt-BR:
       delete: "Excluir despesa"
       confirm_delete: "Excluir despesa?"
       confirm_delete_description: "Essa ação não poderá ser desfeita."
+      confirm_delete_cancel: "Cancelar"
       installment_of: "Parcela %{current} de %{total}"

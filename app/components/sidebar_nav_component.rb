@@ -85,7 +85,7 @@ class SidebarNavComponent < ApplicationComponent
         confirm_path:   helpers.session_path,
         confirm_method: :delete,
         confirm_label:  I18n.t('account.show_view.logout_modal.confirm'),
-        cancel_label:   I18n.t('ui.cancel'),
+        cancel_label:   I18n.t('account.show_view.logout_modal.cancel'),
         description:    I18n.t('account.show_view.logout_modal.description'),
         turbo:          false
       ) do
