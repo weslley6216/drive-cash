@@ -30,4 +30,26 @@ RSpec.describe History::SearchBarComponent, type: :component do
     expect(html).to include(%(action="#{Rails.application.routes.url_helpers.history_path}"))
     expect(html).to include('method="get"')
   end
+
+  context 'when query is present' do
+    let(:html) { view_context.render(described_class.new(query: 'uber', filter: 'earnings')) }
+
+    it 'renders a clear button with accessible label' do
+      expect(html).to include(I18n.t('history.index.search_clear'))
+    end
+
+    it 'clear button links to history without the search query, preserving filter' do
+      expect(html).to include(%(href="#{Rails.application.routes.url_helpers.history_path(filter: 'earnings')}"))
+    end
+
+    it 'clear button has cursor-pointer' do
+      expect(html).to include('cursor-pointer')
+    end
+  end
+
+  context 'when query is blank' do
+    it 'does not render a clear button' do
+      expect(html).not_to include(I18n.t('history.index.search_clear'))
+    end
+  end
 end

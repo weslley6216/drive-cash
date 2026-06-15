@@ -59,60 +59,22 @@ module Dashboard
         render PhlexIcons::Lucide::Pencil.new(class: 'w-4 h-4')
       end
 
-      div(data: { controller: 'delete-confirm' }) do
+      render ConfirmActionComponent.new(
+        title:          labels[:confirm],
+        icon:           PhlexIcons::Lucide::Trash2,
+        confirm_path:   delete_path,
+        confirm_method: :delete,
+        confirm_label:  labels[:delete],
+        cancel_label:   t('ui.cancel')
+      ) do
         button(
           type:       'button',
           class:      'text-slate-400 hover:text-red-500 transition-colors cursor-pointer',
-          data:       { action: 'click->delete-confirm#open' },
+          data:       { action: 'click->confirm-action#open' },
           aria_label: labels[:delete],
           title:      labels[:delete]
         ) do
           render PhlexIcons::Lucide::Trash2.new(class: 'w-4 h-4')
-        end
-
-        delete_overlay(delete_path: delete_path, labels: labels)
-      end
-    end
-
-    def delete_overlay(delete_path:, labels:)
-      div(class: 'fixed inset-0 z-[60] hidden', data: { 'delete-confirm-target': 'overlay' }) do
-        div(class: 'absolute inset-0 bg-slate-900/40', data: { action: 'click->delete-confirm#dismiss' })
-        delete_sheet_mobile(delete_path: delete_path, labels: labels)
-        delete_modal_desktop(delete_path: delete_path, labels: labels)
-      end
-    end
-
-    def delete_sheet_mobile(delete_path:, labels:)
-      div(class: 'absolute left-0 right-0 bottom-0 bg-white rounded-t-3xl px-6 pt-3 pb-9 shadow-2xl lg:hidden') do
-        div(class: 'w-10 h-1 rounded-full bg-slate-200 mx-auto mb-5')
-        div(class: 'w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto') do
-          render PhlexIcons::Lucide::Trash2.new(class: 'w-6 h-6')
-        end
-        h2(class: 'text-xl font-bold text-slate-900 text-center mt-4') { labels[:confirm] }
-        div(class: 'space-y-2.5 mt-6') do
-          raw helpers.button_to(labels[:delete], delete_path, method: :delete,
-                                                              form:   { class: 'contents' },
-                                                              class:  'w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-3.5 text-sm font-semibold cursor-pointer')
-          button(type: 'button', class: 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold cursor-pointer',
-                 data: { action: 'click->delete-confirm#dismiss' }) { t('ui.cancel') }
-        end
-      end
-    end
-
-    def delete_modal_desktop(delete_path:, labels:)
-      div(class: 'absolute inset-0 hidden lg:flex items-center justify-center p-8') do
-        div(class: 'bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6') do
-          div(class: 'w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center') do
-            render PhlexIcons::Lucide::Trash2.new(class: 'w-6 h-6')
-          end
-          h2(class: 'text-xl font-bold text-slate-900 mt-4') { labels[:confirm] }
-          div(class: 'flex items-center justify-end gap-3 mt-6') do
-            button(type: 'button', class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
-                   data: { action: 'click->delete-confirm#dismiss' }) { t('ui.cancel') }
-            raw helpers.button_to(labels[:delete], delete_path, method: :delete,
-                                                                form:   { class: 'contents' },
-                                                                class:  'px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer')
-          end
         end
       end
     end
