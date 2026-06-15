@@ -11,4 +11,11 @@ module ModalRefreshResponse
       format.html { redirect_to html_redirect }
     end
   end
+
+  def respond_with_refresh(html_redirect:)
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.refresh(request_id: nil) }
+      format.html { redirect_to html_redirect }
+    end
+  end
 end

@@ -44,7 +44,7 @@ class GoalsController < ApplicationController
   def destroy
     @goal.destroy
     flash[:notice] = t('goals.index.destroyed')
-    redirect_to goals_path
+    respond_with_refresh(html_redirect: goals_path)
   end
 
   private

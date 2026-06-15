@@ -16,6 +16,7 @@ pt-BR:
       buttons:
         cancel: "Cancelar"
         save: "Salvar"
+        saving: "Salvando..."
     update:
       success: "Receita atualizada com sucesso!"
     destroy:

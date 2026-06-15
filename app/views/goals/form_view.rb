@@ -65,7 +65,8 @@ module Goals
     def render_actions
       div(class: 'flex gap-3 pt-4') do
         button(type: 'button', data: { action: 'modal#close' }, class: button_classes(variant: :secondary, full_width: true)) { t('goals.index.form.buttons.cancel') }
-        button(type: 'submit', class: "#{button_classes(variant: :primary, full_width: true)} flex items-center justify-center gap-2") do
+        button(type: 'submit', class: "#{button_classes(variant: :primary, full_width: true)} flex items-center justify-center gap-2",
+               data: { turbo_submits_with: t('goals.index.form.buttons.saving') }) do
           render PhlexIcons::Lucide::Save.new(class: 'w-5 h-5')
           span { t('goals.index.form.buttons.save') }
         end

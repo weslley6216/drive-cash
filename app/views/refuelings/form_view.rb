@@ -52,7 +52,8 @@ module Refuelings
     def render_actions
       div(class: 'flex gap-3 pt-4') do
         button(type: 'button', data: { action: 'modal#close' }, class: button_classes(variant: :secondary, full_width: true)) { t('refuelings.form.buttons.cancel') }
-        button(type: 'submit', class: button_classes(variant: :danger, full_width: true)) { t('refuelings.form.buttons.save') }
+        button(type: 'submit', class: button_classes(variant: :danger, full_width: true),
+               data: { turbo_submits_with: t('refuelings.form.buttons.saving') }) { t('refuelings.form.buttons.save') }
       end
     end
   end

@@ -363,8 +363,8 @@ pt-BR:
       page_subtitle: "Créditos e débitos desde o início"
       empty: "Nenhum lançamento de combustível ainda."
       cadence:
-        one: "Você abastece a cada ~%{count} dia"
-        other: "Você abastece a cada ~%{count} dias"
+        one: "Você abastece em média a cada %{count} dia"
+        other: "Você abastece em média a cada %{count} dias"
         unknown: "Sem cadência calculada — registre mais um tanque cheio."
     empty:
       title: "Nenhum veículo cadastrado"
@@ -401,6 +401,7 @@ pt-BR:
         estimated_cost: "Custo estimado"
       buttons:
         save: "Salvar"
+        saving: "Salvando..."
         cancel: "Cancelar"
     flash:
       created: "Manutenção cadastrada."
@@ -422,6 +423,7 @@ pt-BR:
         vendor: "Posto Orense"
       buttons:
         save: "Salvar"
+        saving: "Salvando..."
         cancel: "Cancelar"
     flash:
       created: "Abastecimento registrado."

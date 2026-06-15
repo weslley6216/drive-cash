@@ -60,8 +60,8 @@ module Vehicles
       div(class: 'space-y-4') do
         header_mobile
         render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago])
-        render_tank_card
-        maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT)
+        div(id: 'vehicle_tank_section') { render_tank_card }
+        div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
         moves_section
         insight_section
       end

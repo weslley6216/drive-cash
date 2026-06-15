@@ -26,5 +26,6 @@ pt-BR:
       buttons:
         cancel: "Cancelar"
         save: "Salvar"
+        saving: "Salvando..."
     create:
       success: "Despesa registrada com sucesso!"

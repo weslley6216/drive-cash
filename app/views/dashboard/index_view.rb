@@ -84,7 +84,7 @@ module Dashboard
     end
 
     def monthly_goal_mobile_section
-      div(class: 'lg:hidden mb-6') do
+      div(id: 'monthly_goal_card', class: 'lg:hidden mb-6') do
         render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal
       end
     end

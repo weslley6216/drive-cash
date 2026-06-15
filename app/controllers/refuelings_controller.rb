@@ -42,7 +42,7 @@ class RefuelingsController < ApplicationController
   def destroy
     @refueling.destroy
     flash[:notice] = t('refuelings.flash.destroyed')
-    redirect_to vehicle_path
+    respond_with_refresh(html_redirect: vehicle_path)
   end
 
   private

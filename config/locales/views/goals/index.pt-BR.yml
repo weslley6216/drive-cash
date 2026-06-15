@@ -69,6 +69,7 @@ pt-BR:
         buttons:
           cancel: "Cancelar"
           save: "Salvar"
+          saving: "Salvando..."
       created: "Meta criada com sucesso."
       updated: "Meta atualizada."
       destroyed: "Meta removida."
