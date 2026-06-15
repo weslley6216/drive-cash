@@ -34,7 +34,7 @@ Rails.application.routes.draw do
   resources :maintenances, only: %i[new create edit update destroy] do
     member { patch :mark_done }
   end
-  resources :refuelings,    only: %i[new create edit update destroy]
+  resources :refuelings, only: %i[index new create edit update destroy]
 
   # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

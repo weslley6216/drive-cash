@@ -359,6 +359,13 @@ pt-BR:
       today: "Hoje"
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
+      page_title: "Movimentação do tanque"
+      page_subtitle: "Créditos e débitos desde o início"
+      empty: "Nenhum lançamento de combustível ainda."
+      cadence:
+        one: "Você abastece a cada ~%{count} dia"
+        other: "Você abastece a cada ~%{count} dias"
+        unknown: "Sem cadência calculada — registre mais um tanque cheio."
     empty:
       title: "Nenhum veículo cadastrado"
       body: "Cadastre seu carro pra acompanhar km, manutenções e o saldo do tanque."
