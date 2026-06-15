@@ -98,5 +98,9 @@ RSpec.describe Goals::IndexView, type: :component do
     it 'renders annual bar section' do
       expect(html).to include('width: 25%')
     end
+
+    it 'renders edit links for all visible goals' do
+      expect(html).to include("href=\"#{view_context.edit_goal_path(weekly_goal)}\"")
+    end
   end
 end

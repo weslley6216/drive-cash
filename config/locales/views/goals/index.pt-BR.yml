@@ -3,6 +3,7 @@ pt-BR:
     index:
       title: "Metas"
       subtitle: "%{month_name} · %{year}"
+      edit_aria: "Editar meta"
       monthly:
         label: "Meta do mês"
         sublabel: "Lucro líquido"

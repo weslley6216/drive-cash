@@ -1,8 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Goals::AnnualBarComponent, type: :component do
+  let(:goal) do
+    build_stubbed(:goal, kind:         'annual',
+                         period_start: Date.new(2026, 1, 1),
+                         period_end:   Date.new(2026, 12, 31))
+  end
   let(:progress) do
-    { current: 20_000, target: 80_000, percent: 25, days_remaining: 199 }
+    { goal: goal, current: 20_000, target: 80_000, percent: 25, days_remaining: 199 }
   end
   let(:html) { view_context.render(described_class.new(progress: progress)) }
 
@@ -34,5 +39,10 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
     output = view_context.render(described_class.new(progress: progress.merge(percent: 120)))
 
     expect(output).to include('width: 100%')
+  end
+
+  it 'renders an edit link to edit_goal_path inside a modal frame' do
+    expect(html).to include("href=\"#{view_context.edit_goal_path(progress[:goal])}\"")
+    expect(html).to include('turbo-frame="modal"')
   end
 end

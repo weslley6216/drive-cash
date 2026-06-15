@@ -121,4 +121,13 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
 
     expect(html).to include('R$ 100,00')
   end
+
+  context 'edit pencil' do
+    it 'renders an edit link pointing to edit_goal_path inside a modal frame' do
+      html = view_context.render(described_class.new(progress: progress))
+
+      expect(html).to include("href=\"#{view_context.edit_goal_path(goal)}\"")
+      expect(html).to include('turbo-frame="modal"')
+    end
+  end
 end

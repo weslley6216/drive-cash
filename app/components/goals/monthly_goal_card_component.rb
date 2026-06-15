@@ -28,9 +28,12 @@ module Goals
             render Goals::ProgressRingComponent.new(percent: @progress[:percent], size: 200, color: '#2563eb')
           end
           div(class: 'col-span-12 lg:col-span-5') do
-            div(class: 'flex items-center gap-2 text-blue-700 mb-2') do
-              render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
-              span(class: 'text-xs font-bold uppercase tracking-wider') { t('goals.index.monthly.label') }
+            div(class: 'flex items-center justify-between mb-2') do
+              div(class: 'flex items-center gap-2 text-blue-700') do
+                render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
+                span(class: 'text-xs font-bold uppercase tracking-wider') { t('goals.index.monthly.label') }
+              end
+              edit_link
             end
             p(class: 'text-4xl font-bold text-slate-900 tracking-tight tabular-nums') { format_currency(@progress[:current]) }
             p(class: 'text-sm text-slate-500 mt-1') { t('goals.index.monthly.of_target', target: format_currency(@progress[:target])) }
@@ -69,9 +72,21 @@ module Goals
             p(class: 'text-sm font-semibold text-slate-700') { I18n.l(@progress[:goal].period_start, format: '%B') }
           end
         end
-        span(class: 'text-xs font-medium text-slate-400') do
-          plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+        div(class: 'flex items-center gap-2') do
+          span(class: 'text-xs font-medium text-slate-400') do
+            plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+          end
+          edit_link
         end
+      end
+    end
+
+    def edit_link
+      link_to(helpers.edit_goal_path(@progress[:goal]),
+              class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+              aria_label: t('goals.index.edit_aria'),
+              data:       { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
       end
     end
 
