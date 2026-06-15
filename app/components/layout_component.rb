@@ -61,11 +61,22 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
+      loading_overlay unless @auth
       render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
       div(class: content_wrapper_classes) do
         div(class: container_classes, &block)
       end
       render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav && !@auth
+    end
+  end
+
+  def loading_overlay
+    div(id:    'loading-overlay',
+        class: 'hidden fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm',
+        data:  { turbo_permanent: true, controller: 'loading' }) do
+      div(class: 'bg-white rounded-2xl shadow-xl p-6 flex items-center justify-center') do
+        div(class: 'w-10 h-10 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+      end
     end
   end
 
