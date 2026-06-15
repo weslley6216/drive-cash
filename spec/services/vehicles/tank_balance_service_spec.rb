@@ -15,7 +15,7 @@ RSpec.describe Vehicles::TankBalanceService do
 
     expect(result[:balance]).to eq(125)
     expect(result[:full]).to eq(260)
-    expect(result[:status_key]).to eq(:ok)
+    expect(result[:status_key]).to eq(:low)
   end
 
   it 'excludes fuel expenses that produced a refueling from the debit' do
@@ -66,20 +66,34 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(moves.map { |move| move[:amount] }).to contain_exactly(260, -45)
   end
 
-  it 'accumulates credits minus debits since anchor' do
+  it 'uses the last full_tank as ceiling and only debits posterior to it' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
-    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
-    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 1, 5))
+    create(:refueling, vehicle: vehicle, total_amount: 200, full_tank: true, date: Date.new(2025, 12, 19))
     fuel_expense(user, 45, Date.new(2025, 12, 20))
-    fuel_expense(user, 45, Date.new(2026, 1, 4))
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 1, 5))
+    fuel_expense(user, 30, Date.new(2026, 1, 8))
 
     result = described_class.new(user: user).call
 
-    expect(result[:balance]).to eq(430)
+    expect(result[:full]).to eq(260)
+    expect(result[:balance]).to eq(230)
   end
 
-  it 'ignores fuel expenses before the anchor date' do
+  it 'adds partial refuelings to the balance without resetting the ceiling' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 1))
+    fuel_expense(user, 100, Date.new(2026, 6, 5))
+    create(:refueling, vehicle: vehicle, total_amount: 50, full_tank: false, date: Date.new(2026, 6, 6))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:full]).to eq(260)
+    expect(result[:balance]).to eq(210)
+  end
+
+  it 'ignores fuel expenses before the last full_tank date' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
