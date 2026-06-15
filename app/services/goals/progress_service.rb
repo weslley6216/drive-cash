@@ -1,5 +1,7 @@
 module Goals
   class ProgressService
+    MIN_DAYS_FOR_PROJECTION = 3
+
     def initialize(user:, date: Date.current)
       @user = user
       @date = date
@@ -41,14 +43,31 @@ module Goals
       days_elapsed = [(@date - goal.period_start).to_i + 1, 1].max
       days_remaining = [(goal.period_end - @date).to_i, 0].max
       target = goal.target_amount
-      projection = current * (total_days.to_f / days_elapsed)
+      reached = current >= target
 
       {
-        projection:        projection,
-        on_track:          projection >= target,
-        remaining_per_day: days_remaining.zero? ? 0 : (target - current) / days_remaining,
+        projection:        projection_value(current, total_days, days_elapsed, reached),
+        on_track:          reached || (current * (total_days.to_f / days_elapsed) >= target),
+        reached:           reached,
+        tracking:          !reached && days_elapsed < MIN_DAYS_FOR_PROJECTION,
+        surplus:           reached ? current - target : 0,
+        daily_pace:        days_elapsed.zero? ? 0 : current / days_elapsed,
+        remaining_per_day: remaining_per_day(target, current, days_remaining, reached),
         days_remaining:    days_remaining
       }
+    end
+
+    def projection_value(current, total_days, days_elapsed, reached)
+      return current if reached
+      return nil if days_elapsed < MIN_DAYS_FOR_PROJECTION
+
+      current * (total_days.to_f / days_elapsed)
+    end
+
+    def remaining_per_day(target, current, days_remaining, reached)
+      return 0 if reached || days_remaining.zero?
+
+      [(target - current) / days_remaining, 0].max
     end
 
     def compute_metric_for_period(goal)

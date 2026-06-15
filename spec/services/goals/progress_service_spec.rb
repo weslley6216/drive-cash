@@ -64,12 +64,38 @@ RSpec.describe Goals::ProgressService do
         expect(result[:monthly][:on_track]).to be(true)
       end
 
-      it 'returns zero projection on day 1 (days_elapsed = 1 is safe; explicitly handles 0)' do
-        edge_service = described_class.new(user: user, date: Date.new(2026, 6, 1))
+      context 'when goal is reached' do
+        before { create(:earning, user: user, date: Date.new(2026, 6, 4), amount: 5500) }
 
-        result = edge_service.call
+        it 'flags reached and exposes surplus' do
+          result = described_class.new(user: user, date: reference_date).call
 
-        expect(result[:monthly][:projection]).to be_a(Numeric)
+          expect(result[:monthly][:reached]).to be(true)
+          expect(result[:monthly][:surplus]).to eq(1000)
+        end
+
+        it 'caps remaining_per_day at zero when reached' do
+          result = described_class.new(user: user, date: reference_date).call
+
+          expect(result[:monthly][:remaining_per_day]).to eq(0)
+        end
+      end
+
+      context 'when days_elapsed is below MIN_DAYS_FOR_PROJECTION' do
+        it 'returns nil projection and a tracking flag' do
+          edge_service = described_class.new(user: user, date: Date.new(2026, 6, 1))
+
+          result = edge_service.call
+
+          expect(result[:monthly][:projection]).to be_nil
+          expect(result[:monthly][:tracking]).to be(true)
+        end
+      end
+
+      it 'computes daily_pace as current divided by days_elapsed' do
+        result = described_class.new(user: user, date: reference_date).call
+
+        expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
     end
 
