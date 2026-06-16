@@ -40,6 +40,15 @@
     justify-content: center;
   }
 
+  .feed-loading-overlay--page {
+    align-items: flex-start;
+  }
+
+  .feed-loading-overlay--page > * {
+    position: sticky;
+    top: 40vh;
+  }
+
   turbo-frame#page[busy] .feed-loading-overlay {
     display: flex;
   }

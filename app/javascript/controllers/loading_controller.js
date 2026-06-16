@@ -2,39 +2,81 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
-    this.showHandler = (event) => {
-      if (event.type === "turbo:submit-start" && event.target.closest("turbo-frame")?.id === "page") return
-      this.show()
+    this.pendingRefresh = false
+    this.handlers = {
+      "turbo:submit-start":         (event) => this.onSubmitStart(event),
+      "turbo:submit-end":           (event) => this.onSubmitEnd(event),
+      "turbo:before-visit":         (event) => this.onBeforeVisit(event),
+      "turbo:before-fetch-request": (event) => this.onBeforeFetch(event),
+      "turbo:before-stream-render": (event) => this.onStreamRender(event),
+      "turbo:frame-load":           (event) => this.onFrameLoad(event),
+      "turbo:load":                 ()      => this.hide()
     }
-    this.hideHandler = () => this.scheduleHide()
 
-    document.addEventListener("turbo:submit-start", this.showHandler)
-    document.addEventListener("turbo:before-visit", this.showHandler)
-    document.addEventListener("turbo:submit-end", this.hideHandler)
-    document.addEventListener("turbo:load", this.hideHandler)
+    Object.entries(this.handlers).forEach(([type, handler]) => {
+      document.addEventListener(type, handler)
+    })
   }
 
   disconnect() {
-    document.removeEventListener("turbo:submit-start", this.showHandler)
-    document.removeEventListener("turbo:before-visit", this.showHandler)
-    document.removeEventListener("turbo:submit-end", this.hideHandler)
-    document.removeEventListener("turbo:load", this.hideHandler)
+    Object.entries(this.handlers).forEach(([type, handler]) => {
+      document.removeEventListener(type, handler)
+    })
+  }
+
+  onSubmitStart(event) {
+    if (this.inPageFrame(event.target)) return
+    this.show()
+  }
+
+  onSubmitEnd(event) {
+    if (this.inPageFrame(event.target)) return
+    if (!this.pendingRefresh) this.hide()
+  }
+
+  onBeforeVisit(event) {
+    if (this.isSamePath(event.detail?.url)) return
+    this.show()
+  }
+
+  onBeforeFetch(event) {
+    if (event.target?.id === "modal") this.show()
+  }
+
+  onStreamRender(event) {
+    if (event.target?.getAttribute?.("action") === "refresh") {
+      this.pendingRefresh = true
+      this.show()
+    }
+  }
+
+  onFrameLoad(event) {
+    if (event.target?.id === "modal" && !this.pendingRefresh) this.hide()
   }
 
   show() {
-    clearTimeout(this.hideTimeout)
     clearTimeout(this.safetyNet)
     this.element.classList.remove("hidden")
-    this.safetyNet = setTimeout(() => this.forceHide(), 5000)
+    this.safetyNet = setTimeout(() => this.hide(), 8000)
   }
 
-  scheduleHide() {
-    this.hideTimeout = setTimeout(() => this.forceHide(), 80)
-  }
-
-  forceHide() {
+  hide() {
     clearTimeout(this.safetyNet)
-    clearTimeout(this.hideTimeout)
+    this.pendingRefresh = false
     this.element.classList.add("hidden")
+  }
+
+  inPageFrame(element) {
+    return element?.closest?.("turbo-frame")?.id === "page"
+  }
+
+  isSamePath(url) {
+    if (!url) return false
+
+    try {
+      return new URL(url, window.location.origin).pathname === window.location.pathname
+    } catch {
+      return false
+    }
   }
 }

@@ -118,6 +118,13 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="category_breakdown"')
     end
 
+    it 'wraps the content in a page-scoped loading region for filter navigations' do
+      get root_path
+
+      expect(response.body).to include('feed-loading-region')
+      expect(response.body).to include('feed-loading-overlay--page')
+    end
+
     it 'keeps today_card wrapper in DOM even without activity today' do
       get root_path
 

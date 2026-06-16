@@ -37,8 +37,8 @@ RSpec.describe ConfirmActionComponent, type: :component do
     expect(html).to include('rounded-2xl')
   end
 
-  it 'renders a dismiss action for the backdrop click' do
-    expect(html).to include('confirm-action#dismiss')
+  it 'marks the backdrop and cancel controls as dismiss triggers' do
+    expect(html.scan('data-confirm-action-dismiss').size).to be >= 3
   end
 
   it 'renders the cancel button in both variants' do

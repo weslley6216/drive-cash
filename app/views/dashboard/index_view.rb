@@ -15,10 +15,7 @@ module Dashboard
           div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 
           topbar_section
-          primary_grid
-          stats_grid_section
-          monthly_goal_mobile_section
-          secondary_grid
+          loading_region
 
           render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
         end
@@ -55,6 +52,19 @@ module Dashboard
     def new_record_button_classes
       'hidden lg:inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 ' \
       'text-white rounded-lg px-4 py-2 text-sm font-semibold'
+    end
+
+    def loading_region
+      div(class: 'feed-loading-region') do
+        div(class: 'feed-loading-overlay feed-loading-overlay--page') do
+          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+        end
+
+        primary_grid
+        stats_grid_section
+        monthly_goal_mobile_section
+        secondary_grid
+      end
     end
 
     def primary_grid

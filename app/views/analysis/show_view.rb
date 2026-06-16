@@ -23,7 +23,7 @@ module Analysis
           div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
           pinned_topbar
-          content_scroll_region
+          loading_region
         end
         turbo_frame_tag 'modal'
       end
@@ -33,6 +33,15 @@ module Analysis
 
     def pinned_topbar
       div(class: 'flex-none px-4 sm:px-6 pt-4') { topbar }
+    end
+
+    def loading_region
+      div(class: 'feed-loading-region flex-1 flex flex-col min-h-0') do
+        div(class: 'feed-loading-overlay') do
+          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+        end
+        content_scroll_region
+      end
     end
 
     def content_scroll_region

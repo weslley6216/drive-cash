@@ -25,6 +25,13 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include(I18n.t('analysis.show_view.title'))
     end
 
+    it 'wraps the content in a localized loading region for filter navigations' do
+      get analysis_path
+
+      expect(response.body).to include('feed-loading-region')
+      expect(response.body).to include('feed-loading-overlay')
+    end
+
     it 'renders the four metric cards in a 2x2 grid' do
       create(:earning, user: current_user, date: Date.current, amount: 200, trips_count: 4)
 

@@ -23,7 +23,7 @@ class ConfirmActionComponent < ApplicationComponent
 
   def overlay
     div(class: 'fixed inset-0 z-[60] hidden', data: { 'confirm-action-target': 'overlay' }) do
-      div(class: 'absolute inset-0 bg-slate-900/40 lg:hidden', data: { action: 'click->confirm-action#dismiss' })
+      div(class: 'absolute inset-0 bg-slate-900/40 lg:hidden', data: { 'confirm-action-dismiss': '' })
       mobile_sheet
       desktop_modal
     end
@@ -41,7 +41,7 @@ class ConfirmActionComponent < ApplicationComponent
           button(
             type:  'button',
             class: 'w-full bg-slate-100 text-slate-700 rounded-xl py-3.5 text-sm font-semibold cursor-pointer',
-            data:  { action: 'click->confirm-action#dismiss' }
+            data:  { 'confirm-action-dismiss': '' }
           ) { @cancel_label }
         end
       end
@@ -50,7 +50,7 @@ class ConfirmActionComponent < ApplicationComponent
 
   def desktop_modal
     div(class: 'absolute inset-0 hidden lg:flex items-center justify-center p-8') do
-      div(class: 'absolute inset-0 bg-black/30', data: { action: 'click->confirm-action#dismiss' })
+      div(class: 'absolute inset-0 bg-black/30', data: { 'confirm-action-dismiss': '' })
       div(class: 'relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6') do
         icon_circle(centered: false)
         h2(class: 'text-xl font-bold text-slate-900 mt-4') { @title }
@@ -60,7 +60,7 @@ class ConfirmActionComponent < ApplicationComponent
             button(
               type:  'button',
               class: 'px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer',
-              data:  { action: 'click->confirm-action#dismiss' }
+              data:  { 'confirm-action-dismiss': '' }
             ) { @cancel_label }
             button(type: 'submit', class: 'px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-2 cursor-pointer') do
               render @icon.new(class: 'w-4 h-4')
