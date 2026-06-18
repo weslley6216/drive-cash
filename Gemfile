@@ -10,6 +10,10 @@ gem 'puma', '>= 6.0'
 gem 'faraday'
 gem 'faraday-retry'
 
+# Transactional email over Resend's HTTP API (port 443) — works on hosts that
+# block outbound SMTP ports, unlike :smtp delivery.
+gem 'resend', '~> 1.5'
+
 # Assets
 gem 'importmap-rails'
 gem 'propshaft'
