@@ -88,8 +88,8 @@ module History
     end
 
     def build_group(date, day_items)
-      day_earnings = day_items.select { |record| record.is_a?(Earning) }.sum(&:amount)
-      day_expenses = day_items.select { |record| record.is_a?(Expense) }.sum(&:amount)
+      day_earnings = day_items.select(&:credit?).sum(&:amount)
+      day_expenses = day_items.reject(&:credit?).sum(&:amount)
 
       {
         date:           date,

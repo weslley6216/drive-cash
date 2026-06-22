@@ -134,4 +134,12 @@ RSpec.describe Earning, type: :model do
       expect(earning.user).to eq(user)
     end
   end
+
+  describe '#credit?' do
+    it 'returns true for Earning instances' do
+      earning = build(:earning)
+
+      expect(earning.credit?).to be(true)
+    end
+  end
 end

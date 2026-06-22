@@ -223,4 +223,12 @@ RSpec.describe Expense, type: :model do
       expect(refueling.reload.expense_id).to be_nil
     end
   end
+
+  describe '#credit?' do
+    it 'returns false for Expense instances' do
+      expense = build(:expense)
+
+      expect(expense.credit?).to be(false)
+    end
+  end
 end

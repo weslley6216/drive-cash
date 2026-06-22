@@ -4,6 +4,8 @@ module FinancialEntry
   include MonetaryAmount
 
   included do
+    class_attribute :credit, instance_writer: false, default: false
+
     belongs_to :user
 
     monetize :amount
@@ -31,4 +33,6 @@ module FinancialEntry
       month ? relation.for_month(month) : relation
     }
   end
+
+  def credit? = self.class.credit
 end

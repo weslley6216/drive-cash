@@ -1,6 +1,8 @@
 class Earning < ApplicationRecord
   include FinancialEntry
 
+  self.credit = true
+
   enum :platform, {
     amazon:        0,
     ifood:         1,
