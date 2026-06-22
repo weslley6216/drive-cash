@@ -421,6 +421,10 @@ pt-BR:
         full_tank: "Tanque cheio"
       placeholders:
         vendor: "Posto Orense"
+      odometer_preview:
+        title_advance: "Atualiza o odômetro do veículo"
+        delta_line: "%{current} → %{reading} km · +%{delta} km"
+        cannot_recede: "Menor que o atual (%{current} km). O odômetro não anda pra trás — só avança."
       buttons:
         save: "Salvar"
         saving: "Salvando..."
@@ -429,3 +433,4 @@ pt-BR:
       created: "Abastecimento registrado."
       updated: "Abastecimento atualizado."
       destroyed: "Abastecimento removido."
+      odometer_synced: "Abastecimento salvo · odômetro atualizado p/ %{km} km"
