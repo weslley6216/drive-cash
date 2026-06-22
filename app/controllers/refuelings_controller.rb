@@ -5,7 +5,7 @@ class RefuelingsController < ApplicationController
 
   def index
     cadence = Vehicles::TankCadence.new(user: current_user).call
-    render Refuelings::IndexView.new(moves: all_moves, cadence: cadence)
+    render Refuelings::IndexView.new(moves: Refuelings::Moves.call(user: current_user), cadence: cadence)
   end
 
   def new
@@ -48,24 +48,6 @@ class RefuelingsController < ApplicationController
   end
 
   private
-
-  def all_moves
-    vehicle = current_user.vehicle
-    return [] unless vehicle
-
-    anchor = vehicle.refuelings.minimum(:date)
-    return [] unless anchor
-
-    credits = vehicle.refuelings.chronological.map do |refueling|
-      { kind: :credit, date: refueling.date, amount: refueling.total_amount,
-        vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter }
-    end
-    debits = current_user.expenses.where(category: :fuel).where.missing(:refueling)
-      .where('expenses.date >= ?', anchor).chronological.map do |expense|
-      { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }
-    end
-    (credits + debits).sort_by { |move| move[:date] }.reverse
-  end
 
   def find_refueling
     @refueling = current_user.vehicle.refuelings.find(params[:id])
