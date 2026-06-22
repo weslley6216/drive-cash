@@ -11,11 +11,9 @@ RSpec.describe Dashboard::IndexView, type: :component do
   end
   let(:filters) { { year: 2026, month: nil, available_years: [2026] } }
 
-  before { allow(Current).to receive(:user).and_return(user) }
-
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
     html = view_context.render(
-      described_class.new(totals: totals, filters: filters, recent_activity: [], categories: [])
+      described_class.new(totals: totals, first_name: user.first_name, filters: filters, recent_activity: [], categories: [])
     )
 
     expect(html).to include('<turbo-frame id="page">')

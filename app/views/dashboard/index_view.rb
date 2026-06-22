@@ -1,7 +1,8 @@
 module Dashboard
   class IndexView < ApplicationComponent
-    def initialize(totals:, filters: {}, recent_activity: [], categories: [], today: nil, monthly_goal: nil)
+    def initialize(totals:, first_name:, filters: {}, recent_activity: [], categories: [], today: nil, monthly_goal: nil)
       @totals = totals
+      @first_name = first_name
       @filters = filters
       @recent_activity = recent_activity
       @categories = categories
@@ -28,7 +29,7 @@ module Dashboard
     def topbar_section
       div(class: 'mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between') do
         div do
-          h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.greeting', name: Current.user.first_name) }
+          h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.greeting', name: @first_name) }
           p(class: 'text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
         end
 

@@ -10,6 +10,7 @@ class DashboardController < ApplicationController
 
     render Dashboard::IndexView.new(
       totals:          @totals,
+      first_name:      current_user.first_name,
       filters:         @filters,
       recent_activity: @recent_activity,
       categories:      @categories,
