@@ -1,14 +1,12 @@
 class GoalsController < ApplicationController
   before_action :find_goal, only: %i[edit update destroy]
+  before_action :load_filters, only: :index
 
   def index
-    filters = dashboard_filters
-    first_day = Date.new(filters[:year], filters[:month], 1)
+    first_day = Date.new(@year, @month, 1)
     reference_date = Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day.end_of_month
     service = Goals::ProgressService.new(user: current_user, date: reference_date)
-    progress = service.call
-    past_monthly = service.past_goals('monthly')
-    render Goals::IndexView.new(progress: progress, filters: filters, past_monthly: past_monthly)
+    render Goals::IndexView.new(progress: service.call, filters: @filters, past_monthly: service.past_goals('monthly'))
   end
 
   def new
@@ -57,7 +55,7 @@ class GoalsController < ApplicationController
     params.require(:goal).permit(:kind, :target_amount, :period_start, :period_end, :metric)
   end
 
-  def dashboard_filters
-    { year: params[:year]&.to_i || Date.current.year, month: params[:month]&.to_i || Date.current.month }
+  def load_filters
+    set_dashboard_filters(month_default: Date.current.month)
   end
 end
