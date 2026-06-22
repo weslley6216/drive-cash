@@ -12,7 +12,7 @@ class ExpensesController < ApplicationController
       maybe_create_refueling(result.expenses.first)
       turbo_success(Expenses::CreateView, expense: result.expenses.first)
     else
-      turbo_error(Expenses::NewView, expense: result.expense)
+      turbo_error(Expenses::NewView, expense: result.expense, active_vendor: active_tank_vendor(result.expense.user))
     end
   end
 
@@ -34,6 +34,10 @@ class ExpensesController < ApplicationController
   end
 
   private
+
+  def active_tank_vendor(user)
+    Vehicles::ActiveTankVendor.new(user: user).call.to_s
+  end
 
   def find_expense
     @expense = current_user.expenses.find(params[:id])

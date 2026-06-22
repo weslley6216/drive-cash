@@ -1,7 +1,7 @@
 module Expenses
   class NewView < FormView
-    def initialize(expense:, context: {}, totals: nil)
-      super(expense: expense, context: context)
+    def initialize(expense:, context: {}, totals: nil, active_vendor: nil)
+      super(expense: expense, context: context, active_vendor: active_vendor)
     end
 
     private

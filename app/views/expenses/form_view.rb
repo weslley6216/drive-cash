@@ -1,9 +1,10 @@
 module Expenses
   class FormView < ApplicationView
-    def initialize(expense:, context: {})
+    def initialize(expense:, context: {}, active_vendor: nil)
       @expense = expense
       @context = context || {}
       @theme = :red
+      @active_vendor = active_vendor.to_s
     end
 
     def view_template
@@ -65,12 +66,8 @@ module Expenses
 
     def form_stimulus_data
       data = { controller: 'refueling-fields' }
-      data[:refueling_fields_active_vendor_value] = active_vendor unless @expense.persisted?
+      data[:refueling_fields_active_vendor_value] = @active_vendor unless @expense.persisted?
       data
-    end
-
-    def active_vendor
-      Vehicles::ActiveTankVendor.new(user: @expense.user).call.to_s
     end
 
     def vendor_field(form)
