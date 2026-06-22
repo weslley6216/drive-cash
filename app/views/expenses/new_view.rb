@@ -21,7 +21,7 @@ module Expenses
         end
         div(class: 'hidden space-y-3 pl-7 border-l-2 border-slate-200 ml-2', data: { expense_installment_target: 'fields' }) do
           field_wrapper(t('.labels.period'), theme: @theme) do
-            options = Expense::INSTALLMENT_PERIODS.map { |p| [t(".periods.#{p}"), p] }
+            options = Expense::INSTALLMENT_PERIODS.map { |period| [t(".periods.#{period}"), period] }
             raw helpers.select_tag(
               'installment[period]',
               helpers.options_for_select(options, 'monthly'),

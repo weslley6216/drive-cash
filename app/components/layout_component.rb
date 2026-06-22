@@ -33,10 +33,8 @@ class LayoutComponent < ApplicationComponent
       meta(name: 'turbo-refresh-method', content: 'morph')
       meta(name: 'turbo-refresh-scroll', content: 'preserve')
 
-      # PWA manifest
       link(rel: 'manifest', href: '/manifest.json')
 
-      # Icons
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
       link(rel: 'apple-touch-icon', href: '/icon-192.png')
 
@@ -46,7 +44,6 @@ class LayoutComponent < ApplicationComponent
       stylesheet_link_tag('tailwind', "data-turbo-track": 'reload')
       javascript_importmap_tags
 
-      # Register service worker
       script do
         plain <<~JS.html_safe
           if ('serviceWorker' in navigator) {
