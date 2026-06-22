@@ -34,7 +34,7 @@ module RecordSaveResponse
   def turbo_render_list(detail_service, detail_view)
     filter = dashboard_context
     detail = detail_for(detail_service, filter)
-    totals = Dashboard::StatsService.new(**filter).call
+    totals = Dashboard::StatsService.new(**filter, user: current_user).call
     flash[:notice] = t('.success')
 
     respond_to do |format|
@@ -50,12 +50,12 @@ module RecordSaveResponse
 
   def build_totals_context(record)
     context = dashboard_context(record)
-    totals = Dashboard::StatsService.new(**context).call
+    totals = Dashboard::StatsService.new(**context, user: current_user).call
 
     [context, totals]
   end
 
   def detail_for(detail_service, filter)
-    detail_service.new(year: filter[:year], month: filter[:month]).call
+    detail_service.new(year: filter[:year], month: filter[:month], user: current_user).call
   end
 end
