@@ -70,6 +70,21 @@ RSpec.describe Refuelings::VendorEfficiency do
       end
     end
 
+    context 'with vendor strings that differ only by whitespace' do
+      it 'groups them as the same vendor after normalization' do
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 60.days, odometer_km: 156_000, liters: 30, total_amount: 165)
+        create(:refueling, vehicle: vehicle, vendor: '  Posto   Orense ', date: reference_date - 30.days, odometer_km: 156_345, liters: 30, total_amount: 165)
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 20.days, odometer_km: 156_675, liters: 28, total_amount: 168)
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Geladão', date: reference_date - 10.days, odometer_km: 156_983, liters: 28, total_amount: 168)
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Shell', date: reference_date - 5.days, odometer_km: 157_300, liters: 30, total_amount: 175)
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Shell', date: reference_date, odometer_km: 157_620, liters: 30, total_amount: 175)
+
+        result = described_class.new(vehicle: vehicle, date: reference_date).cheapest
+
+        expect(result.winner).to eq('Posto Orense')
+      end
+    end
+
     context 'when no readings fall in the last 30 days' do
       it 'estimates zero savings' do
         create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', date: reference_date - 120.days, odometer_km: 150_000, liters: 30, total_amount: 165)

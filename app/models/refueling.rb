@@ -1,5 +1,6 @@
 class Refueling < ApplicationRecord
   include MonetaryAmount
+  include VendorNormalization
   monetize :total_amount, :liters
 
   belongs_to :vehicle
