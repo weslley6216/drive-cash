@@ -12,7 +12,7 @@ class GoalsController < ApplicationController
   end
 
   def new
-    @goal = current_user.goals.new(default_attributes)
+    @goal = current_user.goals.new(Goal.new_form_defaults)
     render Goals::NewView.new(goal: @goal)
   end
 
@@ -55,16 +55,6 @@ class GoalsController < ApplicationController
 
   def goal_params
     params.require(:goal).permit(:kind, :target_amount, :period_start, :period_end, :metric)
-  end
-
-  def default_attributes
-    today = Date.current
-    {
-      kind:         'monthly',
-      metric:       'profit',
-      period_start: today.beginning_of_month,
-      period_end:   today.end_of_month
-    }
   end
 
   def dashboard_filters

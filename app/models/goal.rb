@@ -15,6 +15,16 @@ class Goal < ApplicationRecord
   scope :active_at, ->(date) { where('period_start <= ? AND period_end >= ?', date, date) }
   scope :for_kind, ->(kind) { where(kind: kind) }
 
+  def self.new_form_defaults
+    today = Date.current
+    {
+      kind:         'monthly',
+      metric:       'profit',
+      period_start: today.beginning_of_month,
+      period_end:   today.end_of_month
+    }
+  end
+
   private
 
   def period_consistency

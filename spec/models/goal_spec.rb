@@ -100,6 +100,19 @@ RSpec.describe Goal, type: :model do
     end
   end
 
+  describe '.new_form_defaults' do
+    it 'returns kind monthly, metric profit, and current month range' do
+      travel_to Date.new(2026, 6, 15) do
+        expect(described_class.new_form_defaults).to eq(
+          kind:         'monthly',
+          metric:       'profit',
+          period_start: Date.new(2026, 6, 1),
+          period_end:   Date.new(2026, 6, 30)
+        )
+      end
+    end
+  end
+
   describe 'user association' do
     it 'is invalid without a user' do
       goal = build(:goal, user: nil)
