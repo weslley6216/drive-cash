@@ -9,10 +9,19 @@ class ExpensesController < ApplicationController
     result = create_expense_via_creator(:expense)
 
     if result.success?
-      maybe_create_refueling(result.expenses.first)
+      refueling_data = params[:refueling]
+      if refueling_data.present?
+        Refuelings::CreatorFromExpense.call(
+          expense:     result.expenses.first,
+          liters:      refueling_data[:liters],
+          odometer_km: refueling_data[:odometer_km],
+          full_tank:   refueling_data[:full_tank]
+        )
+      end
       turbo_success(Expenses::CreateView, expense: result.expenses.first)
     else
-      turbo_error(Expenses::NewView, expense: result.expense, active_vendor: active_tank_vendor(result.expense.user))
+      turbo_error(Expenses::NewView, expense:       result.expense,
+                                     active_vendor: Vehicles::ActiveTankVendor.new(user: result.expense.user).call.to_s)
     end
   end
 
@@ -35,24 +44,7 @@ class ExpensesController < ApplicationController
 
   private
 
-  def active_tank_vendor(user)
-    Vehicles::ActiveTankVendor.new(user: user).call.to_s
-  end
-
   def find_expense
     @expense = current_user.expenses.find(params[:id])
-  end
-
-  def maybe_create_refueling(expense)
-    refueling_data = params[:refueling]
-    return unless refueling_data.present?
-    return unless expense.category_fuel?
-
-    Refuelings::CreatorFromExpense.call(
-      expense:     expense,
-      liters:      refueling_data[:liters],
-      odometer_km: refueling_data[:odometer_km],
-      full_tank:   refueling_data[:full_tank]
-    )
   end
 end
