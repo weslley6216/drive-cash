@@ -34,7 +34,7 @@ module Vehicles
     private
 
     def build_maintenances(vehicle)
-      vehicle.maintenances.includes(:vehicle).sort_by { |maintenance| -maintenance.progress }.map do |maintenance|
+      vehicle.maintenances.sort_by { |maintenance| -maintenance.progress }.map do |maintenance|
         Row.new(
           maintenance: maintenance,
           progress:    maintenance.progress,
