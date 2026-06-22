@@ -48,19 +48,14 @@ RSpec.describe Dashboard::InsightsService do
       end
 
       it 'applies YTD cutoff when year is current year and month is nil' do
-        current_year = Date.current.year
-        cutoff_month = Date.current.month
+        travel_to(Date.new(2025, 10, 15)) do
+          create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 200, trips_count: 1)
+          create(:earning, user: user, date: Date.new(2024, 1, 1), amount: 100, trips_count: 1)
+          create(:earning, user: user, date: Date.new(2024, 12, 1), amount: 9999, trips_count: 1)
 
-        create(:earning, user: user, date: Date.new(current_year, 1, 1), amount: 200, trips_count: 1)
-        create(:earning, user: user, date: Date.new(current_year - 1, 1, 1), amount: 100, trips_count: 1)
-        create(:earning, user: user, date: Date.new(current_year - 1, 12, 1), amount: 9999, trips_count: 1)
+          result = described_class.new(year: 2025, month: nil, user: user).call
 
-        result = described_class.new(year: current_year, month: nil, user: user).call
-
-        if cutoff_month < 12
           expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
-        else
-          expect(result[:metrics][:change_pct][:per_day]).not_to be_nil
         end
       end
 
@@ -209,10 +204,12 @@ RSpec.describe Dashboard::InsightsService do
       end
 
       it 'returns mode :annual with cutoff_month_name for current year' do
-        result = described_class.new(year: Date.current.year, month: nil, user: user).call
+        travel_to(Date.new(2025, 6, 15)) do
+          result = described_class.new(year: 2025, month: nil, user: user).call
 
-        expect(result[:period_context][:mode]).to eq(:annual)
-        expect(result[:period_context][:cutoff_month_name]).not_to be_nil
+          expect(result[:period_context][:mode]).to eq(:annual)
+          expect(result[:period_context][:cutoff_month_name]).to eq(I18n.t('date.abbr_month_names')[6])
+        end
       end
     end
 
@@ -260,7 +257,6 @@ RSpec.describe Dashboard::InsightsService do
 
         spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
 
-        expect(spike).not_to be_nil
         expect(spike[:severity]).to eq('warning')
       end
 
@@ -293,7 +289,6 @@ RSpec.describe Dashboard::InsightsService do
         result = described_class.new(year: 2025, month: 6, user: user).call
         best = result[:insights].find { |insight| insight[:type] == 'best_day' }
 
-        expect(best).not_to be_nil
         expect(best[:title]).to include('500,00')
       end
 
@@ -304,7 +299,6 @@ RSpec.describe Dashboard::InsightsService do
         result = described_class.new(year: 2025, month: 6, user: user).call
         worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
 
-        expect(worst).not_to be_nil
         expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
       end
 
@@ -315,7 +309,6 @@ RSpec.describe Dashboard::InsightsService do
         result = described_class.new(year: 2025, month: 6, user: user).call
         worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
 
-        expect(worst).not_to be_nil
         expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
         expect(worst[:description]).to include('25,00')
       end
@@ -329,7 +322,6 @@ RSpec.describe Dashboard::InsightsService do
         result = described_class.new(year: 2025, month: 2, user: user).call
         drop = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
 
-        expect(drop).not_to be_nil
         expect(drop[:severity]).to eq('critical')
       end
 
