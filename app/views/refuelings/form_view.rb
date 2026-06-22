@@ -43,9 +43,40 @@ module Refuelings
         text_field(form, :vendor, label: t('refuelings.form.labels.vendor'), theme: @theme, placeholder: t('refuelings.form.placeholders.vendor'))
         money_field(form, :liters, label: t('refuelings.form.labels.liters'), theme: @theme, required: true)
         money_field(form, :total_amount, label: t('refuelings.form.labels.total_amount'), theme: @theme, required: true)
-        integer_field(form, :odometer_km, label: t('refuelings.form.labels.odometer_km'), theme: @theme)
+        odometer_field_with_preview(form)
         toggle_field(form, :full_tank, label: t('refuelings.form.labels.full_tank'), theme: @theme)
         render_actions
+      end
+    end
+
+    def odometer_field_with_preview(form)
+      div(data: { controller:                        'odometer-preview',
+                  odometer_preview_current_km_value: @refueling.vehicle.odometer_km.to_i }) do
+        integer_field(form, :odometer_km, label: t('refuelings.form.labels.odometer_km'), theme: @theme)
+        odometer_preview_cards
+      end
+    end
+
+    def odometer_preview_cards
+      current_formatted = helpers.number_with_delimiter(@refueling.vehicle.odometer_km.to_i)
+
+      div(class: 'mt-2.5 hidden rounded-xl bg-blue-50 border border-blue-200 p-3 flex items-start gap-2.5',
+          data:  { odometer_preview_target: 'advance' }) do
+        div(class: 'w-7 h-7 rounded-full bg-blue-500/15 flex items-center justify-center flex-shrink-0 mt-0.5') do
+          render PhlexIcons::Lucide::Gauge.new(class: 'w-4 h-4 text-blue-700')
+        end
+        div(class: 'min-w-0') do
+          p(class: 'text-sm font-semibold text-blue-900') { t('refuelings.form.odometer_preview.title_advance') }
+          p(class: 'text-xs text-blue-800 mt-0.5 tabular-nums', data: { odometer_preview_target: 'advanceLine' })
+        end
+      end
+
+      div(class: 'mt-2.5 hidden rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-start gap-2.5',
+          data:  { odometer_preview_target: 'warn' }) do
+        render PhlexIcons::Lucide::TriangleAlert.new(class: 'w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5')
+        p(class: 'text-xs text-amber-800 leading-snug') do
+          t('refuelings.form.odometer_preview.cannot_recede', current: current_formatted)
+        end
       end
     end
 

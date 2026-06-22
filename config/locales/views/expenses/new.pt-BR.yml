@@ -18,6 +18,10 @@ pt-BR:
         monthly: "Mensal"
         annual: "Anual"
       repeat_hint: "Cada parcela fica como “a pagar” até você marcar como paga; o lucro do dashboard só considera despesas pagas."
+      vendor_inherited: "Preenchido do seu último abastecimento"
+      vendor_clear: "limpar"
+      vendor_use: "Usar %{vendor}"
+      vendor_from_tank: "do tanque"
       placeholders:
         money: "R$ 0,00"
         select: "Selecione..."

@@ -1,5 +1,6 @@
 class Expense < ApplicationRecord
   include FinancialEntry
+  include VendorNormalization
 
   has_one :refueling, dependent: :nullify
 

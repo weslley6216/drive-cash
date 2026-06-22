@@ -61,5 +61,23 @@ RSpec.describe Refuelings::CreatorFromExpense do
 
       expect(result).to be_nil
     end
+
+    it 'advances the vehicle odometer when the created refueling km is greater' do
+      vehicle.update!(odometer_km: 48_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+      expense.update!(date: Date.new(2026, 6, 22))
+
+      described_class.call(expense: expense, liters: '30', odometer_km: '48230', full_tank: true)
+
+      expect(vehicle.reload.odometer_km).to eq(48_230)
+      expect(vehicle.odometer_updated_at.to_date).to eq(Date.new(2026, 6, 22))
+    end
+
+    it 'does not recede the vehicle odometer when the created refueling km is smaller' do
+      vehicle.update!(odometer_km: 50_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+
+      described_class.call(expense: expense, liters: '30', odometer_km: '48230', full_tank: true)
+
+      expect(vehicle.reload.odometer_km).to eq(50_000)
+    end
   end
 end

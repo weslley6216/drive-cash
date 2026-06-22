@@ -14,7 +14,7 @@ module Refuelings
     def call
       return nil unless eligible?
 
-      Refueling.create(
+      refueling = Refueling.create(
         vehicle:      @expense.user.vehicle,
         expense:      @expense,
         date:         @expense.date,
@@ -24,6 +24,12 @@ module Refuelings
         total_amount: @expense.amount,
         full_tank:    ActiveModel::Type::Boolean.new.cast(@full_tank)
       )
+
+      if refueling&.persisted?
+        Vehicles::OdometerSync.new(vehicle: refueling.vehicle, reading_km: refueling.odometer_km, on: refueling.date).call
+      end
+
+      refueling
     end
 
     private

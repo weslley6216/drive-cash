@@ -17,6 +17,7 @@ class RefuelingsController < ApplicationController
     @refueling = current_user.vehicle.refuelings.new(refueling_params)
 
     if @refueling.save
+      sync_odometer(@refueling)
       flash[:notice] = t('refuelings.flash.created')
       respond_with_modal_refresh(html_redirect: vehicle_path)
     else
@@ -31,6 +32,7 @@ class RefuelingsController < ApplicationController
 
   def update
     if @refueling.update(refueling_params)
+      sync_odometer(@refueling)
       flash[:notice] = t('refuelings.flash.updated')
       respond_with_modal_refresh(html_redirect: vehicle_path)
     else
@@ -63,6 +65,10 @@ class RefuelingsController < ApplicationController
       { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }
     end
     (credits + debits).sort_by { |move| move[:date] }.reverse
+  end
+
+  def sync_odometer(refueling)
+    Vehicles::OdometerSync.new(vehicle: refueling.vehicle, reading_km: refueling.odometer_km, on: refueling.date).call
   end
 
   def find_refueling

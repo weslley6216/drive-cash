@@ -84,6 +84,22 @@ RSpec.describe 'Refuelings', type: :request do
 
       expect(response).to redirect_to(vehicle_path)
     end
+
+    it 'advances vehicle odometer when create includes a higher km' do
+      vehicle.update!(odometer_km: 48_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+
+      post refuelings_path, params: valid_params, as: :turbo_stream
+
+      expect(vehicle.reload.odometer_km).to eq(48_230)
+    end
+
+    it 'does not recede vehicle odometer when create has a lower km' do
+      vehicle.update!(odometer_km: 50_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+
+      post refuelings_path, params: valid_params, as: :turbo_stream
+
+      expect(vehicle.reload.odometer_km).to eq(50_000)
+    end
   end
 
   describe 'GET /refuelings/:id/edit' do
@@ -110,6 +126,15 @@ RSpec.describe 'Refuelings', type: :request do
       patch refueling_path(refueling), params: { refueling: { total_amount: '' } }, as: :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'advances vehicle odometer when update raises the km' do
+      vehicle.update!(odometer_km: 50_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+      refueling.update_column(:odometer_km, 49_000)
+
+      patch refueling_path(refueling), params: { refueling: { odometer_km: 51_000 } }, as: :turbo_stream
+
+      expect(vehicle.reload.odometer_km).to eq(51_000)
     end
   end
 
