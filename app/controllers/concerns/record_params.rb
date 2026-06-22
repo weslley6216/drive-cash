@@ -30,4 +30,11 @@ module RecordParams
       user: current_user
     )
   end
+
+  def create_earning_via_creator(scope_key)
+    Earnings::Creator.call(
+      earning_attributes(scope_key).to_unsafe_h,
+      user: current_user
+    )
+  end
 end
