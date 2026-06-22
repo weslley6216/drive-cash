@@ -92,4 +92,45 @@ RSpec.describe Refueling, type: :model do
       expect(described_class.chronological).to eq([newer, older])
     end
   end
+
+  describe 'odometer sync callback' do
+    let(:vehicle) { create(:vehicle, odometer_km: 160_928, odometer_updated_at: Time.zone.local(2026, 6, 1, 10)) }
+
+    it 'advances the vehicle odometer when the refueling km is greater' do
+      create(:refueling, vehicle: vehicle, odometer_km: 161_450, date: Date.new(2026, 6, 22))
+
+      expect(vehicle.reload.odometer_km).to eq(161_450)
+      expect(vehicle.odometer_updated_at.to_date).to eq(Date.new(2026, 6, 22))
+    end
+
+    it 'does not recede the odometer for a retroactive refueling' do
+      create(:refueling, vehicle: vehicle, odometer_km: 159_000, date: Date.new(2026, 5, 10))
+
+      expect(vehicle.reload.odometer_km).to eq(160_928)
+      expect(vehicle.odometer_updated_at.to_date).to eq(Date.new(2026, 6, 1))
+    end
+
+    it 'ignores refuelings without odometer_km' do
+      create(:refueling, vehicle: vehicle, odometer_km: nil, date: Date.new(2026, 6, 22))
+
+      expect(vehicle.reload.odometer_km).to eq(160_928)
+    end
+
+    it 'does not trigger when the odometer_km is unchanged on update' do
+      refueling = create(:refueling, vehicle: vehicle, odometer_km: 161_450, date: Date.new(2026, 6, 22))
+      vehicle.reload
+
+      refueling.update!(total_amount: 250)
+
+      expect(vehicle.reload.odometer_updated_at.to_date).to eq(Date.new(2026, 6, 22))
+    end
+
+    it 'advances again when the odometer_km is raised on update' do
+      refueling = create(:refueling, vehicle: vehicle, odometer_km: 161_000, date: Date.new(2026, 6, 22))
+
+      refueling.update!(odometer_km: 162_000)
+
+      expect(vehicle.reload.odometer_km).to eq(162_000)
+    end
+  end
 end
