@@ -88,7 +88,7 @@ RSpec.describe 'Expenses', type: :request do
 
       expect(response.body).to include('data-refueling-fields-target="extension"')
       expect(response.body).to include(I18n.t('expenses.refueling_extension.heading'))
-      expect(response.body).not_to include('class="mt-2 hidden"')
+      expect(response.body).not_to include('class="mt-2 hidden" data-refueling-fields-target="extension"')
     end
 
     it 're-renders the refueling extension hidden when the failed expense is not fuel' do
@@ -96,7 +96,7 @@ RSpec.describe 'Expenses', type: :request do
            params: { expense: { amount: 0, category: 'meals' } },
            as:     :turbo_stream
 
-      expect(response.body).to include('class="mt-2 hidden"')
+      expect(response.body).to include('class="mt-2 hidden" data-refueling-fields-target="extension"')
     end
 
     it 're-renders new expense when installment parameters are invalid' do

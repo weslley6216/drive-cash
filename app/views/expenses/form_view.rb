@@ -29,14 +29,14 @@ module Expenses
 
     def render_form
       form_with(model: @expense, url: form_url, method: form_method, class: 'p-6 space-y-4',
-                data: { controller: 'refueling-fields' }) do |f|
+                data: form_stimulus_data) do |f|
         hidden_context_fields
 
         date_field(f, :date, label: t('.labels.date'), theme: @theme)
         money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
         form_body(f)
         category_select(f)
-        text_field(f, :vendor, label: t('.labels.vendor'), theme: @theme, placeholder: t('.placeholders.vendor'))
+        vendor_field(f)
         text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
         refueling_extension unless @expense.persisted?
 
@@ -62,6 +62,44 @@ module Expenses
     end
 
     def selected_category = @expense.category
+
+    def form_stimulus_data
+      data = { controller: 'refueling-fields' }
+      data[:refueling_fields_active_vendor_value] = active_vendor unless @expense.persisted?
+      data
+    end
+
+    def active_vendor
+      Vehicles::ActiveTankVendor.new(user: @expense.user).call.to_s
+    end
+
+    def vendor_field(form)
+      text_field(form, :vendor, label: t('.labels.vendor'), theme: @theme,
+                 placeholder: t('.placeholders.vendor'),
+                 data: { refueling_fields_target: 'vendorInput',
+                         action:                  'input->refueling-fields#refreshVendorUi' })
+      vendor_inheritance_hint unless @expense.persisted?
+    end
+
+    def vendor_inheritance_hint
+      div(class: 'mt-2 hidden', data: { refueling_fields_target: 'vendorHint' }) do
+        div(class: 'flex items-center gap-2 text-xs text-slate-500') do
+          span(class: 'inline-flex items-center gap-1.5 text-amber-600 font-medium') do
+            span(class: 'w-1.5 h-1.5 rounded-full bg-amber-400')
+            span { t('.vendor_inherited') }
+          end
+          button(type: 'button', class: 'text-slate-400 underline underline-offset-2 hover:text-slate-600',
+                 data: { action: 'click->refueling-fields#clearVendor' }) { t('.vendor_clear') }
+        end
+      end
+      button(type:  'button',
+             class: 'mt-2 hidden inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300 shadow-sm',
+             data:  { refueling_fields_target: 'vendorSuggest', action: 'click->refueling-fields#applyVendor' }) do
+        render PhlexIcons::Lucide::Fuel.new(class: 'w-3 h-3 text-amber-500')
+        span(data: { refueling_fields_target: 'vendorSuggestLabel' })
+        span(class: 'text-slate-400') { "· #{t('.vendor_from_tank')}" }
+      end
+    end
 
     def refueling_extension
       div(class: class_names('mt-2', ('hidden' unless @expense.category_fuel?)), data: { refueling_fields_target: 'extension' }) do
