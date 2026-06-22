@@ -1,6 +1,14 @@
 module Expenses
   class InstallmentCreator
-    Result = Struct.new(:success?, :expenses, :expense, keyword_init: true)
+    Result = Data.define(:success?, :expenses, :expense) do
+      def self.success(expenses:)
+        new(success?: true, expenses: expenses, expense: nil)
+      end
+
+      def self.failure(expense:)
+        new(success?: false, expenses: nil, expense: expense)
+      end
+    end
 
     def self.call(expense_attributes, installment_attributes, user:)
       new(expense_attributes, installment_attributes, user: user).call
@@ -17,7 +25,7 @@ module Expenses
       return invalid_plan_failure(plan) unless plan.valid?
 
       expenses = persist_installments(plan)
-      Result.new(success?: true, expenses: expenses)
+      Result.success(expenses: expenses)
     rescue ActiveRecord::RecordInvalid => exception
       record_invalid_failure(exception)
     end
@@ -54,7 +62,7 @@ module Expenses
     def invalid_plan_failure(plan)
       expense = @user.expenses.new(@base_attrs)
       expense.errors.add(:base, I18n.t(invalid_plan_i18n_key(plan)))
-      Result.new(success?: false, expense: expense)
+      Result.failure(expense: expense)
     end
 
     def invalid_plan_i18n_key(plan)
@@ -68,7 +76,7 @@ module Expenses
     def record_invalid_failure(exception)
       expense = @user.expenses.new(@base_attrs)
       expense.errors.add(:base, exception.record.errors.full_messages.to_sentence)
-      Result.new(success?: false, expense: expense)
+      Result.failure(expense: expense)
     end
   end
 end

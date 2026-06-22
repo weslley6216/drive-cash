@@ -20,14 +20,14 @@ module Ai
         expense = user.expenses.new(attrs.merge(paid: true))
         expense.errors.add(:base, I18n.t('expenses.installments.errors.invalid_period_for_installments'))
 
-        Expenses::InstallmentCreator::Result.new(success?: false, expense: expense)
+        Expenses::InstallmentCreator::Result.failure(expense: expense)
       end
 
       def persist_single(attrs, user)
         expense = user.expenses.new(attrs.merge(paid: true))
-        return Expenses::InstallmentCreator::Result.new(success?: true, expenses: [expense]) if expense.save
+        return Expenses::InstallmentCreator::Result.success(expenses: [expense]) if expense.save
 
-        Expenses::InstallmentCreator::Result.new(success?: false, expense: expense)
+        Expenses::InstallmentCreator::Result.failure(expense: expense)
       end
     end
   end

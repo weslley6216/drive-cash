@@ -1,11 +1,11 @@
 module Chat
-  PersistedResult = Struct.new(:success?, :record, :action, :errors, keyword_init: true) do
+  PersistedResult = Data.define(:success?, :record, :action, :errors) do
     def self.success(record:, action:)
       new(success?: true, record: record, action: action, errors: [])
     end
 
     def self.failure(errors:)
-      new(success?: false, errors: errors)
+      new(success?: false, record: nil, action: nil, errors: errors)
     end
   end
 end

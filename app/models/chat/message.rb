@@ -1,7 +1,7 @@
 module Chat
-  Message = Struct.new(:role, :content, :type, :action, :params, :summary, keyword_init: true) do
+  Message = Data.define(:role, :content, :type, :action, :params, :summary) do
     def self.from_user(content)
-      new(role: 'user', content: content.to_s)
+      new(role: 'user', content: content.to_s, type: nil, action: nil, params: nil, summary: nil)
     end
 
     def self.from_result(result, fallback_content:)

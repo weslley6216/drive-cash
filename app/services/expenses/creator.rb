@@ -28,9 +28,9 @@ module Expenses
       expense = @user.expenses.new(@expense_params.reverse_merge('paid' => true))
 
       if expense.save
-        InstallmentCreator::Result.new(success?: true, expenses: [expense])
+        InstallmentCreator::Result.success(expenses: [expense])
       else
-        InstallmentCreator::Result.new(success?: false, expense: expense)
+        InstallmentCreator::Result.failure(expense: expense)
       end
     end
   end
