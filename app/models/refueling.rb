@@ -15,7 +15,6 @@ class Refueling < ApplicationRecord
   scope :full_tank, -> { where(full_tank: true) }
 
   before_save :compute_price_per_liter
-  after_save :sync_vehicle_odometer
 
   private
 
@@ -23,12 +22,5 @@ class Refueling < ApplicationRecord
     return if liters.to_f.zero?
 
     self.price_per_liter = (total_amount.to_f / liters.to_f).round(3)
-  end
-
-  def sync_vehicle_odometer
-    return unless saved_change_to_odometer_km?
-    return if odometer_km.blank?
-
-    Vehicles::OdometerSync.new(vehicle: vehicle, reading_km: odometer_km, on: date).call
   end
 end
