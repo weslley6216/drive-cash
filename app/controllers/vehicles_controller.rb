@@ -25,7 +25,7 @@ class VehiclesController < ApplicationController
       flash[:notice] = t('vehicle.flash.updated')
       respond_with_modal_refresh(html_redirect: vehicle_path)
     else
-      payload = if current_user.vehicle
+      payload = if @vehicle.persisted?
                   Vehicles::MaintenanceService.new(user: current_user).call
                     .merge(tank: Vehicles::TankBalanceService.new(user: current_user).call)
       else
