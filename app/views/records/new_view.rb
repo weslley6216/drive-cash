@@ -30,8 +30,10 @@ module Records
     def expense? = @type == 'expense'
 
     def stimulus_data
-      { controller: 'record-form', record_form_type_value: @type,
-        record_form_active_vendor_value: @active_vendor }
+      { controller:                          'record-form',
+        record_form_type_value:              @type,
+        record_form_active_vendor_value:     @active_vendor,
+        record_form_selected_category_value: @expense.category.to_s }
     end
 
     def cta_theme
@@ -156,12 +158,14 @@ module Records
                  data: { action: 'click->record-form#clearVendor' }) { t('records.new_view.vendor_clear') }
         end
       end
-      button(type:  'button',
-             class: 'mt-2 hidden inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300 shadow-sm',
-             data:  { record_form_target: 'vendorSuggest', action: 'click->record-form#applyVendor' }) do
-        render PhlexIcons::Lucide::Fuel.new(class: 'w-3 h-3 text-amber-500')
-        span(data: { record_form_target: 'vendorSuggestLabel' })
-        span(class: 'text-slate-400') { "· #{t('records.new_view.vendor_from_tank')}" }
+      div(class: 'mt-2 hidden', data: { record_form_target: 'vendorSuggest' }) do
+        button(type:  'button',
+               class: 'cursor-pointer inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300 shadow-sm',
+               data:  { action: 'click->record-form#applyVendor' }) do
+          render PhlexIcons::Lucide::Fuel.new(class: 'w-3 h-3 text-amber-500')
+          span(data: { record_form_target: 'vendorSuggestLabel' })
+          span(class: 'text-slate-400') { "· #{t('records.new_view.vendor_from_tank')}" }
+        end
       end
     end
 

@@ -25,6 +25,12 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include('data-record-form-type-value="expense"')
     end
 
+    it 'exposes selected-category as a Stimulus value on the expense form' do
+      get new_record_path, params: { type: 'expense' }
+
+      expect(response.body).to include('data-record-form-selected-category-value=')
+    end
+
     it 'renders the type toggle' do
       get new_record_path
 

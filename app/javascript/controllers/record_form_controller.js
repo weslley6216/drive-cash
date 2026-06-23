@@ -5,7 +5,7 @@ const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
 const TOGGLE_INACTIVE = ['text-slate-500']
 
 export default class extends Controller {
-  static values = { type: String, activeVendor: String }
+  static values = { type: String, activeVendor: String, selectedCategory: String }
   static targets = [
     'typeInput', 'earningFields', 'expenseFields',
     'submit', 'tripsValue', 'tripsInput',
@@ -17,10 +17,12 @@ export default class extends Controller {
   connect() {
     this.applyType(this.typeValue)
     this.initAmountDisplay()
+    this._syncCategoryFromDom()
     this.maybePrefillVendor()
     this.refreshVendorUi()
     this._onCategoryChange = (event) => {
       if (event.target.type === 'radio' && event.target.name === 'record[category]') {
+        this.selectedCategoryValue = event.target.value
         this.maybePrefillVendor()
         this.refreshVendorUi()
       }
@@ -45,6 +47,7 @@ export default class extends Controller {
   clearFieldset(node) {
     node.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = '' })
     node.querySelectorAll('input[type="radio"]').forEach(el => { el.checked = false })
+    if (node === this.expenseFieldsTarget) this.selectedCategoryValue = ''
     this.refreshVendorUi()
   }
 
@@ -96,10 +99,14 @@ export default class extends Controller {
     this.vendorInputTarget.value = this.activeVendorValue
   }
 
-  get isFuel() {
+  _syncCategoryFromDom() {
     const radios = Array.from(this.element.querySelectorAll('input[type="radio"]'))
     const checked = radios.find(radio => radio.name === 'record[category]' && radio.checked)
-    return checked?.value === 'fuel'
+    this.selectedCategoryValue = checked?.value || ''
+  }
+
+  get isFuel() {
+    return this.selectedCategoryValue === 'fuel'
   }
 
   applyType(type) {
