@@ -2,10 +2,11 @@ class RecordsController < ApplicationController
   def new
     @type = (params[:type].presence || 'earning')
     render Records::NewView.new(
-      type:    @type,
-      earning: Earning.new(date: Date.current),
-      expense: Expense.new(date: Date.current),
-      context: params[:context]
+      type:          @type,
+      earning:       Earning.new(date: Date.current),
+      expense:       Expense.new(date: Date.current),
+      context:       params[:context],
+      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
     )
   end
 
@@ -29,10 +30,11 @@ class RecordsController < ApplicationController
         redirect_to root_path, notice: t('records.create.success')
       else
         render Records::NewView.new(
-          type:    'expense',
-          earning: Earning.new(date: Date.current),
-          expense: result.expense,
-          context: params[:context]
+          type:          'expense',
+          earning:       Earning.new(date: Date.current),
+          expense:       result.expense,
+          context:       params[:context],
+          active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
         ), status: :unprocessable_content
       end
     else

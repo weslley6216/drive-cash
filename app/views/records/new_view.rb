@@ -1,10 +1,11 @@
 module Records
   class NewView < ApplicationView
-    def initialize(type:, earning: nil, expense: nil, context: nil)
+    def initialize(type:, earning: nil, expense: nil, context: nil, active_vendor: nil)
       @type = type.to_s
       @earning = earning || Earning.new(date: Date.current)
       @expense = expense || Expense.new(date: Date.current)
       @context = context || {}
+      @active_vendor = active_vendor.to_s
     end
 
     def view_template
@@ -29,7 +30,8 @@ module Records
     def expense? = @type == 'expense'
 
     def stimulus_data
-      { controller: 'record-form', record_form_type_value: @type }
+      { controller: 'record-form', record_form_type_value: @type,
+        record_form_active_vendor_value: @active_vendor }
     end
 
     def cta_theme
@@ -105,7 +107,8 @@ module Records
     end
 
     def expense_block
-      div(class: (expense? ? '' : 'hidden'), data: { record_form_target: 'expenseFields' }) do
+      div(class: (expense? ? '' : 'hidden'),
+          data:  { record_form_target: 'expenseFields', action: 'change->record-form#categoryChanged' }) do
         render Records::CategoryPickerComponent.new(selected: @expense.category)
         details_section do
           vendor_card
@@ -133,7 +136,32 @@ module Records
     def vendor_card
       div(class: 'rounded-xl border border-slate-200 bg-white p-3') do
         label(class: 'text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-1 block') { t('records.new_view.vendor_label') }
-        input(type: 'text', name: 'record[vendor]', value: @expense.vendor, placeholder: t('records.new_view.vendor_placeholder'), class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none')
+        input(type: 'text', name: 'record[vendor]', value: @expense.vendor,
+              placeholder: t('records.new_view.vendor_placeholder'),
+              class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none',
+              data: { record_form_target: 'vendorInput',
+                      action:             'input->record-form#refreshVendorUi' })
+        vendor_inheritance_hint
+      end
+    end
+
+    def vendor_inheritance_hint
+      div(class: 'mt-2 hidden', data: { record_form_target: 'vendorHint' }) do
+        div(class: 'flex items-center gap-2 text-xs text-slate-500') do
+          span(class: 'inline-flex items-center gap-1.5 text-amber-600 font-medium') do
+            span(class: 'w-1.5 h-1.5 rounded-full bg-amber-400')
+            span { t('records.new_view.vendor_inherited') }
+          end
+          button(type: 'button', class: 'text-slate-400 underline underline-offset-2 hover:text-slate-600',
+                 data: { action: 'click->record-form#clearVendor' }) { t('records.new_view.vendor_clear') }
+        end
+      end
+      button(type:  'button',
+             class: 'mt-2 hidden inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300 shadow-sm',
+             data:  { record_form_target: 'vendorSuggest', action: 'click->record-form#applyVendor' }) do
+        render PhlexIcons::Lucide::Fuel.new(class: 'w-3 h-3 text-amber-500')
+        span(data: { record_form_target: 'vendorSuggestLabel' })
+        span(class: 'text-slate-400') { "· #{t('records.new_view.vendor_from_tank')}" }
       end
     end
 

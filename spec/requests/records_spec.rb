@@ -82,6 +82,48 @@ RSpec.describe 'Records', type: :request do
 
       expect(response.body).to include('sm:grid-cols-2')
     end
+
+    context 'when the user has a vehicle with a full_tank refueling' do
+      let(:vehicle) { create(:vehicle, user: current_user) }
+
+      before do
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', full_tank: true, date: Date.current - 2)
+      end
+
+      it 'exposes the active tank vendor as a Stimulus value on the form' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include('data-record-form-active-vendor-value="Posto Orense"')
+      end
+
+      it 'renders the vendorInput target on the vendor field' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include('data-record-form-target="vendorInput"')
+      end
+
+      it 'renders the vendorHint target slot with the inherited label' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include('data-record-form-target="vendorHint"')
+        expect(response.body).to include(I18n.t('records.new_view.vendor_inherited'))
+      end
+
+      it 'renders the vendorSuggest target slot with the tank label' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include('data-record-form-target="vendorSuggest"')
+        expect(response.body).to include(I18n.t('records.new_view.vendor_from_tank'))
+      end
+    end
+
+    context 'when the user has no vehicle' do
+      it 'exposes an empty active vendor value' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include('data-record-form-active-vendor-value=""')
+      end
+    end
   end
 
   describe 'POST /records' do

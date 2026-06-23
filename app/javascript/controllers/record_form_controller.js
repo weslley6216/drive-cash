@@ -5,17 +5,20 @@ const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
 const TOGGLE_INACTIVE = ['text-slate-500']
 
 export default class extends Controller {
-  static values = { type: String }
+  static values = { type: String, activeVendor: String }
   static targets = [
     'typeInput', 'earningFields', 'expenseFields',
     'submit', 'tripsValue', 'tripsInput',
     'earningToggle', 'expenseToggle', 'amountTheme',
-    'amountDisplay', 'amountInput'
+    'amountDisplay', 'amountInput',
+    'vendorInput', 'vendorHint', 'vendorSuggest', 'vendorSuggestLabel'
   ]
 
   connect() {
     this.applyType(this.typeValue)
     this.initAmountDisplay()
+    this.maybePrefillVendor()
+    this.refreshVendorUi()
   }
 
   switch(event) {
@@ -29,6 +32,60 @@ export default class extends Controller {
   clearFieldset(node) {
     node.querySelectorAll('input[type="text"], textarea').forEach(el => { el.value = '' })
     node.querySelectorAll('input[type="radio"]').forEach(el => { el.checked = false })
+    this.refreshVendorUi()
+  }
+
+  categoryChanged() {
+    this.maybePrefillVendor()
+    this.refreshVendorUi()
+  }
+
+  clearVendor() {
+    if (!this.hasVendorInputTarget) return
+
+    this.vendorInputTarget.value = ''
+    this.refreshVendorUi()
+    this.vendorInputTarget.focus()
+  }
+
+  applyVendor() {
+    if (!this.hasVendorInputTarget || !this.activeVendorValue) return
+
+    this.vendorInputTarget.value = this.activeVendorValue
+    this.refreshVendorUi()
+  }
+
+  refreshVendorUi() {
+    if (!this.hasVendorInputTarget) return
+
+    const current = this.vendorInputTarget.value.trim()
+    const hasActive = this.activeVendorValue.length > 0
+    const showHint = this.isFuel && hasActive && current === this.activeVendorValue
+    const showSuggest = this.isFuel && hasActive && current.length === 0
+
+    if (this.hasVendorHintTarget) {
+      this.vendorHintTarget.classList.toggle('hidden', !showHint)
+    }
+    if (this.hasVendorSuggestTarget) {
+      this.vendorSuggestTarget.classList.toggle('hidden', !showSuggest)
+      if (this.hasVendorSuggestLabelTarget) {
+        this.vendorSuggestLabelTarget.textContent = `Usar ${this.activeVendorValue}`
+      }
+    }
+  }
+
+  maybePrefillVendor() {
+    if (!this.hasVendorInputTarget) return
+    if (!this.isFuel) return
+    if (this.activeVendorValue.length === 0) return
+    if (this.vendorInputTarget.value.trim().length > 0) return
+
+    this.vendorInputTarget.value = this.activeVendorValue
+  }
+
+  get isFuel() {
+    const checked = this.element.querySelector('input[name="record[category]"]:checked')
+    return checked !== null && checked.value === 'fuel'
   }
 
   applyType(type) {
