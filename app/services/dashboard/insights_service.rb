@@ -54,6 +54,14 @@ module Dashboard
       @previous_calculator ||= MetricsCalculator.from_stats(previous_stats)
     end
 
+    def current_km
+      @current_km ||= KmDriven.new(user: @user, year: year, month: month).call
+    end
+
+    def previous_km
+      @previous_km ||= KmDriven.new(user: @user, year: previous_year, month: previous_month).call
+    end
+
     def ytd_cutoff
       return nil if month
       return nil if year != Date.current.year
@@ -94,12 +102,12 @@ module Dashboard
       {
         per_day:    current_stats[:profit_per_day],
         per_trip:   current_calculator.per_trip,
-        per_hour:   current_calculator.per_hour,
+        per_km:     current_calculator.per_km(current_km),
         margin:     current_calculator.margin,
         change_pct: {
           per_day:  PercentChange.between(current_stats[:profit_per_day], previous_stats[:profit_per_day]),
           per_trip: PercentChange.between(current_calculator.per_trip, previous_calculator.per_trip),
-          per_hour: PercentChange.between(current_calculator.per_hour, previous_calculator.per_hour),
+          per_km:   PercentChange.between(current_calculator.per_km(current_km), previous_calculator.per_km(previous_km)),
           margin:   PercentChange.between(current_calculator.margin, previous_calculator.margin)
         }
       }

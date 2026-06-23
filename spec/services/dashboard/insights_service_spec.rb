@@ -5,10 +5,13 @@ RSpec.describe Dashboard::InsightsService do
 
   describe '#call' do
     context 'metrics' do
-      it 'returns per_day, per_trip, per_hour, margin and change_pct hash' do
+      it 'returns per_day, per_trip, per_km, margin and change_pct hash' do
+        vehicle = create(:vehicle, user: user)
         create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 800, trips_count: 10)
         create(:earning, user: user, date: Date.new(2025, 2, 5), amount: 200, trips_count: 10)
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 200, category: 'fuel', paid: true)
+        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 1), odometer_km: 10_000)
+        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 5), odometer_km: 10_800)
         create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 600, trips_count: 20)
         create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
@@ -16,17 +19,34 @@ RSpec.describe Dashboard::InsightsService do
 
         expect(result[:metrics][:per_day]).to eq(400.0)
         expect(result[:metrics][:per_trip].to_f.round(2)).to eq(40.0)
-        expect(result[:metrics][:per_hour].to_f.round(2)).to eq(50.0)
+        expect(result[:metrics][:per_km]).to eq(1.0)
         expect(result[:metrics][:margin]).to eq(80.0)
         expect(result[:metrics][:change_pct]).to be_a(Hash)
-        expect(result[:metrics][:change_pct].keys).to match_array(%i[per_day per_trip per_hour margin])
+        expect(result[:metrics][:change_pct].keys).to match_array(%i[per_day per_trip per_km margin])
+      end
+
+      it 'returns nil for per_km when there are no odometer readings' do
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:metrics][:per_km]).to be_nil
+      end
+
+      it 'returns nil for change_pct[:per_km] when previous period has no km' do
+        vehicle = create(:vehicle, user: user)
+        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 200, trips_count: 1)
+        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 1), odometer_km: 10_000)
+        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 15), odometer_km: 10_200)
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:metrics][:change_pct][:per_km]).to be_nil
       end
 
       it 'returns zero for per_trip when there are no trips' do
         result = described_class.new(year: 2025, month: 2, user: user).call
 
         expect(result[:metrics][:per_trip]).to eq(0)
-        expect(result[:metrics][:per_hour]).to eq(0)
+        expect(result[:metrics][:per_km]).to be_nil
         expect(result[:metrics][:margin]).to eq(0)
       end
 
