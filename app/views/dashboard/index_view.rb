@@ -28,9 +28,15 @@ module Dashboard
 
     def topbar_section
       div(class: 'mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between') do
-        div do
-          h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.greeting', name: @first_name) }
-          p(class: 'text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
+        div(class: 'flex items-center justify-between') do
+          div do
+            h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.greeting', name: @first_name) }
+            p(class: 'text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
+          end
+          div(class: 'flex items-center gap-2 lg:hidden') do
+            bell_button
+            avatar_link
+          end
         end
 
         div(class: 'flex items-center gap-2 flex-wrap') do
@@ -46,6 +52,10 @@ module Dashboard
             render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
             plain t('.new_record')
           end
+          div(class: 'hidden lg:flex items-center gap-2') do
+            bell_button
+            avatar_link
+          end
         end
       end
     end
@@ -53,6 +63,23 @@ module Dashboard
     def new_record_button_classes
       'hidden lg:inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 ' \
       'text-white rounded-lg px-4 py-2 text-sm font-semibold'
+    end
+
+    def bell_button
+      button(
+        type:     'button',
+        disabled: true,
+        class:    'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600'
+      ) do
+        render PhlexIcons::Lucide::Bell.new(class: 'w-[18px] h-[18px]')
+      end
+    end
+
+    def avatar_link
+      a(href:  account_path,
+        class: 'w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm') do
+        plain @first_name.to_s.first&.upcase || '?'
+      end
     end
 
     def loading_region
