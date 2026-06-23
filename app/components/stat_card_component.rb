@@ -80,7 +80,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def card_classes
-    class_names('border-2 rounded-lg p-4 shadow-sm', colors[:bg], colors[:border])
+    class_names('border-2 rounded-xl p-3 shadow-sm', colors[:bg], colors[:border])
   end
 
   def title_classes
