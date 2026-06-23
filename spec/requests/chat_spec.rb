@@ -65,6 +65,18 @@ RSpec.describe 'Chats', type: :request do
       allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
     end
 
+    context 'when ParserService returns an answer (query tool)' do
+      before do
+        allow(parser_mock).to receive(:call).and_return({ type: :answer, content: 'Lucro: R$ 500,00' })
+      end
+
+      it 'renders the answer as a text bubble' do
+        post chat_message_path, params: { message: 'qual meu lucro?' }, as: :turbo_stream
+
+        expect(response.body).to include('500,00')
+      end
+    end
+
     context 'when ParserService returns an expense preview' do
       before do
         allow(parser_mock).to receive(:call).and_return({
@@ -370,6 +382,27 @@ RSpec.describe 'Chats', type: :request do
 
       expect(response.body).to include('Despesa')
       expect(response.body).to include('45')
+    end
+
+    it 'renders error when queued next call has unknown tool name' do
+      allow(Ai::ParserService).to receive(:new).and_return(
+        instance_double(Ai::ParserService, call: {
+          type:        :preview,
+          action:      'create_earning',
+          params:      earning_input,
+          summary:     'Receita',
+          content:     'Apresentado',
+          extra_calls: [{ name: 'nonexistent_tool', input: {} }]
+        })
+      )
+
+      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input },
+           as:     :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
     end
 
     it 'does not persist second record before individual confirmation' do

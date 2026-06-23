@@ -39,5 +39,16 @@ RSpec.describe Chat::MaintenanceUpdater do
 
       expect(result.success?).to be false
     end
+
+    it 'returns failure when update violates validation' do
+      user = create(:user)
+      vehicle = create(:vehicle, user: user, odometer_km: 50_000)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 45_000)
+
+      result = described_class.new.persist({ 'category' => 'oil_change', 'done_km' => 0 }, user: user)
+
+      expect(result.success?).to be false
+      expect(result.errors).to be_present
+    end
   end
 end

@@ -37,8 +37,4 @@ module ChatSession
     session[:pending_tool_calls] = queue.map { |call| call.transform_keys(&:to_s) }
     next_call
   end
-
-  def pending_calls?
-    pending_tool_calls.any?
-  end
 end

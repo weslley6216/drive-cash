@@ -229,6 +229,19 @@ RSpec.describe Ai::ParserService do
 
         expect(reader_class).to have_received(:new).with({ 'year' => 2026, 'month' => 6 }, user: user)
       end
+
+      context 'when reader raises an error' do
+        before do
+          allow(reader_class).to receive(:new).and_raise(StandardError, 'connection refused')
+        end
+
+        it 'rescues and returns api_error text' do
+          result = service.call
+
+          expect(result[:type]).to eq(:text)
+          expect(result[:content]).to eq(I18n.t('chat.errors.api_error'))
+        end
+      end
     end
 
     context 'when LLM returns multiple tool_calls (multi-create)' do
