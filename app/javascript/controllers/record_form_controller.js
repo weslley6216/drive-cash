@@ -20,7 +20,7 @@ export default class extends Controller {
     this.maybePrefillVendor()
     this.refreshVendorUi()
     this._onCategoryChange = (event) => {
-      if (event.target.matches('input[name="record[category]"]')) {
+      if (event.target.type === 'radio' && event.target.name === 'record[category]') {
         this.maybePrefillVendor()
         this.refreshVendorUi()
       }
@@ -97,8 +97,9 @@ export default class extends Controller {
   }
 
   get isFuel() {
-    const checked = this.element.querySelector('input[name="record[category]"]:checked')
-    return checked !== null && checked.value === 'fuel'
+    const radios = Array.from(this.element.querySelectorAll('input[type="radio"]'))
+    const checked = radios.find(radio => radio.name === 'record[category]' && radio.checked)
+    return checked?.value === 'fuel'
   }
 
   applyType(type) {
