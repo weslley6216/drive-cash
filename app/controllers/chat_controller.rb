@@ -71,7 +71,7 @@ class ChatController < ApplicationController
         success: true,
         message: t(i18n_key),
         action:  action,
-        date:    record.date
+        date:    record.respond_to?(:date) ? record.date : nil
       )
     end
   end
