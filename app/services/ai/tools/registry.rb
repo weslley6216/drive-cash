@@ -144,6 +144,22 @@ module Ai
           declaration:      QueryHistorySearch.declaration,
           reader:           Ai::Readers::HistorySearch,
           answer_presenter: Chat::Answers::HistorySearch
+        ),
+        Tool.create_tool(
+          name:              'create_goal',
+          declaration:       CreateGoal.declaration,
+          persister:         Chat::GoalPersister,
+          summary_presenter: Chat::Summaries::Goal,
+          confirm_key:       'chat.confirm.success_goal',
+          requires_amount:   true
+        ),
+        Tool.create_tool(
+          name:              'update_maintenance',
+          declaration:       UpdateMaintenance.declaration,
+          persister:         Chat::MaintenanceUpdater,
+          summary_presenter: Chat::Summaries::Maintenance,
+          confirm_key:       'chat.confirm.success_maintenance',
+          requires_amount:   false
         )
       ].freeze
 
