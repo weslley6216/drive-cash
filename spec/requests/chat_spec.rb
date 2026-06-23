@@ -343,4 +343,53 @@ RSpec.describe 'Chats', type: :request do
       expect(response).to redirect_to(chat_root_path)
     end
   end
+
+  describe 'multi-create queue' do
+    let(:earning_input) { { 'amount' => 245.0, 'platform' => 'shopee', 'date' => '2026-06-23' } }
+    let(:expense_input) { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-06-23', 'vendor' => 'Ipiranga' } }
+
+    it 'queues second tool call and renders next preview on first confirm' do
+      allow(Ai::ParserService).to receive(:new).and_return(
+        instance_double(Ai::ParserService, call: {
+          type:        :preview,
+          action:      'create_earning',
+          params:      earning_input,
+          summary:     'Receita de R$ 245,00 via Shopee',
+          content:     'Apresentado',
+          extra_calls: [{ name: 'create_expense', input: expense_input }]
+        })
+      )
+
+      post chat_message_path, params: { message: 'rota Shopee 245 e abasteci 45 no Ipiranga' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input },
+           as:     :turbo_stream
+
+      expect(response.body).to include('Despesa')
+      expect(response.body).to include('45')
+    end
+
+    it 'does not persist second record before individual confirmation' do
+      allow(Ai::ParserService).to receive(:new).and_return(
+        instance_double(Ai::ParserService, call: {
+          type:        :preview,
+          action:      'create_earning',
+          params:      earning_input,
+          summary:     'Receita',
+          content:     'Apresentado',
+          extra_calls: [{ name: 'create_expense', input: expense_input }]
+        })
+      )
+
+      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+
+      expect {
+        post chat_confirm_path, params: { record_action: 'create_earning', record: earning_input }, as: :turbo_stream
+      }.to change(Earning, :count).by(1)
+        .and change(Expense, :count).by(0)
+    end
+  end
 end

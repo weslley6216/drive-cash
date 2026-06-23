@@ -13,6 +13,11 @@ class ChatController < ApplicationController
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
 
+    if result[:extra_calls].present?
+      push_pending_calls(result[:extra_calls])
+      result = result.except(:extra_calls)
+    end
+
     add_to_history(Chat::Message.from_result(result, fallback_content: t('chat.history.preview_sent')))
 
     respond_to do |format|
@@ -57,11 +62,33 @@ class ChatController < ApplicationController
       fallback_content: t(i18n_key)
     ))
 
-    render Chat::ConfirmView.new(
-      success: true,
-      message: t(i18n_key),
-      action:  action,
-      date:    record.date
-    )
+    next_call = pop_pending_call
+
+    if next_call
+      dispatch_next_preview(next_call)
+    else
+      render Chat::ConfirmView.new(
+        success: true,
+        message: t(i18n_key),
+        action:  action,
+        date:    record.date
+      )
+    end
+  end
+
+  def dispatch_next_preview(call)
+    tool = Ai::Tools::Registry.find(call[:name])
+    unless tool
+      render Chat::ConfirmView.new(success: false, message: t('chat.errors.unknown_action'))
+      return
+    end
+
+    params_hash = call[:input].is_a?(Hash) ? call[:input] : {}
+    summary = tool.summary_presenter.new(params_hash).call
+    result = { type: :preview, action: call[:name], params: params_hash, summary: summary, content: t('chat.history.preview_sent') }
+
+    add_to_history(Chat::Message.from_result(result, fallback_content: t('chat.history.preview_sent')))
+
+    render Chat::MessageView.new(user_text: nil, result: result)
   end
 end
