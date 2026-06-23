@@ -38,11 +38,20 @@ RSpec.describe Vehicles::ActiveTankVendor do
     expect(result).to be_nil
   end
 
-  it 'returns the vendor already normalized by VendorNormalization' do
+  it 'returns the vendor normalized by VendorNormalization' do
     create(:refueling, vehicle: vehicle, vendor: '  Posto   Orense ', full_tank: true, date: Date.new(2026, 6, 20))
 
     result = described_class.new(user: user).call
 
     expect(result).to eq('Posto Orense')
+  end
+
+  it 'normalizes unicode whitespace not covered by VendorNormalization' do
+    refueling = create(:refueling, vehicle: vehicle, vendor: 'Posto Ipiranga', full_tank: true, date: Date.new(2026, 6, 20))
+    refueling.update_column(:vendor, "Posto Ipiranga")
+
+    result = described_class.new(user: user).call
+
+    expect(result).to eq('Posto Ipiranga')
   end
 end

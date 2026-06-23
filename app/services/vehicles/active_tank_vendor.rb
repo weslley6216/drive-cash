@@ -8,7 +8,8 @@ module Vehicles
       vehicle = @user.vehicle
       return nil unless vehicle
 
-      vehicle.refuelings.full_tank.chronological.first&.vendor.presence
+      vendor = vehicle.refuelings.full_tank.chronological.first&.vendor.presence
+      vendor&.gsub(/[[:space:]]+/, ' ')&.strip
     end
   end
 end

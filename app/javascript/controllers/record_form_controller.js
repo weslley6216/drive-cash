@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { normalizeVendor } from 'utils/normalize_vendor'
 
 const TOGGLE_ACTIVE_EARN = ['bg-white', 'shadow-sm', 'text-emerald-700']
 const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
@@ -18,12 +19,10 @@ export default class extends Controller {
     this.applyType(this.typeValue)
     this.initAmountDisplay()
     this._syncCategoryFromDom()
-    this.maybePrefillVendor()
     this.refreshVendorUi()
     this._onCategoryChange = (event) => {
       if (event.target.type === 'radio' && event.target.name === 'record[category]') {
         this.selectedCategoryValue = event.target.value
-        this.maybePrefillVendor()
         this.refreshVendorUi()
       }
     }
@@ -67,16 +66,17 @@ export default class extends Controller {
   applyVendor() {
     if (!this.hasVendorInputTarget || !this.activeVendorValue) return
 
-    this.vendorInputTarget.value = this.activeVendorValue
+    this.vendorInputTarget.value = normalizeVendor(this.activeVendorValue)
     this.refreshVendorUi()
   }
 
   refreshVendorUi() {
     if (!this.hasVendorInputTarget) return
 
-    const current = this.vendorInputTarget.value.trim()
-    const hasActive = this.activeVendorValue.length > 0
-    const showHint = this.isFuel && hasActive && current === this.activeVendorValue
+    const current = normalizeVendor(this.vendorInputTarget.value)
+    const active = normalizeVendor(this.activeVendorValue)
+    const hasActive = active.length > 0
+    const showHint = this.isFuel && hasActive && current === active
     const showSuggest = this.isFuel && hasActive && current.length === 0
 
     if (this.hasVendorHintTarget) {
@@ -85,18 +85,9 @@ export default class extends Controller {
     if (this.hasVendorSuggestTarget) {
       this.vendorSuggestTarget.classList.toggle('hidden', !showSuggest)
       if (this.hasVendorSuggestLabelTarget) {
-        this.vendorSuggestLabelTarget.textContent = `Usar ${this.activeVendorValue}`
+        this.vendorSuggestLabelTarget.textContent = `Usar ${active}`
       }
     }
-  }
-
-  maybePrefillVendor() {
-    if (!this.hasVendorInputTarget) return
-    if (!this.isFuel) return
-    if (this.activeVendorValue.length === 0) return
-    if (this.vendorInputTarget.value.trim().length > 0) return
-
-    this.vendorInputTarget.value = this.activeVendorValue
   }
 
   _syncCategoryFromDom() {
