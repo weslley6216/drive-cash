@@ -19,6 +19,19 @@ export default class extends Controller {
     this.initAmountDisplay()
     this.maybePrefillVendor()
     this.refreshVendorUi()
+    this._onCategoryChange = (event) => {
+      if (event.target.matches('input[name="record[category]"]')) {
+        this.maybePrefillVendor()
+        this.refreshVendorUi()
+      }
+    }
+    this.element.addEventListener('change', this._onCategoryChange)
+  }
+
+  disconnect() {
+    if (this._onCategoryChange) {
+      this.element.removeEventListener('change', this._onCategoryChange)
+    }
   }
 
   switch(event) {

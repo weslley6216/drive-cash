@@ -85,7 +85,7 @@ module Expenses
             span(class: 'w-1.5 h-1.5 rounded-full bg-amber-400')
             span { t('.vendor_inherited') }
           end
-          button(type: 'button', class: 'text-slate-400 underline underline-offset-2 hover:text-slate-600',
+          button(type: 'button', class: 'cursor-pointer text-slate-400 underline underline-offset-2 hover:text-slate-600',
                  data: { action: 'click->refueling-fields#clearVendor' }) { t('.vendor_clear') }
         end
       end

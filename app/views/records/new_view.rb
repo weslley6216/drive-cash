@@ -108,7 +108,7 @@ module Records
 
     def expense_block
       div(class: (expense? ? '' : 'hidden'),
-          data:  { record_form_target: 'expenseFields', action: 'change->record-form#categoryChanged' }) do
+          data:  { record_form_target: 'expenseFields' }) do
         render Records::CategoryPickerComponent.new(selected: @expense.category)
         details_section do
           vendor_card
@@ -152,7 +152,7 @@ module Records
             span(class: 'w-1.5 h-1.5 rounded-full bg-amber-400')
             span { t('records.new_view.vendor_inherited') }
           end
-          button(type: 'button', class: 'text-slate-400 underline underline-offset-2 hover:text-slate-600',
+          button(type: 'button', class: 'cursor-pointer text-slate-400 underline underline-offset-2 hover:text-slate-600',
                  data: { action: 'click->record-form#clearVendor' }) { t('records.new_view.vendor_clear') }
         end
       end
