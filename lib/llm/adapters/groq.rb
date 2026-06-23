@@ -57,10 +57,16 @@ module Llm
         return { type: :text, content: '' } unless message
 
         if message['tool_calls']
-          call = message['tool_calls'].first['function']
-          input = JSON.parse(call['arguments'])
-          Rails.logger.info "[Groq] Tool call: #{call['name']}"
-          { type: :tool_use, tool_name: call['name'], tool_input: input }
+          calls = message['tool_calls'].map do |tc|
+            { name: tc.dig('function', 'name'), input: JSON.parse(tc.dig('function', 'arguments')) }
+          end
+
+          first = calls.first
+          Rails.logger.info "[Groq] Tool call: #{first[:name]} (#{calls.size} total)"
+
+          result = { type: :tool_use, tool_name: first[:name], tool_input: first[:input] }
+          result[:extra_calls] = calls.drop(1) if calls.size > 1
+          result
         else
           content = message['content'].to_s.strip
           content = sanitize_function_leaks(content)
