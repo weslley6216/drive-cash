@@ -39,7 +39,7 @@ RSpec.describe 'Analysis', type: :request do
 
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_day'))
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_trip'))
-      expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_hour'))
+      expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_km'))
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.margin'))
       expect(response.body).to include('grid-cols-2')
     end

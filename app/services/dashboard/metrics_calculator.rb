@@ -1,20 +1,12 @@
 module Dashboard
   class MetricsCalculator
-    HOURS_PER_DAY = 8
-
     def self.from_stats(stats)
-      new(
-        profit:   stats[:profit],
-        trips:    stats[:trips],
-        days:     stats[:days],
-        earnings: stats[:earnings]
-      )
+      new(profit: stats[:profit], trips: stats[:trips], earnings: stats[:earnings])
     end
 
-    def initialize(profit:, trips:, days:, earnings:)
+    def initialize(profit:, trips:, earnings:)
       @profit = profit.to_f
       @trips = trips.to_i
-      @days = days.to_i
       @earnings = earnings.to_f
     end
 
@@ -24,10 +16,10 @@ module Dashboard
       (@profit / @trips).round(2)
     end
 
-    def per_hour
-      return 0 if @days.zero?
+    def per_km(km)
+      return nil if km.nil? || km.zero?
 
-      (@profit / (@days * HOURS_PER_DAY)).round(2)
+      (@profit / km).round(2)
     end
 
     def margin

@@ -22,10 +22,10 @@ RSpec.describe Analysis::MetricCardComponent, type: :component do
 
   it 'renders the hint when present' do
     with_hint = Analysis::MetricCardComponent.new(
-      label: 'R$ / hora *', icon: PhlexIcons::Lucide::Clock, value: 'R$ 29,85', hint: '*estimado em 8h/dia'
+      label: 'R$ / km', icon: PhlexIcons::Lucide::Route, value: 'R$ 1,50', hint: 'lucro por km rodado'
     )
 
-    expect(view_context.render(with_hint)).to include('*estimado em 8h/dia')
+    expect(view_context.render(with_hint)).to include('lucro por km rodado')
   end
 
   it 'renders the change badge in green as simple text when change_pct is positive' do
