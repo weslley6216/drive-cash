@@ -42,6 +42,18 @@ module Ai
           summary_presenter: Chat::Summaries::Expense,
           confirm_key:       'chat.confirm.success_expense',
           requires_amount:   true
+        ),
+        Tool.query_tool(
+          name:             'query_summary',
+          declaration:      QuerySummary.declaration,
+          reader:           Ai::Readers::Summary,
+          answer_presenter: Chat::Answers::Summary
+        ),
+        Tool.query_tool(
+          name:             'query_vendor_efficiency',
+          declaration:      QueryVendorEfficiency.declaration,
+          reader:           Ai::Readers::VendorEfficiency,
+          answer_presenter: Chat::Answers::VendorEfficiency
         )
       ].freeze
 
