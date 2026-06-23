@@ -11,7 +11,7 @@ class ChatController < ApplicationController
 
     add_to_history(Chat::Message.from_user(user_text))
 
-    result = Ai::ParserService.new(messages: chat_history, today: Date.current).call
+    result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
 
     add_to_history(Chat::Message.from_result(result, fallback_content: t('chat.history.preview_sent')))
 
