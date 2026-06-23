@@ -7,7 +7,6 @@ module Ai
         :reader, :answer_presenter
       ) do
         def query? = kind == :query
-        def create? = kind == :create
 
         def self.create_tool(name:, declaration:, persister:, summary_presenter:, confirm_key:, requires_amount: false)
           new(
