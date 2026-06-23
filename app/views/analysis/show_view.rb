@@ -3,7 +3,7 @@ module Analysis
     METRIC_ICONS = {
       per_day:  PhlexIcons::Lucide::Zap,
       per_trip: PhlexIcons::Lucide::Package,
-      per_hour: PhlexIcons::Lucide::Clock,
+      per_km:   PhlexIcons::Lucide::Route,
       margin:   PhlexIcons::Lucide::Gauge
     }.freeze
 
@@ -83,9 +83,20 @@ module Analysis
       div(class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
         metric_card(:per_day, format_currency(metrics[:per_day]))
         metric_card(:per_trip, format_currency(metrics[:per_trip]))
-        metric_card(:per_hour, format_currency(metrics[:per_hour]), hint: t('.metrics.per_hour_hint'))
+        metric_card(:per_km, per_km_value, hint: per_km_hint)
         metric_card(:margin, "#{format_percentage(metrics[:margin])}%")
       end
+    end
+
+    def per_km_value
+      value = metrics[:per_km]
+      return '—' if value.nil?
+
+      format_currency(value)
+    end
+
+    def per_km_hint
+      metrics[:per_km].nil? ? t('.metrics.per_km_empty') : t('.metrics.per_km_hint')
     end
 
     def metric_card(key, value, hint: nil, pp: false)

@@ -7,8 +7,9 @@ pt-BR:
       metrics:
         per_day: "R$ / dia"
         per_trip: "R$ / rota"
-        per_hour: "R$ / hora *"
-        per_hour_hint: "*estimado em 8h/dia"
+        per_km: "R$ / km"
+        per_km_hint: "lucro por km rodado"
+        per_km_empty: "informe o km no abastecimento"
         margin: "Margem"
         vs_previous: "% vs anterior"
         vs_previous_pp: " p.p. vs anterior"

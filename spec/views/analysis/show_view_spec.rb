@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Analysis::ShowView, type: :component do
   let(:insights) do
     {
-      metrics: { per_day: 0, per_trip: 0, per_hour: 0, margin: 0, change_pct: {} },
+      metrics: { per_day: 0, per_trip: 0, per_km: nil, margin: 0, change_pct: {} },
       monthly_bars: [], categories: [], platforms: [], insights: [],
       period_context: nil
     }
