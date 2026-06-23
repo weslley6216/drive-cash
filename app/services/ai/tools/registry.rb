@@ -54,6 +54,30 @@ module Ai
           declaration:      QueryVendorEfficiency.declaration,
           reader:           Ai::Readers::VendorEfficiency,
           answer_presenter: Chat::Answers::VendorEfficiency
+        ),
+        Tool.query_tool(
+          name:             'query_best_day',
+          declaration:      QueryBestDay.declaration,
+          reader:           Ai::Readers::BestDay,
+          answer_presenter: Chat::Answers::BestDay
+        ),
+        Tool.query_tool(
+          name:             'query_worst_platform',
+          declaration:      QueryWorstPlatform.declaration,
+          reader:           Ai::Readers::WorstPlatform,
+          answer_presenter: Chat::Answers::WorstPlatform
+        ),
+        Tool.query_tool(
+          name:             'query_category_spike',
+          declaration:      QueryCategorySpike.declaration,
+          reader:           Ai::Readers::CategorySpike,
+          answer_presenter: Chat::Answers::CategorySpike
+        ),
+        Tool.query_tool(
+          name:             'query_margin_drop',
+          declaration:      QueryMarginDrop.declaration,
+          reader:           Ai::Readers::MarginDrop,
+          answer_presenter: Chat::Answers::MarginDrop
         )
       ].freeze
 
