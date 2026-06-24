@@ -3,6 +3,7 @@ pt-BR:
     history:
       preview: "Prévia de registro"
       preview_sent: "Registro apresentado ao usuário para confirmação."
+      preview_cancelled: "Cancelei o registro. Pode continuar com o que precisar."
     confirm:
       success_earning: "✅ Receita registrada com sucesso!"
       success_expense: "✅ Despesa registrada com sucesso!"

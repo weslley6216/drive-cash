@@ -29,8 +29,23 @@ export default class extends Controller {
   }
 
   cancelPreview(e) {
+    const actionName = e.target.dataset.actionName
     const card = e.target.closest(".flex.items-start")
+
     if (card) card.remove()
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    fetch('/chat/cancel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRF-Token': csrfToken,
+        'Accept': 'text/vnd.turbo-stream.html'
+      },
+      body: new URLSearchParams({ action_name: actionName })
+    }).then(res => res.text()).then(html => {
+      Turbo.renderStreamMessage(html)
+    })
   }
 
   confirmSubmission(e) {

@@ -125,6 +125,40 @@ RSpec.describe Llm::Adapters::Groq do
       end
     end
 
+    context 'when LLM returns text alongside a tool call' do
+      it 'includes text_before in the result' do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{
+            'message' => {
+              'tool_calls' => [{ 'function' => { 'name' => 'create_earning', 'arguments' => '{"amount":80}' } }],
+              'content'    => 'E o iFood de R$ 45, registro também?'
+            }
+          }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:text_before]).to eq('E o iFood de R$ 45, registro também?')
+      end
+
+      it 'sets text_before to nil when content is blank' do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{
+            'message' => {
+              'tool_calls' => [{ 'function' => { 'name' => 'create_earning', 'arguments' => '{"amount":80}' } }],
+              'content'    => nil
+            }
+          }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:text_before]).to be_nil
+      end
+    end
+
     context 'when tools are provided' do
       let(:tools) do
         [{

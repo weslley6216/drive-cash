@@ -48,11 +48,49 @@ RSpec.describe Llm::Adapters::Gemini do
         result = adapter.chat(messages: messages)
 
         expect(result).to eq({
-          type:       :tool_use,
-          tool_name:  'create_expense',
-          tool_input: { 'amount' => 45, 'category' => 'fuel' }
+          type:        :tool_use,
+          tool_name:   'create_expense',
+          tool_input:  { 'amount' => 45, 'category' => 'fuel' },
+          text_before: nil
         })
         expect(result[:tool_input]['amount']).to be_a(Integer)
+      end
+    end
+
+    context 'when LLM returns text alongside a function call' do
+      it 'includes text_before in the result' do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({
+          'candidates' => [{
+            'content' => {
+              'parts' => [
+                { 'text' => 'E o iFood de R$ 45, registro também?' },
+                { 'functionCall' => { 'name' => 'create_earning', 'args' => { 'amount' => 80 } } }
+              ]
+            }
+          }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:text_before]).to eq('E o iFood de R$ 45, registro também?')
+      end
+
+      it 'sets text_before to nil when no text parts exist' do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({
+          'candidates' => [{
+            'content' => {
+              'parts' => [
+                { 'functionCall' => { 'name' => 'create_earning', 'args' => { 'amount' => 80 } } }
+              ]
+            }
+          }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result[:text_before]).to be_nil
       end
     end
 

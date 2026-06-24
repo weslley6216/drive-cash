@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     root to: 'chat#index'
     post 'message', to: 'chat#message', as: :message
     post 'confirm', to: 'chat#confirm', as: :confirm
+    post 'cancel',  to: 'chat#cancel_preview', as: :cancel_preview
     delete 'clear', to: 'chat#clear',   as: :clear
   end
 

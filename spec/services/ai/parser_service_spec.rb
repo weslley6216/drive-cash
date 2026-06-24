@@ -264,6 +264,35 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when LLM response includes text_before' do
+      it 'includes text_before in the preview result' do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_earning',
+          tool_input:  { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' },
+          text_before: 'E o iFood de R$ 45, registro também?'
+        })
+
+        result = service.call
+
+        expect(result[:type]).to eq(:preview)
+        expect(result[:text_before]).to eq('E o iFood de R$ 45, registro também?')
+      end
+
+      it 'omits text_before from result when nil' do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_earning',
+          tool_input:  { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' },
+          text_before: nil
+        })
+
+        result = service.call
+
+        expect(result).not_to have_key(:text_before)
+      end
+    end
+
     context 'when the tool_input amount comes as an Integer (Gemini-shaped) and as a Float (legacy Groq-shaped)' do
       let(:integer_input) { { 'amount' => 45, 'category' => 'fuel', 'date' => '2026-04-21' } }
       let(:float_input) { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-04-21' } }

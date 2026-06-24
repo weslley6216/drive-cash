@@ -4,6 +4,7 @@ module ChatSession
   private
 
   HISTORY_LIMIT = 12
+  MAX_CONTINUATION_DEPTH = 5
   private_constant :HISTORY_LIMIT
 
   def chat_history
@@ -19,6 +20,23 @@ module ChatSession
   def clear_history
     session.delete(:chat_history)
     session.delete(:pending_tool_calls)
+    session.delete(:continuation_depth)
+  end
+
+  def continuation_depth
+    session[:continuation_depth].to_i
+  end
+
+  def increment_continuation_depth
+    session[:continuation_depth] = continuation_depth + 1
+  end
+
+  def reset_continuation_depth
+    session.delete(:continuation_depth)
+  end
+
+  def continuation_depth_exceeded?
+    continuation_depth >= MAX_CONTINUATION_DEPTH
   end
 
   def pending_tool_calls

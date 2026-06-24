@@ -61,8 +61,12 @@ module Llm
           first = calls.first
           Rails.logger.info "[Gemini] Tool call: #{first[:name]} (#{calls.size} total)"
 
+          text_parts = parts.reject { |part| part['functionCall'] }
+          text_before = text_parts.map { |part| part['text'].to_s }.join.strip.presence
+
           result = { type: :tool_use, tool_name: first[:name], tool_input: first[:input] }
           result[:extra_calls] = calls.drop(1) if calls.size > 1
+          result[:text_before] = text_before
           result
         else
           part = parts.first

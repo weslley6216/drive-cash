@@ -125,6 +125,25 @@ RSpec.describe 'Chats', type: :request do
       end
     end
 
+    context 'when ParserService returns a preview with text_before' do
+      before do
+        allow(parser_mock).to receive(:call).and_return({
+          type:        :preview,
+          action:      'create_earning',
+          summary:     'Receita de R$ 45,00 via iFood em 24/06/2026',
+          text_before: 'Já registrei o Uber! E o iFood de R$ 45, registro também?',
+          params:      { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-06-24' }
+        })
+      end
+
+      it 'renders text_before as a separate bubble before the preview card' do
+        post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+
+        expect(response.body).to include('Já registrei o Uber!')
+        expect(response.body).to include('Receita de R$ 45,00 via iFood')
+      end
+    end
+
     context 'when ParserService returns an unexpected type' do
       before do
         allow(parser_mock).to receive(:call).and_return({ type: :alien })
@@ -344,6 +363,135 @@ RSpec.describe 'Chats', type: :request do
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
         expect(response.body).to include(I18n.t('expenses.installments.errors.invalid_repeat_max'))
       end
+    end
+  end
+
+  describe 'POST /chat/cancel' do
+    let(:parser_mock) { instance_double(Ai::ParserService) }
+
+    before { allow(Ai::ParserService).to receive(:new).and_return(parser_mock) }
+
+    it 'adds cancelled history entry and re-invokes ParserService for continuation' do
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 45,00 via iFood',
+          params: { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-06-24' } }
+      )
+
+      post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('iFood')
+    end
+
+    it 'renders cancelled message when depth exceeded' do
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
+        { type: :text, content: 'Texto 1' },
+        { type: :text, content: 'Texto 2' },
+        { type: :text, content: 'Texto 3' },
+        { type: :text, content: 'Texto 4' },
+        { type: :text, content: 'Texto 5' }
+      )
+
+      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+
+      ChatSession::MAX_CONTINUATION_DEPTH.times do
+        post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      end
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
+    end
+  end
+
+  describe 'auto-continue after confirm' do
+    let(:parser_mock) { instance_double(Ai::ParserService) }
+
+    before { allow(Ai::ParserService).to receive(:new).and_return(parser_mock) }
+
+    it 'renders continuation preview in ConfirmView when auto-continue returns a preview' do
+      earning_input = { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' }
+
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: earning_input },
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 45,00 via iFood',
+          params: { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-06-24' } }
+      )
+
+      post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input },
+           as:     :turbo_stream
+
+      expect(response.body).to include('iFood')
+      expect(response.body).to include('45')
+    end
+
+    it 'renders text continuation when auto-continue returns plain text' do
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
+        { type: :text, content: 'Ótimo! Mais alguma coisa para registrar?' }
+      )
+
+      post chat_message_path, params: { message: 'Uber 80 hoje' }, as: :turbo_stream
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' } },
+           as:     :turbo_stream
+
+      expect(response.body).to include('Mais alguma coisa')
+    end
+
+    it 'renders text_before bubble when auto-continue preview includes text_before' do
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
+        { type:        :preview,
+          action:      'create_earning',
+          summary:     'Receita de R$ 45,00 via iFood',
+          text_before: 'Ótimo! E o iFood de R$ 45, registro também?',
+          params:      { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-06-24' } }
+      )
+
+      post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' } },
+           as:     :turbo_stream
+
+      expect(response.body).to include('Ótimo! E o iFood de R$ 45')
+    end
+
+    it 'stops auto-continue after reaching max depth' do
+      earning_input = { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' }
+      preview_result = { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber', params: earning_input }
+
+      allow(parser_mock).to receive(:call).and_return(preview_result)
+
+      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+
+      ChatSession::MAX_CONTINUATION_DEPTH.times do
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: earning_input },
+             as:     :turbo_stream
+      end
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input },
+           as:     :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('chat.confirm.success_earning'))
     end
   end
 

@@ -9,6 +9,7 @@ class ChatController < ApplicationController
     user_text = params[:message].to_s.strip
     return head :bad_request if user_text.blank?
 
+    reset_continuation_depth
     add_to_history(Chat::Message.from_user(user_text))
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
@@ -47,6 +48,20 @@ class ChatController < ApplicationController
     end
   end
 
+  def cancel_preview
+    cancelled_message = Chat::Message.from_result(
+      { type: :text, content: t('chat.history.preview_cancelled') },
+      fallback_content: t('chat.history.preview_cancelled')
+    )
+    add_to_history(cancelled_message)
+
+    respond_to do |format|
+      format.turbo_stream do
+        auto_continue_and_render_cancel
+      end
+    end
+  end
+
   def clear
     clear_history
     redirect_to chat_root_path
@@ -67,13 +82,53 @@ class ChatController < ApplicationController
     if next_call
       dispatch_next_preview(next_call)
     else
+      auto_continue_and_render_confirm(action: action, record: record, i18n_key: i18n_key)
+    end
+  end
+
+  def auto_continue_and_render_confirm(action:, record:, i18n_key:)
+    if continuation_depth_exceeded?
       render Chat::ConfirmView.new(
         success: true,
         message: t(i18n_key),
         action:  action,
         date:    record.respond_to?(:date) ? record.date : nil
       )
+      return
     end
+
+    increment_continuation_depth
+    continuation = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
+
+    fallback = continuation[:type] == :preview ? t('chat.history.preview_sent') : continuation[:content].to_s
+    add_to_history(Chat::Message.from_result(continuation, fallback_content: fallback)) if continuation[:type].in?(%i[text preview])
+
+    render Chat::ConfirmView.new(
+      success:      true,
+      message:      t(i18n_key),
+      action:       action,
+      date:         record.respond_to?(:date) ? record.date : nil,
+      continuation: continuation[:type].in?(%i[text preview]) ? continuation : nil
+    )
+  end
+
+  def auto_continue_and_render_cancel
+    if continuation_depth_exceeded?
+      render Chat::MessageView.new(
+        user_text: nil,
+        result:    { type: :text, content: t('chat.history.preview_cancelled') }
+      )
+      return
+    end
+
+    increment_continuation_depth
+    continuation = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
+
+    if continuation[:type] == :preview
+      add_to_history(Chat::Message.from_result(continuation, fallback_content: t('chat.history.preview_sent')))
+    end
+
+    render Chat::MessageView.new(user_text: nil, result: continuation)
   end
 
   def dispatch_next_preview(call)

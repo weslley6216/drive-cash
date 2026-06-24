@@ -66,6 +66,7 @@ module Llm
 
           result = { type: :tool_use, tool_name: first[:name], tool_input: first[:input] }
           result[:extra_calls] = calls.drop(1) if calls.size > 1
+          result[:text_before] = message['content'].to_s.strip.presence
           result
         else
           content = message['content'].to_s.strip

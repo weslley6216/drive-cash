@@ -55,7 +55,9 @@ module Ai
       if tool.query?
         build_answer(tool, response[:tool_input])
       else
-        build_preview(tool, response[:tool_input], extra_calls: response[:extra_calls])
+        build_preview(tool, response[:tool_input],
+                      extra_calls: response[:extra_calls],
+                      text_before: response[:text_before])
       end
     end
 
@@ -69,12 +71,13 @@ module Ai
       { type: :text, content: I18n.t('chat.errors.api_error') }
     end
 
-    def build_preview(tool, tool_input, extra_calls: nil)
+    def build_preview(tool, tool_input, extra_calls: nil, text_before: nil)
       params = parse_params(tool_input)
       return missing_amount_result(tool.name, params) if invalid_amount?(tool, params)
 
       result = preview_for(tool, params)
       result[:extra_calls] = extra_calls if extra_calls.present?
+      result[:text_before] = text_before if text_before.present?
       result
     rescue JSON::ParserError
       { type: :text, content: I18n.t('chat.message.fallback') }

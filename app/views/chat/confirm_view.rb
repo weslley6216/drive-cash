@@ -1,19 +1,20 @@
 module Chat
   class ConfirmView < ApplicationView
-    def initialize(success:, message:, action: nil, date: nil)
+    include Chat::BubbleMixin
+
+    def initialize(success:, message:, action: nil, date: nil, continuation: nil)
       @success = success
       @message = message
       @action = action
       @date = date.is_a?(Date) ? date : Date.current
+      @continuation = continuation
     end
 
     def view_template
       raw turbo_stream.append('chat_messages') {
         div(class: 'flex flex-col gap-2') do
           div(class: 'flex items-start gap-2') do
-            div(class: 'w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5') do
-              render PhlexIcons::Lucide::Sparkles.new(class: 'w-4 h-4 text-violet-600')
-            end
+            sparkles_icon
             div(class: "bg-white border px-4 py-2.5 rounded-2xl rounded-tl-sm text-sm shadow-sm leading-relaxed #{bubble_style}") do
               plain message
             end
@@ -21,6 +22,7 @@ module Chat
           render_action_chips if @success
         end
       }
+      render_continuation if @continuation
     end
 
     private
@@ -32,6 +34,18 @@ module Chat
         ConfirmChips.for(@action).each do |chip|
           action_chip(public_send(chip.route, context), t(chip.label), frame: chip.frame)
         end
+      end
+    end
+
+    def render_continuation
+      case @continuation[:type]
+      when :text
+        raw turbo_stream.append('chat_messages') { text_bubble(@continuation[:content]) }
+      when :preview
+        if @continuation[:text_before].present?
+          raw turbo_stream.append('chat_messages') { text_bubble(@continuation[:text_before]) }
+        end
+        raw turbo_stream.append('chat_messages') { preview_card(@continuation) }
       end
     end
 
