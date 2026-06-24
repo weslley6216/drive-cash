@@ -16,6 +16,7 @@ module Chat
     def ai_response
       case @result[:type]
       when :text then text_bubble(@result[:content])
+      when :answer then text_bubble(@result[:content])
       when :preview then preview_card
       else
         text_bubble(t('chat.errors.unexpected'))

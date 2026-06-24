@@ -1,5 +1,3 @@
-require_relative 'error'
-
 module Llm
   class BaseAdapter
     RATE_LIMIT_STATUSES = [429, 503].freeze

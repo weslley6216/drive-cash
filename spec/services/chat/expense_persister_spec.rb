@@ -34,4 +34,39 @@ RSpec.describe Chat::ExpensePersister do
       expect(result.record.user).to eq(user)
     end
   end
+
+  context 'fuel expense without vendor' do
+    it 'inherits vendor from ActiveTankVendor when available' do
+      user = create(:user)
+      vehicle = create(:vehicle, user: user)
+      create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', full_tank: true)
+      payload = { 'amount' => 60.0, 'category' => 'fuel', 'date' => '2026-06-23' }
+
+      result = described_class.new.persist(payload, user: user)
+
+      expect(result.success?).to be true
+      expect(result.record.vendor).to eq('Posto Orense')
+    end
+
+    it 'keeps vendor blank when ActiveTankVendor returns nil' do
+      user = create(:user)
+      payload = { 'amount' => 60.0, 'category' => 'fuel', 'date' => '2026-06-23' }
+
+      result = described_class.new.persist(payload, user: user)
+
+      expect(result.success?).to be true
+      expect(result.record.vendor).to be_nil
+    end
+
+    it 'respects explicitly informed vendor and does not override it' do
+      user = create(:user)
+      vehicle = create(:vehicle, user: user)
+      create(:refueling, vehicle: vehicle, vendor: 'Tanque Ativo', full_tank: true)
+      payload = { 'amount' => 60.0, 'category' => 'fuel', 'date' => '2026-06-23', 'vendor' => 'Shell' }
+
+      result = described_class.new.persist(payload, user: user)
+
+      expect(result.record.vendor).to eq('Shell')
+    end
+  end
 end

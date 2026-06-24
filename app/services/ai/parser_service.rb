@@ -4,10 +4,11 @@ module Ai
 
     PROMPT_PATH = Rails.root.join('app', 'services', 'ai', 'prompts', 'financial_assistant.txt').freeze
 
-    def initialize(messages:, today: Date.current, client: Llm::Client)
+    def initialize(messages:, today: Date.current, client: Llm::Client, user: nil)
       @messages = messages
       @today = today
       @client = client
+      @user = user
     end
 
     def call
@@ -39,7 +40,7 @@ module Ai
 
     def process_response(response)
       case response[:type]
-      when :tool_use then build_preview(response[:tool_name], response[:tool_input])
+      when :tool_use then dispatch_tool(response)
       when :text then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
       else
         Rails.logger.warn "[ParserService] Unexpected response type: #{response.inspect}"
@@ -47,14 +48,34 @@ module Ai
       end
     end
 
-    def build_preview(tool_name, tool_input)
-      tool = Ai::Tools::Registry.find(tool_name)
+    def dispatch_tool(response)
+      tool = Ai::Tools::Registry.find(response[:tool_name])
       return { type: :text, content: I18n.t('chat.message.fallback') } unless tool
 
+      if tool.query?
+        build_answer(tool, response[:tool_input])
+      else
+        build_preview(tool, response[:tool_input], extra_calls: response[:extra_calls])
+      end
+    end
+
+    def build_answer(tool, tool_input)
+      params = parse_params(tool_input)
+      data = tool.reader.new(params, user: @user).call
+      content = tool.answer_presenter.new(data).call
+      { type: :answer, content: content }
+    rescue StandardError => e
+      Rails.logger.error "[ParserService] Reader error for #{tool.name}: #{e.message}"
+      { type: :text, content: I18n.t('chat.errors.api_error') }
+    end
+
+    def build_preview(tool, tool_input, extra_calls: nil)
       params = parse_params(tool_input)
       return missing_amount_result(tool.name, params) if invalid_amount?(tool, params)
 
-      preview_for(tool, params)
+      result = preview_for(tool, params)
+      result[:extra_calls] = extra_calls if extra_calls.present?
+      result
     rescue JSON::ParserError
       { type: :text, content: I18n.t('chat.message.fallback') }
     end

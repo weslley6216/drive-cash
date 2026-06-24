@@ -10,6 +10,9 @@ module Chat
       'create_expense' => [
         Chip.new(route: :dashboard_expenses_detail_path, label: 'chat.confirm.btn_expenses', frame: 'modal'),
         Chip.new(route: :root_path, label: 'chat.confirm.btn_home', frame: '_top')
+      ],
+      'create_goal'    => [
+        Chip.new(route: :goals_path, label: 'chat.confirm.btn_goals', frame: '_top')
       ]
     }.freeze
 

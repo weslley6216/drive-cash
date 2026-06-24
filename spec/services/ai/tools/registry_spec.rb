@@ -28,7 +28,46 @@ RSpec.describe Ai::Tools::Registry do
     it 'exposes a declaration for every registered tool' do
       names = described_class.declarations.map { |declaration| declaration[:name] }
 
-      expect(names).to contain_exactly('create_earning', 'create_expense')
+      expect(names).to include('create_earning', 'create_expense')
+    end
+  end
+
+  describe '.find — action tools wiring' do
+    it 'resolves create_goal with requires_amount false (target_amount not amount)' do
+      tool = described_class.find('create_goal')
+
+      expect(tool.kind).to eq(:create)
+      expect(tool.requires_amount).to be(false)
+      expect(tool.persister).to eq(Chat::GoalPersister)
+    end
+
+    it 'resolves update_maintenance with requires_amount false' do
+      tool = described_class.find('update_maintenance')
+
+      expect(tool.kind).to eq(:create)
+      expect(tool.requires_amount).to be(false)
+      expect(tool.persister).to eq(Chat::MaintenanceUpdater)
+    end
+  end
+
+  describe 'query tool wiring' do
+    it 'every query tool has kind :query, reader and answer_presenter' do
+      query_tools = described_class.all.select(&:query?)
+
+      query_tools.each do |tool|
+        expect(tool.kind).to eq(:query), "#{tool.name} missing kind"
+        expect(tool.reader).not_to be_nil, "#{tool.name} missing reader"
+        expect(tool.answer_presenter).not_to be_nil, "#{tool.name} missing answer_presenter"
+      end
+    end
+
+    it 'existing create tools keep kind :create and have no reader' do
+      %w[create_earning create_expense].each do |name|
+        tool = described_class.find(name)
+
+        expect(tool.kind).to eq(:create)
+        expect(tool.reader).to be_nil
+      end
     end
   end
 end

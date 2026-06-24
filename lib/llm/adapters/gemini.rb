@@ -49,14 +49,25 @@ module Llm
         candidate = body.dig('candidates', 0)
         return { type: :text, content: '' } unless candidate
 
-        part = candidate.dig('content', 'parts', 0)
-        return { type: :text, content: '' } unless part
+        parts = candidate.dig('content', 'parts') || []
+        function_parts = parts.select { |part| part['functionCall'] }
 
-        if part['functionCall']
-          call = part['functionCall']
-          Rails.logger.info "[Gemini] Tool call: #{call['name']}"
-          { type: :tool_use, tool_name: call['name'], tool_input: call['args'] }
+        if function_parts.any?
+          calls = function_parts.map do |part|
+            call = part['functionCall']
+            { name: call['name'], input: call['args'] || {} }
+          end
+
+          first = calls.first
+          Rails.logger.info "[Gemini] Tool call: #{first[:name]} (#{calls.size} total)"
+
+          result = { type: :tool_use, tool_name: first[:name], tool_input: first[:input] }
+          result[:extra_calls] = calls.drop(1) if calls.size > 1
+          result
         else
+          part = parts.first
+          return { type: :text, content: '' } unless part
+
           content = part['text'].to_s.strip
           content = sanitize_function_leaks(content)
           { type: :text, content: content }
