@@ -38,7 +38,7 @@ module Chat
       action = result[:action]
       rparams = result[:params] || {}
 
-      form_with(url: chat_confirm_path, data: { turbo_stream: true, action: 'submit->chat#confirmSubmission' }) do |form|
+      form_with(url: chat_confirm_path, data: { loading_skip: true, turbo_stream: true, action: 'submit->chat#confirmSubmission' }) do |form|
         input(type: 'hidden', name: 'record_action', value: action)
         rparams.each { |key, value| input(type: 'hidden', name: "record[#{key}]", value: value) }
 

@@ -1,7 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
+const SUPPRESSED_PROGRESS_BAR_DELAY = 2_000_000_000
+
 export default class extends Controller {
   static targets = ["input", "submit", "messages", "userTemplate", "typingTemplate"]
+
+  connect() {
+    this.originalProgressBarDelay = Turbo.config.drive.progressBarDelay
+    Turbo.config.drive.progressBarDelay = SUPPRESSED_PROGRESS_BAR_DELAY
+  }
+
+  disconnect() {
+    Turbo.config.drive.progressBarDelay = this.originalProgressBarDelay
+  }
 
   send(e) {
     const message = this.inputTarget.value.trim()

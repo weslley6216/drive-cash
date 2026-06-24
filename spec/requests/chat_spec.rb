@@ -495,6 +495,34 @@ RSpec.describe 'Chats', type: :request do
     end
   end
 
+  describe 'global loading overlay suppression' do
+    it 'marks the message form so the global overlay is skipped on submit' do
+      get chat_root_path
+
+      expect(response.body).to include('data-loading-skip')
+    end
+
+    context 'when a preview card is rendered' do
+      let(:parser_mock) { instance_double(Ai::ParserService) }
+
+      before do
+        allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
+        allow(parser_mock).to receive(:call).and_return({
+          type:    :preview,
+          action:  'create_expense',
+          summary: 'Despesa de R$ 50,00 em 22/04/2026',
+          params:  { 'amount' => 50, 'category' => 'meals', 'date' => '2026-04-22' }
+        })
+      end
+
+      it 'marks the confirm form so the global overlay is skipped on submit' do
+        post chat_message_path, params: { message: 'Spent 50' }, as: :turbo_stream
+
+        expect(response.body).to include('data-loading-skip')
+      end
+    end
+  end
+
   describe 'DELETE /chat/clear' do
     it 'clears the session and redirects to chat root' do
       delete chat_clear_path

@@ -26,6 +26,7 @@ export default class extends Controller {
 
   onSubmitStart(event) {
     if (this.inPageFrame(event.target)) return
+    if (this.skipsLoading(event.target)) return
     this.show()
   }
 
@@ -68,6 +69,10 @@ export default class extends Controller {
 
   inPageFrame(element) {
     return element?.closest?.("turbo-frame")?.id === "page"
+  }
+
+  skipsLoading(element) {
+    return Boolean(element?.closest?.("[data-loading-skip]"))
   }
 
   isSamePath(url) {
