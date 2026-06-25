@@ -37,9 +37,11 @@ module Chat
     def preview_confirm_form(result)
       action = result[:action]
       rparams = result[:params] || {}
+      nonce = result[:nonce]
 
       form_with(url: chat_confirm_path, data: { loading_skip: true, turbo_stream: true, action: 'submit->chat#confirmSubmission' }) do |form|
         input(type: 'hidden', name: 'record_action', value: action)
+        input(type: 'hidden', name: 'confirm_nonce', value: nonce) if nonce
         rparams.each { |key, value| input(type: 'hidden', name: "record[#{key}]", value: value) }
 
         form.button(

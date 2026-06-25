@@ -10,6 +10,7 @@ pt-BR:
       success_goal: "✅ Meta criada com sucesso!"
       success_maintenance: "✅ Manutenção atualizada!"
       error_prefix: "Não foi possível registrar:"
+      duplicate_submit: "Esse registro já foi processado."
       vendor_inherited: "Posto herdado do tanque ativo: %{vendor}"
       btn_dashboard: "📊 Ver Dashboard"
       btn_earnings: "💰 Ver Ganhos"

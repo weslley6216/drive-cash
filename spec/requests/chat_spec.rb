@@ -427,9 +427,10 @@ RSpec.describe 'Chats', type: :request do
       )
 
       post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
 
       post chat_confirm_path,
-           params: { record_action: 'create_earning', record: earning_input },
+           params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
            as:     :turbo_stream
 
       expect(response.body).to include('iFood')
@@ -444,9 +445,10 @@ RSpec.describe 'Chats', type: :request do
       )
 
       post chat_message_path, params: { message: 'Uber 80 hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
 
       post chat_confirm_path,
-           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' } },
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' }, confirm_nonce: nonce },
            as:     :turbo_stream
 
       expect(response.body).to include('Mais alguma coisa')
@@ -464,9 +466,10 @@ RSpec.describe 'Chats', type: :request do
       )
 
       post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
 
       post chat_confirm_path,
-           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' } },
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-06-24' }, confirm_nonce: nonce },
            as:     :turbo_stream
 
       expect(response.body).to include('Ótimo! E o iFood de R$ 45')
@@ -479,15 +482,17 @@ RSpec.describe 'Chats', type: :request do
       allow(parser_mock).to receive(:call).and_return(preview_result)
 
       post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
 
       ChatSession::MAX_CONTINUATION_DEPTH.times do
         post chat_confirm_path,
-             params: { record_action: 'create_earning', record: earning_input },
+             params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
              as:     :turbo_stream
+        nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
       end
 
       post chat_confirm_path,
-           params: { record_action: 'create_earning', record: earning_input },
+           params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
            as:     :turbo_stream
 
       expect(response).to have_http_status(:ok)
@@ -532,73 +537,42 @@ RSpec.describe 'Chats', type: :request do
     end
   end
 
-  describe 'multi-create queue' do
-    let(:earning_input) { { 'amount' => 245.0, 'platform' => 'shopee', 'date' => '2026-06-23' } }
-    let(:expense_input) { { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-06-23', 'vendor' => 'Ipiranga' } }
+  describe 'double-submit idempotency' do
+    let(:parser_mock) { instance_double(Ai::ParserService) }
+    let(:earning_input) { { 'amount' => '80', 'platform' => 'uber', 'date' => '2026-06-25' } }
 
-    it 'queues second tool call and renders next preview on first confirm' do
-      allow(Ai::ParserService).to receive(:new).and_return(
-        instance_double(Ai::ParserService, call: {
-          type:        :preview,
-          action:      'create_earning',
-          params:      earning_input,
-          summary:     'Receita de R$ 245,00 via Shopee',
-          content:     'Apresentado',
-          extra_calls: [{ name: 'create_expense', input: expense_input }]
-        })
+    before do
+      allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: earning_input },
+        { type: :text, content: 'Posso ajudar com mais alguma coisa?' }
       )
-
-      post chat_message_path, params: { message: 'rota Shopee 245 e abasteci 45 no Ipiranga' }, as: :turbo_stream
-
-      expect(response).to have_http_status(:ok)
-
-      post chat_confirm_path,
-           params: { record_action: 'create_earning', record: earning_input },
-           as:     :turbo_stream
-
-      expect(response.body).to include('Despesa')
-      expect(response.body).to include('45')
     end
 
-    it 'renders error when queued next call has unknown tool name' do
-      allow(Ai::ParserService).to receive(:new).and_return(
-        instance_double(Ai::ParserService, call: {
-          type:        :preview,
-          action:      'create_earning',
-          params:      earning_input,
-          summary:     'Receita',
-          content:     'Apresentado',
-          extra_calls: [{ name: 'nonexistent_tool', input: {} }]
-        })
-      )
+    it 'includes a confirm_nonce hidden field in the preview card' do
+      post chat_message_path, params: { message: 'ganhei 80 no Uber' }, as: :turbo_stream
 
-      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
-
-      post chat_confirm_path,
-           params: { record_action: 'create_earning', record: earning_input },
-           as:     :turbo_stream
-
-      expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
+      expect(response.body).to include('confirm_nonce')
     end
 
-    it 'does not persist second record before individual confirmation' do
-      allow(Ai::ParserService).to receive(:new).and_return(
-        instance_double(Ai::ParserService, call: {
-          type:        :preview,
-          action:      'create_earning',
-          params:      earning_input,
-          summary:     'Receita',
-          content:     'Apresentado',
-          extra_calls: [{ name: 'create_expense', input: expense_input }]
-        })
-      )
+    it 'rejects a second confirm submitted with the same nonce' do
+      post chat_message_path, params: { message: 'ganhei 80 no Uber' }, as: :turbo_stream
 
-      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+      expect(nonce).to be_present
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
+           as:     :turbo_stream
 
       expect {
-        post chat_confirm_path, params: { record_action: 'create_earning', record: earning_input }, as: :turbo_stream
-      }.to change(Earning, :count).by(1)
-        .and change(Expense, :count).by(0)
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
+             as:     :turbo_stream
+      }.not_to change(Earning, :count)
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
     end
   end
 end

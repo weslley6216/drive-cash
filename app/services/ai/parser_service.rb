@@ -39,6 +39,10 @@ module Ai
     private
 
     def process_response(response)
+      if response[:extra_calls].present?
+        Rails.logger.warn "[ParserService] LLM returned #{response[:extra_calls].size} extra tool_call(s), ignoring: #{response[:extra_calls].map { |call| call[:name] }.inspect}"
+      end
+
       case response[:type]
       when :tool_use then dispatch_tool(response)
       when :text then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
@@ -55,9 +59,7 @@ module Ai
       if tool.query?
         build_answer(tool, response[:tool_input])
       else
-        build_preview(tool, response[:tool_input],
-                      extra_calls: response[:extra_calls],
-                      text_before: response[:text_before])
+        build_preview(tool, response[:tool_input], text_before: response[:text_before])
       end
     end
 
@@ -71,12 +73,11 @@ module Ai
       { type: :text, content: I18n.t('chat.errors.api_error') }
     end
 
-    def build_preview(tool, tool_input, extra_calls: nil, text_before: nil)
+    def build_preview(tool, tool_input, text_before: nil)
       params = parse_params(tool_input)
       return missing_amount_result(tool.name, params) if invalid_amount?(tool, params)
 
       result = preview_for(tool, params)
-      result[:extra_calls] = extra_calls if extra_calls.present?
       result[:text_before] = text_before if text_before.present?
       result
     rescue JSON::ParserError

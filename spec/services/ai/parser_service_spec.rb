@@ -254,13 +254,12 @@ RSpec.describe Ai::ParserService do
         })
       end
 
-      it 'builds preview for first call and includes extra_calls' do
+      it 'returns only the first call as preview, ignoring extra_calls' do
         result = service.call
 
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_earning')
-        expect(result[:extra_calls]).to be_an(Array)
-        expect(result[:extra_calls].first[:name]).to eq('create_expense')
+        expect(result).not_to have_key(:extra_calls)
       end
     end
 
