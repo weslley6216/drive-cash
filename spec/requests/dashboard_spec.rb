@@ -173,7 +173,7 @@ RSpec.describe 'Dashboard', type: :request do
 
         get root_path, params: { year: 2026, month: 6 }
 
-        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 18))
+        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 19))
       end
     end
 

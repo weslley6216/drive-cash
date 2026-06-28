@@ -48,7 +48,7 @@ RSpec.describe 'Goals', type: :request do
 
         get goals_path
 
-        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 15))
+        expect(response.body).to include(I18n.t('goals.index.monthly.days_left', count: 16))
       end
     end
 

@@ -51,7 +51,7 @@ module Goals
     def projection_for(goal, current)
       total_days = (goal.period_end - goal.period_start).to_i + 1
       days_elapsed = [(@date - goal.period_start).to_i + 1, 1].max
-      days_remaining = [(goal.period_end - @date).to_i, 0].max
+      days_remaining = [(goal.period_end - @date).to_i + 1, 0].max
       target = goal.target_amount
       reached = current >= target
 

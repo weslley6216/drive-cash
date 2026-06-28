@@ -52,8 +52,8 @@ RSpec.describe Goals::ProgressService do
       it 'computes remaining_per_day based on days left in period' do
         result = described_class.new(user: user, date: reference_date).call
 
-        expect(result[:monthly][:days_remaining]).to eq(15)
-        expect(result[:monthly][:remaining_per_day].round(2)).to eq(300.00)
+        expect(result[:monthly][:days_remaining]).to eq(16)
+        expect(result[:monthly][:remaining_per_day].round(2)).to eq(281.25)
       end
 
       it 'flags on_track when projection reaches target' do
@@ -154,7 +154,7 @@ RSpec.describe Goals::ProgressService do
         result = described_class.new(user: user, date: reference_date).call
 
         expect(result[:annual][:projection]).to be > 0
-        expect(result[:annual][:days_remaining]).to eq(199)
+        expect(result[:annual][:days_remaining]).to eq(200)
       end
     end
 
