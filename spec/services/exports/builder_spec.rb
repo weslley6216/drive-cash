@@ -88,5 +88,18 @@ RSpec.describe Exports::Builder do
 
       expect(payload.earnings).to be_empty
     end
+
+    it 'filters records to the derived period_kind window' do
+      travel_to Date.new(2026, 6, 15) do
+        create(:earning, user: user, date: Date.new(2026, 6, 10), amount: 100)
+        create(:earning, user: user, date: Date.new(2026, 5, 10), amount: 999)
+
+        export = create(:export, user: user, period_kind: 'this_month', period_start: nil, period_end: nil, includes: { 'earnings' => true, 'expenses' => false, 'refuelings' => false, 'maintenances' => false })
+
+        payload = described_class.call(export: export)
+
+        expect(payload.earnings.map { |row| row[:amount] }).to eq([BigDecimal('100')])
+      end
+    end
   end
 end
