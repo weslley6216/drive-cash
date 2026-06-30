@@ -12,7 +12,7 @@ class Account::ShowView < ApplicationView
       title_key: 'account.groups.preferences',
       items:     [
         { icon: PhlexIcons::Lucide::Truck, key: 'vehicle', path_name: :vehicle, badge: false },
-        { icon: PhlexIcons::Lucide::Download, key: 'export', path_name: :coming_soon, badge: false },
+        { icon: PhlexIcons::Lucide::Download, key: 'exports', path_name: :exports, badge: false },
         { icon: PhlexIcons::Lucide::LifeBuoy, key: 'help', path_name: :coming_soon, badge: false }
       ]
     }

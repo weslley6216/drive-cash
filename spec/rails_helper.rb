@@ -25,7 +25,9 @@ end
 RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.filter_rails_from_backtrace!
-  
+
+  ActiveJob::Base.queue_adapter = :test
+
   config.before(:each, type: :component) do
     Rails.application.routes.default_url_options[:host] = 'test.host'
   end

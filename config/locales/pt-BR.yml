@@ -20,6 +20,10 @@ pt-BR:
           attributes:
             period_end:
               after_start: "deve ser depois do início"
+        export:
+          attributes:
+            period_end:
+              after_start: "deve ser igual ou depois do início"
         restrict_dependent_destroy:
           has_one: Não é possível excluir o registro pois existe um %{record} dependente
           has_many: Não é possível excluir o registro pois existem %{record} dependentes
@@ -434,3 +438,88 @@ pt-BR:
       updated: "Abastecimento atualizado."
       destroyed: "Abastecimento removido."
       odometer_synced: "Abastecimento salvo · odômetro atualizado p/ %{km} km"
+  account:
+    items:
+      exports:
+        label: "Exportar"
+        sub: "Relatórios e backup"
+  exports:
+    title: "Exportar"
+    subtitle: "Relatórios e backup"
+    desktop_title: "Exportar dados"
+    desktop_subtitle: "Relatórios pra IR, contabilidade e comprovação de renda"
+    why: "Gere um relatório pra imposto de renda, contabilidade ou pra comprovar renda em financiamento."
+    period:
+      label: "Período"
+      this_month: "Este mês"
+      last_month: "Mês passado"
+      year: "Ano de %{year}"
+      custom: "Personalizado"
+    format:
+      label: "Formato"
+      pdf: "PDF"
+      pdf_sub: "Relatório pronto"
+      csv: "CSV"
+      csv_sub: "Planilha / Excel"
+      json: "Backup"
+      json_sub: "JSON completo"
+    include:
+      label: "Incluir"
+      earnings: "Receitas"
+      earnings_sub: "Ganhos por plataforma"
+      expenses: "Despesas"
+      expenses_sub: "Todas as categorias"
+      refuelings: "Abastecimentos"
+      refuelings_sub: "Litros, preço/L, posto"
+      maintenances: "Manutenções"
+      maintenances_sub: "Histórico por km"
+    recents: "Exportações recentes"
+    empty_recents: "Nada exportado ainda."
+    cta: "Gerar e baixar"
+    generating: "Gerando seu relatório…"
+    async_hint: "Geração assíncrona · você recebe quando ficar pronto"
+    summary:
+      title: "Resumo do relatório"
+      period: "Período"
+      entries: "Lançamentos"
+      earnings: "Receitas"
+      expenses: "Despesas"
+      profit: "Lucro líquido"
+    flash:
+      enqueued: "Estamos preparando seu relatório."
+      not_ready: "Seu relatório ainda está sendo gerado."
+      not_found: "Exportação não encontrada."
+    report:
+      title: "Relatório DriveCash"
+      generated_at: "Gerado em %{datetime}"
+      sections:
+        earnings: "Receitas"
+        expenses: "Despesas"
+        refuelings: "Abastecimentos"
+        maintenances: "Manutenções"
+      headers:
+        earnings:
+        - "Data"
+        - "Plataforma"
+        - "Valor"
+        - "Corridas"
+        expenses:
+        - "Data"
+        - "Categoria"
+        - "Estabelecimento"
+        - "Valor"
+        refuelings:
+        - "Data"
+        - "Posto"
+        - "Litros"
+        - "Valor"
+        maintenances:
+        - "Tipo"
+        - "Intervalo km"
+        - "Última km"
+      totals:
+        title: "Totais"
+        earnings: "Receitas"
+        expenses: "Despesas"
+        profit: "Lucro líquido"
+        count: "Lançamentos"
