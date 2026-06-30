@@ -9,11 +9,18 @@ module Exports
     end
 
     def view_template
-      label(class: container_classes, data: { controller: 'export-pill' }) do
-        input(type: 'radio', name: 'export[format]', value: @value, checked: @selected, class: 'sr-only', data: { action: 'change->export-pill#select' })
+      label(
+        class: container_classes,
+        data:  {
+          export_pill_target: 'pill',
+          export_pill_value:  @value,
+          action:             'click->export-pill#select'
+        }
+      ) do
+        input(type: 'radio', name: 'export[format]', value: @value, checked: @selected, class: 'sr-only', data: { export_pill_target: 'radio' })
         div(class: 'flex items-center justify-between mb-1.5') do
           div(class: badge_classes) { render @icon.new(class: 'w-[18px] h-[18px]') }
-          if @selected
+          div(data: { export_pill_target: 'check' }, class: @selected ? '' : 'hidden') do
             render PhlexIcons::Lucide::Check.new(class: 'w-[18px] h-[18px] text-blue-600')
           end
         end

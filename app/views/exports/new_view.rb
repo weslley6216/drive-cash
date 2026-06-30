@@ -26,7 +26,7 @@ module Exports
     def mobile_layout
       div(class: 'lg:hidden') do
         mobile_header
-        form_with(model: @export, url: exports_path, method: :post, local: true, class: 'pb-28') do |f|
+        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill' }, class: 'pb-28') do |f|
           div(class: 'px-5 space-y-5') do
             why_block
             period_chips_mobile(f)
@@ -42,14 +42,14 @@ module Exports
     def desktop_layout
       div(class: 'hidden lg:block') do
         desktop_header
-        form_with(model: @export, url: exports_path, method: :post, local: true) do |f|
+        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill' }) do |f|
           div(class: 'grid grid-cols-[1fr_360px] gap-8 items-start max-w-5xl') do
             div(class: 'space-y-6') do
               desktop_panel(t('exports.period.label')) { period_chips_desktop(f) }
               desktop_panel(t('exports.format.label')) { format_pills(mobile: false) }
               include_panel_desktop
             end
-            summary_panel_desktop
+            summary_frame
           end
         end
       end
@@ -103,8 +103,17 @@ module Exports
     def period_button(kind, mobile:)
       selected = (@export.period_kind || 'year') == kind
       classes = mobile ? mobile_chip_classes(selected) : desktop_chip_classes(selected)
-      label(class: classes) do
-        input(type: 'radio', name: 'export[period_kind]', value: kind, checked: selected, class: 'sr-only')
+      variant = mobile ? 'mobile' : 'desktop'
+      label(
+        class: classes,
+        data:  {
+          export_period_target:  'chip',
+          export_period_value:   kind,
+          export_period_variant: variant,
+          action:                'click->export-period#select'
+        }
+      ) do
+        input(type: 'radio', name: 'export[period_kind]', value: kind, checked: selected, class: 'sr-only', data: { export_period_target: 'radio' })
         plain period_label(kind)
       end
     end
@@ -124,7 +133,8 @@ module Exports
     end
 
     def period_dates_fields
-      div(class: 'grid grid-cols-2 gap-3 mt-3') do
+      is_hidden = (@export.period_kind || 'year') != 'custom'
+      div(class: "#{'hidden' if is_hidden} grid grid-cols-2 gap-3 mt-3", data: { export_period_target: 'customFields' }) do
         date_field('export[period_start]', @export.period_start)
         date_field('export[period_end]', @export.period_end)
       end
@@ -206,25 +216,13 @@ module Exports
       end
     end
 
-    def summary_panel_desktop
-      div(class: 'bg-white rounded-2xl border border-slate-200 p-5 sticky top-8') do
-        p(class: 'text-sm font-bold text-slate-800 mb-3') { t('exports.summary.title') }
-        div(class: 'rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2.5 mb-4') do
-          summary_row(t('exports.summary.period'), period_label(@export.period_kind || 'year'), value_class: 'text-slate-800')
-        end
-        button(type: 'submit', class: 'w-full rounded-lg py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 cursor-pointer') do
-          render PhlexIcons::Lucide::Download.new(class: 'w-[17px] h-[17px]')
-          plain t('exports.cta')
-        end
-        p(class: 'text-[11px] text-slate-400 text-center mt-2') { t('exports.async_hint') }
-      end
-    end
-
-    def summary_row(label, value, value_class: 'text-slate-800')
-      div(class: 'flex justify-between text-sm') do
-        span(class: 'text-slate-500') { label }
-        span(class: "font-medium #{value_class}") { value }
-      end
+    def summary_frame
+      payload = Exports::Builder.call(export: @export)
+      render Exports::SummaryFrameView.new(
+        payload:      payload,
+        period_label: @export.display_name,
+        format:       @export.format || 'pdf'
+      )
     end
 
     def recents_card

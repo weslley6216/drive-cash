@@ -26,15 +26,20 @@ RSpec.describe Export, type: :model do
   end
 
   describe 'validations' do
-    subject { build(:export) }
+    it 'requires period_kind' do
+      export = build(:export, period_kind: nil)
 
-    it { is_expected.to validate_presence_of(:period_start) }
-    it { is_expected.to validate_presence_of(:period_end) }
-    it { is_expected.to validate_presence_of(:period_kind) }
-    it { is_expected.to validate_presence_of(:format) }
+      expect(export).not_to be_valid
+    end
+
+    it 'requires format' do
+      export = build(:export, format: nil)
+
+      expect(export).not_to be_valid
+    end
 
     it 'requires period_end on or after period_start' do
-      export = build(:export, period_start: Date.new(2026, 6, 30), period_end: Date.new(2026, 6, 1))
+      export = build(:export, period_kind: 'custom', period_start: Date.new(2026, 6, 30), period_end: Date.new(2026, 6, 1))
 
       export.valid?
 
