@@ -137,4 +137,24 @@ RSpec.describe 'Exports', type: :request do
       expect(response).to redirect_to(new_session_path)
     end
   end
+
+  describe 'GET /exports/:id/row' do
+    it 'returns the latest row markup for the user export' do
+      export = create(:export, user: current_user, status: 'pending')
+
+      get row_export_path(export)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(id="export_#{export.id}"))
+      expect(response.body).to include(I18n.t('exports.flash.not_ready'))
+    end
+
+    it 'returns not found for another user export' do
+      other = create(:export, user: create(:user))
+
+      get row_export_path(other)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

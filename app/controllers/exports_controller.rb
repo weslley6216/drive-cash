@@ -35,6 +35,13 @@ class ExportsController < ApplicationController
     render Exports::SummaryFrameView.new(payload: payload, period_label: export.display_name, format: export.format)
   end
 
+  def row
+    export = current_user.exports.find_by(id: params[:id])
+    return head :not_found unless export
+
+    render Exports::RecentRowView.new(export: export, last: true)
+  end
+
   private
 
   def build_export

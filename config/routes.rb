@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   resources :goals, only: %i[index new create edit update destroy]
   resources :exports, only: %i[index new create show] do
     collection { get :preview }
+    member { get :row }
   end
   resource :vehicle, only: %i[show edit update]
   resources :maintenances, only: %i[new create edit update destroy] do

@@ -6,7 +6,19 @@ module Exports
     end
 
     def view_template
-      turbo_frame_tag "export_#{@export.id}" do
+      frame_attrs = if @export.status_done?
+                      {}
+      else
+                      {
+                        src:  helpers.row_export_path(@export),
+                        data: {
+                          controller:                     'export-row-poll',
+                          export_row_poll_interval_value: 4000
+                        }
+                      }
+      end
+
+      turbo_frame_tag("export_#{@export.id}", **frame_attrs) do
         link_to(export_path(@export), class: "flex items-center gap-3 px-4 py-3 #{'border-b border-slate-100' unless @last}") do
           icon
           info
