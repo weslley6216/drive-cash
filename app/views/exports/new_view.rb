@@ -232,35 +232,10 @@ module Exports
           if @exports.empty?
             p(class: 'p-5 text-sm text-slate-500 text-center') { t('exports.empty_recents') }
           else
-            @exports.each_with_index { |export, index| recent_row(export, last: index == @exports.size - 1) }
+            @exports.each_with_index { |export, index| render RecentRowView.new(export: export, last: index == @exports.size - 1) }
           end
         end
       end
-    end
-
-    def recent_row(export, last:)
-      link_to(export_path(export), class: "flex items-center gap-3 px-4 py-3 #{'border-b border-slate-100' unless last}") do
-        div(class: 'w-9 h-9 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0') do
-          render PhlexIcons::Lucide::FileText.new(class: 'w-[17px] h-[17px]')
-        end
-        div(class: 'flex-1 min-w-0') do
-          p(class: 'text-sm font-medium text-slate-800 truncate') { recent_name(export) }
-          p(class: 'text-xs text-slate-500') { recent_meta(export) }
-        end
-        span(class: 'text-slate-400') { render PhlexIcons::Lucide::Download.new(class: 'w-[18px] h-[18px]') }
-      end
-    end
-
-    def recent_name(export)
-      "DriveCash · #{I18n.l(export.created_at.to_date, format: :short)}"
-    end
-
-    def recent_meta(export)
-      [export.format.upcase, recent_size(export), I18n.l(export.created_at, format: :short)].compact.join(' · ')
-    end
-
-    def recent_size(export)
-      export.file.attached? ? helpers.number_to_human_size(export.file.byte_size) : t('exports.flash.not_ready')
     end
 
     def mobile_cta
