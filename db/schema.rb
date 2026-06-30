@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_30_210136) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_30_210228) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_210136) do
     t.index ["installment_series_id"], name: "index_expenses_on_installment_series_id"
     t.index ["user_id", "date", "paid"], name: "index_expenses_on_user_id_and_date_and_paid"
     t.index ["user_id"], name: "index_expenses_on_user_id"
+  end
+
+  create_table "exports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "format", default: 0, null: false
+    t.jsonb "includes", default: {"earnings"=>true, "expenses"=>true, "refuelings"=>true, "maintenances"=>false}, null: false
+    t.date "period_end", null: false
+    t.integer "period_kind", default: 0, null: false
+    t.date "period_start", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "created_at"], name: "index_exports_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_exports_on_user_id"
   end
 
   create_table "goals", force: :cascade do |t|
@@ -289,6 +303,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_210136) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "earnings", "users"
   add_foreign_key "expenses", "users"
+  add_foreign_key "exports", "users"
   add_foreign_key "goals", "users"
   add_foreign_key "maintenances", "vehicles"
   add_foreign_key "refuelings", "expenses"
