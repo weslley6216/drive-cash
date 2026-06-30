@@ -104,4 +104,37 @@ RSpec.describe 'Exports', type: :request do
       end
     end
   end
+
+  describe 'GET /exports/preview' do
+    let(:params) do
+      {
+        export: {
+          period_kind: 'this_month',
+          format:      'csv',
+          includes:    { earnings: '1', expenses: '1', refuelings: '0', maintenances: '0' }
+        }
+      }
+    end
+
+    it 'renders the summary frame with the format-aware CTA' do
+      travel_to Date.new(2026, 6, 15) do
+        create(:earning, user: current_user, date: Date.new(2026, 6, 10), amount: 150)
+
+        get preview_exports_path, params: params
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('id="export-summary"')
+        expect(response.body).to include(I18n.t('exports.cta_format.csv'))
+        expect(response.body).to include('R$ 150,00')
+      end
+    end
+
+    it 'requires authentication' do
+      delete session_path
+
+      get preview_exports_path, params: params
+
+      expect(response).to redirect_to(new_session_path)
+    end
+  end
 end

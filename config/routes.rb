@@ -31,7 +31,9 @@ Rails.application.routes.draw do
   get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
   resources :goals, only: %i[index new create edit update destroy]
-  resources :exports, only: %i[index new create show]
+  resources :exports, only: %i[index new create show] do
+    collection { get :preview }
+  end
   resource :vehicle, only: %i[show edit update]
   resources :maintenances, only: %i[new create edit update destroy] do
     member { patch :mark_done }
