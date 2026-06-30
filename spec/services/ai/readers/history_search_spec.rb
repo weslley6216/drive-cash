@@ -32,5 +32,16 @@ RSpec.describe Ai::Readers::HistorySearch do
 
       expect(result[:earnings]).to be_empty
     end
+
+    it 'does not raise when term is absent and sets term to empty string' do
+      user = create(:user)
+      create(:earning, user: user, platform: 'uber')
+
+      result = described_class.new({}, user: user).call
+
+      expect(result[:term]).to eq('')
+      expect(result).to have_key(:earnings)
+      expect(result).to have_key(:expenses)
+    end
   end
 end

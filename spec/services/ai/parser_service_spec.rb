@@ -337,5 +337,23 @@ RSpec.describe Ai::ParserService do
         expect(preview_with_integer[:action]).to eq(preview_with_float[:action])
       end
     end
+
+    context 'parity across the 17 query kinds' do
+      Ai::Tools::Registry::QUERY_KINDS.each do |kind, expected|
+        it "routes type=#{kind} to the matching reader and answer_presenter" do
+          reader_double = instance_double('reader', call: :reader_output)
+          presenter_double = instance_double('presenter', call: 'rendered')
+          allow(expected.reader).to receive(:new).with({ 'type' => kind }, user: nil).and_return(reader_double)
+          allow(expected.answer_presenter).to receive(:new).with(:reader_output).and_return(presenter_double)
+          allow(client).to receive(:chat).and_return({
+            type: :tool_use, tool_name: 'query', tool_input: { 'type' => kind }
+          })
+
+          result = service.call
+
+          expect(result).to eq(type: :answer, content: 'rendered')
+        end
+      end
+    end
   end
 end
