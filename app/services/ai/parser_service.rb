@@ -57,19 +57,26 @@ module Ai
       return { type: :text, content: I18n.t('chat.message.fallback') } unless tool
 
       if tool.query?
-        build_answer(tool, response[:tool_input])
+        dispatch_query(response[:tool_input])
       else
         build_preview(tool, response[:tool_input], text_before: response[:text_before])
       end
     end
 
-    def build_answer(tool, tool_input)
+    def dispatch_query(tool_input)
       params = parse_params(tool_input)
-      data = tool.reader.new(params, user: @user).call
-      content = tool.answer_presenter.new(data).call
+      query_kind = Ai::Tools::Registry.query_kind(params['type'])
+      return { type: :text, content: I18n.t('chat.message.fallback') } unless query_kind
+
+      build_answer(query_kind.reader, query_kind.answer_presenter, params)
+    end
+
+    def build_answer(reader_class, presenter_class, params)
+      data = reader_class.new(params, user: @user).call
+      content = presenter_class.new(data).call
       { type: :answer, content: content }
     rescue StandardError => e
-      Rails.logger.error "[ParserService] Reader error for #{tool.name}: #{e.message}"
+      Rails.logger.error "[ParserService] Reader error: #{e.message}"
       { type: :text, content: I18n.t('chat.errors.api_error') }
     end
 

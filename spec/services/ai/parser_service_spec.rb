@@ -194,43 +194,40 @@ RSpec.describe Ai::ParserService do
       end
     end
 
-    context 'when LLM returns a query tool' do
+    context 'when LLM returns the consolidated query tool' do
       let(:user) { create(:user) }
-      let(:reader_double) { instance_double('reader', call: { profit: 1000.0, earnings: 1500.0, expenses: 500.0, per_km: 2.5, per_trip: 50.0, margin: 66.7 }) }
+      let(:reader_double) { instance_double('reader', call: { profit: 1000.0 }) }
       let(:presenter_double) { instance_double('presenter', call: 'Lucro: R$ 1.000,00') }
       let(:reader_class) { class_double('Ai::Readers::Summary', new: reader_double) }
       let(:presenter_class) { class_double('Chat::Answers::Summary', new: presenter_double) }
 
+      let(:service) { described_class.new(messages: messages, today: Date.new(2026, 6, 1), client: client, user: user) }
+
       before do
-        allow(Ai::Tools::Registry).to receive(:find).with('query_summary').and_return(
-          Ai::Tools::Registry::Tool.query_tool(
-            name:             'query_summary',
-            declaration:      {},
-            reader:           reader_class,
-            answer_presenter: presenter_class
-          )
+        allow(Ai::Tools::Registry).to receive(:query_kind).with('summary').and_return(
+          Ai::Tools::Registry::QueryKind.new(reader: reader_class, answer_presenter: presenter_class)
         )
         allow(client).to receive(:chat).and_return({
-          type: :tool_use, tool_name: 'query_summary', tool_input: { 'year' => 2026, 'month' => 6 }
+          type: :tool_use, tool_name: 'query', tool_input: { 'type' => 'summary', 'year' => 2026, 'month' => 6 }
         })
       end
 
-      let(:service) { described_class.new(messages: messages, today: Date.new(2026, 6, 1), client: client, user: user) }
-
-      it 'returns type :answer with formatted content' do
+      it 'returns type :answer with the presenter content' do
         result = service.call
 
         expect(result[:type]).to eq(:answer)
         expect(result[:content]).to eq('Lucro: R$ 1.000,00')
       end
 
-      it 'passes user to reader' do
+      it 'passes user and full params (including type) to the reader' do
         service.call
 
-        expect(reader_class).to have_received(:new).with({ 'year' => 2026, 'month' => 6 }, user: user)
+        expect(reader_class).to have_received(:new).with(
+          { 'type' => 'summary', 'year' => 2026, 'month' => 6 }, user: user
+        )
       end
 
-      context 'when reader raises an error' do
+      context 'when the reader raises an error' do
         before do
           allow(reader_class).to receive(:new).and_raise(StandardError, 'connection refused')
         end
@@ -241,6 +238,36 @@ RSpec.describe Ai::ParserService do
           expect(result[:type]).to eq(:text)
           expect(result[:content]).to eq(I18n.t('chat.errors.api_error'))
         end
+      end
+    end
+
+    context 'when LLM returns a query with an unknown type' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type: :tool_use, tool_name: 'query', tool_input: { 'type' => 'not_a_kind' }
+        })
+      end
+
+      it 'returns the fallback message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.message.fallback'))
+      end
+    end
+
+    context 'when LLM returns a query without a type' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type: :tool_use, tool_name: 'query', tool_input: {}
+        })
+      end
+
+      it 'returns the fallback message' do
+        result = service.call
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to eq(I18n.t('chat.message.fallback'))
       end
     end
 
