@@ -30,6 +30,21 @@ RSpec.describe Exports::Generators::Pdf do
       expect(pdf_text).to include('endstream')
     end
 
+    it 'includes refuelings and maintenances in the pdf' do
+      full_payload = Exports::Builder::Payload.new(
+        earnings:     [{ date: Date.new(2026, 3, 1), amount: BigDecimal('200.00'), platform: 'uber', trips_count: 5, notes: nil }],
+        expenses:     [{ date: Date.new(2026, 3, 2), amount: BigDecimal('50.00'), category: 'fuel', vendor: 'Shell', description: 'Tanque cheio', paid: true }],
+        refuelings:   [{ date: Date.new(2026, 3, 3), vendor: 'Petrobrás', liters: BigDecimal('30.0'), price_per_liter: BigDecimal('6.50'), total_amount: BigDecimal('195.00'), odometer_km: 50000 }],
+        maintenances: [{ category: 'oil_change', interval_km: 5000, last_done_km: 45000, estimated_cost: BigDecimal('150.00') }],
+        totals:       { earnings: BigDecimal('200.00'), expenses: BigDecimal('50.00'), profit: BigDecimal('150.00'), count: 4 }
+      )
+
+      result = described_class.call(payload: full_payload)
+
+      expect(result.io.string).to start_with('%PDF-')
+      expect(result.io.string.bytesize).to be > 1_000
+    end
+
     it 'gracefully handles empty payload' do
       empty = Exports::Builder::Payload.new(
         earnings:     [],
