@@ -21,6 +21,18 @@ class Export < ApplicationRecord
     includes.fetch(kind.to_s, false)
   end
 
+  def display_name
+    key = "exports.recents_name.#{period_kind}"
+    case period_kind
+    when 'year'
+      I18n.t(key, year: period_start.year)
+    when 'custom'
+      I18n.t(key, start: I18n.l(period_start), end: I18n.l(period_end))
+    else
+      I18n.t(key, month: I18n.t('date.month_names')[period_start.month], year: period_start.year)
+    end
+  end
+
   private
 
   def apply_period_range
