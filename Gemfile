@@ -9,6 +9,9 @@ gem 'solid_cache'
 gem 'puma', '>= 6.0'
 gem 'faraday'
 gem 'faraday-retry'
+gem 'matrix'
+gem 'prawn'
+gem 'prawn-table'
 
 # Transactional email over Resend's HTTP API (port 443) — works on hosts that
 # block outbound SMTP ports, unlike :smtp delivery.

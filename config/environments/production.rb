@@ -79,4 +79,6 @@ Rails.application.configure do
     host:     ENV.fetch('APP_HOST', 'drivecash.net.br'),
     protocol: 'https'
   }
+
+  config.active_storage.service = :local
 end
