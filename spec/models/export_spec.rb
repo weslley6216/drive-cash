@@ -77,4 +77,40 @@ RSpec.describe Export, type: :model do
       expect(export.file).to be_attached
     end
   end
+
+  describe 'period derivation from period_kind' do
+    it 'derives period_start and period_end for this_month' do
+      travel_to Date.new(2026, 6, 15) do
+        export = create(:export, period_kind: 'this_month', period_start: nil, period_end: nil)
+
+        expect(export.period_start).to eq(Date.new(2026, 6, 1))
+        expect(export.period_end).to eq(Date.new(2026, 6, 30))
+      end
+    end
+
+    it 'derives the previous month for last_month' do
+      travel_to Date.new(2026, 6, 15) do
+        export = create(:export, period_kind: 'last_month', period_start: nil, period_end: nil)
+
+        expect(export.period_start).to eq(Date.new(2026, 5, 1))
+        expect(export.period_end).to eq(Date.new(2026, 5, 31))
+      end
+    end
+
+    it 'derives the current year for year' do
+      travel_to Date.new(2026, 6, 15) do
+        export = create(:export, period_kind: 'year', period_start: nil, period_end: nil)
+
+        expect(export.period_start).to eq(Date.new(2026, 1, 1))
+        expect(export.period_end).to eq(Date.new(2026, 12, 31))
+      end
+    end
+
+    it 'keeps the provided dates for custom' do
+      export = create(:export, period_kind: 'custom', period_start: Date.new(2026, 2, 1), period_end: Date.new(2026, 2, 28))
+
+      expect(export.period_start).to eq(Date.new(2026, 2, 1))
+      expect(export.period_end).to eq(Date.new(2026, 2, 28))
+    end
+  end
 end

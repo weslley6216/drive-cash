@@ -12,6 +12,7 @@ class Export < ApplicationRecord
   validates :period_kind, :period_start, :period_end, :format, presence: true
   validate :period_end_after_start
 
+  before_validation :apply_period_range
   after_initialize :apply_defaults, if: :new_record?
 
   scope :recent, -> { order(created_at: :desc) }
@@ -21,6 +22,19 @@ class Export < ApplicationRecord
   end
 
   private
+
+  def apply_period_range
+    return if period_kind.blank?
+
+    range = Exports::PeriodRange.new(
+      kind:         period_kind,
+      custom_start: period_start,
+      custom_end:   period_end
+    )
+
+    self.period_start = range.period_start
+    self.period_end = range.period_end
+  end
 
   def apply_defaults
     self.includes = DEFAULT_INCLUDES.dup if includes.blank?
