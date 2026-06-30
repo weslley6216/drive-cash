@@ -32,9 +32,16 @@ RSpec.describe Exports::Generators::Csv do
       body = result.io.string
 
       expect(body).to include('2026-03-01')
-      expect(body).to include('uber')
       expect(body).to include('200.00')
       expect(body).to include('Shell')
+    end
+
+    it 'translates enum keys to localized labels' do
+      result = described_class.call(payload: payload)
+      body = result.io.string
+
+      expect(body).to include('Uber')
+      expect(body).to include('Combustível')
     end
 
     it 'omits sections that are empty' do

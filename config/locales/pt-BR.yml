@@ -489,3 +489,37 @@ pt-BR:
       enqueued: "Estamos preparando seu relatório."
       not_ready: "Seu relatório ainda está sendo gerado."
       not_found: "Exportação não encontrada."
+    report:
+      title: "Relatório DriveCash"
+      generated_at: "Gerado em %{datetime}"
+      sections:
+        earnings: "Receitas"
+        expenses: "Despesas"
+        refuelings: "Abastecimentos"
+        maintenances: "Manutenções"
+      headers:
+        earnings:
+        - "Data"
+        - "Plataforma"
+        - "Valor"
+        - "Corridas"
+        expenses:
+        - "Data"
+        - "Categoria"
+        - "Estabelecimento"
+        - "Valor"
+        refuelings:
+        - "Data"
+        - "Posto"
+        - "Litros"
+        - "Valor"
+        maintenances:
+        - "Tipo"
+        - "Intervalo km"
+        - "Última km"
+      totals:
+        title: "Totais"
+        earnings: "Receitas"
+        expenses: "Despesas"
+        profit: "Lucro líquido"
+        count: "Lançamentos"

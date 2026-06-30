@@ -4,6 +4,8 @@ require 'prawn/table'
 module Exports
   module Generators
     class Pdf
+      include Labels
+
       File = Data.define(:io, :filename, :content_type)
 
       def self.call(payload:)
@@ -17,10 +19,10 @@ module Exports
       def call
         document = Prawn::Document.new(margin: 36)
         render_header(document)
-        render_section(document, 'Receitas', earning_table)
-        render_section(document, 'Despesas', expense_table)
-        render_section(document, 'Abastecimentos', refueling_table)
-        render_section(document, 'Manutenções', maintenance_table)
+        render_section(document, I18n.t('exports.report.sections.earnings'), earning_table)
+        render_section(document, I18n.t('exports.report.sections.expenses'), expense_table)
+        render_section(document, I18n.t('exports.report.sections.refuelings'), refueling_table)
+        render_section(document, I18n.t('exports.report.sections.maintenances'), maintenance_table)
         render_totals(document)
 
         io = StringIO.new(document.render)
@@ -30,9 +32,9 @@ module Exports
       private
 
       def render_header(document)
-        document.text 'Relatório DriveCash', size: 18, style: :bold
+        document.text I18n.t('exports.report.title'), size: 18, style: :bold
         document.move_down 6
-        document.text "Gerado em #{I18n.l(Time.current, format: :long)}", size: 10
+        document.text I18n.t('exports.report.generated_at', datetime: I18n.l(Time.current, format: :long)), size: 10
         document.move_down 16
       end
 
@@ -50,18 +52,18 @@ module Exports
 
       def earning_table
         rows = @payload.earnings.map do |earning|
-          [I18n.l(earning[:date]), earning[:platform], format('%.2f', earning[:amount]), earning[:trips_count].to_s]
+          [I18n.l(earning[:date]), platform_label(earning[:platform]), format('%.2f', earning[:amount]), earning[:trips_count].to_s]
         end
 
-        [%w[Data Plataforma Valor Corridas]] + rows
+        [I18n.t('exports.report.headers.earnings')] + rows
       end
 
       def expense_table
         rows = @payload.expenses.map do |expense|
-          [I18n.l(expense[:date]), expense[:category], expense[:vendor].to_s, format('%.2f', expense[:amount])]
+          [I18n.l(expense[:date]), expense_category_label(expense[:category]), expense[:vendor].to_s, format('%.2f', expense[:amount])]
         end
 
-        [%w[Data Categoria Vendor Valor]] + rows
+        [I18n.t('exports.report.headers.expenses')] + rows
       end
 
       def refueling_table
@@ -69,25 +71,25 @@ module Exports
           [I18n.l(refueling[:date]), refueling[:vendor].to_s, refueling[:liters].to_s, format('%.2f', refueling[:total_amount])]
         end
 
-        [%w[Data Posto Litros Valor]] + rows
+        [I18n.t('exports.report.headers.refuelings')] + rows
       end
 
       def maintenance_table
         rows = @payload.maintenances.map do |maintenance|
-          [maintenance[:category], maintenance[:interval_km].to_s, maintenance[:last_done_km].to_s]
+          [maintenance_category_label(maintenance[:category]), maintenance[:interval_km].to_s, maintenance[:last_done_km].to_s]
         end
 
-        [%w[Tipo Intervalo\ km Última\ km]] + rows
+        [I18n.t('exports.report.headers.maintenances')] + rows
       end
 
       def render_totals(document)
-        document.text 'Totais', size: 13, style: :bold
+        document.text I18n.t('exports.report.totals.title'), size: 13, style: :bold
         document.move_down 4
         rows = [
-          ['Receitas', format('R$ %.2f', @payload.totals[:earnings])],
-          ['Despesas', format('R$ %.2f', @payload.totals[:expenses])],
-          ['Lucro líquido', format('R$ %.2f', @payload.totals[:profit])],
-          ['Lançamentos', @payload.totals[:count].to_s]
+          [I18n.t('exports.report.totals.earnings'), format('R$ %.2f', @payload.totals[:earnings])],
+          [I18n.t('exports.report.totals.expenses'), format('R$ %.2f', @payload.totals[:expenses])],
+          [I18n.t('exports.report.totals.profit'), format('R$ %.2f', @payload.totals[:profit])],
+          [I18n.t('exports.report.totals.count'), @payload.totals[:count].to_s]
         ]
         document.table(rows, cell_style: { size: 10, padding: 4 })
       end
