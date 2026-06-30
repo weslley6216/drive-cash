@@ -42,7 +42,7 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.items.plan.label'))
         expect(response.body).to include(I18n.t('account.items.notifications.label'))
         expect(response.body).to include(I18n.t('account.items.vehicle.label'))
-        expect(response.body).to include(I18n.t('account.items.export.label'))
+        expect(response.body).to include(I18n.t('account.items.exports.label'))
         expect(response.body).to include(I18n.t('account.items.help.label'))
       end
 
