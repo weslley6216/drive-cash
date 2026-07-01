@@ -489,6 +489,15 @@ pt-BR:
       enqueued: "Estamos preparando seu relatório."
       not_ready: "Seu relatório ainda está sendo gerado."
       not_found: "Exportação não encontrada."
+    cta_format:
+      pdf: "Gerar PDF"
+      csv: "Gerar CSV"
+      json: "Gerar Backup"
+    recents_name:
+      this_month: "%{month} %{year}"
+      last_month: "%{month} %{year}"
+      year: "Ano de %{year}"
+      custom: "%{start}–%{end}"
     report:
       title: "Relatório DriveCash"
       generated_at: "Gerado em %{datetime}"

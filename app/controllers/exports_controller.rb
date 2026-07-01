@@ -28,6 +28,20 @@ class ExportsController < ApplicationController
     redirect_to rails_blob_path(export.file, disposition: 'attachment')
   end
 
+  def preview
+    export = current_user.exports.new(preview_attributes)
+    export.valid?
+    payload = Exports::Builder.call(export: export)
+    render Exports::SummaryFrameView.new(payload: payload, period_label: export.display_name, format: export.format)
+  end
+
+  def row
+    export = current_user.exports.find_by(id: params[:id])
+    return head :not_found unless export
+
+    render Exports::RecentRowView.new(export: export, last: true)
+  end
+
   private
 
   def build_export
@@ -44,6 +58,12 @@ class ExportsController < ApplicationController
       :period_kind, :period_start, :period_end, :format,
       includes: %i[earnings expenses refuelings maintenances]
     ).then { |attrs| attrs.merge(includes: normalize_includes(attrs[:includes])) }
+  end
+
+  def preview_attributes
+    params.permit(export: [:period_kind, :period_start, :period_end, :format, includes: %i[earnings expenses refuelings maintenances]])
+      .fetch(:export, {})
+      .then { |attrs| attrs.merge(includes: normalize_includes(attrs[:includes])) }
   end
 
   def normalize_includes(payload)
