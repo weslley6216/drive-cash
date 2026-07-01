@@ -15,7 +15,7 @@ class Export < ApplicationRecord
   before_validation :apply_period_range
   after_initialize :apply_defaults, if: :new_record?
 
-  scope :recent, -> { order(created_at: :desc) }
+  scope :recent, -> { order(created_at: :desc).includes(file_attachment: :blob) }
 
   def includes_for(kind)
     includes.fetch(kind.to_s, false)

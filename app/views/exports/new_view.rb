@@ -217,6 +217,7 @@ module Exports
     end
 
     def summary_frame
+      @export.validate
       payload = Exports::Builder.call(export: @export)
       render Exports::SummaryFrameView.new(
         payload:      payload,
