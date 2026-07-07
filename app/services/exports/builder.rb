@@ -1,6 +1,7 @@
 module Exports
   class Builder
     Payload = Data.define(:earnings, :expenses, :refuelings, :maintenances, :totals)
+    EMPTY_SECTIONS = { earnings: [], expenses: [], refuelings: [], maintenances: [] }.freeze
 
     def self.call(export:)
       new(export: export).call
@@ -13,17 +14,24 @@ module Exports
     end
 
     def call
-      sections = {
+      sections = blank_range? ? EMPTY_SECTIONS : collect_sections
+      Payload.new(**sections, totals: totals(sections))
+    end
+
+    private
+
+    def blank_range?
+      @export.period_start.blank? || @export.period_end.blank?
+    end
+
+    def collect_sections
+      {
         earnings:     collect_earnings,
         expenses:     collect_expenses,
         refuelings:   collect_refuelings,
         maintenances: collect_maintenances
       }
-
-      Payload.new(**sections, totals: totals(sections))
     end
-
-    private
 
     def collect_earnings
       return [] unless @export.includes_for(:earnings)
@@ -61,7 +69,7 @@ module Exports
 
     def totals(sections)
       earnings_sum = sections[:earnings].sum { |row| row[:amount] || 0 }
-      expenses_sum = sections[:expenses].sum { |row| row[:amount] || 0 }
+      expenses_sum = sections[:expenses].select { |row| row[:paid] }.sum { |row| row[:amount] || 0 }
       count = sections.values.sum(&:size)
 
       { earnings: earnings_sum, expenses: expenses_sum, profit: earnings_sum - expenses_sum, count: count }
