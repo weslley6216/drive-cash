@@ -5,9 +5,9 @@ class Export < ApplicationRecord
   belongs_to :user
   has_one_attached :file
 
-  enum :period_kind, { this_month: 0, last_month: 1, year: 2, custom: 3 }, prefix: true
-  enum :format, { pdf: 0, csv: 1, json: 2 }, prefix: true
-  enum :status, { pending: 0, processing: 1, done: 2, failed: 3 }, prefix: true
+  enum :period_kind, { this_month: 0, last_month: 1, year: 2, custom: 3 }, prefix: true, validate: true
+  enum :format, { pdf: 0, csv: 1, json: 2 }, prefix: true, validate: true
+  enum :status, { pending: 0, processing: 1, done: 2, failed: 3 }, prefix: true, validate: true
 
   validates :period_kind, :period_start, :period_end, :format, presence: true
   validate :period_end_after_start
@@ -21,22 +21,15 @@ class Export < ApplicationRecord
     includes.fetch(kind.to_s, false)
   end
 
-  def display_name
-    key = "exports.recents_name.#{period_kind}"
-    case period_kind
-    when 'year'
-      I18n.t(key, year: period_start.year)
-    when 'custom'
-      I18n.t(key, start: I18n.l(period_start), end: I18n.l(period_end))
-    else
-      I18n.t(key, month: I18n.t('date.month_names')[period_start.month], year: period_start.year)
-    end
+  def resolve_period
+    apply_period_range
   end
 
   private
 
   def apply_period_range
     return if period_kind.blank?
+    return unless self.class.period_kinds.key?(period_kind)
 
     range = Exports::PeriodRange.new(
       kind:         period_kind,
