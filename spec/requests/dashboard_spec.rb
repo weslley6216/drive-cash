@@ -177,6 +177,20 @@ RSpec.describe 'Dashboard', type: :request do
       end
     end
 
+    it 'shows the final result without a countdown for a goal from a past month' do
+      travel_to Date.new(2026, 7, 15) do
+        create(:goal, user: current_user, kind: 'monthly',
+                      period_start: Date.new(2026, 3, 1),
+                      period_end: Date.new(2026, 3, 31),
+                      target_amount: 5000)
+
+        get root_path, params: { year: 2026, month: 3 }
+
+        expect(response.body).to include(I18n.t('goals.index.monthly.missed', shortfall: 'R$ 5.000,00'))
+        expect(response.body).not_to include('dias restantes')
+      end
+    end
+
     it 'does not render monthly goal card when filtered month has no active goal' do
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.new(2026, 6, 1),
