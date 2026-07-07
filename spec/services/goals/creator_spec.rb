@@ -47,14 +47,24 @@ RSpec.describe Goals::Creator do
       expect(result.goal.metric).to eq('profit')
     end
 
-    it 'returns failure when kind is invalid' do
+    it 'returns a pt-BR validation error when kind is invalid' do
       user = create(:user)
       attrs = { 'kind' => 'invalid', 'target_amount' => 100.0 }
 
       result = described_class.new(attrs, user: user).call
 
       expect(result.success?).to be false
-      expect(result.goal.errors).to be_present
+      expect(result.goal.errors.full_messages).to include(I18n.t('goals.errors.invalid_kind'))
+    end
+
+    it 'returns a pt-BR validation error when metric is invalid' do
+      user = create(:user)
+      attrs = { 'kind' => 'monthly', 'target_amount' => 100.0, 'metric' => 'revenue' }
+
+      result = described_class.new(attrs, user: user).call
+
+      expect(result.success?).to be false
+      expect(result.goal.errors.full_messages).to include(I18n.t('goals.errors.invalid_metric'))
     end
   end
 end

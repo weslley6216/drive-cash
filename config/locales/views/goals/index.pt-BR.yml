@@ -73,3 +73,6 @@ pt-BR:
       created: "Meta criada com sucesso."
       updated: "Meta atualizada."
       destroyed: "Meta removida."
+    errors:
+      invalid_kind: "Período de meta inválido. Use semanal, mensal ou anual."
+      invalid_metric: "Métrica inválida. Use lucro ou receita."
