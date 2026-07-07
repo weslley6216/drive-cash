@@ -19,8 +19,8 @@ class Refueling < ApplicationRecord
   private
 
   def compute_price_per_liter
-    return if liters.to_f.zero?
+    return if liters.to_d.zero?
 
-    self.price_per_liter = (total_amount.to_f / liters.to_f).round(3)
+    self.price_per_liter = (total_amount.to_d / liters.to_d).round(3)
   end
 end
