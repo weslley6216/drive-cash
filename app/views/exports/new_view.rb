@@ -17,7 +17,7 @@ module Exports
     def view_template
       render LayoutComponent.new(title: t('exports.title'), bottom_nav: :more, sidebar_nav: :more) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill' }) do
+        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill export-field-sync' }) do
           mobile_layout
           desktop_layout
         end
@@ -140,7 +140,8 @@ module Exports
     end
 
     def date_field(name, value)
-      input(type: 'date', name: name, value: value&.iso8601, class: 'w-full px-3 py-2 rounded-lg border border-slate-300 text-sm')
+      input(type: 'date', name: name, value: value&.iso8601, class: 'w-full px-3 py-2 rounded-lg border border-slate-300 text-sm',
+            data: { export_field_sync_target: 'field', action: 'change->export-field-sync#sync' })
     end
 
     def format_pills(mobile:)

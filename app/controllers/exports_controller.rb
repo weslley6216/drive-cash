@@ -27,8 +27,9 @@ class ExportsController < ApplicationController
 
   def preview
     export = current_user.exports.new(preview_attributes)
+    view = summary_view_for(export)
 
-    render summary_view_for(export), status: export.valid? ? :ok : :unprocessable_content
+    render view, status: export.valid? ? :ok : :unprocessable_content
   end
 
   def row
