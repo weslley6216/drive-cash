@@ -5,16 +5,14 @@ RSpec.describe 'Exports', type: :request do
 
   before { login_as(current_user) }
 
-  describe 'GET /exports/new' do
+  describe 'GET /exports' do
     it 'renders the form' do
-      get new_export_path
+      get exports_path
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(I18n.t('exports.cta'))
     end
-  end
 
-  describe 'GET /exports' do
     it 'lists the user exports' do
       mine = create(:export, user: current_user)
       other = create(:export, user: create(:user))
@@ -68,6 +66,12 @@ RSpec.describe 'Exports', type: :request do
       expect(export.includes_for(:earnings)).to be true
       expect(export.includes_for(:refuelings)).to be false
     end
+
+    it 'returns unprocessable_content for an invalid format param' do
+      post exports_path, params: { export: valid_params[:export].merge(format: 'xml') }
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
   end
 
   describe 'GET /exports/:id' do
@@ -103,6 +107,17 @@ RSpec.describe 'Exports', type: :request do
         expect(response.location).to include(export.file.filename.to_s)
       end
     end
+
+    context 'when the export failed' do
+      it 'redirects back with a failure alert' do
+        export = create(:export, user: current_user, status: 'failed')
+
+        get export_path(export)
+
+        expect(response).to redirect_to(exports_path)
+        expect(flash[:alert]).to eq(I18n.t('exports.flash.failed'))
+      end
+    end
   end
 
   describe 'GET /exports/preview' do
@@ -135,6 +150,18 @@ RSpec.describe 'Exports', type: :request do
       get preview_exports_path, params: params
 
       expect(response).to redirect_to(new_session_path)
+    end
+
+    it 'returns unprocessable_content for an invalid period_kind param' do
+      get preview_exports_path, params: { export: { period_kind: 'x', format: 'csv' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'returns unprocessable_content for an invalid format param' do
+      get preview_exports_path, params: { export: { period_kind: 'year', format: 'xml' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

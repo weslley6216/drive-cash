@@ -28,4 +28,14 @@ RSpec.describe Exports::RecentRowView, type: :view do
 
     expect(html).to include('2 KB')
   end
+
+  it 'stops polling and hides the download link when the export failed' do
+    export = create(:export, user: user, status: 'failed')
+
+    html = render(described_class.new(export: export, last: true))
+
+    expect(html).to include(I18n.t('exports.flash.failed'))
+    expect(html).not_to include('export-row-poll')
+    expect(html).not_to include(%(href="/exports/#{export.id}"))
+  end
 end
