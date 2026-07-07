@@ -18,6 +18,7 @@ export default class extends Controller {
         } else {
           chip.classList.add("bg-blue-600")
           chip.classList.add("border-blue-600")
+          chip.classList.remove("hover:bg-slate-50")
         }
         chip.classList.remove("bg-white", "text-slate-600", "border-slate-200")
       } else {
@@ -26,6 +27,7 @@ export default class extends Controller {
           chip.classList.remove("bg-slate-800", "border-slate-800")
         } else {
           chip.classList.remove("bg-blue-600", "border-blue-600")
+          chip.classList.add("hover:bg-slate-50")
         }
         chip.classList.add("bg-white", "text-slate-600", "border-slate-200")
       }
