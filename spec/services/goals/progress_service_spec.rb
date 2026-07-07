@@ -167,6 +167,22 @@ RSpec.describe Goals::ProgressService do
 
       expect(result[:achievements].map { |badge| badge[:type] }).to include(:streak)
     end
+
+    context 'consistency with the dashboard profit for the same period' do
+      it 'matches Dashboard::StatsService profit and ignores unpaid expenses' do
+        create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+               period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30), metric: 'profit')
+        create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+        create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 500, paid: true)
+        create(:expense, user: user, date: Date.new(2026, 6, 7), amount: 300, paid: false)
+
+        progress = described_class.new(user: user, date: reference_date).call
+        stats = Dashboard::StatsService.new(year: 2026, month: 6, user: user).call
+
+        expect(progress[:monthly][:current]).to eq(stats[:profit])
+        expect(progress[:monthly][:current]).to eq(1500)
+      end
+    end
   end
 
   describe '#past_goals' do

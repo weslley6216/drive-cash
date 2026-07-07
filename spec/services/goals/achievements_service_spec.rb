@@ -63,6 +63,18 @@ RSpec.describe Goals::AchievementsService do
       expect(completed[:label]).to include('Abril')
     end
 
+    it 'ignores unpaid expenses when deciding if a past monthly goal was beaten' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+             period_start: Date.new(2026, 5, 1), period_end: Date.new(2026, 5, 31), metric: 'profit')
+      create(:earning, user: user, date: Date.new(2026, 5, 10), amount: 6000)
+      create(:expense, user: user, date: Date.new(2026, 5, 11), amount: 2000, paid: false)
+
+      result = described_class.new(user: user, date: reference_date).call
+
+      completed = result.find { |badge| badge[:type] == :goal_completed }
+      expect(completed[:label]).to include('Maio')
+    end
+
     it 'does not return goal_completed badge when no past monthly goal was beaten' do
       create(:goal,
              user:          user,

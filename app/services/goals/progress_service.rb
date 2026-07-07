@@ -82,14 +82,14 @@ module Goals
 
     def compute_metric_for_period(goal)
       earnings = @user.earnings.where(date: goal.period_start..goal.period_end).sum(:amount)
-      expenses = @user.expenses.where(date: goal.period_start..goal.period_end).sum(:amount)
+      expenses = @user.expenses.paid_only.where(date: goal.period_start..goal.period_end).sum(:amount)
       goal.metric_profit? ? earnings - expenses : earnings
     end
 
     def days_breakdown(goal)
       range = goal.period_start..goal.period_end
       earnings_by_day = @user.earnings.where(date: range).group(:date).sum(:amount).transform_keys(&:to_date)
-      expenses_by_day = @user.expenses.where(date: range).group(:date).sum(:amount).transform_keys(&:to_date)
+      expenses_by_day = @user.expenses.paid_only.where(date: range).group(:date).sum(:amount).transform_keys(&:to_date)
 
       range.map do |day|
         earned = earnings_by_day.fetch(day, 0)
