@@ -10,10 +10,14 @@ module Goals
     def call
       {
         weekly:       progress_for('weekly'),
-        monthly:      progress_for('monthly'),
+        monthly:      monthly,
         annual:       progress_for('annual'),
         achievements: AchievementsService.new(user: @user, date: @date).call
       }
+    end
+
+    def monthly
+      progress_for('monthly')
     end
 
     def past_goals(kind, limit: 12)

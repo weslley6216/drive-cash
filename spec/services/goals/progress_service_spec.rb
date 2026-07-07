@@ -185,6 +185,34 @@ RSpec.describe Goals::ProgressService do
     end
   end
 
+  describe '#monthly' do
+    it 'returns only the monthly progress hash' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+
+      result = described_class.new(user: user, date: reference_date).monthly
+
+      expect(result[:current]).to eq(2000)
+      expect(result[:target]).to eq(6000)
+    end
+
+    it 'skips weekly, annual and achievements queries' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+
+      queries = []
+      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] }
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        described_class.new(user: user, date: reference_date).monthly
+      end
+
+      expect(queries.grep(/FROM "goals"/).size).to eq(1)
+      expect(queries.grep(/SELECT DISTINCT "earnings"/)).to be_empty
+    end
+  end
+
   describe '#past_goals' do
     let(:user) { create(:user) }
     let(:reference_date) { Date.new(2026, 6, 30) }
