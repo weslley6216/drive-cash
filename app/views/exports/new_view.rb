@@ -8,49 +8,48 @@ module Exports
       { key: 'maintenances', icon: PhlexIcons::Lucide::Wrench }
     ].freeze
 
-    def initialize(export:, exports:)
+    def initialize(export:, exports:, summary_view:)
       @export = export
       @exports = exports
+      @summary_view = summary_view
     end
 
     def view_template
       render LayoutComponent.new(title: t('exports.title'), bottom_nav: :more, sidebar_nav: :more) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        mobile_layout
-        desktop_layout
+        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill export-field-sync' }) do
+          mobile_layout
+          desktop_layout
+        end
       end
     end
 
     private
 
     def mobile_layout
-      div(class: 'lg:hidden') do
+      div(class: 'lg:hidden pb-28') do
         mobile_header
-        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill' }, class: 'pb-28') do |f|
-          div(class: 'px-5 space-y-5') do
-            why_block
-            period_chips_mobile(f)
-            format_pills(mobile: true)
-            include_card
-            recents_card
-          end
-          mobile_cta
+        div(class: 'px-5 space-y-5') do
+          why_block
+          period_chips_mobile
+          format_pills(mobile: true)
+          include_card
+          recents_card
         end
+        mobile_cta
       end
     end
 
     def desktop_layout
       div(class: 'hidden lg:block') do
         desktop_header
-        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill' }) do |f|
-          div(class: 'grid grid-cols-[1fr_360px] gap-8 items-start max-w-5xl') do
-            div(class: 'space-y-6') do
-              desktop_panel(t('exports.period.label')) { period_chips_desktop(f) }
-              desktop_panel(t('exports.format.label')) { format_pills(mobile: false) }
-              include_panel_desktop
-            end
-            summary_frame
+        div(class: 'grid grid-cols-[1fr_360px] gap-8 items-start max-w-5xl') do
+          div(class: 'space-y-6') do
+            desktop_panel(t('exports.period.label')) { period_chips_desktop }
+            desktop_panel(t('exports.format.label')) { format_pills(mobile: false) }
+            include_panel_desktop
           end
+          summary_frame
         end
       end
     end
@@ -83,7 +82,7 @@ module Exports
       end
     end
 
-    def period_chips_mobile(_form)
+    def period_chips_mobile
       div do
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5') { t('exports.period.label') }
         div(class: 'flex flex-wrap gap-2') do
@@ -93,7 +92,7 @@ module Exports
       end
     end
 
-    def period_chips_desktop(_form)
+    def period_chips_desktop
       div(class: 'flex flex-wrap gap-2') do
         PERIOD_KINDS.each { |kind| period_button(kind, mobile: false) }
       end
@@ -141,7 +140,8 @@ module Exports
     end
 
     def date_field(name, value)
-      input(type: 'date', name: name, value: value&.iso8601, class: 'w-full px-3 py-2 rounded-lg border border-slate-300 text-sm')
+      input(type: 'date', name: name, value: value&.iso8601, class: 'w-full px-3 py-2 rounded-lg border border-slate-300 text-sm',
+            data: { export_field_sync_target: 'field', action: 'change->export-field-sync#sync' })
     end
 
     def format_pills(mobile:)
@@ -217,13 +217,7 @@ module Exports
     end
 
     def summary_frame
-      @export.validate
-      payload = Exports::Builder.call(export: @export)
-      render Exports::SummaryFrameView.new(
-        payload:      payload,
-        period_label: @export.display_name,
-        format:       @export.format || 'pdf'
-      )
+      render @summary_view
     end
 
     def recents_card

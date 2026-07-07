@@ -31,7 +31,7 @@ Rails.application.routes.draw do
   get '/history',      to: 'history#index',           as: :history
   get '/settings',     to: 'application#coming_soon', as: :settings
   resources :goals, only: %i[index new create edit update destroy]
-  resources :exports, only: %i[index new create show] do
+  resources :exports, only: %i[index create show] do
     collection { get :preview }
     member { get :row }
   end

@@ -12,7 +12,8 @@ module Exports
     def view_template
       label(class: container_classes) do
         input(type: 'hidden', name: "export[includes][#{@key}]", value: '0')
-        input(type: 'checkbox', name: "export[includes][#{@key}]", value: '1', checked: @checked, class: 'sr-only peer')
+        input(type: 'checkbox', name: "export[includes][#{@key}]", value: '1', checked: @checked, class: 'sr-only peer',
+              data: { export_field_sync_target: 'field', action: 'change->export-field-sync#sync' })
         div(class: 'w-9 h-9 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0') do
           render @icon.new(class: 'w-[17px] h-[17px]')
         end

@@ -101,5 +101,26 @@ RSpec.describe Exports::Builder do
         expect(payload.earnings.map { |row| row[:amount] }).to eq([BigDecimal('100')])
       end
     end
+
+    it 'returns an empty payload when the period bounds are unresolved' do
+      export = build(:export, user: user, period_kind: nil, period_start: nil, period_end: nil)
+
+      payload = described_class.call(export: export)
+
+      expect(payload.earnings).to be_empty
+      expect(payload.expenses).to be_empty
+      expect(payload.totals[:count]).to eq(0)
+    end
+
+    it 'excludes unpaid expenses from totals but keeps them in the rows' do
+      create(:expense, user: user, date: Date.new(2026, 2, 10), amount: 50.00, category: 'fuel', paid: true)
+      create(:expense, user: user, date: Date.new(2026, 2, 11), amount: 30.00, category: 'fuel', paid: false)
+      export = build_export(includes: { 'earnings' => false, 'expenses' => true, 'refuelings' => false, 'maintenances' => false })
+
+      payload = described_class.call(export: export)
+
+      expect(payload.expenses.size).to eq(2)
+      expect(payload.totals[:expenses]).to eq(BigDecimal('50.00'))
+    end
   end
 end

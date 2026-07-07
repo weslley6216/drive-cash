@@ -1,11 +1,7 @@
 class ExportsController < ApplicationController
   def index
-    @exports = current_user.exports.recent
-    render Exports::NewView.new(export: build_export, exports: @exports)
-  end
-
-  def new
-    render Exports::NewView.new(export: build_export, exports: current_user.exports.recent)
+    export = build_export
+    render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export))
   end
 
   def create
@@ -15,7 +11,7 @@ class ExportsController < ApplicationController
       ExportJob.perform_later(export.id)
       redirect_to exports_path, notice: t('exports.flash.enqueued')
     else
-      render Exports::NewView.new(export: export, exports: current_user.exports.recent),
+      render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export)),
              status: :unprocessable_content
     end
   end
@@ -23,6 +19,7 @@ class ExportsController < ApplicationController
   def show
     export = current_user.exports.find_by(id: params[:id])
     return head :not_found unless export
+    return redirect_to(exports_path, alert: t('exports.flash.failed')) if export.status_failed?
     return redirect_to(exports_path, alert: t('exports.flash.not_ready')) unless export.status_done? && export.file.attached?
 
     redirect_to rails_blob_path(export.file, disposition: 'attachment')
@@ -30,9 +27,9 @@ class ExportsController < ApplicationController
 
   def preview
     export = current_user.exports.new(preview_attributes)
-    export.valid?
-    payload = Exports::Builder.call(export: export)
-    render Exports::SummaryFrameView.new(payload: payload, period_label: export.display_name, format: export.format)
+    view = summary_view_for(export)
+
+    render view, status: export.valid? ? :ok : :unprocessable_content
   end
 
   def row
@@ -51,6 +48,13 @@ class ExportsController < ApplicationController
       period_end:   Date.current.end_of_year,
       format:       'pdf'
     )
+  end
+
+  def summary_view_for(export)
+    export.resolve_period
+    payload = Exports::Builder.call(export: export)
+
+    Exports::SummaryFrameView.new(payload: payload, period_label: Exports::RecentsName.new(export).call, format: export.format || 'pdf')
   end
 
   def export_attributes

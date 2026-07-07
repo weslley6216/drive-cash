@@ -489,6 +489,7 @@ pt-BR:
       enqueued: "Estamos preparando seu relatório."
       not_ready: "Seu relatório ainda está sendo gerado."
       not_found: "Exportação não encontrada."
+      failed: "Falha ao gerar o relatório."
     cta_format:
       pdf: "Gerar PDF"
       csv: "Gerar CSV"

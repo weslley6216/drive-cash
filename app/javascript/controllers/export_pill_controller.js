@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { loadExportPreview } from "utils/export_preview"
 
 export default class extends Controller {
   static targets = ["pill", "radio"]
@@ -15,20 +16,17 @@ export default class extends Controller {
       pill.classList.toggle("bg-white", !isSelected)
       const check = pill.querySelector("[data-export-pill-target='check']")
       if (check) check.classList.toggle("hidden", !isSelected)
+      const badge = pill.querySelector("[data-export-pill-target='badge']")
+      if (badge) {
+        badge.classList.toggle("bg-blue-600", isSelected)
+        badge.classList.toggle("text-white", isSelected)
+        badge.classList.toggle("bg-slate-100", !isSelected)
+        badge.classList.toggle("text-slate-500", !isSelected)
+      }
     })
     this.radioTargets.forEach((radio) => {
       radio.checked = radio.value === value
     })
-    this.previewFrame()
-  }
-
-  previewFrame() {
-    const form = this.element.closest('form')
-    if (!form) return
-    const body = new URLSearchParams(new FormData(form))
-    const frame = document.querySelector('[id="export-summary"]')
-    if (frame) {
-      frame.src = `/exports/preview?${body}`
-    }
+    loadExportPreview(this.element)
   }
 }

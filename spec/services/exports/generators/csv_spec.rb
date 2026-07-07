@@ -51,5 +51,21 @@ RSpec.describe Exports::Generators::Csv do
       expect(body).not_to include('# Abastecimentos')
       expect(body).not_to include('# Manutenções')
     end
+
+    it 'neutralizes formula injection in string cells' do
+      malicious_payload = Exports::Builder::Payload.new(
+        earnings:     [],
+        expenses:     [{ date: Date.new(2026, 3, 2), amount: BigDecimal('50.00'), category: 'fuel', vendor: '=SUM(A1:A10)', description: '+cmd', paid: true }],
+        refuelings:   [],
+        maintenances: [],
+        totals:       { earnings: BigDecimal('0'), expenses: BigDecimal('50.00'), profit: BigDecimal('-50.00'), count: 1 }
+      )
+
+      result = described_class.call(payload: malicious_payload)
+      body = result.io.string
+
+      expect(body).to include("'=SUM(A1:A10)")
+      expect(body).to include("'+cmd")
+    end
   end
 end

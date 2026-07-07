@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { loadExportPreview } from "utils/export_preview"
 
 export default class extends Controller {
   static targets = ["chip", "radio", "customFields"]
@@ -17,6 +18,7 @@ export default class extends Controller {
         } else {
           chip.classList.add("bg-blue-600")
           chip.classList.add("border-blue-600")
+          chip.classList.remove("hover:bg-slate-50")
         }
         chip.classList.remove("bg-white", "text-slate-600", "border-slate-200")
       } else {
@@ -25,6 +27,7 @@ export default class extends Controller {
           chip.classList.remove("bg-slate-800", "border-slate-800")
         } else {
           chip.classList.remove("bg-blue-600", "border-blue-600")
+          chip.classList.add("hover:bg-slate-50")
         }
         chip.classList.add("bg-white", "text-slate-600", "border-slate-200")
       }
@@ -36,16 +39,6 @@ export default class extends Controller {
 
     this.customFieldsTargets.forEach((el) => el.classList.toggle("hidden", value !== "custom"))
 
-    this.previewFrame()
-  }
-
-  previewFrame() {
-    const form = this.element.closest('form')
-    if (!form) return
-    const body = new URLSearchParams(new FormData(form))
-    const frame = document.querySelector('[id="export-summary"]')
-    if (frame) {
-      frame.src = `/exports/preview?${body}`
-    }
+    loadExportPreview(this.element)
   }
 }
