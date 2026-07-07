@@ -49,7 +49,7 @@ module Refuelings
         next if current_one.odometer_km.nil? || previous_one.odometer_km.nil?
 
         delta_km = current_one.odometer_km - previous_one.odometer_km
-        liters_value = current_one.liters.to_f
+        liters_value = current_one.liters.to_d
         next if delta_km <= 0 || liters_value.zero?
 
         delta_km / liters_value
@@ -79,7 +79,7 @@ module Refuelings
     def average_price_per_liter
       @average_price_per_liter ||= @vehicle.refuelings.full_tank
         .where(date: (@date - 90.days)..@date)
-        .average(:price_per_liter).to_f
+        .average(:price_per_liter).to_d
     end
   end
 end
