@@ -252,5 +252,34 @@ RSpec.describe Goals::ProgressService do
 
       expect(result.size).to eq(3)
     end
+
+    it 'runs a constant number of queries regardless of how many past goals exist' do
+      12.times do |offset|
+        month = Date.new(2025, 6, 1) + offset.months
+        create(:goal, user: user, kind: 'monthly', target_amount: 1000,
+               period_start: month.beginning_of_month, period_end: month.end_of_month)
+      end
+
+      queries = []
+      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM "(goals|earnings|expenses)"/ }
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        described_class.new(user: user, date: Date.new(2026, 7, 1)).past_goals('monthly', limit: 12)
+      end
+
+      expect(queries.size).to eq(3)
+    end
+
+    it 'ignores unpaid expenses when computing the achieved flag of past goals' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+             period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30), metric: 'profit')
+      create(:earning, user: user, date: Date.new(2026, 4, 15), amount: 6000)
+      create(:expense, user: user, date: Date.new(2026, 4, 16), amount: 2000, paid: false)
+
+      result = described_class.new(user: user, date: reference_date).past_goals('monthly')
+
+      expect(result.first[:current]).to eq(6000)
+      expect(result.first[:achieved]).to be(true)
+    end
   end
 end
