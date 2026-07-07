@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { loadExportPreview } from "utils/export_preview"
 
 export default class extends Controller {
   static targets = ["chip", "radio", "customFields"]
@@ -36,16 +37,6 @@ export default class extends Controller {
 
     this.customFieldsTargets.forEach((el) => el.classList.toggle("hidden", value !== "custom"))
 
-    this.previewFrame()
-  }
-
-  previewFrame() {
-    const form = this.element.closest('form')
-    if (!form) return
-    const body = new URLSearchParams(new FormData(form))
-    const frame = document.querySelector('[id="export-summary"]')
-    if (frame) {
-      frame.src = `/exports/preview?${body}`
-    }
+    loadExportPreview(this.element)
   }
 }
