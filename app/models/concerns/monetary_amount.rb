@@ -23,7 +23,7 @@ module MonetaryAmount
     integer_part = cleaned[0...last_separator].delete('.,')
     decimal_part = cleaned[(last_separator + 1)..]
 
-    if decimal_part.length == 3 && cleaned.count('.,') == 1
+    if cleaned[last_separator] == '.' && decimal_part.length == 3 && cleaned.count('.,') == 1
       "#{integer_part}#{decimal_part}"
     else
       "#{integer_part}.#{decimal_part}"
