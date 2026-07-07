@@ -16,6 +16,13 @@ export default class extends Controller {
       pill.classList.toggle("bg-white", !isSelected)
       const check = pill.querySelector("[data-export-pill-target='check']")
       if (check) check.classList.toggle("hidden", !isSelected)
+      const badge = pill.querySelector("[data-export-pill-target='badge']")
+      if (badge) {
+        badge.classList.toggle("bg-blue-600", isSelected)
+        badge.classList.toggle("text-white", isSelected)
+        badge.classList.toggle("bg-slate-100", !isSelected)
+        badge.classList.toggle("text-slate-500", !isSelected)
+      }
     })
     this.radioTargets.forEach((radio) => {
       radio.checked = radio.value === value

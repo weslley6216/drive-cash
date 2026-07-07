@@ -19,7 +19,7 @@ module Exports
       ) do
         input(type: 'radio', name: 'export[format]', value: @value, checked: @selected, class: 'sr-only', data: { export_pill_target: 'radio' })
         div(class: 'flex items-center justify-between mb-1.5') do
-          div(class: badge_classes) { render @icon.new(class: 'w-[18px] h-[18px]') }
+          div(class: badge_classes, data: { export_pill_target: 'badge' }) { render @icon.new(class: 'w-[18px] h-[18px]') }
           div(data: { export_pill_target: 'check' }, class: @selected ? '' : 'hidden') do
             render PhlexIcons::Lucide::Check.new(class: 'w-[18px] h-[18px] text-blue-600')
           end
