@@ -5,6 +5,7 @@ module Exports
   module Generators
     class Pdf
       include Labels
+      include Formatting
 
       File = Data.define(:io, :filename, :content_type)
 
@@ -86,9 +87,9 @@ module Exports
         document.text I18n.t('exports.report.totals.title'), size: 13, style: :bold
         document.move_down 4
         rows = [
-          [I18n.t('exports.report.totals.earnings'), format('R$ %.2f', @payload.totals[:earnings])],
-          [I18n.t('exports.report.totals.expenses'), format('R$ %.2f', @payload.totals[:expenses])],
-          [I18n.t('exports.report.totals.profit'), format('R$ %.2f', @payload.totals[:profit])],
+          [I18n.t('exports.report.totals.earnings'), format_currency(@payload.totals[:earnings])],
+          [I18n.t('exports.report.totals.expenses'), format_currency(@payload.totals[:expenses])],
+          [I18n.t('exports.report.totals.profit'), format_currency(@payload.totals[:profit])],
           [I18n.t('exports.report.totals.count'), @payload.totals[:count].to_s]
         ]
         document.table(rows, cell_style: { size: 10, padding: 4 })
