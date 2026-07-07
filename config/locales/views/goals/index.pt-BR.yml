@@ -24,6 +24,7 @@ pt-BR:
         on_track_projection: "Vai bater · projeção %{value}"
         at_risk_projection: "Em risco · projeção %{value}"
         reached: "✅ Meta batida · +%{surplus} acima da meta"
+        missed: "❌ Meta não batida · %{shortfall} abaixo da meta"
         tracking: "Acompanhando…"
         remaining: "Faltam"
         per_day: "Por dia"

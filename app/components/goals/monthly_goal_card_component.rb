@@ -73,8 +73,10 @@ module Goals
           end
         end
         div(class: 'flex items-center gap-2') do
-          span(class: 'text-xs font-medium text-slate-400') do
-            plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+          unless @progress[:ended]
+            span(class: 'text-xs font-medium text-slate-400') do
+              plain t('goals.index.monthly.days_left', count: @progress[:days_remaining])
+            end
           end
           edit_link
         end
@@ -103,6 +105,7 @@ module Goals
 
     def projection_badge(mt: 'mt-3')
       return reached_badge(mt) if @progress[:reached]
+      return missed_badge(mt) if @progress[:ended]
       return tracking_badge(mt) if @progress[:tracking]
 
       classic_projection_badge(mt)
@@ -112,6 +115,12 @@ module Goals
       div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-emerald-50 border-emerald-200 text-emerald-700") do
         render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3', 'stroke-width': '2.5')
         span(class: 'text-xs font-medium') { t('goals.index.monthly.reached', surplus: format_currency(@progress[:surplus])) }
+      end
+    end
+
+    def missed_badge(mt)
+      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-rose-50 border-rose-200 text-rose-700") do
+        span(class: 'text-xs font-medium') { t('goals.index.monthly.missed', shortfall: format_currency([@progress[:target] - @progress[:current], 0].max)) }
       end
     end
 

@@ -97,6 +97,18 @@ RSpec.describe Goals::ProgressService do
 
         expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
+
+      it 'does not flag ended before the period end' do
+        result = described_class.new(user: user, date: reference_date).call
+
+        expect(result[:monthly][:ended]).to be(false)
+      end
+
+      it 'flags ended when the reference date reaches the period end' do
+        result = described_class.new(user: user, date: Date.new(2026, 6, 30)).call
+
+        expect(result[:monthly][:ended]).to be(true)
+      end
     end
 
     context 'with a weekly goal' do
