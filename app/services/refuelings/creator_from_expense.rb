@@ -19,7 +19,7 @@ module Refuelings
         expense:      @expense,
         date:         @expense.date,
         vendor:       @expense.vendor,
-        liters:       normalize_decimal(@liters),
+        liters:       @liters,
         odometer_km:  @odometer_km.to_i,
         total_amount: @expense.amount,
         full_tank:    ActiveModel::Type::Boolean.new.cast(@full_tank)
@@ -41,10 +41,6 @@ module Refuelings
       return false unless @expense.user.vehicle
 
       true
-    end
-
-    def normalize_decimal(value)
-      value.to_s.tr(',', '.').to_f
     end
   end
 end
