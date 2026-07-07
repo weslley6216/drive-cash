@@ -11,6 +11,7 @@ module Exports
       EXPENSE_COLUMNS = %w[date category vendor amount paid description].freeze
       REFUELING_COLUMNS = %w[date vendor liters price_per_liter total_amount odometer_km].freeze
       MAINTENANCE_COLUMNS = %w[category interval_km last_done_km estimated_cost].freeze
+      FORMULA_PREFIXES = ['=', '+', '-', '@', "\t", "\r"].freeze
 
       def self.call(payload:)
         new(payload: payload).call
@@ -59,8 +60,15 @@ module Exports
         case value
         when BigDecimal then format('%.2f', value)
         when Date then value.iso8601
+        when String then sanitize_formula(value)
         else value
         end
+      end
+
+      def sanitize_formula(value)
+        return value unless FORMULA_PREFIXES.include?(value[0])
+
+        "'#{value}"
       end
     end
   end
