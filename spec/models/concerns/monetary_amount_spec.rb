@@ -105,6 +105,14 @@ RSpec.describe MonetaryAmount, type: :model do
 
       expect(expense.amount).to eq(BigDecimal('1234'))
     end
+
+    it 'parses multiple pt-BR thousands dots without decimal as an integer' do
+      expense = Expense.new
+
+      expense.amount = '1.234.567'
+
+      expect(expense.amount).to eq(BigDecimal('1234567'))
+    end
   end
 
   describe '.monetize on attributes other than amount' do
