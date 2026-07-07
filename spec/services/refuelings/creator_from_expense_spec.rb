@@ -31,6 +31,12 @@ RSpec.describe Refuelings::CreatorFromExpense do
       expect(result.full_tank).to be(false)
     end
 
+    it 'normalizes liters with pt-BR thousands and decimal separators through the model concern' do
+      result = described_class.call(expense: expense, liters: '1.234,56', odometer_km: '48230', full_tank: true)
+
+      expect(result.liters).to eq(BigDecimal('1234.56'))
+    end
+
     it 'returns nil when liters is blank' do
       result = described_class.call(expense: expense, liters: '', odometer_km: '48230', full_tank: true)
 

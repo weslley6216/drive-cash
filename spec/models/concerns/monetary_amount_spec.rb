@@ -89,6 +89,30 @@ RSpec.describe MonetaryAmount, type: :model do
 
       expect(expense.amount).to eq(BigDecimal('100000'))
     end
+
+    it 'parses comma decimal with two digits and no thousands' do
+      expense = Expense.new
+
+      expense.amount = '12,34'
+
+      expect(expense.amount).to eq(BigDecimal('12.34'))
+    end
+
+    it 'parses pt-BR thousands without decimal when the only separator is a dot' do
+      expense = Expense.new
+
+      expense.amount = '1.234'
+
+      expect(expense.amount).to eq(BigDecimal('1234'))
+    end
+
+    it 'parses multiple pt-BR thousands dots without decimal as an integer' do
+      expense = Expense.new
+
+      expense.amount = '1.234.567'
+
+      expect(expense.amount).to eq(BigDecimal('1234567'))
+    end
   end
 
   describe '.monetize on attributes other than amount' do
@@ -100,6 +124,14 @@ RSpec.describe MonetaryAmount, type: :model do
 
       expect(refueling.total_amount).to eq(BigDecimal('1180.50'))
       expect(refueling.liters).to eq(BigDecimal('32.5'))
+    end
+
+    it 'treats a comma as the decimal separator even with three digits after it' do
+      refueling = Refueling.new
+
+      refueling.liters = '45,678'
+
+      expect(refueling.liters).to eq(BigDecimal('45.678'))
     end
   end
 end

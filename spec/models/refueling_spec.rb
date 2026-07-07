@@ -72,6 +72,18 @@ RSpec.describe Refueling, type: :model do
 
       expect(refueling.reload.price_per_liter).to eq(7.000)
     end
+
+    it 'computes price_per_liter with BigDecimal precision instead of float rounding error' do
+      refueling = create(:refueling, liters: 24.00, total_amount: 100.02)
+
+      expect(refueling.price_per_liter).to eq(BigDecimal('4.168'))
+    end
+
+    it 'leaves price_per_liter nil when liters is not provided' do
+      refueling = create(:refueling, liters: nil, total_amount: 100.00)
+
+      expect(refueling.price_per_liter).to be_nil
+    end
   end
 
   describe '.full_tank' do
