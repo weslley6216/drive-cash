@@ -3,9 +3,7 @@ class GoalsController < ApplicationController
   before_action :load_filters, only: :index
 
   def index
-    first_day = Date.new(@year, @month, 1)
-    reference_date = Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day.end_of_month
-    service = Goals::ProgressService.new(user: current_user, date: reference_date)
+    service = Goals::ProgressService.new(user: current_user, date: filter_reference_date)
     render Goals::IndexView.new(progress: service.call, filters: @filters, past_monthly: service.past_goals('monthly'))
   end
 

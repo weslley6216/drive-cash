@@ -116,6 +116,23 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     end
   end
 
+  context 'when the period has ended without reaching the goal' do
+    let(:ended_progress) { progress.merge(ended: true, reached: false) }
+
+    it 'shows the missed badge with the shortfall instead of a projection' do
+      html = view_context.render(described_class.new(progress: ended_progress))
+
+      expect(html).to include(I18n.t('goals.index.monthly.missed', shortfall: 'R$ 4.500,00'))
+      expect(html).not_to include(I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000,00'))
+    end
+
+    it 'omits the days remaining countdown' do
+      html = view_context.render(described_class.new(progress: ended_progress))
+
+      expect(html).not_to include(I18n.t('goals.index.monthly.days_left', count: 15))
+    end
+  end
+
   it 'uses daily_pace for the current_pace metric' do
     html = view_context.render(described_class.new(progress: progress))
 

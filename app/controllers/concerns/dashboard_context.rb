@@ -25,6 +25,6 @@ module DashboardContext
     return Date.current unless @month
 
     first_day = Date.new(@year, @month, 1)
-    Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day
+    Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day.end_of_month
   end
 end

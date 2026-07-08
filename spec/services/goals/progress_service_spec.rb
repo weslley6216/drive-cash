@@ -97,6 +97,22 @@ RSpec.describe Goals::ProgressService do
 
         expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
+
+      it 'does not flag ended on the last day while the period is still open' do
+        travel_to Date.new(2026, 6, 30) do
+          result = described_class.new(user: user, date: reference_date).call
+
+          expect(result[:monthly][:ended]).to be(false)
+        end
+      end
+
+      it 'flags ended once the period has closed' do
+        travel_to Date.new(2026, 7, 1) do
+          result = described_class.new(user: user, date: reference_date).call
+
+          expect(result[:monthly][:ended]).to be(true)
+        end
+      end
     end
 
     context 'with a weekly goal' do
@@ -167,6 +183,50 @@ RSpec.describe Goals::ProgressService do
 
       expect(result[:achievements].map { |badge| badge[:type] }).to include(:streak)
     end
+
+    context 'consistency with the dashboard profit for the same period' do
+      it 'matches Dashboard::StatsService profit and ignores unpaid expenses' do
+        create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+               period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30), metric: 'profit')
+        create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+        create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 500, paid: true)
+        create(:expense, user: user, date: Date.new(2026, 6, 7), amount: 300, paid: false)
+
+        progress = described_class.new(user: user, date: reference_date).call
+        stats = Dashboard::StatsService.new(year: 2026, month: 6, user: user).call
+
+        expect(progress[:monthly][:current]).to eq(stats[:profit])
+        expect(progress[:monthly][:current]).to eq(1500)
+      end
+    end
+  end
+
+  describe '#monthly' do
+    it 'returns only the monthly progress hash' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+
+      result = described_class.new(user: user, date: reference_date).monthly
+
+      expect(result[:current]).to eq(2000)
+      expect(result[:target]).to eq(6000)
+    end
+
+    it 'skips weekly, annual and achievements queries' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+
+      queries = []
+      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] }
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        described_class.new(user: user, date: reference_date).monthly
+      end
+
+      expect(queries.grep(/FROM "goals"/).size).to eq(1)
+      expect(queries.grep(/SELECT DISTINCT "earnings"/)).to be_empty
+    end
   end
 
   describe '#past_goals' do
@@ -207,6 +267,35 @@ RSpec.describe Goals::ProgressService do
       result = described_class.new(user: user, date: reference_date).past_goals('monthly', limit: 3)
 
       expect(result.size).to eq(3)
+    end
+
+    it 'runs a constant number of queries regardless of how many past goals exist' do
+      12.times do |offset|
+        month = Date.new(2025, 6, 1) + offset.months
+        create(:goal, user: user, kind: 'monthly', target_amount: 1000,
+               period_start: month.beginning_of_month, period_end: month.end_of_month)
+      end
+
+      queries = []
+      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM "(goals|earnings|expenses)"/ }
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        described_class.new(user: user, date: Date.new(2026, 7, 1)).past_goals('monthly', limit: 12)
+      end
+
+      expect(queries.size).to eq(3)
+    end
+
+    it 'ignores unpaid expenses when computing the achieved flag of past goals' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 5000,
+             period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30), metric: 'profit')
+      create(:earning, user: user, date: Date.new(2026, 4, 15), amount: 6000)
+      create(:expense, user: user, date: Date.new(2026, 4, 16), amount: 2000, paid: false)
+
+      result = described_class.new(user: user, date: reference_date).past_goals('monthly')
+
+      expect(result.first[:current]).to eq(6000)
+      expect(result.first[:achieved]).to be(true)
     end
   end
 end
