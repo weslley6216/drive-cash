@@ -65,7 +65,7 @@ module Goals
         projection:        projection_value(current, total_days, days_elapsed, reached),
         on_track:          reached || (current * (total_days.to_f / days_elapsed) >= target),
         reached:           reached,
-        ended:             @date >= goal.period_end,
+        ended:             goal.period_end < Date.current,
         tracking:          !reached && days_elapsed < MIN_DAYS_FOR_PROJECTION,
         surplus:           reached ? current - target : 0,
         daily_pace:        days_elapsed.zero? ? 0 : current / days_elapsed,
@@ -90,11 +90,7 @@ module Goals
     def compute_metric_for_period(goal)
       earnings = @user.earnings.where(date: goal.period_start..goal.period_end).sum(:amount)
       expenses = @user.expenses.paid_only.where(date: goal.period_start..goal.period_end).sum(:amount)
-      metric_value(goal, earnings, expenses)
-    end
-
-    def metric_value(goal, earned, spent)
-      goal.metric_profit? ? earned - spent : earned
+      MetricValue.of(goal, earned: earnings, spent: expenses)
     end
 
     def days_breakdown(goal)
@@ -104,7 +100,7 @@ module Goals
       range.map do |day|
         earned = earnings_by_day.fetch(day, 0)
         spent = expenses_by_day.fetch(day, 0)
-        { date: day, today: day == @date, done: day < @date, value: metric_value(goal, earned, spent) }
+        { date: day, today: day == @date, done: day < @date, value: MetricValue.of(goal, earned: earned, spent: spent) }
       end
     end
 
@@ -123,7 +119,7 @@ module Goals
       period = goal.period_start..goal.period_end
       earned = period.sum { |day| earnings_by_day.fetch(day, 0) }
       spent = period.sum { |day| expenses_by_day.fetch(day, 0) }
-      metric_value(goal, earned, spent)
+      MetricValue.of(goal, earned: earned, spent: spent)
     end
   end
 end

@@ -98,16 +98,20 @@ RSpec.describe Goals::ProgressService do
         expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
 
-      it 'does not flag ended before the period end' do
-        result = described_class.new(user: user, date: reference_date).call
+      it 'does not flag ended on the last day while the period is still open' do
+        travel_to Date.new(2026, 6, 30) do
+          result = described_class.new(user: user, date: reference_date).call
 
-        expect(result[:monthly][:ended]).to be(false)
+          expect(result[:monthly][:ended]).to be(false)
+        end
       end
 
-      it 'flags ended when the reference date reaches the period end' do
-        result = described_class.new(user: user, date: Date.new(2026, 6, 30)).call
+      it 'flags ended once the period has closed' do
+        travel_to Date.new(2026, 7, 1) do
+          result = described_class.new(user: user, date: reference_date).call
 
-        expect(result[:monthly][:ended]).to be(true)
+          expect(result[:monthly][:ended]).to be(true)
+        end
       end
     end
 
