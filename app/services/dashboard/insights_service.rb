@@ -20,12 +20,13 @@ module Dashboard
 
     def call
       {
-        metrics:        metrics,
-        monthly_bars:   monthly_bars,
-        categories:     categories,
-        platforms:      platforms,
-        insights:       insights,
-        period_context: period_context
+        metrics:         metrics,
+        monthly_bars:    monthly_bars,
+        categories:      categories,
+        platforms:       platforms,
+        platforms_total: platforms_total,
+        insights:        insights,
+        period_context:  period_context
       }
     end
 
@@ -117,8 +118,16 @@ module Dashboard
       @categories ||= CategoryBreakdownService.new(year: year, month: month, limit: CATEGORIES_LIMIT, user: @user).call
     end
 
+    def platform_breakdown
+      @platform_breakdown ||= PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user)
+    end
+
     def platforms
-      @platforms ||= PlatformBreakdownService.new(year: year, month: month, limit: PLATFORMS_LIMIT, user: @user).call
+      @platforms ||= platform_breakdown.call
+    end
+
+    def platforms_total
+      platform_breakdown.total
     end
 
     def monthly_bars

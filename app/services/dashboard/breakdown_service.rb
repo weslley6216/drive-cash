@@ -15,16 +15,16 @@ module Dashboard
         .map { |row| build_row(row) }
     end
 
+    def total
+      @total ||= rows.sum { |row| row[:amount] }.to_f
+    end
+
     private
 
     attr_reader :year, :month, :user
 
     def rows
       @rows ||= aggregates
-    end
-
-    def total
-      @total ||= rows.sum { |row| row[:amount] }.to_f
     end
 
     def percent(amount)

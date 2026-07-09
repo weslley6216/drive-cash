@@ -144,7 +144,7 @@ module Analysis
         div do
           render Analysis::PlatformDonutComponent.new(
             platforms: @insights[:platforms],
-            total:     platforms_total,
+            total:     @insights[:platforms_total],
             month:     @filters[:month]
           )
         end
@@ -161,10 +161,6 @@ module Analysis
 
     def metrics
       @insights[:metrics]
-    end
-
-    def platforms_total
-      @insights[:platforms].sum { |row| row[:amount].to_f }
     end
   end
 end
