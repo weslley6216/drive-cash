@@ -18,7 +18,7 @@ RSpec.describe CategoryBreakdownComponent, type: :component do
     expect(html).to include(I18n.t('category_breakdown_component.percent', value: '60.0'))
     expect(html).to include(I18n.t('category_breakdown_component.percent', value: '40.0'))
     expect(html).to include('#dc2626')
-    expect(html).to include('#f97316')
+    expect(html).to include('#f59e0b')
     expect(html).to include('width: 60.0%')
     expect(html).to include('width: 40.0%')
   end
