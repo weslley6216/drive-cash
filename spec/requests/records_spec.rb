@@ -164,6 +164,16 @@ RSpec.describe 'Records', type: :request do
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('Valor')
       end
+
+      it 'keeps the active tank vendor exposed after an invalid earning' do
+        vehicle = create(:vehicle, user: current_user)
+        create(:refueling, vehicle: vehicle, vendor: 'Posto Ipiranga', full_tank: true)
+
+        post records_path, params: { type: 'earning', record: { amount: '0', platform: 'uber', date: '2026-05-22', trips_count: 1 } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('data-record-form-active-vendor-value="Posto Ipiranga"')
+      end
     end
 
     context 'when type is expense' do

@@ -6,6 +6,11 @@ module RecordParams
   INSTALLMENT_ATTRIBUTES = %i[repeat period repetitions].freeze
   REFUELING_ATTRIBUTES = %i[liters odometer_km full_tank].freeze
 
+  RECORD_BUILDERS = {
+    'earning' => { create: :create_earning_via_creator, record_key: :earning },
+    'expense' => { create: :create_expense_via_creator, record_key: :expense }
+  }.freeze
+
   private
 
   def expense_attribute_keys = EXPENSE_ATTRIBUTES.map(&:to_s)

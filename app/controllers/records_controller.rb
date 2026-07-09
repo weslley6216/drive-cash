@@ -1,44 +1,30 @@
 class RecordsController < ApplicationController
   def new
-    @type = (params[:type].presence || 'earning')
-    render Records::NewView.new(
-      type:          @type,
-      earning:       Earning.new(date: Date.current),
-      expense:       Expense.new(date: Date.current),
-      context:       params[:context],
-      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
-    )
+    render new_view(type: params[:type].presence || 'earning')
   end
 
   def create
-    case params[:type]
-    when 'earning'
-      result = create_earning_via_creator(:record)
-      if result.success?
-        redirect_to root_path, notice: t('records.create.success')
-      else
-        render Records::NewView.new(
-          type:    'earning',
-          earning: result.earning,
-          expense: Expense.new(date: Date.current),
-          context: params[:context]
-        ), status: :unprocessable_content
-      end
-    when 'expense'
-      result = create_expense_via_creator(:record)
-      if result.success?
-        redirect_to root_path, notice: t('records.create.success')
-      else
-        render Records::NewView.new(
-          type:          'expense',
-          earning:       Earning.new(date: Date.current),
-          expense:       result.expense,
-          context:       params[:context],
-          active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
-        ), status: :unprocessable_content
-      end
+    builder = RecordParams::RECORD_BUILDERS[params[:type]]
+    return head :bad_request unless builder
+
+    result = send(builder[:create], :record)
+    if result.success?
+      redirect_to root_path, notice: t('records.create.success')
     else
-      head :bad_request
+      render new_view(type: params[:type], builder[:record_key] => result.public_send(builder[:record_key])),
+             status: :unprocessable_content
     end
+  end
+
+  private
+
+  def new_view(type:, earning: nil, expense: nil)
+    Records::NewView.new(
+      type:          type,
+      earning:       earning || Earning.new(date: Date.current),
+      expense:       expense || Expense.new(date: Date.current),
+      context:       params[:context],
+      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
+    )
   end
 end
