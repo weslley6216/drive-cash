@@ -14,16 +14,8 @@ class RefuelingsController < ApplicationController
   end
 
   def create
-    @refueling = current_user.vehicle.refuelings.new(refueling_params)
-
-    if @refueling.save
-      Vehicles::OdometerSync.new(vehicle: @refueling.vehicle, reading_km: @refueling.odometer_km, on: @refueling.date).call
-      flash[:notice] = t('refuelings.flash.created')
-      respond_with_modal_refresh(html_redirect: vehicle_path)
-    else
-      flash.now[:alert] = @refueling.errors.full_messages.to_sentence
-      render Refuelings::FormView.new(refueling: @refueling), status: :unprocessable_content
-    end
+    result = Refuelings::Creator.call(vehicle: current_user.vehicle, params: refueling_params)
+    handle_refueling_result(result, notice_key: 'refuelings.flash.created')
   end
 
   def edit
@@ -31,14 +23,8 @@ class RefuelingsController < ApplicationController
   end
 
   def update
-    if @refueling.update(refueling_params)
-      Vehicles::OdometerSync.new(vehicle: @refueling.vehicle, reading_km: @refueling.odometer_km, on: @refueling.date).call
-      flash[:notice] = t('refuelings.flash.updated')
-      respond_with_modal_refresh(html_redirect: vehicle_path)
-    else
-      flash.now[:alert] = @refueling.errors.full_messages.to_sentence
-      render Refuelings::FormView.new(refueling: @refueling), status: :unprocessable_content
-    end
+    result = Refuelings::Updater.call(refueling: @refueling, params: refueling_params)
+    handle_refueling_result(result, notice_key: 'refuelings.flash.updated')
   end
 
   def destroy
@@ -48,6 +34,17 @@ class RefuelingsController < ApplicationController
   end
 
   private
+
+  def handle_refueling_result(result, notice_key:)
+    if result.success?
+      flash[:notice] = t(notice_key)
+      respond_with_modal_refresh(html_redirect: vehicle_path)
+    else
+      @refueling = result.refueling
+      flash.now[:alert] = @refueling.errors.full_messages.to_sentence
+      render Refuelings::FormView.new(refueling: @refueling), status: :unprocessable_content
+    end
+  end
 
   def find_refueling
     @refueling = current_user.vehicle.refuelings.find(params[:id])
