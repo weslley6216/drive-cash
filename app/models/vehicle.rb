@@ -11,9 +11,20 @@ class Vehicle < ApplicationRecord
     less_than_or_equal_to:    ->(_record) { Date.current.year + 1 }
   }
 
+  before_save :stamp_odometer_freshness
+
   def updated_days_ago
     return nil if odometer_updated_at.nil?
 
     (Date.current - odometer_updated_at.to_date).to_i
+  end
+
+  private
+
+  def stamp_odometer_freshness
+    return unless odometer_km_changed?
+    return if odometer_updated_at_changed?
+
+    self.odometer_updated_at = Time.current
   end
 end
