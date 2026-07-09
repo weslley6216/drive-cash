@@ -35,9 +35,13 @@ class MaintenancesController < ApplicationController
   end
 
   def mark_done
-    @maintenance.update(last_done_km: current_user.vehicle.odometer_km)
-    flash[:notice] = t('maintenances.flash.marked_done')
-    respond_with_modal_refresh(html_redirect: vehicle_path)
+    if @maintenance.update(last_done_km: current_user.vehicle.odometer_km)
+      flash[:notice] = t('maintenances.flash.marked_done')
+      respond_with_modal_refresh(html_redirect: vehicle_path)
+    else
+      flash.now[:alert] = @maintenance.errors.full_messages.to_sentence
+      render Maintenances::FormView.new(maintenance: @maintenance), status: :unprocessable_content
+    end
   end
 
   def destroy
