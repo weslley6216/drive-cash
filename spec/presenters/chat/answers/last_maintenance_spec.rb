@@ -8,13 +8,14 @@ RSpec.describe Chat::Answers::LastMaintenance do
       expect(result).to eq(I18n.t('chat.answer.no_data'))
     end
 
-    it 'formats category and km from maintenance record' do
+    it 'formats the localized category and km from the maintenance record' do
       user = create(:user)
       vehicle = create(:vehicle, user: user)
       maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 45_000)
 
       result = described_class.new(maintenance).call
 
+      expect(result).to include(I18n.t('vehicle.maintenances.catalog.oil_change'))
       expect(result).to include('45000')
     end
   end

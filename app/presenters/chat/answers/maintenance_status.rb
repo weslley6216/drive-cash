@@ -12,7 +12,10 @@ module Chat
         urgent = maintenances.select { |row| %w[soon overdue].include?(row.status_key.to_s) }
         return 'Tudo em dia com as manutenções!' if urgent.empty?
 
-        urgent.map { |row| "#{row.maintenance.category.humanize}: #{row.status_key}" }.join(' · ')
+        urgent.map do |row|
+          category = I18n.t("vehicle.maintenances.catalog.#{row.maintenance.category}")
+          "#{category}: #{I18n.t("vehicle.maintenances.status.#{row.status_key}")}"
+        end.join(' · ')
       end
     end
   end

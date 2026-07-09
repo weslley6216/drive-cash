@@ -16,13 +16,14 @@ RSpec.describe Chat::Answers::MaintenanceStatus do
       expect(result).to include('em dia')
     end
 
-    it 'lists urgent maintenances' do
+    it 'lists urgent maintenances with localized category and status' do
       status = double(status_key: 'overdue', maintenance: double(category: 'oil_change'))
       data = { maintenances: [status] }
 
       result = described_class.new(data).call
 
-      expect(result).to include('overdue')
+      expect(result).to include(I18n.t('vehicle.maintenances.catalog.oil_change'))
+      expect(result).to include(I18n.t('vehicle.maintenances.status.overdue'))
     end
   end
 end
