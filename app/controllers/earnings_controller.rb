@@ -9,9 +9,9 @@ class EarningsController < ApplicationController
     result = create_earning_via_creator(:earning)
 
     if result.success?
-      turbo_success(Earnings::CreateView, earning: result.earning)
+      turbo_success(Earnings::CreateView, record: result.earning, record_key: :earning)
     else
-      turbo_error(Earnings::CreateView, earning: result.earning)
+      turbo_error(Earnings::CreateView, record: result.earning, record_key: :earning)
     end
   end
 
@@ -21,9 +21,9 @@ class EarningsController < ApplicationController
 
   def update
     if @earning.update(earning_attributes(:earning))
-      turbo_success(Earnings::UpdateView, detail_service: Dashboard::EarningsDetailService, earning: @earning)
+      turbo_success(Earnings::UpdateView, record: @earning, record_key: :earning, detail_service: Dashboard::EarningsDetailService)
     else
-      turbo_error(Earnings::UpdateView, earning: @earning)
+      turbo_error(Earnings::UpdateView, record: @earning, record_key: :earning)
     end
   end
 
