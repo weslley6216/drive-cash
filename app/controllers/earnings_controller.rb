@@ -6,12 +6,12 @@ class EarningsController < ApplicationController
   end
 
   def create
-    earning = current_user.earnings.new(earning_attributes(:earning))
+    result = create_earning_via_creator(:earning)
 
-    if earning.save
-      turbo_success(Earnings::CreateView, earning: earning)
+    if result.success?
+      turbo_success(Earnings::CreateView, earning: result.earning)
     else
-      turbo_error(Earnings::CreateView, earning: earning)
+      turbo_error(Earnings::CreateView, earning: result.earning)
     end
   end
 
