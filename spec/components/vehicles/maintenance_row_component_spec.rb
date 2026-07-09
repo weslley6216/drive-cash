@@ -8,7 +8,7 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
       progress:    maintenance.progress,
       km_until:    maintenance.km_until,
       target:      maintenance.target,
-      status_key:  maintenance.status_key
+      status_key:  Vehicles::MaintenanceStatus.for(maintenance.progress)
     )
   end
 
@@ -43,7 +43,7 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
         progress:    maintenance.progress,
         km_until:    maintenance.km_until,
         target:      maintenance.target,
-        status_key:  maintenance.status_key
+        status_key:  Vehicles::MaintenanceStatus.for(maintenance.progress)
       )
 
       html = view_context.render(described_class.new(row: row, variant: :desktop))

@@ -199,6 +199,19 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
+    context 'platforms_total' do
+      it 'returns the total earnings across every platform, not only the displayed rows' do
+        %w[uber ifood rappi shopee amazon nine_nine].each_with_index do |platform, offset|
+          create(:earning, user: user, date: Date.new(2025, 2, offset + 1), amount: 100, platform: platform)
+        end
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:platforms].size).to eq(5)
+        expect(result[:platforms_total]).to eq(600.0)
+      end
+    end
+
     context 'period_context' do
       it 'returns mode :monthly with the previous month name and its year' do
         result = described_class.new(year: 2025, month: 6, user: user).call

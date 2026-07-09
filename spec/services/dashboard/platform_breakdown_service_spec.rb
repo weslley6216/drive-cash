@@ -75,4 +75,17 @@ RSpec.describe Dashboard::PlatformBreakdownService do
       expect(ifood_row[:trips_count]).to eq(3)
     end
   end
+
+  describe '#total' do
+    it 'sums every platform even beyond the display limit' do
+      %w[uber ifood rappi shopee amazon nine_nine].each_with_index do |platform, offset|
+        create(:earning, user: user, date: Date.new(2025, 6, offset + 1), amount: 100, platform: platform)
+      end
+
+      service = described_class.new(year: 2025, month: 6, limit: 5, user: user)
+
+      expect(service.call.size).to eq(5)
+      expect(service.total).to eq(600.0)
+    end
+  end
 end

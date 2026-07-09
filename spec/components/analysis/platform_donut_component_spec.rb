@@ -38,7 +38,7 @@ RSpec.describe Analysis::PlatformDonutComponent, type: :component do
     html = view_context.render(Analysis::PlatformDonutComponent.new(platforms: platforms, total: 1000.0, month: nil))
 
     expect(html).to include('#000000')
-    expect(html).to include('#ea1d2c')
+    expect(html).to include('#ef4444')
   end
 
   it 'uses stroke-dasharray to draw the donut segments' do

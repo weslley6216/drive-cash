@@ -3,9 +3,15 @@ require 'rails_helper'
 RSpec.describe Records::CategoryPickerComponent, type: :component do
   let(:html) { view_context.render(described_class.new(selected: 'fuel')) }
 
-  it 'renders all 11 categories from Expense.categories' do
+  it 'renders one option per Expense.categories key' do
     expect(html.scan('type="radio"').size).to eq(Expense.categories.size)
     Expense.categories.each_key { |key| expect(html).to include("value=\"#{key}\"") }
+  end
+
+  it 'labels each category from the expense categories locale' do
+    expect(html).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
+    expect(html).to include(I18n.t('activerecord.attributes.expense.categories.meals'))
+    expect(html).to include(I18n.t('activerecord.attributes.expense.categories.other'))
   end
 
   it 'uses CSS has-[:checked] for red theme selection styling' do

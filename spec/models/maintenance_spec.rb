@@ -27,30 +27,6 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
-  describe '#status_key' do
-    it 'is ok below 80 percent' do
-      vehicle = create(:vehicle, odometer_km: 160_000)
-      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_000, interval_km: 5_000)
-
-      expect(maintenance.status_key).to eq(:ok)
-    end
-
-    it 'is overdue at or beyond the interval' do
-      vehicle = create(:vehicle, odometer_km: 165_000)
-      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 158_000, interval_km: 5_000)
-
-      expect(maintenance.status_key).to eq(:overdue)
-    end
-  end
-
-  describe '#icon_component' do
-    it 'returns the lucide icon mapped to its category' do
-      maintenance = build(:maintenance, category: 'timing_belt')
-
-      expect(maintenance.icon_component).to eq(PhlexIcons::Lucide::Settings)
-    end
-  end
-
   describe '.catalog_defaults' do
     it 'returns interval and cost for a known kind' do
       defaults = described_class.catalog_defaults('timing_belt')

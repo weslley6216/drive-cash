@@ -3,12 +3,19 @@ require 'rails_helper'
 RSpec.describe Records::PlatformPickerComponent, type: :component do
   let(:html) { view_context.render(described_class.new(selected: 'uber')) }
 
-  it 'renders 8 platform options' do
-    expect(html.scan('type="radio"').size).to eq(8)
+  it 'renders one option per Earning.platforms key' do
+    expect(html.scan('type="radio"').size).to eq(Earning.platforms.size)
+    Earning.platforms.each_key { |key| expect(html).to include("value=\"#{key}\"") }
   end
 
-  it 'renders all platforms from Earning.platforms keys' do
-    Earning.platforms.each_key { |key| expect(html).to include("value=\"#{key}\"") }
+  it 'labels each platform from the earning platforms locale' do
+    expect(html).to include(I18n.t('activerecord.attributes.earning.platforms.ifood'))
+    expect(html).to include(I18n.t('activerecord.attributes.earning.platforms.other'))
+  end
+
+  it 'paints the avatar with the palette color and foreground' do
+    expect(html).to include('background: #fbbf24; color: #000000')
+    expect(html).to include('background: #ef4444; color: #ffffff')
   end
 
   it 'uses CSS has-[:checked] for ring selection styling' do
