@@ -1,5 +1,7 @@
 module Vehicles
   class MaintenanceRowComponent < ApplicationComponent
+    include MaintenancePalette
+
     STATUS_STYLES = {
       overdue: { color: '#dc2626', badge_class: 'text-red-700 bg-red-100 border-red-200', tint_class: 'border-red-200 bg-red-50/60' },
       soon:    { color: '#f59e0b', badge_class: 'text-amber-700 bg-amber-100 border-amber-200', tint_class: 'border-amber-200 bg-amber-50/50' },
@@ -37,7 +39,7 @@ module Vehicles
     def icon_block
       div(class: 'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
           style: "background: #{@style[:color]}20; color: #{@style[:color]};") do
-        render @maintenance.icon_component.new(class: 'w-[18px] h-[18px]')
+        render maintenance_icon(@maintenance.category).new(class: 'w-[18px] h-[18px]')
       end
     end
 

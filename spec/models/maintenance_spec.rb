@@ -43,14 +43,6 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
-  describe '#icon_component' do
-    it 'returns the lucide icon mapped to its category' do
-      maintenance = build(:maintenance, category: 'timing_belt')
-
-      expect(maintenance.icon_component).to eq(PhlexIcons::Lucide::Settings)
-    end
-  end
-
   describe '.catalog_defaults' do
     it 'returns interval and cost for a known kind' do
       defaults = described_class.catalog_defaults('timing_belt')

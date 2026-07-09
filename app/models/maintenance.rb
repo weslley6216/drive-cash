@@ -13,14 +13,14 @@ class Maintenance < ApplicationRecord
   }, prefix: true
 
   CATALOG = {
-    'oil_change'    => { interval_km: 5_000, estimated_cost: 280, icon: PhlexIcons::Lucide::Wrench },
-    'oil_filter'    => { interval_km: 10_000, estimated_cost: 45, icon: PhlexIcons::Lucide::Wind },
-    'air_filter'    => { interval_km: 10_000, estimated_cost: 70, icon: PhlexIcons::Lucide::Wind },
-    'fuel_filter'   => { interval_km: 20_000, estimated_cost: 90, icon: PhlexIcons::Lucide::Wind },
-    'tire_rotation' => { interval_km: 10_000, estimated_cost: 60, icon: PhlexIcons::Lucide::Disc },
-    'brake_pads'    => { interval_km: 30_000, estimated_cost: 400, icon: PhlexIcons::Lucide::Shield },
-    'spark_plugs'   => { interval_km: 40_000, estimated_cost: 240, icon: PhlexIcons::Lucide::Zap },
-    'timing_belt'   => { interval_km: 60_000, estimated_cost: 900, icon: PhlexIcons::Lucide::Settings }
+    'oil_change'    => { interval_km: 5_000, estimated_cost: 280 },
+    'oil_filter'    => { interval_km: 10_000, estimated_cost: 45 },
+    'air_filter'    => { interval_km: 10_000, estimated_cost: 70 },
+    'fuel_filter'   => { interval_km: 20_000, estimated_cost: 90 },
+    'tire_rotation' => { interval_km: 10_000, estimated_cost: 60 },
+    'brake_pads'    => { interval_km: 30_000, estimated_cost: 400 },
+    'spark_plugs'   => { interval_km: 40_000, estimated_cost: 240 },
+    'timing_belt'   => { interval_km: 60_000, estimated_cost: 900 }
   }.freeze
 
   validates :last_done_km, :interval_km, presence:     true,
@@ -49,10 +49,6 @@ class Maintenance < ApplicationRecord
 
   def status_key
     Vehicles::MaintenanceStatus.for(progress)
-  end
-
-  def icon_component
-    CATALOG.fetch(category, CATALOG['oil_change'])[:icon]
   end
 
   def apply_catalog_defaults
