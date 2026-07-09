@@ -47,10 +47,6 @@ class Maintenance < ApplicationRecord
     target - vehicle.odometer_km
   end
 
-  def status_key
-    Vehicles::MaintenanceStatus.for(progress)
-  end
-
   def apply_catalog_defaults
     defaults = self.class.catalog_defaults(category)
     self.interval_km ||= defaults[:interval_km]

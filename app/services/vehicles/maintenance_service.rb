@@ -40,7 +40,7 @@ module Vehicles
           progress:    maintenance.progress,
           km_until:    maintenance.km_until,
           target:      maintenance.target,
-          status_key:  maintenance.status_key
+          status_key:  Vehicles::MaintenanceStatus.for(maintenance.progress)
         )
       end
     end
