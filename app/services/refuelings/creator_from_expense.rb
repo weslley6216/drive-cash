@@ -1,5 +1,7 @@
 module Refuelings
   class CreatorFromExpense
+    Result = Data.define(:success?, :refueling)
+
     def self.call(expense:, liters:, odometer_km:, full_tank: true)
       new(expense: expense, liters: liters, odometer_km: odometer_km, full_tank: full_tank).call
     end
@@ -12,10 +14,21 @@ module Refuelings
     end
 
     def call
-      return nil unless eligible?
+      return Result.new(success?: true, refueling: nil) unless eligible?
 
-      refueling = Refueling.create(
-        vehicle:      @expense.user.vehicle,
+      refueling = build_refueling
+      if refueling.save
+        Vehicles::OdometerSync.new(vehicle: refueling.vehicle, reading_km: refueling.odometer_km, on: refueling.date).call
+        Result.new(success?: true, refueling: refueling)
+      else
+        Result.new(success?: false, refueling: refueling)
+      end
+    end
+
+    private
+
+    def build_refueling
+      @expense.user.vehicle.refuelings.new(
         expense:      @expense,
         date:         @expense.date,
         vendor:       @expense.vendor,
@@ -24,15 +37,7 @@ module Refuelings
         total_amount: @expense.amount,
         full_tank:    ActiveModel::Type::Boolean.new.cast(@full_tank)
       )
-
-      if refueling&.persisted?
-        Vehicles::OdometerSync.new(vehicle: refueling.vehicle, reading_km: refueling.odometer_km, on: refueling.date).call
-      end
-
-      refueling
     end
-
-    private
 
     def eligible?
       return false unless @expense.category_fuel?

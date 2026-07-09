@@ -11,14 +11,12 @@ RSpec.describe Refuelings::CreatorFromExpense do
     it 'creates a Refueling linked to the expense when liters and odometer are present' do
       result = described_class.call(expense: expense, liters: '30,5', odometer_km: '48230', full_tank: true)
 
-      expect(result).to be_a(Refueling)
-      expect(result.persisted?).to be(true)
-      expect(result.expense).to eq(expense)
-      expect(result.vehicle).to eq(vehicle)
-      expect(result.liters).to eq(30.5)
-      expect(result.odometer_km).to eq(48_230)
-      expect(result.total_amount).to eq(expense.amount)
-      expect(result.full_tank).to be(true)
+      expect(result.success?).to be(true)
+      expect(result.refueling).to be_persisted
+      expect(result.refueling.expense).to eq(expense)
+      expect(result.refueling.liters).to eq(30.5)
+      expect(result.refueling.odometer_km).to eq(48_230)
+      expect(result.refueling.total_amount).to eq(expense.amount)
     end
 
     it 'copies the expense date and vendor' do
@@ -26,46 +24,58 @@ RSpec.describe Refuelings::CreatorFromExpense do
 
       result = described_class.call(expense: expense, liters: '30', odometer_km: '48000', full_tank: false)
 
-      expect(result.date).to eq(Date.new(2026, 5, 20))
-      expect(result.vendor).to eq('Posto Orense')
-      expect(result.full_tank).to be(false)
+      expect(result.refueling.date).to eq(Date.new(2026, 5, 20))
+      expect(result.refueling.vendor).to eq('Posto Orense')
+      expect(result.refueling.full_tank).to be(false)
     end
 
-    it 'normalizes liters with pt-BR thousands and decimal separators through the model concern' do
+    it 'normalizes liters with pt-BR separators through the model concern' do
       result = described_class.call(expense: expense, liters: '1.234,56', odometer_km: '48230', full_tank: true)
 
-      expect(result.liters).to eq(BigDecimal('1234.56'))
+      expect(result.refueling.liters).to eq(BigDecimal('1234.56'))
     end
 
-    it 'returns nil when liters is blank' do
+    it 'skips without error when liters is blank' do
       result = described_class.call(expense: expense, liters: '', odometer_km: '48230', full_tank: true)
 
-      expect(result).to be_nil
+      expect(result.success?).to be(true)
+      expect(result.refueling).to be_nil
       expect(Refueling.count).to eq(0)
     end
 
-    it 'returns nil when odometer_km is blank' do
+    it 'skips without error when odometer_km is blank' do
       result = described_class.call(expense: expense, liters: '30', odometer_km: nil, full_tank: true)
 
-      expect(result).to be_nil
+      expect(result.success?).to be(true)
+      expect(result.refueling).to be_nil
     end
 
-    it 'returns nil when the user has no vehicle' do
+    it 'skips when the user has no vehicle' do
       vehicle.destroy
       other_user = create(:user)
       other_expense = create(:expense, user: other_user, category: 'fuel')
 
       result = described_class.call(expense: other_expense, liters: '30', odometer_km: '48230', full_tank: true)
 
-      expect(result).to be_nil
+      expect(result.success?).to be(true)
+      expect(result.refueling).to be_nil
     end
 
-    it 'returns nil when expense category is not fuel' do
+    it 'skips when the expense category is not fuel' do
       non_fuel = create(:expense, user: user, category: 'meals')
 
       result = described_class.call(expense: non_fuel, liters: '30', odometer_km: '48230', full_tank: true)
 
-      expect(result).to be_nil
+      expect(result.success?).to be(true)
+      expect(result.refueling).to be_nil
+    end
+
+    it 'returns failure and persists nothing when the refueling is invalid' do
+      result = described_class.call(expense: expense, liters: '0', odometer_km: '48230', full_tank: true)
+
+      expect(result.success?).to be(false)
+      expect(result.refueling.errors[:liters]).to be_present
+      expect(Refueling.count).to eq(0)
     end
 
     it 'advances the vehicle odometer when the created refueling km is greater' do
