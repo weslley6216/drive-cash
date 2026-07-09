@@ -1,6 +1,6 @@
 module Refuelings
   class CreatorFromExpense
-    Result = Data.define(:success?, :refueling)
+    include SyncsOdometer
 
     def self.call(expense:, liters:, odometer_km:, full_tank: true)
       new(expense: expense, liters: liters, odometer_km: odometer_km, full_tank: full_tank).call
@@ -18,7 +18,7 @@ module Refuelings
 
       refueling = build_refueling
       if refueling.save
-        Vehicles::OdometerSync.new(vehicle: refueling.vehicle, reading_km: refueling.odometer_km, on: refueling.date).call
+        sync_odometer(refueling)
         Result.new(success?: true, refueling: refueling)
       else
         Result.new(success?: false, refueling: refueling)
