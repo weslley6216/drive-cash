@@ -14,8 +14,8 @@ RSpec.describe Records::PlatformPickerComponent, type: :component do
   end
 
   it 'paints the avatar with the palette color and foreground' do
-    expect(html).to include('background: #ef4444')
-    expect(html).to include('color: #000000')
+    expect(html).to include('background: #fbbf24; color: #000000')
+    expect(html).to include('background: #ef4444; color: #ffffff')
   end
 
   it 'uses CSS has-[:checked] for ring selection styling' do

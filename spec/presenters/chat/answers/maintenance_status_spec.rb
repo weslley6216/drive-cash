@@ -17,7 +17,7 @@ RSpec.describe Chat::Answers::MaintenanceStatus do
     end
 
     it 'lists urgent maintenances with localized category and status' do
-      status = double(status_key: 'overdue', maintenance: double(category: 'oil_change'))
+      status = double(status_key: :overdue, maintenance: double(category: 'oil_change'))
       data = { maintenances: [status] }
 
       result = described_class.new(data).call

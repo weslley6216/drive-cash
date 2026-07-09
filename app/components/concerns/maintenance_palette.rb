@@ -1,5 +1,5 @@
 module MaintenancePalette
-  MAINTENANCE_META = {
+  MAINTENANCE_ICONS = {
     'oil_change'    => PhlexIcons::Lucide::Wrench,
     'oil_filter'    => PhlexIcons::Lucide::Wind,
     'air_filter'    => PhlexIcons::Lucide::Wind,
@@ -13,6 +13,6 @@ module MaintenancePalette
   DEFAULT_ICON = PhlexIcons::Lucide::Wrench
 
   def maintenance_icon(category)
-    MAINTENANCE_META.fetch(category, DEFAULT_ICON)
+    MAINTENANCE_ICONS.fetch(category, DEFAULT_ICON)
   end
 end
