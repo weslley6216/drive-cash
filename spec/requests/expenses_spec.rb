@@ -267,6 +267,17 @@ RSpec.describe 'Expenses', type: :request do
 
       expect(Refueling.count).to eq(0)
     end
+
+    it 'rolls back the expense and refueling when the refueling data is invalid' do
+      post expenses_path, params: {
+        expense:   { date: Date.current.to_s, amount: '180,50', category: 'fuel', vendor: 'Posto' },
+        refueling: { liters: '0', odometer_km: '48230', full_tank: '1' }
+      }, as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(Expense.count).to eq(0)
+      expect(Refueling.count).to eq(0)
+    end
   end
 
   describe 'DELETE /expenses/:id' do
