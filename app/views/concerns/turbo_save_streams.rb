@@ -14,4 +14,8 @@ module TurboSaveStreams
   def clear_modal_stream
     raw turbo_stream.update('modal', '')
   end
+
+  def refresh_stream
+    raw '<turbo-stream action="refresh"></turbo-stream>'.html_safe
+  end
 end

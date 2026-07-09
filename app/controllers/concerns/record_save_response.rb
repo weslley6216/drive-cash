@@ -3,30 +3,23 @@ module RecordSaveResponse
 
   private
 
-  def turbo_success(view_class, detail_service: nil, **kwargs)
-    record = kwargs.values.first
+  def turbo_success(view_class, record:, record_key:, detail_service: nil, **extra)
     context, totals = build_totals_context(record)
     flash[:notice] = t('.success')
-    extra = detail_service && record.persisted? ? { detail: detail_for(detail_service, context) } : {}
+    detail = detail_service && record.persisted? ? { detail: detail_for(detail_service, context) } : {}
     respond_to do |format|
       format.turbo_stream do
-        render view_class.new(
-          **kwargs,
-          totals:  totals,
-          context: context,
-          **extra
-        )
+        render view_class.new(record_key => record, totals: totals, context: context, **detail, **extra)
       end
     end
   end
 
-  def turbo_error(view_class, **kwargs)
-    record = kwargs.values.first
+  def turbo_error(view_class, record:, record_key:, **extra)
     context, _totals = build_totals_context(record)
     flash.now[:alert] = record.errors.full_messages.to_sentence
     respond_to do |format|
       format.turbo_stream do
-        render view_class.new(**kwargs, totals: nil, context: context), status: :unprocessable_content
+        render view_class.new(record_key => record, totals: nil, context: context, **extra), status: :unprocessable_content
       end
     end
   end

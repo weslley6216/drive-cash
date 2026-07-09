@@ -11,7 +11,7 @@ module Dashboard
     def view_template
       modal_stream(@detail_view)
       flash_stream('flash_modal', inline: true)
-      raw '<turbo-stream action="refresh"></turbo-stream>'.html_safe
+      refresh_stream
     end
   end
 end

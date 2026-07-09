@@ -86,6 +86,16 @@ RSpec.describe 'Maintenances', type: :request do
       expect(maintenance.progress).to eq(0)
       expect(response.body).to include('action="refresh"')
     end
+
+    it 'rerenders with an error flash when marking done fails validation' do
+      vehicle.update!(odometer_km: 0)
+      maintenance = create(:maintenance, vehicle: vehicle, last_done_km: 100)
+
+      patch mark_done_maintenance_path(maintenance), as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(maintenance.reload.last_done_km).to eq(100)
+    end
   end
 
   describe 'DELETE /maintenances/:id' do

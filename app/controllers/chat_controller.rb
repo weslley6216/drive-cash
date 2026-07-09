@@ -23,10 +23,7 @@ class ChatController < ApplicationController
     return respond_with_duplicate_submit unless consume_confirm_nonce(params[:confirm_nonce])
 
     persister = Chat::RecordPersister.for(params[:record_action])
-    record = params[:record] || {}
-    payload = record.respond_to?(:to_unsafe_h) ? record.to_unsafe_h : record.to_h
-
-    respond_with_confirm_result(persister.persist(payload, user: current_user))
+    respond_with_confirm_result(persister.persist(params[:record]&.to_unsafe_h || {}, user: current_user))
   end
 
   def cancel_preview

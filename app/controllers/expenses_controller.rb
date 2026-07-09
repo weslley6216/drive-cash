@@ -9,19 +9,10 @@ class ExpensesController < ApplicationController
     result = create_expense_via_creator(:expense)
 
     if result.success?
-      refueling_data = params[:refueling]
-      if refueling_data.present?
-        Refuelings::CreatorFromExpense.call(
-          expense:     result.expenses.first,
-          liters:      refueling_data[:liters],
-          odometer_km: refueling_data[:odometer_km],
-          full_tank:   refueling_data[:full_tank]
-        )
-      end
-      turbo_success(Expenses::CreateView, expense: result.expenses.first)
+      turbo_success(Expenses::CreateView, record: result.expenses.first, record_key: :expense)
     else
-      turbo_error(Expenses::NewView, expense:       result.expense,
-                                     active_vendor: Vehicles::ActiveTankVendor.new(user: result.expense.user).call.to_s)
+      turbo_error(Expenses::NewView, record: result.expense, record_key: :expense,
+                                     active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s)
     end
   end
 
@@ -31,9 +22,9 @@ class ExpensesController < ApplicationController
 
   def update
     if @expense.update(expense_attributes(:expense))
-      turbo_success(Expenses::UpdateView, detail_service: Dashboard::ExpensesDetailService, expense: @expense)
+      turbo_success(Expenses::UpdateView, record: @expense, record_key: :expense, detail_service: Dashboard::ExpensesDetailService)
     else
-      turbo_error(Expenses::UpdateView, expense: @expense)
+      turbo_error(Expenses::UpdateView, record: @expense, record_key: :expense)
     end
   end
 

@@ -70,4 +70,32 @@ RSpec.describe Vehicle, type: :model do
       expect(vehicle.updated_days_ago).to be_nil
     end
   end
+
+  describe 'odometer freshness stamping' do
+    it 'stamps the timestamp when the odometer advances' do
+      vehicle = create(:vehicle, odometer_km: 48_000, odometer_updated_at: 10.days.ago)
+
+      vehicle.update!(odometer_km: 49_000)
+
+      expect(vehicle.odometer_updated_at).to be_within(1.second).of(Time.current)
+    end
+
+    it 'keeps an explicitly provided timestamp when the odometer changes' do
+      vehicle = create(:vehicle, odometer_km: 48_000)
+      explicit = Time.zone.local(2026, 5, 1, 12)
+
+      vehicle.update!(odometer_km: 49_000, odometer_updated_at: explicit)
+
+      expect(vehicle.odometer_updated_at).to eq(explicit)
+    end
+
+    it 'leaves the timestamp untouched when the odometer does not change' do
+      original = Time.zone.local(2026, 5, 1, 12)
+      vehicle = create(:vehicle, odometer_km: 48_000, odometer_updated_at: original)
+
+      vehicle.update!(brand: 'Toyota')
+
+      expect(vehicle.odometer_updated_at).to eq(original)
+    end
+  end
 end

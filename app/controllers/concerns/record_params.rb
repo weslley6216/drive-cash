@@ -4,6 +4,12 @@ module RecordParams
   EXPENSE_ATTRIBUTES = %i[date amount category vendor description paid].freeze
   EARNING_ATTRIBUTES = %i[date amount platform notes trips_count].freeze
   INSTALLMENT_ATTRIBUTES = %i[repeat period repetitions].freeze
+  REFUELING_ATTRIBUTES = %i[liters odometer_km full_tank].freeze
+
+  RECORD_BUILDERS = {
+    'earning' => { create: :create_earning_via_creator, record_key: :earning },
+    'expense' => { create: :create_expense_via_creator, record_key: :expense }
+  }.freeze
 
   private
 
@@ -23,10 +29,15 @@ module RecordParams
     params.fetch(:installment, {}).permit(*INSTALLMENT_ATTRIBUTES)
   end
 
+  def refueling_attributes
+    params.fetch(:refueling, {}).permit(*REFUELING_ATTRIBUTES)
+  end
+
   def create_expense_via_creator(scope_key)
     Expenses::Creator.call(
       expense_attributes(scope_key).to_unsafe_h,
       installment_attributes.to_unsafe_h,
+      refueling_attributes.to_unsafe_h,
       user: current_user
     )
   end
