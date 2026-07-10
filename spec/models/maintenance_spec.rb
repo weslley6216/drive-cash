@@ -64,6 +64,24 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
+  describe '#selectable_categories' do
+    it 'excludes categories already used on the vehicle for a new record' do
+      vehicle = create(:vehicle)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      new_maintenance = vehicle.maintenances.new
+
+      expect(new_maintenance.selectable_categories).not_to include('oil_change')
+      expect(new_maintenance.selectable_categories).to include('air_filter')
+    end
+
+    it 'keeps its own category available for a persisted record' do
+      vehicle = create(:vehicle)
+      maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      expect(maintenance.selectable_categories).to include('oil_change')
+    end
+  end
+
   describe 'enums' do
     it 'defines the eight catalog categories' do
       expect(described_class.categories.keys).to eq(described_class::CATALOG.keys)

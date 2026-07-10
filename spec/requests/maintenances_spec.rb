@@ -16,6 +16,15 @@ RSpec.describe 'Maintenances', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('maintenances.form.title_new'))
     end
+
+    it 'omits categories already used on the vehicle' do
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      get new_maintenance_path
+
+      expect(response.body).not_to include('value="oil_change"')
+      expect(response.body).to include('value="air_filter"')
+    end
   end
 
   describe 'POST /maintenances' do
@@ -44,6 +53,15 @@ RSpec.describe 'Maintenances', type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('maintenances.form.title_new'))
+    end
+
+    it 'rejects a duplicate category for the same vehicle' do
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      post maintenances_path, params: valid_params, as: :turbo_stream
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(vehicle.maintenances.where(category: 'oil_change').count).to eq(1)
     end
   end
 

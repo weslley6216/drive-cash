@@ -32,6 +32,11 @@ class Maintenance < ApplicationRecord
     CATALOG.fetch(kind, {})
   end
 
+  def selectable_categories
+    used = vehicle.maintenances.where.not(id: id).pluck(:category)
+    self.class.categories.keys - used
+  end
+
   def progress
     (done.to_f / interval_km) * 100
   end
