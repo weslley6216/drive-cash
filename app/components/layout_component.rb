@@ -43,16 +43,6 @@ class LayoutComponent < ApplicationComponent
       csp_meta_tag
       stylesheet_link_tag('tailwind', "data-turbo-track": 'reload')
       javascript_importmap_tags
-
-      script do
-        plain <<~JS.html_safe
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-              .then(reg => console.log('SW registered', reg))
-              .catch(err => console.log('SW error', err));
-          }
-        JS
-      end
     end
   end
 

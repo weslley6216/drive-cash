@@ -17,6 +17,20 @@ RSpec.describe 'Earnings', type: :request do
 
       expect(response.location).to include('context%5Byear%5D=2026')
     end
+
+    it 'drops context keys outside the year/month whitelist' do
+      get new_earning_path, params: { context: { year: 2026, evil: 'x' } }
+
+      expect(response.location).to include('context%5Byear%5D=2026')
+      expect(response.location).not_to include('evil')
+    end
+
+    it 'ignores a non-hash context instead of erroring' do
+      get new_earning_path, params: { context: 'evil' }
+
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).not_to include('evil')
+    end
   end
 
   describe 'POST /earnings' do

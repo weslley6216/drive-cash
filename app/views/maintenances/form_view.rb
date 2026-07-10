@@ -49,7 +49,7 @@ module Maintenances
 
     def category_select(form)
       field_wrapper(t('maintenances.form.labels.category'), theme: @theme) do
-        options = Maintenance.categories.keys.map { |category| [t("vehicle.maintenances.catalog.#{category}"), category] }
+        options = @maintenance.selectable_categories.map { |category| [t("vehicle.maintenances.catalog.#{category}"), category] }
         render form.select(:category, options, {}, { class: "#{input_classes(theme: @theme)} bg-white", required: true })
       end
     end

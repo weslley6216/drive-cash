@@ -4,7 +4,7 @@ class MaintenancesController < ApplicationController
   before_action :find_maintenance, only: %i[edit update destroy mark_done]
 
   def new
-    @maintenance = current_user.vehicle.maintenances.new(category: :oil_change)
+    @maintenance = current_user.vehicle.maintenances.new
     render Maintenances::FormView.new(maintenance: @maintenance)
   end
 

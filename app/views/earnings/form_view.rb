@@ -28,14 +28,14 @@ module Earnings
     end
 
     def render_form
-      form_with(model: @earning, url: form_url, method: form_method, class: 'p-6 space-y-4') do |f|
+      form_with(model: @earning, url: form_url, method: form_method, class: 'p-6 space-y-4') do |form|
         hidden_context_fields
 
-        date_field(f, :date, label: t('.labels.date'), theme: @theme)
-        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
-        platform_select(f)
-        text_area(f, :notes, label: t('.labels.notes'), theme: @theme, placeholder: t('.placeholders.notes'), rows: 2)
-        integer_field(f, :trips_count, label: t('.labels.trips_count'), theme: @theme, required: true)
+        date_field(form, :date, label: t('.labels.date'), theme: @theme)
+        money_field(form, :amount, label: t('.labels.amount'), theme: @theme, required: true)
+        platform_select(form)
+        text_area(form, :notes, label: t('.labels.notes'), theme: @theme, placeholder: t('.placeholders.notes'), rows: 2)
+        integer_field(form, :trips_count, label: t('.labels.trips_count'), theme: @theme, required: true)
 
         render_actions
       end

@@ -13,9 +13,9 @@ module Goals
       offset = (circumference - (@percent / 100.0) * circumference).round(4)
 
       div(class: 'relative flex-shrink-0', style: "width: #{@size}px; height: #{@size}px") do
-        svg(width: @size, height: @size, class: '-rotate-90', viewBox: "0 0 #{@size} #{@size}") do |s|
-          s.circle(cx: @size / 2, cy: @size / 2, r: radius, fill: 'none', stroke: '#f1f5f9', 'stroke-width': @stroke)
-          s.circle(
+        svg(width: @size, height: @size, class: '-rotate-90', viewBox: "0 0 #{@size} #{@size}") do |svg|
+          svg.circle(cx: @size / 2, cy: @size / 2, r: radius, fill: 'none', stroke: '#f1f5f9', 'stroke-width': @stroke)
+          svg.circle(
             cx: @size / 2, cy: @size / 2, r: radius, fill: 'none',
             stroke: @color, 'stroke-width': @stroke, 'stroke-linecap': 'round',
             'stroke-dasharray': circumference, 'stroke-dashoffset': offset

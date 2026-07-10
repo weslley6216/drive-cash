@@ -30,15 +30,15 @@ module Expenses
 
     def render_form
       form_with(model: @expense, url: form_url, method: form_method, class: 'p-6 space-y-4',
-                data: form_stimulus_data) do |f|
+                data: form_stimulus_data) do |form|
         hidden_context_fields
 
-        date_field(f, :date, label: t('.labels.date'), theme: @theme)
-        money_field(f, :amount, label: t('.labels.amount'), theme: @theme, required: true)
-        form_body(f)
-        category_select(f)
-        vendor_field(f)
-        text_area(f, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
+        date_field(form, :date, label: t('.labels.date'), theme: @theme)
+        money_field(form, :amount, label: t('.labels.amount'), theme: @theme, required: true)
+        form_body(form)
+        category_select(form)
+        vendor_field(form)
+        text_area(form, :description, label: t('.labels.description'), theme: @theme, placeholder: t('.placeholders.description'), rows: 2)
         refueling_extension unless @expense.persisted?
 
         render_actions

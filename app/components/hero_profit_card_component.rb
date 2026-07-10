@@ -92,23 +92,23 @@ class HeroProfitCardComponent < ApplicationComponent
       viewBox: "0 0 #{width} #{height}",
       class:   "w-full #{height_class}",
       xmlns:   'http://www.w3.org/2000/svg'
-    ) do |s|
-      s.defs do
-        s.linearGradient(id: gradient_id, x1: '0', y1: '0', x2: '0', y2: '1') do
-          s.stop(offset: '0%', 'stop-color': '#3b82f6', 'stop-opacity': '0.35')
-          s.stop(offset: '100%', 'stop-color': '#3b82f6', 'stop-opacity': '0')
+    ) do |svg|
+      svg.defs do
+        svg.linearGradient(id: gradient_id, x1: '0', y1: '0', x2: '0', y2: '1') do
+          svg.stop(offset: '0%', 'stop-color': '#3b82f6', 'stop-opacity': '0.35')
+          svg.stop(offset: '100%', 'stop-color': '#3b82f6', 'stop-opacity': '0')
         end
       end
 
-      s.path(d: area_path(pts, height), fill: "url(##{gradient_id})")
-      s.path(
+      svg.path(d: area_path(pts, height), fill: "url(##{gradient_id})")
+      svg.path(
         d: line_path(pts), fill: 'none', stroke: '#1d4ed8',
         'stroke-width': stroke_width.to_s,
         'stroke-linecap': 'round', 'stroke-linejoin': 'round'
       )
       pts.each_with_index do |(x, y), idx|
         last = idx == pts.size - 1
-        s.circle(
+        svg.circle(
           cx: x, cy: y, r: (last ? last_dot_r : dot_r).to_s,
           fill: last ? '#1d4ed8' : '#fff',
           stroke: '#1d4ed8', 'stroke-width': '2'

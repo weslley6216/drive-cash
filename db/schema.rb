@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_190934) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_10_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,7 +66,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_190934) do
     t.integer "installment_count"
     t.integer "installment_number"
     t.uuid "installment_series_id"
-    t.text "notes"
     t.boolean "paid", default: true, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -113,6 +112,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_190934) do
     t.integer "last_done_km"
     t.datetime "updated_at", null: false
     t.bigint "vehicle_id", null: false
+    t.index ["vehicle_id", "category"], name: "index_maintenances_on_vehicle_id_and_category", unique: true
     t.index ["vehicle_id"], name: "index_maintenances_on_vehicle_id"
   end
 

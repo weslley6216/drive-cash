@@ -1,8 +1,10 @@
 class ExpensesController < ApplicationController
+  include RecordRedirect
+
   before_action :find_expense, only: [:edit, :update, :destroy]
 
   def new
-    redirect_to new_record_path(type: 'expense', context: params[:context]&.to_unsafe_h)
+    redirect_to_new_record('expense')
   end
 
   def create

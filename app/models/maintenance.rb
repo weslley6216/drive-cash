@@ -26,9 +26,15 @@ class Maintenance < ApplicationRecord
   validates :last_done_km, :interval_km, presence:     true,
                                          numericality: { greater_than: 0, only_integer: true }
   validates :estimated_cost, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+  validates :category, uniqueness: { scope: :vehicle_id }
 
   def self.catalog_defaults(kind)
     CATALOG.fetch(kind, {})
+  end
+
+  def selectable_categories
+    used = vehicle.maintenances.where.not(id: id).pluck(:category)
+    self.class.categories.keys - used
   end
 
   def progress

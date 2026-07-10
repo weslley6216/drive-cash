@@ -101,7 +101,7 @@ module Chat
         form_with(
           url:  chat_message_path,
           data: { loading_skip: true, action: 'submit->chat#send turbo:submit-end->chat#clearInput' }
-        ) do |f|
+        ) do
           div(class: 'flex gap-2 items-end') do
             div(class: 'flex-1 relative') do
               textarea(

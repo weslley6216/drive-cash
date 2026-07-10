@@ -16,8 +16,7 @@ Rails.application.routes.draw do
 
   get  '/records/new', to: 'records#new',    as: :new_record
   post '/records',     to: 'records#create', as: :records
-  
-  # AI Chat
+
   scope '/chat', module: nil, as: :chat do
     root to: 'chat#index'
     post 'message', to: 'chat#message', as: :message
@@ -41,10 +40,8 @@ Rails.application.routes.draw do
   end
   resources :refuelings, only: %i[index new create edit update destroy]
 
-  # PWA routes
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  
-  # Health check
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

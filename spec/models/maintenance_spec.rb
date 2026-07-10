@@ -64,6 +64,24 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
+  describe '#selectable_categories' do
+    it 'excludes categories already used on the vehicle for a new record' do
+      vehicle = create(:vehicle)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      new_maintenance = vehicle.maintenances.new
+
+      expect(new_maintenance.selectable_categories).not_to include('oil_change')
+      expect(new_maintenance.selectable_categories).to include('air_filter')
+    end
+
+    it 'keeps its own category available for a persisted record' do
+      vehicle = create(:vehicle)
+      maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      expect(maintenance.selectable_categories).to include('oil_change')
+    end
+  end
+
   describe 'enums' do
     it 'defines the eight catalog categories' do
       expect(described_class.categories.keys).to eq(described_class::CATALOG.keys)
@@ -90,6 +108,22 @@ RSpec.describe Maintenance, type: :model do
       maintenance.valid?
 
       expect(maintenance.errors[:estimated_cost]).to be_present
+    end
+
+    it 'enforces one maintenance per category and vehicle' do
+      vehicle = create(:vehicle)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      duplicate = build(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:category]).to be_present
+    end
+
+    it 'allows the same category on different vehicles' do
+      create(:maintenance, vehicle: create(:vehicle), category: 'oil_change')
+      other = build(:maintenance, vehicle: create(:vehicle), category: 'oil_change')
+
+      expect(other).to be_valid
     end
   end
 end
