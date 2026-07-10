@@ -91,5 +91,21 @@ RSpec.describe Maintenance, type: :model do
 
       expect(maintenance.errors[:estimated_cost]).to be_present
     end
+
+    it 'enforces one maintenance per category and vehicle' do
+      vehicle = create(:vehicle)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      duplicate = build(:maintenance, vehicle: vehicle, category: 'oil_change')
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:category]).to be_present
+    end
+
+    it 'allows the same category on different vehicles' do
+      create(:maintenance, vehicle: create(:vehicle), category: 'oil_change')
+      other = build(:maintenance, vehicle: create(:vehicle), category: 'oil_change')
+
+      expect(other).to be_valid
+    end
   end
 end
