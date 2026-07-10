@@ -2,7 +2,7 @@ class EarningsController < ApplicationController
   before_action :find_earning, only: [:edit, :update, :destroy]
 
   def new
-    redirect_to new_record_path(type: 'earning', context: params[:context]&.to_unsafe_h)
+    redirect_to new_record_path(type: 'earning', context: params[:context]&.permit(:year, :month))
   end
 
   def create
