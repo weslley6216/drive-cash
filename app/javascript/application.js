@@ -3,3 +3,7 @@ import { Turbo } from "@hotwired/turbo-rails"
 import "controllers"
 
 Turbo.setProgressBarDelay(150)
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js")
+}
