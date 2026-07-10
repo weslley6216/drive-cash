@@ -1,8 +1,10 @@
 class EarningsController < ApplicationController
+  include RecordRedirect
+
   before_action :find_earning, only: [:edit, :update, :destroy]
 
   def new
-    redirect_to new_record_path(type: 'earning', context: params[:context]&.permit(:year, :month))
+    redirect_to_new_record('earning')
   end
 
   def create
