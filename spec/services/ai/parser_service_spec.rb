@@ -140,6 +140,16 @@ RSpec.describe Ai::ParserService do
         expect(result[:type]).to eq(:text)
         expect(result[:content]).to eq(I18n.t('chat.message.not_understood'))
       end
+
+      it 'logs the response type without leaking the content' do
+        logged = nil
+        allow(Rails.logger).to receive(:warn) { |message| logged = message }
+
+        service.call
+
+        expect(logged).to include('unknown')
+        expect(logged).not_to include('???')
+      end
     end
 
     context 'when the LLM raises a RateLimitError' do
@@ -353,6 +363,26 @@ RSpec.describe Ai::ParserService do
 
           expect(result).to eq(type: :answer, content: 'rendered')
         end
+      end
+    end
+
+    context 'when it rejects a tool with an invalid amount' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:       :tool_use,
+          tool_name:  'create_expense',
+          tool_input: { 'amount' => -1337.42, 'category' => 'fuel', 'date' => '2026-04-21' }
+        })
+      end
+
+      it 'logs the tool name without leaking the amount value' do
+        logged = nil
+        allow(Rails.logger).to receive(:warn) { |message| logged = message }
+
+        service.call
+
+        expect(logged).to include('create_expense')
+        expect(logged).not_to include('1337')
       end
     end
   end

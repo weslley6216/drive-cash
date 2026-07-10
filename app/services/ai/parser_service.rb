@@ -47,7 +47,7 @@ module Ai
       when :tool_use then dispatch_tool(response)
       when :text then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
       else
-        Rails.logger.warn "[ParserService] Unexpected response type: #{response.inspect}"
+        Rails.logger.warn "[ParserService] Unexpected response type: #{response[:type].inspect}"
         { type: :text, content: I18n.t('chat.message.not_understood') }
       end
     end
@@ -82,7 +82,7 @@ module Ai
 
     def build_preview(tool, tool_input, text_before: nil)
       params = parse_params(tool_input)
-      return missing_amount_result(tool.name, params) if invalid_amount?(tool, params)
+      return missing_amount_result(tool.name) if invalid_amount?(tool, params)
 
       result = preview_for(tool, params)
       result[:text_before] = text_before if text_before.present?
@@ -101,8 +101,8 @@ module Ai
       params['amount'].to_f <= 0
     end
 
-    def missing_amount_result(tool_name, params)
-      Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount: #{params['amount']}"
+    def missing_amount_result(tool_name)
+      Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount"
       { type: :text, content: I18n.t('chat.errors.missing_amount') }
     end
 
