@@ -6,6 +6,7 @@ RSpec.describe Earning, type: :model do
 
     it { is_expected.to validate_presence_of(:date) }
     it { is_expected.to validate_presence_of(:amount) }
+    it { is_expected.to validate_presence_of(:platform) }
 
     it 'rejects amount equal to zero' do
       earning = build(:earning, amount: 0)
