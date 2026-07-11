@@ -13,10 +13,6 @@ module RecordParams
 
   private
 
-  def expense_attribute_keys = EXPENSE_ATTRIBUTES.map(&:to_s)
-  def earning_attribute_keys = EARNING_ATTRIBUTES.map(&:to_s)
-  def installment_attribute_keys = INSTALLMENT_ATTRIBUTES.map(&:to_s)
-
   def expense_attributes(scope_key)
     params.require(scope_key).permit(*EXPENSE_ATTRIBUTES)
   end
