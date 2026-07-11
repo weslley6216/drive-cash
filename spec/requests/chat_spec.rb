@@ -556,4 +556,37 @@ RSpec.describe 'Chats', type: :request do
       expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
     end
   end
+
+  describe 'conversational multi-create — LLM history contract' do
+    let(:responses) do
+      [
+        { type: :tool_use, tool_name: 'create_earning', tool_input: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
+        { type: :tool_use, tool_name: 'create_earning', tool_input: { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-07-02' } },
+        { type: :text, content: 'Fechou, chefe!' }
+      ]
+    end
+    let(:sent_histories) { [] }
+
+    before do
+      allow(Llm::Client).to receive(:chat) do |messages:, **|
+        sent_histories << messages.map { |message| message[:content].to_s }
+        responses.shift
+      end
+    end
+
+    it 'identifies the confirmed record in the history sent on auto-continue' do
+      post chat_message_path, params: { message: 'ganhei 80 no Uber e 45 no iFood hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-07-02' }, confirm_nonce: nonce },
+           as:     :turbo_stream
+
+      auto_continue_history = sent_histories.last.join("\n")
+
+      expect(auto_continue_history).to include(
+        I18n.t('chat.history.record_confirmed', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026')
+      )
+    end
+  end
 end

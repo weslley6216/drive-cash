@@ -73,11 +73,11 @@ module ChatSession
     end
   end
 
-  def respond_with_confirm_result(result)
+  def respond_with_confirm_result(result, record_params: {})
     respond_to do |format|
       format.turbo_stream do
         if result.success?
-          finalize_chat_confirm_success(action: result.action, record: result.record)
+          finalize_chat_confirm_success(action: result.action, record: result.record, record_params: record_params)
         else
           render Chat::ConfirmView.new(
             success: false,
@@ -94,15 +94,19 @@ module ChatSession
     end
   end
 
-  def finalize_chat_confirm_success(action:, record:)
+  def finalize_chat_confirm_success(action:, record:, record_params:)
     i18n_key = Ai::Tools::Registry.find(action).confirm_key
 
     add_to_history(Chat::Message.from_result(
-      { type: :text, content: t(i18n_key) },
+      { type: :text, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
       fallback_content: t(i18n_key)
     ))
 
     auto_continue_and_render_confirm(action: action, record: record, i18n_key: i18n_key)
+  end
+
+  def confirm_summary(action, record_params)
+    Ai::Tools::Registry.find(action).summary_presenter.new(record_params).call
   end
 
   def auto_continue_and_render_confirm(action:, record:, i18n_key:)
