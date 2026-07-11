@@ -368,8 +368,9 @@ RSpec.describe 'Chats', type: :request do
       post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
 
       cancel_history = histories.last.join("\n")
-      expect(cancel_history).to include('Uber')
-      expect(cancel_history).to include('80,00')
+      expect(cancel_history).to include(
+        I18n.t('chat.history.record_cancelled', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026')
+      )
     end
 
     it 'adds cancelled history entry and re-invokes ParserService for continuation' do
