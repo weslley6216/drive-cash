@@ -40,6 +40,12 @@ RSpec.describe Earning, type: :model do
     }
   end
 
+  describe 'platform default' do
+    it 'does not assign a residual platform on a new record' do
+      expect(described_class.new.platform).to be_nil
+    end
+  end
+
   describe 'scopes' do
     let(:earning_dec_2024) { create(:earning, date: Date.new(2024, 12, 31)) }
     let(:earning_jan_2025) { create(:earning, date: Date.new(2025, 1, 1)) }
