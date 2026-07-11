@@ -14,7 +14,7 @@ module Ai
               notes:       { type: 'STRING', description: 'Observações opcionais' },
               trips_count: { type: 'NUMBER', description: 'Quantidade de rotas feitas. Padrão 1 se não informado.' }
             },
-            required:   ['amount', 'date']
+            required:   ['amount', 'date', 'platform']
           }
         }
       end

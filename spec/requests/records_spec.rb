@@ -44,6 +44,13 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include(I18n.t('records.new_view.platform_label'))
     end
 
+    it 'does not pre-select a platform in the new earning form' do
+      get new_record_path, params: { type: 'earning' }
+
+      expect(response.body).to include(I18n.t('records.new_view.platform_label'))
+      expect(response.body).not_to match(/name="record\[platform\]"[^>]*\schecked/)
+    end
+
     it 'renders the category picker when type is expense' do
       get new_record_path, params: { type: 'expense' }
 
@@ -163,6 +170,15 @@ RSpec.describe 'Records', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('Valor')
+      end
+
+      it 'rejects an earning submitted without a platform' do
+        params = { type: 'earning', record: { amount: '245.00', date: '2026-05-22', trips_count: 1 } }
+
+        post records_path, params: params
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Plataforma não pode ficar em branco')
       end
 
       it 'keeps the active tank vendor exposed after an invalid earning' do

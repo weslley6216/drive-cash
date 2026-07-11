@@ -6,6 +6,7 @@ RSpec.describe Earning, type: :model do
 
     it { is_expected.to validate_presence_of(:date) }
     it { is_expected.to validate_presence_of(:amount) }
+    it { is_expected.to validate_presence_of(:platform) }
 
     it 'rejects amount equal to zero' do
       earning = build(:earning, amount: 0)
@@ -37,6 +38,12 @@ RSpec.describe Earning, type: :model do
         other:         7
       ).with_prefix.backed_by_column_of_type(:integer)
     }
+  end
+
+  describe 'platform default' do
+    it 'does not assign a residual platform on a new record' do
+      expect(described_class.new.platform).to be_nil
+    end
   end
 
   describe 'scopes' do
