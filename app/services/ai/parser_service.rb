@@ -107,12 +107,13 @@ module Ai
     end
 
     def preview_for(tool, params)
+      summary = tool.summary_presenter.new(params).call
       {
         type:    :preview,
         action:  tool.name,
         params:  params,
-        summary: tool.summary_presenter.new(params).call,
-        content: I18n.t('chat.history.preview_sent')
+        summary: summary,
+        content: I18n.t('chat.history.preview_sent_detail', summary: summary)
       }
     end
 
