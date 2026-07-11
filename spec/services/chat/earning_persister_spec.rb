@@ -50,7 +50,7 @@ RSpec.describe Chat::EarningPersister do
       result = described_class.new.persist(payload, user: user)
 
       expect(result.success?).to be false
-      expect(result.errors).to be_present
+      expect(result.errors).to include(a_string_matching(/Plataforma/))
     end
 
     it 'ignores user_id forged inside the payload and assigns the kwarg user' do

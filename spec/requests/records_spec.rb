@@ -172,6 +172,15 @@ RSpec.describe 'Records', type: :request do
         expect(response.body).to include('Valor')
       end
 
+      it 'rejects an earning submitted without a platform' do
+        params = { type: 'earning', record: { amount: '245.00', date: '2026-05-22', trips_count: 1 } }
+
+        post records_path, params: params
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Plataforma não pode ficar em branco')
+      end
+
       it 'keeps the active tank vendor exposed after an invalid earning' do
         vehicle = create(:vehicle, user: current_user)
         create(:refueling, vehicle: vehicle, vendor: 'Posto Ipiranga', full_tank: true)
