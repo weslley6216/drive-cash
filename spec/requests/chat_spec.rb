@@ -352,6 +352,26 @@ RSpec.describe 'Chats', type: :request do
 
     before { allow(Ai::ParserService).to receive(:new).and_return(parser_mock) }
 
+    it 'sends the cancelled record identity into the history' do
+      histories = []
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
+        { type: :text, content: 'Beleza, mais alguma coisa?' }
+      )
+      allow(Ai::ParserService).to receive(:new) do |messages:, **|
+        histories << messages.map { |message| message[:content].to_s }
+        parser_mock
+      end
+
+      post chat_message_path, params: { message: 'ganhei 80 no Uber hoje' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      cancel_history = histories.last.join("\n")
+      expect(cancel_history).to include('Uber')
+      expect(cancel_history).to include('80,00')
+    end
+
     it 'adds cancelled history entry and re-invokes ParserService for continuation' do
       allow(parser_mock).to receive(:call).and_return(
         { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',

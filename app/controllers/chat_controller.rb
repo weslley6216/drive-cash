@@ -28,8 +28,11 @@ class ChatController < ApplicationController
   end
 
   def cancel_preview
+    summary = last_preview_summary
+    content = summary.present? ? t('chat.history.record_cancelled', summary: summary) : t('chat.history.preview_cancelled')
+
     add_to_history(Chat::Message.from_result(
-      { type: :text, content: t('chat.history.preview_cancelled') },
+      { type: :text, content: content },
       fallback_content: t('chat.history.preview_cancelled')
     ))
 

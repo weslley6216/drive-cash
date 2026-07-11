@@ -109,6 +109,10 @@ module ChatSession
     Ai::Tools::Registry.find(action).summary_presenter.new(record_params).call
   end
 
+  def last_preview_summary
+    chat_history.reverse_each.find { |message| message[:summary].present? }&.dig(:summary)
+  end
+
   def auto_continue_and_render_confirm(action:, record:, i18n_key:)
     if continuation_depth_exceeded?
       render Chat::ConfirmView.new(
