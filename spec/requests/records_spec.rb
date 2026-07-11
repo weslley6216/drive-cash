@@ -44,6 +44,13 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include(I18n.t('records.new_view.platform_label'))
     end
 
+    it 'does not pre-select a platform in the new earning form' do
+      get new_record_path, params: { type: 'earning' }
+
+      expect(response.body).to include(I18n.t('records.new_view.platform_label'))
+      expect(response.body).not_to match(/name="record\[platform\]"[^>]*\schecked/)
+    end
+
     it 'renders the category picker when type is expense' do
       get new_record_path, params: { type: 'expense' }
 
