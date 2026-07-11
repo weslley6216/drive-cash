@@ -352,6 +352,27 @@ RSpec.describe 'Chats', type: :request do
 
     before { allow(Ai::ParserService).to receive(:new).and_return(parser_mock) }
 
+    it 'sends the cancelled record identity into the history' do
+      histories = []
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
+        { type: :text, content: 'Beleza, mais alguma coisa?' }
+      )
+      allow(Ai::ParserService).to receive(:new) do |messages:, **|
+        histories << messages.map { |message| message[:content].to_s }
+        parser_mock
+      end
+
+      post chat_message_path, params: { message: 'ganhei 80 no Uber hoje' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      cancel_history = histories.last.join("\n")
+      expect(cancel_history).to include(
+        I18n.t('chat.history.record_cancelled', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026')
+      )
+    end
+
     it 'adds cancelled history entry and re-invokes ParserService for continuation' do
       allow(parser_mock).to receive(:call).and_return(
         { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
@@ -456,11 +477,33 @@ RSpec.describe 'Chats', type: :request do
       expect(response.body).to include('Ótimo! E o iFood de R$ 45')
     end
 
+    it 'does not render a duplicate card when the continuation repeats a confirmed record' do
+      earning_input = { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' }
+
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber', params: earning_input },
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber', params: earning_input }
+      )
+
+      post chat_message_path, params: { message: 'ganhei 80 no Uber' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
+           as:     :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.history.all_registered'))
+      expect(response.body).not_to include(I18n.t('chat.message.understood'))
+    end
+
     it 'stops auto-continue after reaching max depth' do
       earning_input = { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' }
-      preview_result = { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber', params: earning_input }
+      distinct_previews = Array.new(ChatSession::MAX_CONTINUATION_DEPTH + 1) do |index|
+        { type: :preview, action: 'create_earning', summary: "Receita #{index}",
+          params: { 'amount' => 80 + index, 'platform' => 'uber', 'date' => '2026-06-24' } }
+      end
 
-      allow(parser_mock).to receive(:call).and_return(preview_result)
+      allow(parser_mock).to receive(:call).and_return(*distinct_previews)
 
       post chat_message_path, params: { message: 'x' }, as: :turbo_stream
       nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
@@ -554,6 +597,39 @@ RSpec.describe 'Chats', type: :request do
       }.not_to change(Earning, :count)
 
       expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+    end
+  end
+
+  describe 'conversational multi-create — LLM history contract' do
+    let(:responses) do
+      [
+        { type: :tool_use, tool_name: 'create_earning', tool_input: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
+        { type: :tool_use, tool_name: 'create_earning', tool_input: { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-07-02' } },
+        { type: :text, content: 'Fechou, chefe!' }
+      ]
+    end
+    let(:sent_histories) { [] }
+
+    before do
+      allow(Llm::Client).to receive(:chat) do |messages:, **|
+        sent_histories << messages.map { |message| message[:content].to_s }
+        responses.shift
+      end
+    end
+
+    it 'identifies the confirmed record in the history sent on auto-continue' do
+      post chat_message_path, params: { message: 'ganhei 80 no Uber e 45 no iFood hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: { amount: 80, platform: 'uber', date: '2026-07-02' }, confirm_nonce: nonce },
+           as:     :turbo_stream
+
+      auto_continue_history = sent_histories.last.join("\n")
+
+      expect(auto_continue_history).to include(
+        I18n.t('chat.history.record_confirmed', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026')
+      )
     end
   end
 end

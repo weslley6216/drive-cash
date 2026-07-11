@@ -10,6 +10,7 @@ class ChatController < ApplicationController
     return head :bad_request if user_text.blank?
 
     reset_continuation_depth
+    reset_confirmed_signatures
     add_to_history(Chat::Message.from_user(user_text))
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
@@ -22,13 +23,17 @@ class ChatController < ApplicationController
   def confirm
     return respond_with_duplicate_submit unless consume_confirm_nonce(params[:confirm_nonce])
 
+    record_params = params[:record]&.to_unsafe_h || {}
     persister = Chat::RecordPersister.for(params[:record_action])
-    respond_with_confirm_result(persister.persist(params[:record]&.to_unsafe_h || {}, user: current_user))
+    respond_with_confirm_result(persister.persist(record_params, user: current_user), record_params: record_params)
   end
 
   def cancel_preview
+    summary = last_preview_summary
+    content = summary.present? ? t('chat.history.record_cancelled', summary: summary) : t('chat.history.preview_cancelled')
+
     add_to_history(Chat::Message.from_result(
-      { type: :text, content: t('chat.history.preview_cancelled') },
+      { type: :text, content: content },
       fallback_content: t('chat.history.preview_cancelled')
     ))
 

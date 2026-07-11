@@ -366,6 +366,22 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when building a create preview' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:       :tool_use,
+          tool_name:  'create_earning',
+          tool_input: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-04-21' }
+        })
+      end
+
+      it 'embeds the summary in the content sent back into the LLM history' do
+        result = service.call
+
+        expect(result[:content]).to include(result[:summary])
+      end
+    end
+
     context 'when it rejects a tool with an invalid amount' do
       before do
         allow(client).to receive(:chat).and_return({
