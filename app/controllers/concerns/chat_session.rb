@@ -74,7 +74,7 @@ module ChatSession
     end
   end
 
-  def respond_with_confirm_result(result, record_params: {})
+  def respond_with_confirm_result(result, record_params:)
     respond_to do |format|
       format.turbo_stream do
         if result.success?
