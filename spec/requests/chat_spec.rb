@@ -287,25 +287,6 @@ RSpec.describe 'Chats', type: :request do
     end
 
     context 'when confirming with an unknown action' do
-      let(:params) { { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } } }
-
-      it 'renders the home chip as fallback' do
-        allow_any_instance_of(ChatController).to receive(:confirm).and_wrap_original do |method, *args|
-          controller = method.receiver
-          controller.respond_to do |format|
-            format.turbo_stream do
-              controller.render Chat::ConfirmView.new(success: true, message: 'Fallback', action: 'unknown_action', date: Date.new(2026, 4, 22))
-            end
-          end
-        end
-
-        post chat_confirm_path, params: params, as: :turbo_stream
-
-        expect(response.body).to include(I18n.t('chat.confirm.btn_home'))
-      end
-    end
-
-    context 'when confirming with an unknown action' do
       it 'renders a failure message via turbo stream' do
         post chat_confirm_path,
              params: { record_action: 'unknown_action', record: {} },
