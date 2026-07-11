@@ -15,4 +15,5 @@ class Earning < ApplicationRecord
   }, prefix: true
 
   validates :trips_count, numericality: { greater_than_or_equal_to: 1, only_integer: true }
+  validates :platform, presence: true
 end

@@ -43,6 +43,16 @@ RSpec.describe Chat::EarningPersister do
       expect(result.errors).to be_present
     end
 
+    it 'returns failure when platform is missing' do
+      user = create(:user)
+      payload = { 'amount' => 200, 'date' => '2026-04-22' }
+
+      result = described_class.new.persist(payload, user: user)
+
+      expect(result.success?).to be false
+      expect(result.errors).to include(a_string_matching(/Plataforma/))
+    end
+
     it 'ignores user_id forged inside the payload and assigns the kwarg user' do
       user = create(:user)
       other = create(:user)
