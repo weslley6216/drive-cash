@@ -10,6 +10,7 @@ class ChatController < ApplicationController
     return head :bad_request if user_text.blank?
 
     reset_continuation_depth
+    reset_confirmed_signatures
     add_to_history(Chat::Message.from_user(user_text))
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
