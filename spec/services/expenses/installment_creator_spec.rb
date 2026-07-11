@@ -82,15 +82,12 @@ RSpec.describe Expenses::InstallmentCreator do
       expect(result.expenses.map(&:user_id)).to all(eq(user.id))
     end
 
-    it 'returns failure when save! raises RecordInvalid' do
-      invalid = Expense.new
-      invalid.errors.add(:base, 'falhou teste')
-      allow_any_instance_of(Expense).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new(invalid))
-
-      result = described_class.call(base, { period: 'monthly', repetitions: 2 }, user: user)
+    it 'returns failure without persisting when an installment is invalid' do
+      result = described_class.call(base.except('category'), { period: 'monthly', repetitions: 2 }, user: user)
 
       expect(result.success?).to be(false)
-      expect(result.expense.errors[:base].join).to include('falhou teste')
+      expect(Expense.count).to eq(0)
+      expect(result.expense.errors[:base].join).to include(I18n.t('errors.messages.blank'))
     end
   end
 end
