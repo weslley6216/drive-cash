@@ -33,6 +33,23 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include('weslley@gmail.com')
       end
 
+      it 'joins email and phone with a middot in the desktop profile card' do
+        user.update!(phone: '(11) 98765-4321')
+
+        get account_path
+
+        expect(response.body).to include('weslley@gmail.com · (11) 98765-4321')
+      end
+
+      it 'shows only the email when the user has no phone' do
+        user.update!(phone: nil)
+
+        get account_path
+
+        expect(response.body).to include('weslley@gmail.com')
+        expect(response.body).not_to include('weslley@gmail.com ·')
+      end
+
       it 'renders both account groups with their items' do
         get account_path
 
