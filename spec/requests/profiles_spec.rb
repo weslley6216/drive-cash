@@ -36,6 +36,15 @@ RSpec.describe 'Profiles', type: :request do
 
         expect(response.body).to include('href="/account"')
       end
+
+      it 'renders each field once so a hidden layout cannot overwrite the edits on submit' do
+        get edit_profile_path
+
+        expect(response.body.scan('name="user[name]"').size).to eq(1)
+        expect(response.body.scan('name="user[email_address]"').size).to eq(1)
+        expect(response.body.scan('name="user[phone]"').size).to eq(1)
+        expect(response.body.scan('name="user[password]"').size).to eq(1)
+      end
     end
   end
 
