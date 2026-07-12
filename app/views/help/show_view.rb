@@ -58,7 +58,7 @@ module Help
         p(class: 'text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1') { t('.contact_title') }
         div(class: 'grid grid-cols-2 gap-3') do
           contact_card(helpers.coming_soon_path, PhlexIcons::Lucide::MessageCircle, 'bg-emerald-50 text-emerald-600', t('.whatsapp'), t('.whatsapp_sub'))
-          contact_card('mailto:ajuda@drivecash.app', PhlexIcons::Lucide::Send, 'bg-blue-50 text-blue-600', t('.email'), t('.email_sub'))
+          contact_card("mailto:#{t('.email_sub')}", PhlexIcons::Lucide::Send, 'bg-blue-50 text-blue-600', t('.email'), t('.email_sub'))
         end
       end
     end
@@ -87,7 +87,7 @@ module Help
     def about_version
       div(class: 'w-full flex items-center gap-3 px-4 py-3.5 border-b border-slate-100') do
         span(class: 'text-sm font-medium text-slate-800 flex-1') { t('.version_label') }
-        span(class: 'text-sm text-slate-500 tabular-nums') { Account::ShowView::APP_VERSION }
+        span(class: 'text-sm text-slate-500 tabular-nums') { DriveCash::APP_VERSION }
       end
     end
 

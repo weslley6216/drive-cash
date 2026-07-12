@@ -18,8 +18,6 @@ class Account::ShowView < ApplicationView
     }
   ].freeze
 
-  APP_VERSION = '1.0.0'.freeze
-
   def initialize(user:, vehicle:)
     @user = user
     @vehicle = vehicle
@@ -44,7 +42,7 @@ class Account::ShowView < ApplicationView
         profile_card_mobile
         GROUPS.each { |group| group_block_mobile(group) }
         sign_out_block_mobile
-        p(class: 'text-center text-[11px] text-slate-400') { t('.version_label', version: APP_VERSION) }
+        p(class: 'text-center text-[11px] text-slate-400') { t('.version_label', version: DriveCash::APP_VERSION) }
       end
     end
   end
