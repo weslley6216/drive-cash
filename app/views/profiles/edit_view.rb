@@ -51,9 +51,7 @@ module Profiles
 
     def avatar
       div(class: 'w-fit mx-auto') do
-        div(class: 'w-[84px] h-[84px] rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold') do
-          plain @user.name.to_s.strip.first&.upcase || '?'
-        end
+        render AvatarComponent.new(name: @user.name, size_classes: 'w-[84px] h-[84px] text-3xl')
       end
     end
 

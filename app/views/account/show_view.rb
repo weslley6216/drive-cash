@@ -67,7 +67,7 @@ class Account::ShowView < ApplicationView
 
   def profile_card_mobile
     link_to(helpers.edit_profile_path, class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4 active:bg-slate-50') do
-      avatar_circle('w-14 h-14 text-xl')
+      render AvatarComponent.new(name: @user.name, size_classes: 'w-14 h-14 text-xl')
       div(class: 'min-w-0 flex-1') do
         div(class: 'flex items-center gap-2') do
           p(class: 'text-base font-bold text-slate-900 truncate') { @user.name }
@@ -82,7 +82,7 @@ class Account::ShowView < ApplicationView
 
   def profile_card_desktop
     div(class: 'bg-white rounded-2xl border border-slate-200 p-6 flex items-center gap-5') do
-      avatar_circle('w-16 h-16 text-2xl')
+      render AvatarComponent.new(name: @user.name, size_classes: 'w-16 h-16 text-2xl')
       div(class: 'flex-1 min-w-0') do
         div(class: 'flex items-center gap-2') do
           p(class: 'text-xl font-bold text-slate-900') { @user.name }
@@ -111,12 +111,6 @@ class Account::ShowView < ApplicationView
     return t('account.items.vehicle.sub') unless @vehicle
 
     "#{@vehicle.vehicle_model} #{@vehicle.year} · #{helpers.number_with_delimiter(@vehicle.odometer_km, delimiter: '.')} km"
-  end
-
-  def avatar_circle(size_classes)
-    div(class: "#{size_classes} rounded-full bg-blue-600 text-white flex items-center justify-center font-bold") do
-      plain @user.name.to_s.strip.first&.upcase || '?'
-    end
   end
 
   def group_block_mobile(group)
