@@ -15,7 +15,7 @@ gem 'prawn-table'
 
 # Transactional email over Resend's HTTP API (port 443) — works on hosts that
 # block outbound SMTP ports, unlike :smtp delivery.
-gem 'resend', '~> 1.5'
+gem 'resend', '~> 1.6'
 
 # Assets
 gem 'importmap-rails'
