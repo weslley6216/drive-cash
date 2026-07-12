@@ -121,6 +121,25 @@ RSpec.describe User, type: :model do
       expect(user.errors[:current_password]).to be_present
     end
 
+    it 'is invalid changing the email without the correct current_password' do
+      user = create(:user, email_address: 'old@gmail.com', password: 'password123', password_confirmation: 'password123')
+
+      user.assign_attributes(current_password: 'wrong', email_address: 'new@gmail.com')
+
+      expect(user.save(context: :profile_update)).to be(false)
+      expect(user.errors[:current_password]).to be_present
+    end
+
+    it 'changes the email when the current_password matches' do
+      user = create(:user, email_address: 'old@gmail.com', password: 'password123', password_confirmation: 'password123')
+
+      user.assign_attributes(current_password: 'password123', email_address: 'new@gmail.com')
+      saved = user.save(context: :profile_update)
+
+      expect(saved).to be(true)
+      expect(user.reload.email_address).to eq('new@gmail.com')
+    end
+
     it 'changes the password when the current_password matches' do
       user = create(:user, password: 'password123', password_confirmation: 'password123')
 

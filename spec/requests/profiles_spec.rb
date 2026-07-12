@@ -51,15 +51,29 @@ RSpec.describe 'Profiles', type: :request do
   describe 'PATCH /profile' do
     before { login_as(user) }
 
-    it 'updates name, email and phone and redirects with a success notice' do
-      patch profile_path, params: { user: { name: 'Novo Nome', email_address: 'novo@gmail.com', phone: '(21) 90000-0000' } }
+    it 'updates name and phone without requiring the current password and redirects with a success notice' do
+      patch profile_path, params: { user: { name: 'Novo Nome', phone: '(21) 90000-0000' } }
 
       expect(response).to redirect_to(edit_profile_path)
       follow_redirect!
       expect(response.body).to include(I18n.t('profiles.flash.saved'))
       expect(user.reload.name).to eq('Novo Nome')
-      expect(user.email_address).to eq('novo@gmail.com')
       expect(user.phone).to eq('(21) 90000-0000')
+    end
+
+    it 'changes the email when the current password is correct' do
+      patch profile_path, params: { user: { email_address: 'novo@gmail.com', current_password: 'password123' } }
+
+      expect(response).to redirect_to(edit_profile_path)
+      expect(user.reload.email_address).to eq('novo@gmail.com')
+    end
+
+    it 'rejects an email change with an inline error when the current password is missing' do
+      patch profile_path, params: { user: { email_address: 'novo@gmail.com' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('activerecord.errors.models.user.attributes.current_password.invalid'))
+      expect(user.reload.email_address).to eq('weslley@gmail.com')
     end
 
     it 'changes the password when the current password is correct' do
@@ -85,7 +99,7 @@ RSpec.describe 'Profiles', type: :request do
     end
 
     it 'keeps the password unchanged when the password fields are left blank' do
-      patch profile_path, params: { user: { name: 'Só Nome' } }
+      patch profile_path, params: { user: { name: 'Só Nome', password: '', password_confirmation: '' } }
 
       expect(response).to redirect_to(edit_profile_path)
       expect(user.reload.authenticate('password123')).to eq(user)

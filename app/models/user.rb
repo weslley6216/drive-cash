@@ -23,7 +23,7 @@ class User < ApplicationRecord
   validate :email_domain_allowed, if: -> { provider.blank? && email_address.present? }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
-  validate :current_password_matches, on: :profile_update, if: -> { will_save_change_to_password_digest? }
+  validate :current_password_matches, on: :profile_update, if: :requires_current_password?
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
@@ -56,6 +56,10 @@ class User < ApplicationRecord
   private_class_method :oauth_name
 
   private
+
+  def requires_current_password?
+    will_save_change_to_password_digest? || will_save_change_to_email_address?
+  end
 
   def current_password_matches
     return if password_digest_was.present? &&
