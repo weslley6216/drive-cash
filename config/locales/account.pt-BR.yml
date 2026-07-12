@@ -3,7 +3,8 @@ pt-BR:
     show_view:
       title: "Conta — DriveCash"
       heading: "Conta"
-      desktop_subtitle: "Gerencie seu perfil e preferências"
+      mobile_subtitle: "Perfil, plano e preferências"
+      desktop_subtitle: "Perfil, plano e preferências"
       edit_profile: "Editar perfil"
       edit_profile_hint: "Editar perfil →"
       know_pro: "Conhecer o PRO"

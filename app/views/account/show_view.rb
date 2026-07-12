@@ -37,6 +37,7 @@ class Account::ShowView < ApplicationView
     div(class: 'lg:hidden') do
       header(class: 'px-5 pt-2 pb-3') do
         h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
+        p(class: 'text-sm text-slate-500 mt-0.5') { t('.mobile_subtitle') }
       end
       div(class: 'px-5 pb-10 space-y-5') do
         profile_card_mobile

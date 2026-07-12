@@ -66,24 +66,37 @@ module Profiles
 
     def identity_fields(form)
       div(class: 'space-y-4') do
-        labeled_field(form, :name, label: t('.name'))
-        labeled_field(form, :email_address, label: t('.email'), type: 'email')
-        labeled_field(form, :phone, label: t('.phone'), type: 'tel')
+        profile_field(form, :name, label: t('.name'))
+        profile_field(form, :email_address, label: t('.email'), type: 'email')
+        profile_field(form, :phone, label: t('.phone'), type: 'tel')
       end
     end
 
-    def labeled_field(form, attribute, label:, **options)
-      field_wrapper(label, theme: :blue) do
-        render form.text_field(attribute, class: input_classes(theme: :blue), **options)
-        field_error(attribute)
+    def profile_field(form, attribute, label:, type: 'text')
+      error = @user.errors[attribute].first
+      div do
+        field_label(form, attribute, label)
+        render form.text_field(attribute, type: type, class: field_input_classes(error))
+        field_error(error)
       end
     end
 
-    def field_error(attribute)
-      message = @user.errors[attribute].first
-      return unless message
+    def field_label(form, attribute, label)
+      label(class: 'block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5', for: form.field_id(attribute)) { label }
+    end
 
-      p(class: 'text-xs text-red-500 mt-1.5') { message }
+    def field_input_classes(error)
+      state = error ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-blue-200 focus:border-blue-400'
+      "w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:ring-2 #{state}"
+    end
+
+    def field_error(error)
+      return unless error
+
+      p(class: 'flex items-center gap-1.5 text-xs text-red-600 mt-1.5') do
+        render PhlexIcons::Lucide::TriangleAlert.new(class: 'w-[13px] h-[13px] flex-shrink-0')
+        plain error
+      end
     end
 
     def security_error?
@@ -123,9 +136,11 @@ module Profiles
     end
 
     def password_field(form, attribute, label:)
-      field_wrapper(label, theme: :blue) do
-        render form.password_field(attribute, autocomplete: 'off', class: input_classes(theme: :blue))
-        field_error(attribute)
+      error = @user.errors[attribute].first
+      div do
+        field_label(form, attribute, label)
+        render form.password_field(attribute, autocomplete: 'off', class: field_input_classes(error))
+        field_error(error)
       end
     end
 
