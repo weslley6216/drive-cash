@@ -280,16 +280,6 @@ pt-BR:
     invalid_credentials: "Email ou senha inválido."
     rate_limit: "Muitas tentativas de login. Tente novamente em alguns minutos."
     sign_out: "Sair"
-  sidebar_nav_component:
-    brand: "DriveCash"
-    brand_subtitle: "Seus ganhos e gastos"
-    settings: "Configurações"
-    tabs:
-      home: "Início"
-      analysis: "Análise"
-      goals: "Metas"
-      history: "Histórico"
-      vehicle: "Veículo"
   vehicle:
     title: "Meu veículo"
     subtitle: "%{brand} %{vehicle_model} · %{year}"
