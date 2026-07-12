@@ -5,6 +5,9 @@ pt-BR:
       heading: "Conta"
       desktop_subtitle: "Gerencie seu perfil e preferências"
       edit_profile: "Editar perfil"
+      edit_profile_hint: "Editar perfil →"
+      know_pro: "Conhecer o PRO"
+      plan_badge: "Grátis"
       free_plan: "Plano Gratuito"
       session_label: "Sessão"
       session_description: "Conectado neste dispositivo"
@@ -22,7 +25,7 @@ pt-BR:
     items:
       personal_data:
         label: "Dados pessoais"
-        sub: "Nome, e-mail, telefone"
+        sub: "Nome, e-mail, telefone e senha"
       plan:
         label: "Plano"
         sub: "Gratuito"
@@ -38,4 +41,4 @@ pt-BR:
         sub: "CSV, PDF"
       help:
         label: "Ajuda e suporte"
-        sub: "Central de ajuda"
+        sub: "FAQ e fale conosco"

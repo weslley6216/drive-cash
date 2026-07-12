@@ -3,7 +3,7 @@ class Account::ShowView < ApplicationView
     {
       title_key: 'account.groups.account',
       items:     [
-        { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :coming_soon, badge: false },
+        { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :edit_profile, badge: false },
         { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :coming_soon, badge: true },
         { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :coming_soon, badge: false }
       ]
@@ -13,7 +13,7 @@ class Account::ShowView < ApplicationView
       items:     [
         { icon: PhlexIcons::Lucide::Truck, key: 'vehicle', path_name: :vehicle, badge: false },
         { icon: PhlexIcons::Lucide::Download, key: 'exports', path_name: :exports, badge: false },
-        { icon: PhlexIcons::Lucide::LifeBuoy, key: 'help', path_name: :coming_soon, badge: false }
+        { icon: PhlexIcons::Lucide::LifeBuoy, key: 'help', path_name: :help, badge: false }
       ]
     }
   ].freeze
@@ -64,13 +64,17 @@ class Account::ShowView < ApplicationView
   end
 
   def profile_card_mobile
-    div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4') do
+    link_to(helpers.edit_profile_path, class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4 active:bg-slate-50') do
       avatar_circle('w-14 h-14 text-xl')
       div(class: 'min-w-0 flex-1') do
-        p(class: 'text-base font-bold text-slate-900') { @user.name }
+        div(class: 'flex items-center gap-2') do
+          p(class: 'text-base font-bold text-slate-900 truncate') { @user.name }
+          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5 flex-shrink-0') { t('.plan_badge') }
+        end
         p(class: 'text-sm text-slate-500 truncate') { @user.email_address }
+        p(class: 'text-[11px] text-blue-600 font-medium mt-0.5') { t('.edit_profile_hint') }
       end
-      span(class: 'text-slate-400') { render PhlexIcons::Lucide::ChevronRight.new(class: 'w-[18px] h-[18px]') }
+      render PhlexIcons::Lucide::ChevronRight.new(class: 'w-[18px] h-[18px] text-slate-300 flex-shrink-0')
     end
   end
 
@@ -81,8 +85,9 @@ class Account::ShowView < ApplicationView
         p(class: 'text-xl font-bold text-slate-900') { @user.name }
         p(class: 'text-sm text-slate-500') { "#{@user.email_address} · #{t('.free_plan')}" }
       end
-      button(class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer') do
-        t('.edit_profile')
+      div(class: 'flex items-center gap-2') do
+        link_to(helpers.edit_profile_path, class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50') { t('.edit_profile') }
+        link_to(helpers.coming_soon_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
       end
     end
   end
