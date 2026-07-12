@@ -7,6 +7,7 @@ pt-BR:
         email_address: "E-mail"
         password: "Senha"
         password_confirmation: "Confirmação de senha"
+        current_password: "Senha atual"
     errors:
       messages:
         record_invalid: 'A validação falhou: %{errors}'
@@ -16,6 +17,8 @@ pt-BR:
           attributes:
             email_address:
               domain_not_allowed: "E-mail deve ser de um provedor válido (Gmail, Hotmail, iCloud etc.)"
+            current_password:
+              invalid: "Senha atual incorreta"
         goal:
           attributes:
             period_end:

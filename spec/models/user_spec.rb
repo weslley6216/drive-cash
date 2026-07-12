@@ -103,6 +103,41 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe 'current password on profile_update context' do
+    it 'is valid changing only the name without current_password' do
+      user = create(:user)
+
+      user.assign_attributes(name: 'Novo Nome')
+
+      expect(user.save(context: :profile_update)).to be(true)
+    end
+
+    it 'is invalid changing the password without the correct current_password' do
+      user = create(:user, password: 'password123', password_confirmation: 'password123')
+
+      user.assign_attributes(current_password: 'wrong', password: 'newpassword123', password_confirmation: 'newpassword123')
+
+      expect(user.save(context: :profile_update)).to be(false)
+      expect(user.errors[:current_password]).to be_present
+    end
+
+    it 'changes the password when the current_password matches' do
+      user = create(:user, password: 'password123', password_confirmation: 'password123')
+
+      user.assign_attributes(current_password: 'password123', password: 'newpassword123', password_confirmation: 'newpassword123')
+      saved = user.save(context: :profile_update)
+
+      expect(saved).to be(true)
+      expect(user.reload.authenticate('newpassword123')).to eq(user)
+    end
+
+    it 'does not require current_password on the default context (password reset)' do
+      user = create(:user)
+
+      expect(user.update(password: 'newpassword123', password_confirmation: 'newpassword123')).to be(true)
+    end
+  end
+
   describe 'password_reset token' do
     it 'generates a token and finds the user back by it' do
       user = create(:user)
