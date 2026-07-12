@@ -26,9 +26,7 @@ Rails.application.routes.draw do
   end
 
   resource :analysis, only: :show, controller: 'analysis'
-  get '/work_session', to: 'application#coming_soon', as: :work_session
   get '/history',      to: 'history#index',           as: :history
-  get '/settings',     to: 'application#coming_soon', as: :settings
   resources :goals, only: %i[index new create edit update destroy]
   resources :exports, only: %i[index create show] do
     collection { get :preview }

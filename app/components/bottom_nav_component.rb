@@ -28,7 +28,7 @@ class BottomNavComponent < ApplicationComponent
   def tab_button(tab)
     active = tab[:id] == @active
     link_to(
-      safe_path(tab[:path_method]),
+      helpers.public_send(tab[:path_method]),
       class: "flex flex-col items-center gap-1 px-2 py-1 rounded-lg #{active ? 'text-blue-600' : 'text-slate-400'}",
       data:  {
         nav_active_target: 'tab',
@@ -46,9 +46,5 @@ class BottomNavComponent < ApplicationComponent
       )
       span(class: 'text-[10px] font-medium') { I18n.t(tab[:label_key]) }
     end
-  end
-
-  def safe_path(method)
-    helpers.respond_to?(method) ? helpers.public_send(method) : '#'
   end
 end
