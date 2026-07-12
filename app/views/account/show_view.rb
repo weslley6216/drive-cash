@@ -83,14 +83,21 @@ class Account::ShowView < ApplicationView
     div(class: 'bg-white rounded-2xl border border-slate-200 p-6 flex items-center gap-5') do
       avatar_circle('w-16 h-16 text-2xl')
       div(class: 'flex-1 min-w-0') do
-        p(class: 'text-xl font-bold text-slate-900') { @user.name }
-        p(class: 'text-sm text-slate-500') { "#{@user.email_address} · #{t('.free_plan')}" }
+        div(class: 'flex items-center gap-2') do
+          p(class: 'text-xl font-bold text-slate-900') { @user.name }
+          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5') { t('.plan_badge') }
+        end
+        p(class: 'text-sm text-slate-500') { profile_contact_line }
       end
       div(class: 'flex items-center gap-2') do
         link_to(helpers.edit_profile_path, class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50') { t('.edit_profile') }
         link_to(helpers.coming_soon_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
       end
     end
+  end
+
+  def profile_contact_line
+    [@user.email_address, @user.phone.presence].compact.join(' · ')
   end
 
   def avatar_circle(size_classes)

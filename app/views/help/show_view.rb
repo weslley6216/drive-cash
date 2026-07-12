@@ -3,10 +3,14 @@ module Help
     def view_template
       render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
         mobile_header
-        div(class: 'px-5 lg:px-0 pb-10 space-y-6') do
-          faq_section
-          contact_section
-          about_section
+        div(class: 'px-5 lg:px-0 pb-10') do
+          div(class: 'lg:max-w-4xl lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-6 lg:items-start') do
+            div(class: 'mb-6 lg:mb-0') { faq_section }
+            div(class: 'space-y-6') do
+              contact_section
+              about_section
+            end
+          end
         end
       end
     end

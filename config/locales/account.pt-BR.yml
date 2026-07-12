@@ -9,7 +9,6 @@ pt-BR:
       edit_profile_hint: "Editar perfil →"
       know_pro: "Conhecer o PRO"
       plan_badge: "Grátis"
-      free_plan: "Plano Gratuito"
       session_label: "Sessão"
       session_description: "Conectado neste dispositivo"
       sign_out_button: "Sair da conta"
@@ -30,7 +29,7 @@ pt-BR:
       plan:
         label: "Plano"
         sub: "Gratuito"
-        badge: "Free"
+        badge: "Grátis"
       notifications:
         label: "Notificações"
         sub: "Lembretes e resumos"
