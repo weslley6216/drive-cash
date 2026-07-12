@@ -6,12 +6,12 @@ RSpec.describe SidebarNavComponent, type: :component do
   context 'when active: :home' do
     let(:active) { :home }
 
-    it 'renders 6 navigation tabs' do
-      expect(html.scan('sidebar-tab').size).to eq(6)
+    it 'renders 5 navigation tabs' do
+      expect(html.scan('sidebar-tab').size).to eq(5)
     end
 
     it 'renders all tab labels from i18n' do
-      %w[home analysis goals journey history vehicle].each do |tab|
+      %w[home analysis goals history vehicle].each do |tab|
         expect(html).to include(I18n.t("sidebar_nav_component.tabs.#{tab}"))
       end
     end
@@ -43,14 +43,13 @@ RSpec.describe SidebarNavComponent, type: :component do
 
     it 'renders the settings link at the bottom' do
       expect(html).to include(I18n.t('sidebar_nav_component.settings'))
-      expect(html).to include('href="/settings"')
+      expect(html).to include('href="/account"')
     end
 
     it 'links each tab to its route' do
       expect(html).to include('href="/"')
       expect(html).to include('href="/analysis"')
       expect(html).to include('href="/goals"')
-      expect(html).to include('href="/work_session"')
       expect(html).to include('href="/history"')
       expect(html).to include('href="/vehicle"')
     end
@@ -68,13 +67,13 @@ RSpec.describe SidebarNavComponent, type: :component do
 
     it 'wires nav-active controller with tab targets and active/inactive class data' do
       expect(html).to include('data-controller="nav-active"')
-      expect(html.scan('data-nav-active-target="tab"').size).to eq(6)
+      expect(html.scan('data-nav-active-target="tab"').size).to eq(5)
       expect(html).to include('data-active-classes="bg-blue-50 text-blue-700"')
       expect(html).to include('data-inactive-classes="text-slate-600 hover:bg-slate-50 hover:text-slate-900"')
     end
 
     it 'exposes icon targets so the controller can swap icon color' do
-      expect(html.scan('data-nav-active-target="icon"').size).to eq(6)
+      expect(html.scan('data-nav-active-target="icon"').size).to eq(5)
       expect(html).to include('data-active-classes="text-blue-600"')
       expect(html).to include('data-inactive-classes="text-slate-400"')
     end
@@ -84,7 +83,7 @@ RSpec.describe SidebarNavComponent, type: :component do
     let(:active) { :analysis }
 
     it 'highlights only the analysis tab' do
-      expect(html.scan('bg-blue-50').size).to eq(7)
+      expect(html.scan('bg-blue-50').size).to eq(6)
     end
   end
 end

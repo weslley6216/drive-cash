@@ -3,7 +3,6 @@ class SidebarNavComponent < ApplicationComponent
     { id: :home, icon: PhlexIcons::Lucide::House, path_method: :root_path },
     { id: :analysis, icon: PhlexIcons::Lucide::ChartColumn, path_method: :analysis_path },
     { id: :goals, icon: PhlexIcons::Lucide::Target, path_method: :goals_path },
-    { id: :journey, icon: PhlexIcons::Lucide::Play, path_method: :work_session_path },
     { id: :history, icon: PhlexIcons::Lucide::List, path_method: :history_path },
     { id: :vehicle, icon: PhlexIcons::Lucide::Truck, path_method: :vehicle_path }
   ].freeze
@@ -70,7 +69,7 @@ class SidebarNavComponent < ApplicationComponent
   def settings_section
     div(class: 'p-4 border-t border-slate-100 space-y-2') do
       link_to(
-        helpers.settings_path,
+        helpers.account_path,
         class: 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900'
       ) do
         div(class: 'w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center') do
