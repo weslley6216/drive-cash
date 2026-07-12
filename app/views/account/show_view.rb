@@ -100,6 +100,19 @@ class Account::ShowView < ApplicationView
     [@user.email_address, @user.phone.presence].compact.join(' · ')
   end
 
+  def item_sub(item)
+    return vehicle_summary if item[:key] == 'vehicle'
+
+    t("account.items.#{item[:key]}.sub")
+  end
+
+  def vehicle_summary
+    vehicle = @user.vehicle
+    return t('account.items.vehicle.sub') unless vehicle
+
+    "#{vehicle.vehicle_model} #{vehicle.year} · #{helpers.number_with_delimiter(vehicle.odometer_km, delimiter: '.')} km"
+  end
+
   def avatar_circle(size_classes)
     div(class: "#{size_classes} rounded-full bg-blue-600 text-white flex items-center justify-center font-bold") do
       plain @user.name.to_s.strip.first&.upcase || '?'
@@ -134,7 +147,7 @@ class Account::ShowView < ApplicationView
       end
       div(class: 'flex-1 min-w-0') do
         p(class: 'text-sm font-medium text-slate-800') { t("account.items.#{item[:key]}.label") }
-        p(class: 'text-xs text-slate-500 truncate') { t("account.items.#{item[:key]}.sub") }
+        p(class: 'text-xs text-slate-500 truncate') { item_sub(item) }
       end
       if item[:badge]
         span(class: 'text-[10px] font-bold uppercase tracking-wide text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5') do

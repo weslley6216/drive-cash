@@ -52,6 +52,27 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.items.plan.badge'))
       end
 
+      it 'renders the vehicle summary with model, year and odometer when the user has a vehicle' do
+        create(:vehicle, user: user, vehicle_model: 'Onix', year: 2021, odometer_km: 48_412)
+
+        get account_path
+
+        expect(response.body).to include('Onix 2021 · 48.412 km')
+      end
+
+      it 'falls back to the generic vehicle subtitle when the user has no vehicle' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.vehicle.sub'))
+      end
+
+      it 'renders the export item label and subtitle from the account locale' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.exports.label'))
+        expect(response.body).to include(I18n.t('account.items.exports.sub'))
+      end
+
       it 'links personal data to the edit profile screen and help to the help center' do
         get account_path
 

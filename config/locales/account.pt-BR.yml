@@ -28,17 +28,17 @@ pt-BR:
         sub: "Nome, e-mail, telefone e senha"
       plan:
         label: "Plano"
-        sub: "Gratuito"
+        sub: "Você está no plano Grátis"
         badge: "Grátis"
       notifications:
         label: "Notificações"
-        sub: "Lembretes e resumos"
+        sub: "Alertas de manutenção, metas e resumos"
       vehicle:
         label: "Veículo"
         sub: "Dados do seu veículo"
-      export:
-        label: "Exportar dados"
-        sub: "CSV, PDF"
+      exports:
+        label: "Exportar"
+        sub: "PDF e CSV pra imposto de renda"
       help:
-        label: "Ajuda e suporte"
+        label: "Ajuda"
         sub: "FAQ e fale conosco"
