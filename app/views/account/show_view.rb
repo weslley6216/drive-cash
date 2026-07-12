@@ -20,8 +20,9 @@ class Account::ShowView < ApplicationView
 
   APP_VERSION = '1.0.0'.freeze
 
-  def initialize(user:)
+  def initialize(user:, vehicle:)
     @user = user
+    @vehicle = vehicle
   end
 
   def view_template
@@ -107,10 +108,9 @@ class Account::ShowView < ApplicationView
   end
 
   def vehicle_summary
-    vehicle = @user.vehicle
-    return t('account.items.vehicle.sub') unless vehicle
+    return t('account.items.vehicle.sub') unless @vehicle
 
-    "#{vehicle.vehicle_model} #{vehicle.year} · #{helpers.number_with_delimiter(vehicle.odometer_km, delimiter: '.')} km"
+    "#{@vehicle.vehicle_model} #{@vehicle.year} · #{helpers.number_with_delimiter(@vehicle.odometer_km, delimiter: '.')} km"
   end
 
   def avatar_circle(size_classes)
