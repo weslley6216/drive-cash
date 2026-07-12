@@ -217,7 +217,7 @@ O protótipo React é a **única fonte de verdade** para qualquer decisão visua
 ### Arquivos do protótipo
 
 ```
-/home/rebase/Downloads/Cosmic scale animation (1)/
+/home/rebase/Downloads/Cosmic scale animation/
 ├── screen-[nome].jsx       ← layout mobile de cada tela
 ├── screens-desktop.jsx     ← layout desktop de todas as telas
 └── lib.jsx                 ← componentes compartilhados (BRL, Icon, etc.)
