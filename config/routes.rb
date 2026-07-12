@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :registrations, only: %i[new create]
   get '/account', to: 'account#show', as: :account
   resource :profile, only: %i[edit update]
+  resource :help, only: :show, controller: 'help'
   get '/coming_soon', to: 'application#coming_soon', as: :coming_soon
   get '/auth/:provider/callback', to: 'sessions#oauth_callback'
   get '/auth/failure',            to: 'sessions#oauth_failure'
