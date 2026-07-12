@@ -66,10 +66,28 @@ module Profiles
 
     def identity_fields(form)
       div(class: 'space-y-4') do
-        text_field(form, :name, label: t('.name'), theme: :blue)
-        text_field(form, :email_address, label: t('.email'), theme: :blue, type: 'email')
-        text_field(form, :phone, label: t('.phone'), theme: :blue, type: 'tel')
+        labeled_field(form, :name, label: t('.name'))
+        labeled_field(form, :email_address, label: t('.email'), type: 'email')
+        labeled_field(form, :phone, label: t('.phone'), type: 'tel')
       end
+    end
+
+    def labeled_field(form, attribute, label:, **options)
+      field_wrapper(label, theme: :blue) do
+        render form.text_field(attribute, class: input_classes(theme: :blue), **options)
+        field_error(attribute)
+      end
+    end
+
+    def field_error(attribute)
+      message = @user.errors[attribute].first
+      return unless message
+
+      p(class: 'text-xs text-red-500 mt-1.5') { message }
+    end
+
+    def security_error?
+      %i[current_password password password_confirmation].any? { |attribute| @user.errors[attribute].any? }
     end
 
     def security_block(form)
@@ -91,13 +109,13 @@ module Profiles
           p(class: 'text-sm font-medium text-slate-800') { t('.change_password') }
           p(class: 'text-xs text-slate-500') { t('.change_password_hint') }
         end
-        span(data: { disclosure_target: 'iconClosed' }) { render PhlexIcons::Lucide::ChevronDown.new(class: 'w-4 h-4 text-slate-400') }
-        span(class: 'hidden', data: { disclosure_target: 'iconOpen' }) { render PhlexIcons::Lucide::ChevronUp.new(class: 'w-4 h-4 text-slate-400') }
+        span(class: (security_error? ? 'hidden' : ''), data: { disclosure_target: 'iconClosed' }) { render PhlexIcons::Lucide::ChevronDown.new(class: 'w-4 h-4 text-slate-400') }
+        span(class: (security_error? ? '' : 'hidden'), data: { disclosure_target: 'iconOpen' }) { render PhlexIcons::Lucide::ChevronUp.new(class: 'w-4 h-4 text-slate-400') }
       end
     end
 
     def security_panel(form)
-      div(class: 'hidden px-4 pb-4 pt-1 space-y-4 border-t border-slate-100', data: { disclosure_target: 'panel' }) do
+      div(class: "#{'hidden' unless security_error?} px-4 pb-4 pt-1 space-y-4 border-t border-slate-100", data: { disclosure_target: 'panel' }) do
         password_field(form, :current_password, label: t('.current_password'))
         password_field(form, :password, label: t('.new_password'))
         password_field(form, :password_confirmation, label: t('.confirm_password'))
@@ -107,6 +125,7 @@ module Profiles
     def password_field(form, attribute, label:)
       field_wrapper(label, theme: :blue) do
         render form.password_field(attribute, autocomplete: 'off', class: input_classes(theme: :blue))
+        field_error(attribute)
       end
     end
 

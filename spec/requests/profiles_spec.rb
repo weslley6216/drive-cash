@@ -38,4 +38,48 @@ RSpec.describe 'Profiles', type: :request do
       end
     end
   end
+
+  describe 'PATCH /profile' do
+    before { login_as(user) }
+
+    it 'updates name, email and phone and redirects with a success notice' do
+      patch profile_path, params: { user: { name: 'Novo Nome', email_address: 'novo@gmail.com', phone: '(21) 90000-0000' } }
+
+      expect(response).to redirect_to(edit_profile_path)
+      follow_redirect!
+      expect(response.body).to include(I18n.t('profiles.flash.saved'))
+      expect(user.reload.name).to eq('Novo Nome')
+      expect(user.email_address).to eq('novo@gmail.com')
+      expect(user.phone).to eq('(21) 90000-0000')
+    end
+
+    it 'changes the password when the current password is correct' do
+      patch profile_path, params: { user: { current_password: 'password123', password: 'newpassword123', password_confirmation: 'newpassword123' } }
+
+      expect(response).to redirect_to(edit_profile_path)
+      expect(user.reload.authenticate('newpassword123')).to eq(user)
+    end
+
+    it 'rejects the password change with an inline error when the current password is wrong' do
+      patch profile_path, params: { user: { current_password: 'wrong', password: 'newpassword123', password_confirmation: 'newpassword123' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('activerecord.errors.models.user.attributes.current_password.invalid'))
+      expect(user.reload.authenticate('newpassword123')).to be(false)
+    end
+
+    it 're-renders with 422 when the name is blank' do
+      patch profile_path, params: { user: { name: '' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(user.reload.name).to eq('Weslley Souza')
+    end
+
+    it 'keeps the password unchanged when the password fields are left blank' do
+      patch profile_path, params: { user: { name: 'Só Nome' } }
+
+      expect(response).to redirect_to(edit_profile_path)
+      expect(user.reload.authenticate('password123')).to eq(user)
+    end
+  end
 end
