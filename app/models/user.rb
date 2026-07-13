@@ -27,6 +27,10 @@ class User < ApplicationRecord
 
   def first_name = name.split.first
 
+  def changing_credentials?
+    will_save_change_to_email_address? || will_save_change_to_password_digest?
+  end
+
   def self.find_or_create_from_oauth(auth)
     existing = find_by(provider: auth.provider, uid: auth.uid)
     return existing if existing

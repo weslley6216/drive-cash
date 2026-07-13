@@ -103,6 +103,32 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe '#changing_credentials?' do
+    it 'is true when the email address is changing' do
+      user = create(:user, email_address: 'old@gmail.com')
+
+      user.email_address = 'new@gmail.com'
+
+      expect(user.changing_credentials?).to be(true)
+    end
+
+    it 'is true when the password is changing' do
+      user = create(:user)
+
+      user.password = 'newpassword123'
+
+      expect(user.changing_credentials?).to be(true)
+    end
+
+    it 'is false when only the name and phone are changing' do
+      user = create(:user)
+
+      user.assign_attributes(name: 'Outro Nome', phone: '(11) 90000-0000')
+
+      expect(user.changing_credentials?).to be(false)
+    end
+  end
+
   describe 'password_reset token' do
     it 'generates a token and finds the user back by it' do
       user = create(:user)
