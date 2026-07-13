@@ -61,6 +61,15 @@ RSpec.describe 'Profiles', type: :request do
         expect(response.body).not_to include('href="/reauthentication/new"')
         expect(response.body).not_to include(I18n.t('profiles.edit_view.password_locked'))
       end
+
+      it 'updates the name but ignores forged email and password changes' do
+        patch profile_path, params: { user: { name: 'Novo', email_address: 'hacker@gmail.com', password: 'newpassword123', password_confirmation: 'newpassword123' } }
+
+        expect(response).to redirect_to(edit_profile_path)
+        expect(google_user.reload.name).to eq('Novo')
+        expect(google_user.email_address).to eq('g@gmail.com')
+        expect(google_user.authenticate('newpassword123')).to be(false)
+      end
     end
   end
 
@@ -113,6 +122,23 @@ RSpec.describe 'Profiles', type: :request do
 
         expect(response).to redirect_to(edit_profile_path)
         expect(user.reload.authenticate('newpassword123')).to eq(user)
+      end
+
+      it 'signs out the other sessions but keeps the current one when the password changes' do
+        other = user.sessions.create!(user_agent: 'other', ip_address: '9.9.9.9')
+
+        patch profile_path, params: { user: { password: 'newpassword123', password_confirmation: 'newpassword123' } }
+
+        expect(Session.exists?(other.id)).to be(false)
+        expect(user.sessions.reload.count).to eq(1)
+      end
+
+      it 'keeps the other sessions when only the email changes' do
+        other = user.sessions.create!(user_agent: 'other', ip_address: '9.9.9.9')
+
+        patch profile_path, params: { user: { email_address: 'novo@gmail.com' } }
+
+        expect(Session.exists?(other.id)).to be(true)
       end
 
       it 're-renders with 422 when the new password is too short' do

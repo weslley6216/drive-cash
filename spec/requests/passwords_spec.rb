@@ -100,5 +100,14 @@ RSpec.describe 'Passwords', type: :request do
       expect(response).to redirect_to(edit_password_path(token))
       expect(flash[:alert]).to be_present
     end
+
+    it 'signs out every existing session after the reset' do
+      user.sessions.create!(user_agent: 'device', ip_address: '1.1.1.1')
+      token = user.password_reset_token
+
+      patch password_path(token), params: { password: 'newpassword', password_confirmation: 'newpassword' }
+
+      expect(user.sessions.reload).to be_empty
+    end
   end
 end
