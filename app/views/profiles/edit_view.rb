@@ -65,12 +65,28 @@ module Profiles
     end
 
     def email_field(form)
+      return managed_email if @user.provider.present?
       return profile_field(form, :email_address, label: t('.email'), type: 'email') if @reauthenticated
 
       reauth_locked(label: t('.email'), prompt: t('.email_locked'), value: @user.email_address)
     end
 
+    def managed_email
+      div do
+        plain_label(t('.email'))
+        div(class: 'rounded-xl border border-slate-200 bg-slate-50 px-4 py-3') do
+          p(class: 'text-sm text-slate-700 truncate') { @user.email_address }
+          p(class: 'flex items-center gap-1.5 text-xs text-slate-500 mt-2') do
+            render PhlexIcons::Lucide::Shield.new(class: 'w-[13px] h-[13px] flex-shrink-0')
+            plain t('.email_managed')
+          end
+        end
+      end
+    end
+
     def security_section(form)
+      return if @user.provider.present?
+
       div do
         p(class: 'text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1') { t('.security') }
         @reauthenticated ? password_fields(form) : reauth_locked(label: t('.change_password'), prompt: t('.password_locked'))

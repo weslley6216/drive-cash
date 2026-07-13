@@ -12,6 +12,7 @@ pt-BR:
       change_password_hint: "Preencha para trocar; deixe em branco para manter"
       email_locked: "Confirme sua identidade para alterar o e-mail"
       password_locked: "Confirme sua identidade para alterar a senha"
+      email_managed: "Gerenciado pela sua conta Google"
       new_password: "Nova senha"
       confirm_password: "Confirmar nova senha"
       save: "Salvar alterações"

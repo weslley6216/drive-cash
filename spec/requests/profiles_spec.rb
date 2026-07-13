@@ -45,6 +45,23 @@ RSpec.describe 'Profiles', type: :request do
         expect(response.body).to include('name="user[password_confirmation]"')
       end
     end
+
+    context 'when the account is managed by Google' do
+      let(:google_user) { create(:user, provider: 'google_oauth2', uid: 'uid-1', email_address: 'g@gmail.com') }
+
+      before { login_as(google_user) }
+
+      it 'shows the email as read-only managed by Google and hides the password section' do
+        get edit_profile_path
+
+        expect(response.body).to include(I18n.t('profiles.edit_view.email_managed'))
+        expect(response.body).to include('g@gmail.com')
+        expect(response.body).not_to include('name="user[email_address]"')
+        expect(response.body).not_to include('name="user[password]"')
+        expect(response.body).not_to include('href="/reauthentication/new"')
+        expect(response.body).not_to include(I18n.t('profiles.edit_view.password_locked'))
+      end
+    end
   end
 
   describe 'PATCH /profile' do
