@@ -5,7 +5,6 @@ class User < ApplicationRecord
   ].freeze
 
   has_secure_password
-  attr_accessor :current_password
 
   has_many :sessions, dependent: :destroy
   has_many :expenses, dependent: :destroy
@@ -23,7 +22,6 @@ class User < ApplicationRecord
   validate :email_domain_allowed, if: -> { provider.blank? && email_address.present? }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
-  validate :current_password_matches, on: :profile_update, if: :requires_current_password?
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
@@ -56,17 +54,6 @@ class User < ApplicationRecord
   private_class_method :oauth_name
 
   private
-
-  def requires_current_password?
-    will_save_change_to_password_digest? || will_save_change_to_email_address?
-  end
-
-  def current_password_matches
-    return if password_digest_was.present? &&
-              BCrypt::Password.new(password_digest_was).is_password?(current_password.to_s)
-
-    errors.add(:current_password, :invalid)
-  end
 
   def email_domain_allowed
     domain = email_address.to_s.split('@').last.downcase
