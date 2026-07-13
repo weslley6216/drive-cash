@@ -103,6 +103,55 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe '#changing_credentials?' do
+    it 'is true when the email address is changing' do
+      user = create(:user, email_address: 'old@gmail.com')
+
+      user.email_address = 'new@gmail.com'
+
+      expect(user.changing_credentials?).to be(true)
+    end
+
+    it 'is true when the password is changing' do
+      user = create(:user)
+
+      user.password = 'newpassword123'
+
+      expect(user.changing_credentials?).to be(true)
+    end
+
+    it 'is false when only the name and phone are changing' do
+      user = create(:user)
+
+      user.assign_attributes(name: 'Outro Nome', phone: '(11) 90000-0000')
+
+      expect(user.changing_credentials?).to be(false)
+    end
+  end
+
+  describe '#revoke_sessions_except' do
+    it 'destroys the other sessions and keeps the given one' do
+      user = create(:user)
+      kept = user.sessions.create!(user_agent: 'kept', ip_address: '1.1.1.1')
+      other = user.sessions.create!(user_agent: 'other', ip_address: '2.2.2.2')
+
+      user.revoke_sessions_except(kept)
+
+      expect(user.sessions.reload).to contain_exactly(kept)
+      expect(Session.exists?(other.id)).to be(false)
+    end
+
+    it 'destroys every session when given nil' do
+      user = create(:user)
+      user.sessions.create!(user_agent: 'a', ip_address: '1.1.1.1')
+      user.sessions.create!(user_agent: 'b', ip_address: '2.2.2.2')
+
+      user.revoke_sessions_except(nil)
+
+      expect(user.sessions.reload).to be_empty
+    end
+  end
+
   describe 'password_reset token' do
     it 'generates a token and finds the user back by it' do
       user = create(:user)

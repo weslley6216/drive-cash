@@ -427,11 +427,6 @@ pt-BR:
       updated: "Abastecimento atualizado."
       destroyed: "Abastecimento removido."
       odometer_synced: "Abastecimento salvo · odômetro atualizado p/ %{km} km"
-  account:
-    items:
-      exports:
-        label: "Exportar"
-        sub: "Relatórios e backup"
   exports:
     title: "Exportar"
     subtitle: "Relatórios e backup"

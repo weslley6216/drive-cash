@@ -3,9 +3,12 @@ pt-BR:
     show_view:
       title: "Conta — DriveCash"
       heading: "Conta"
-      desktop_subtitle: "Gerencie seu perfil e preferências"
+      mobile_subtitle: "Perfil, plano e preferências"
+      desktop_subtitle: "Perfil, plano e preferências"
       edit_profile: "Editar perfil"
-      free_plan: "Plano Gratuito"
+      edit_profile_hint: "Editar perfil →"
+      know_pro: "Conhecer o PRO"
+      plan_badge: "Grátis"
       session_label: "Sessão"
       session_description: "Conectado neste dispositivo"
       sign_out_button: "Sair da conta"
@@ -22,20 +25,20 @@ pt-BR:
     items:
       personal_data:
         label: "Dados pessoais"
-        sub: "Nome, e-mail, telefone"
+        sub: "Nome, e-mail, telefone e senha"
       plan:
         label: "Plano"
-        sub: "Gratuito"
-        badge: "Free"
+        sub: "Você está no plano Grátis"
+        badge: "Grátis"
       notifications:
         label: "Notificações"
-        sub: "Lembretes e resumos"
+        sub: "Alertas de manutenção, metas e resumos"
       vehicle:
         label: "Veículo"
         sub: "Dados do seu veículo"
-      export:
-        label: "Exportar dados"
-        sub: "CSV, PDF"
+      exports:
+        label: "Exportar"
+        sub: "PDF e CSV pra imposto de renda"
       help:
-        label: "Ajuda e suporte"
-        sub: "Central de ajuda"
+        label: "Ajuda"
+        sub: "FAQ e fale conosco"

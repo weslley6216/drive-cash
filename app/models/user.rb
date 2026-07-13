@@ -5,6 +5,7 @@ class User < ApplicationRecord
   ].freeze
 
   has_secure_password
+
   has_many :sessions, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :earnings, dependent: :destroy
@@ -25,6 +26,14 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
   def first_name = name.split.first
+
+  def changing_credentials?
+    will_save_change_to_email_address? || will_save_change_to_password_digest?
+  end
+
+  def revoke_sessions_except(session)
+    sessions.where.not(id: session&.id).destroy_all
+  end
 
   def self.find_or_create_from_oauth(auth)
     existing = find_by(provider: auth.provider, uid: auth.uid)

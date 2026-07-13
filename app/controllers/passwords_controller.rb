@@ -19,6 +19,7 @@ class PasswordsController < ApplicationController
 
   def update
     if @user.update(params.permit(:password, :password_confirmation))
+      @user.revoke_sessions_except(Current.session)
       redirect_to new_session_path, notice: I18n.t('passwords.updated')
     else
       redirect_to edit_password_path(params[:token]), alert: @user.errors.full_messages.to_sentence

@@ -1,0 +1,27 @@
+pt-BR:
+  help:
+    show_view:
+      title: "Ajuda — DriveCash"
+      heading: "Ajuda"
+      subtitle: "Dúvidas frequentes e contato"
+      faq_title: "Perguntas frequentes"
+      contact_title: "Fale conosco"
+      whatsapp: "WhatsApp"
+      whatsapp_sub: "Resposta em até 1 dia útil"
+      email: "E-mail"
+      email_sub: "ajuda@drivecash.app"
+      about_title: "Sobre o DriveCash"
+      version_label: "Versão do app"
+      terms: "Termos de uso"
+      privacy: "Política de privacidade"
+      faqs:
+        - question: "Como registro um ganho?"
+          answer: "Toque no + azul e escolha Receita, ou fale com o Caju: \"Fiz R$45 no Uber\". Você escolhe a plataforma, o valor e quantas rotas fez."
+        - question: "O que é R$/km?"
+          answer: "É o seu lucro dividido pelos quilômetros rodados no período (medidos pelo odômetro). Mostra quanto cada km rodado deixou no seu bolso."
+        - question: "Como funciona o Caju?"
+          answer: "O Caju entende linguagem natural, por texto ou voz. Diga \"Abasteci R$80 no Orense\" e ele monta o lançamento — você confirma antes de salvar."
+        - question: "Como exporto pro imposto de renda?"
+          answer: "Em Conta → Exportar, escolha o período e o formato PDF. O relatório sai com receitas, despesas e lucro, pronto pro contador."
+        - question: "O saldo do tanque está errado. E agora?"
+          answer: "O saldo debita pelo consumo estimado. Registre um abastecimento com tanque cheio pra recalibrar — o app acerta o saldo sozinho."

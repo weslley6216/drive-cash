@@ -33,6 +33,23 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include('weslley@gmail.com')
       end
 
+      it 'joins email and phone with a middot in the desktop profile card' do
+        user.update!(phone: '(11) 98765-4321')
+
+        get account_path
+
+        expect(response.body).to include('weslley@gmail.com · (11) 98765-4321')
+      end
+
+      it 'shows only the email when the user has no phone' do
+        user.update!(phone: nil)
+
+        get account_path
+
+        expect(response.body).to include('weslley@gmail.com')
+        expect(response.body).not_to include('weslley@gmail.com ·')
+      end
+
       it 'renders both account groups with their items' do
         get account_path
 
@@ -52,11 +69,39 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.items.plan.badge'))
       end
 
-      it 'links the vehicle item to vehicle_path and other items to coming_soon' do
+      it 'renders the vehicle summary with model, year and odometer when the user has a vehicle' do
+        create(:vehicle, user: user, vehicle_model: 'Onix', year: 2021, odometer_km: 48_412)
+
+        get account_path
+
+        expect(response.body).to include('Onix 2021 · 48.412 km')
+      end
+
+      it 'falls back to the generic vehicle subtitle when the user has no vehicle' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.vehicle.sub'))
+      end
+
+      it 'renders the export item label and subtitle from the account locale' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.exports.label'))
+        expect(response.body).to include(I18n.t('account.items.exports.sub'))
+      end
+
+      it 'links personal data to the edit profile screen and help to the help center' do
         get account_path
 
         expect(response.body).to include('href="/vehicle"')
-        expect(response.body).to include('href="/coming_soon"').or include('coming_soon')
+        expect(response.body).to include('href="/profile/edit"')
+        expect(response.body).to include('href="/help"')
+      end
+
+      it 'keeps plan and notifications pointing to coming_soon' do
+        get account_path
+
+        expect(response.body.scan('href="/coming_soon"').size).to be >= 2
       end
 
       it 'renders the sign out button with red border' do
@@ -87,10 +132,17 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.show_view.sign_out_short'))
       end
 
-      it 'renders the desktop edit profile button' do
+      it 'renders the desktop edit profile link and the know-PRO button' do
         get account_path
 
         expect(response.body).to include(I18n.t('account.show_view.edit_profile'))
+        expect(response.body).to include(I18n.t('account.show_view.know_pro'))
+      end
+
+      it 'makes the mobile profile card a link to the edit profile screen' do
+        get account_path
+
+        expect(response.body).to match(%r{<a[^>]+href="/profile/edit"[^>]*>.*?#{I18n.t('account.show_view.edit_profile_hint')}}m)
       end
 
       it 'renders the version footer' do
