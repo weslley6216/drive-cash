@@ -1,0 +1,55 @@
+pt-BR:
+  plans:
+    names:
+      free: "Grátis"
+      pro: "PRO"
+    features:
+      records: "Registro de ganhos e gastos"
+      caju_limit: "Caju · 10 mensagens/mês"
+      single_goal: "1 meta ativa"
+      history_limit: "Histórico dos últimos 6 meses"
+      exports: "Exportações ilimitadas (PDF/CSV pra IR)"
+      insights: "Insights avançados de Análise"
+      goals: "Metas ilimitadas"
+      history: "Histórico completo"
+      caju: "Caju sem limite"
+      backup: "Backup automático"
+    toggle:
+      monthly: "Mensal"
+      yearly: "Anual"
+      discount: "−%{pct}%"
+    free_card:
+      badge: "Seu plano"
+      forever: "Pra sempre"
+    pro_card:
+      recommended: "Recomendado"
+      per_month: "/mês"
+      charged_yearly: "%{price} cobrados por ano"
+      charged_monthly: "Cobrança mensal · sem fidelidade"
+      cta: "Assinar PRO"
+      cancel_anytime: "Cancele quando quiser, direto no app"
+    show_view:
+      title: "Plano — DriveCash"
+      heading: "Plano"
+      mobile_subtitle: "Você está no plano Grátis"
+      desktop_subtitle: "Conta · Assinatura"
+      current_plan: "Plano Grátis"
+      current_hint: "Registre ganhos e gastos sem pagar nada"
+      desktop_headline: "Trabalhe com o app inteiro do seu lado"
+      desktop_subheadline: "Exportações pro IR, insights e Caju sem limite — cancele quando quiser."
+    subscription_view:
+      title: "Plano — DriveCash"
+      heading: "Plano"
+      subtitle: "Assinatura ativa"
+      brand: "DriveCash PRO"
+      active_badge: "Ativo"
+      billing_line:
+        monthly: "Plano mensal · %{price}/mês"
+        yearly: "Plano anual · %{price}/ano"
+      next_charge: "Próxima cobrança: %{date}"
+      benefits_title: "Benefícios ativos"
+      payment_history: "Histórico de pagamentos"
+      manage: "Gerenciar assinatura"
+      cancel_note: "Cancelamento vale até o fim do período pago"
+    flash:
+      checkout_soon: "Checkout chega em breve"

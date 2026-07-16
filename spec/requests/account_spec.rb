@@ -63,10 +63,39 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.items.help.label'))
       end
 
-      it 'renders the Free badge on the plan item' do
+      it 'links the plan item to the plan screen' do
         get account_path
 
-        expect(response.body).to include(I18n.t('account.items.plan.badge'))
+        expect(response.body).to include('href="/plan"')
+      end
+
+      it 'badges the plan item with the free plan name' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('plans.names.free'))
+        expect(response.body).to include(I18n.t('account.items.plan.sub', plan: I18n.t('plans.names.free')))
+      end
+
+      it 'badges the plan item with the pro plan name for a subscriber' do
+        user.update!(plan: :pro, plan_billing: :yearly, plan_since: Time.zone.local(2026, 3, 3))
+
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.plan.sub', plan: I18n.t('plans.names.pro')))
+      end
+
+      it 'invites a free user to know the pro plan' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.show_view.know_pro'))
+      end
+
+      it 'hides the pro invitation from a subscriber' do
+        user.update!(plan: :pro, plan_billing: :yearly, plan_since: Time.zone.local(2026, 3, 3))
+
+        get account_path
+
+        expect(response.body).not_to include(I18n.t('account.show_view.know_pro'))
       end
 
       it 'renders the vehicle summary with model, year and odometer when the user has a vehicle' do

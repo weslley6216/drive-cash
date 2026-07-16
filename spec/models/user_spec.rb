@@ -248,4 +248,45 @@ RSpec.describe User, type: :model do
       expect(user.name).to eq('no-name')
     end
   end
+
+  describe 'plan' do
+    it 'starts on the free plan' do
+      user = create(:user)
+
+      expect(user).to be_free
+    end
+
+    it 'answers pro? for a subscriber' do
+      user = create(:user, :pro)
+
+      expect(user).to be_pro
+    end
+
+    it 'exposes the billing period of a subscriber' do
+      user = create(:user, :pro)
+
+      expect(user.plan_billing).to eq('yearly')
+    end
+
+    it 'accepts a free user without billing data' do
+      user = build(:user, plan: :free, plan_billing: nil, plan_since: nil)
+
+      expect(user).to be_valid
+    end
+
+    it 'rejects a pro user without billing data' do
+      user = build(:user, plan: :pro, plan_billing: nil, plan_since: nil)
+
+      expect(user).not_to be_valid
+      expect(user.errors[:plan_billing]).to be_present
+      expect(user.errors[:plan_since]).to be_present
+    end
+
+    it 'rejects an unknown billing period' do
+      user = build(:user, :pro)
+      user.plan_billing = 'weekly'
+
+      expect(user).not_to be_valid
+    end
+  end
 end
