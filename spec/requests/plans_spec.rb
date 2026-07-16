@@ -31,6 +31,13 @@ RSpec.describe 'Plans', type: :request do
         expect(response.body).to include('data-controller="plan-billing"')
       end
 
+      it 'hands the toggle classes to the stimulus controller' do
+        get plan_path
+
+        expect(response.body).to include(%(data-plan-billing-active-class="#{Plans::PriceToggleComponent::ACTIVE_CLASSES}"))
+        expect(response.body).to include(%(data-plan-billing-idle-class="#{Plans::PriceToggleComponent::IDLE_CLASSES}"))
+      end
+
       it 'advertises the yearly discount derived from the catalog' do
         get plan_path
 
@@ -73,6 +80,19 @@ RSpec.describe 'Plans', type: :request do
 
             expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: 'R$ 143,00'))
             expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de março de 2027'))
+          end
+        end
+      end
+
+      context 'with a monthly subscription started in March' do
+        let(:user) { create(:user, :pro, plan_billing: :monthly, plan_since: Time.zone.local(2026, 3, 3)) }
+
+        it 'states the billing period and the next charge date' do
+          travel_to Date.new(2026, 7, 16) do
+            get plan_path
+
+            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.monthly', price: 'R$ 14,90'))
+            expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de agosto de 2026'))
           end
         end
       end
