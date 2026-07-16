@@ -252,6 +252,9 @@ pt-BR:
       default: "%a, %d de %B de %Y, %H:%M:%S %z"
       long: "%d de %B de %Y, %H:%M"
       short: "%d de %B, %H:%M"
+      notification_time: "%H:%M"
+      notification_weekday: "%a · %H:%M"
+      notification_date: "%d/%b"
     pm: pm
   common:
     today: "Hoje"

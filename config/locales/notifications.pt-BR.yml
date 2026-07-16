@@ -1,0 +1,36 @@
+---
+pt-BR:
+  notifications:
+    index:
+      title: "Notificações"
+      read_all: "Marcar todas como lidas"
+      back: "Voltar"
+      unread_count:
+        zero: "Tudo em dia"
+        one: "%{count} não lida"
+        other: "%{count} não lidas"
+      groups:
+        today: "Hoje"
+        week: "Esta semana"
+        earlier: "Anteriores"
+      empty:
+        title: "Nenhuma notificação por aqui"
+        description: "Avisamos quando tiver manutenção chegando, meta batida ou resumo da semana."
+    kinds:
+      maintenance_due:
+        title_overdue: "Manutenção vencida: %{item}"
+        title_soon: "%{item} em breve"
+        body_overdue: "Passou %{km} km do intervalo. Agende pra evitar dano ao motor."
+        body_soon: "Faltam ~%{km} km pro intervalo de %{interval} km."
+      goal_reached:
+        title: "Meta batida! 🎯"
+        body: "Você bateu a meta de %{month} com %{value}."
+      tank_low:
+        title: "Tanque no vermelho"
+        body: "Você rodou além do último tanque. Registre um abastecimento."
+      weekly_summary:
+        title: "Seu resumo semanal chegou"
+        body: "Líquido de %{value} · %{trips}."
+      log_reminder:
+        title: "Registre o seu dia"
+        body: "Ontem você não lançou nada. Leva 10 segundos."
