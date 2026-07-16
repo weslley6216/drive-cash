@@ -4,7 +4,7 @@ class Account::ShowView < ApplicationView
       title_key: 'account.groups.account',
       items:     [
         { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :edit_profile, badge: false },
-        { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :coming_soon, badge: true },
+        { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :plan, badge: true },
         { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :coming_soon, badge: false }
       ]
     },
@@ -69,7 +69,7 @@ class Account::ShowView < ApplicationView
       div(class: 'min-w-0 flex-1') do
         div(class: 'flex items-center gap-2') do
           p(class: 'text-base font-bold text-slate-900 truncate') { @user.name }
-          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5 flex-shrink-0') { t('.plan_badge') }
+          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5 flex-shrink-0') { plan_name }
         end
         p(class: 'text-sm text-slate-500 truncate') { @user.email_address }
         p(class: 'text-[11px] text-blue-600 font-medium mt-0.5') { t('.edit_profile_hint') }
@@ -84,13 +84,13 @@ class Account::ShowView < ApplicationView
       div(class: 'flex-1 min-w-0') do
         div(class: 'flex items-center gap-2') do
           p(class: 'text-xl font-bold text-slate-900') { @user.name }
-          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5') { t('.plan_badge') }
+          span(class: 'text-[10px] font-bold uppercase tracking-wide text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5') { plan_name }
         end
         p(class: 'text-sm text-slate-500') { profile_contact_line }
       end
       div(class: 'flex items-center gap-2') do
         link_to(helpers.edit_profile_path, class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50') { t('.edit_profile') }
-        link_to(helpers.coming_soon_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
+        link_to(helpers.plan_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
       end
     end
   end
@@ -99,10 +99,12 @@ class Account::ShowView < ApplicationView
     [@user.email_address, @user.phone.presence].compact.join(' · ')
   end
 
+  def plan_name = t("plans.names.#{@user.plan}")
+
   def item_sub(item)
     return vehicle_summary if item[:key] == 'vehicle'
 
-    t("account.items.#{item[:key]}.sub")
+    t("account.items.#{item[:key]}.sub", plan: plan_name)
   end
 
   def vehicle_summary
@@ -143,7 +145,7 @@ class Account::ShowView < ApplicationView
       end
       if item[:badge]
         span(class: 'text-[10px] font-bold uppercase tracking-wide text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5') do
-          t("account.items.#{item[:key]}.badge")
+          plan_name
         end
       end
       render PhlexIcons::Lucide::ChevronRight.new(class: 'w-4 h-4 text-slate-300')
