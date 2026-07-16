@@ -84,6 +84,20 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include(I18n.t('account.items.plan.sub', plan: I18n.t('plans.names.pro')))
       end
 
+      it 'invites a free user to know the pro plan' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.show_view.know_pro'))
+      end
+
+      it 'hides the pro invitation from a subscriber' do
+        user.update!(plan: :pro, plan_billing: :yearly, plan_since: Time.zone.local(2026, 3, 3))
+
+        get account_path
+
+        expect(response.body).not_to include(I18n.t('account.show_view.know_pro'))
+      end
+
       it 'renders the vehicle summary with model, year and odometer when the user has a vehicle' do
         create(:vehicle, user: user, vehicle_model: 'Onix', year: 2021, odometer_km: 48_412)
 

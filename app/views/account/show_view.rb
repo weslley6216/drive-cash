@@ -90,7 +90,9 @@ class Account::ShowView < ApplicationView
       end
       div(class: 'flex items-center gap-2') do
         link_to(helpers.edit_profile_path, class: 'px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50') { t('.edit_profile') }
-        link_to(helpers.plan_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
+        if @user.free?
+          link_to(helpers.plan_path, class: 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg') { t('.know_pro') }
+        end
       end
     end
   end
