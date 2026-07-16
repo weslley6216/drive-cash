@@ -51,4 +51,22 @@ RSpec.describe 'Plans', type: :request do
       end
     end
   end
+
+  describe 'PATCH /plan' do
+    before { login_as(user) }
+
+    it 'answers the subscribe cta with an honest checkout notice' do
+      patch plan_path
+
+      expect(response).to redirect_to(plan_path)
+      follow_redirect!
+      expect(response.body).to include(I18n.t('plans.flash.checkout_soon'))
+    end
+
+    it 'does not upgrade the user without a real payment' do
+      patch plan_path
+
+      expect(user.reload).to be_free
+    end
+  end
 end
