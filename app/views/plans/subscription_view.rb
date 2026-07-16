@@ -9,7 +9,7 @@ module Plans
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 
         page_header
-        div(class: 'px-5 lg:px-0 pb-10 lg:max-w-2xl space-y-5') do
+        div(class: 'px-5 lg:px-0 pb-10 pt-1 lg:max-w-2xl space-y-5') do
           subscription_card
           benefits_section
           management_section
