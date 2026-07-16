@@ -7,5 +7,7 @@ module Notifications
       Generators::WeeklySummary,
       Generators::LogReminder
     ].freeze
+
+    KINDS = GENERATORS.map { |generator| generator.name.demodulize.underscore }.freeze
   end
 end

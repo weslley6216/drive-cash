@@ -12,6 +12,22 @@ RSpec.describe Notification, type: :model do
     expect(notification.data).to eq({})
   end
 
+  describe 'kind validation' do
+    it 'accepts a kind backed by a generator' do
+      notification = build(:notification, kind: 'maintenance_due')
+
+      expect(notification).to be_valid
+    end
+
+    it 'rejects a kind without a generator' do
+      notification = build(:notification, kind: 'array')
+
+      notification.valid?
+
+      expect(notification.errors[:kind]).to be_present
+    end
+  end
+
   describe '.unread' do
     it 'returns only notifications without read_at' do
       unread = create(:notification, user: user)
@@ -27,6 +43,22 @@ RSpec.describe Notification, type: :model do
       newer = create(:notification, user: user, created_at: 1.hour.ago)
 
       expect(described_class.chronological).to eq([newer, older])
+    end
+  end
+
+  describe '.recent' do
+    it 'keeps the newest notifications up to the limit and drops the oldest' do
+      newest = create(:notification, user: user, created_at: 1.minute.ago)
+      oldest = create(:notification, user: user, created_at: 1.year.ago)
+      (described_class::INDEX_LIMIT - 1).times do |offset|
+        create(:notification, user: user, created_at: (offset + 1).hours.ago)
+      end
+
+      result = described_class.recent
+
+      expect(result.size).to eq(described_class::INDEX_LIMIT)
+      expect(result).to include(newest)
+      expect(result).not_to include(oldest)
     end
   end
 

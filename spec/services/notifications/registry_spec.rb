@@ -11,11 +11,15 @@ RSpec.describe Notifications::Registry do
     )
   end
 
-  it 'resolves every registered generator to a presenter of the same kind' do
-    kinds = described_class::GENERATORS.map { |generator| generator.name.demodulize.underscore }
+  it 'derives one kind per generator from its class name' do
+    expect(described_class::KINDS).to contain_exactly(
+      'maintenance_due', 'goal_reached', 'tank_low', 'weekly_summary', 'log_reminder'
+    )
+  end
 
-    kinds.each do |kind|
-      expect { Notifications::Presenters.const_get(kind.camelize) }.not_to raise_error
+  it 'resolves every registered kind to a presenter of the same name' do
+    described_class::KINDS.each do |kind|
+      expect { Notifications::Presenters.const_get(kind.camelize, false) }.not_to raise_error
     end
   end
 end

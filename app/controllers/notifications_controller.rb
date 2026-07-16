@@ -4,7 +4,7 @@ class NotificationsController < ApplicationController
   def index
     Notifications::Sweeper.new(user: current_user).call
     render Notifications::IndexView.new(
-      groups:       Notifications::Grouping.new(current_user.notifications.chronological).call,
+      groups:       Notifications::Grouping.new(current_user.notifications.recent).call,
       unread_count: current_user.notifications.unread.count
     )
   end
