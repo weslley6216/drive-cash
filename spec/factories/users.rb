@@ -5,5 +5,11 @@ FactoryBot.define do
     password { 'password123' }
     password_confirmation { 'password123' }
     phone { '(11) 98765-4321' }
+
+    trait :pro do
+      plan { :pro }
+      plan_billing { :yearly }
+      plan_since { Time.zone.local(2026, 3, 3) }
+    end
   end
 end

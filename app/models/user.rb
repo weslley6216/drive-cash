@@ -6,6 +6,9 @@ class User < ApplicationRecord
 
   has_secure_password
 
+  enum :plan, { free: 0, pro: 1 }, default: :free
+  enum :plan_billing, { monthly: 0, yearly: 1 }, prefix: true, validate: { allow_nil: true }
+
   has_many :sessions, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :earnings, dependent: :destroy
@@ -22,6 +25,7 @@ class User < ApplicationRecord
   validate :email_domain_allowed, if: -> { provider.blank? && email_address.present? }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
+  validates :plan_billing, :plan_since, presence: true, if: :pro?
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
