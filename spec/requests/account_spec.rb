@@ -127,10 +127,10 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include('href="/help"')
       end
 
-      it 'keeps plan and notifications pointing to coming_soon' do
+      it 'links notifications to the notification center' do
         get account_path
 
-        expect(response.body.scan('href="/coming_soon"').size).to be >= 2
+        expect(response.body).to include('href="/notifications"')
       end
 
       it 'renders the sign out button with red border' do
