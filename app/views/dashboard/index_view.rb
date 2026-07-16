@@ -1,8 +1,10 @@
 module Dashboard
   class IndexView < ApplicationComponent
-    def initialize(totals:, first_name:, filters: {}, recent_activity: [], categories: [], today: nil, monthly_goal: nil)
+    def initialize(totals:, first_name:, unread_count:, filters: {}, recent_activity: [], categories: [], today: nil,
+                   monthly_goal: nil)
       @totals = totals
       @first_name = first_name
+      @unread_count = unread_count
       @filters = filters
       @recent_activity = recent_activity
       @categories = categories
@@ -66,13 +68,7 @@ module Dashboard
     end
 
     def bell_button
-      button(
-        type:     'button',
-        disabled: true,
-        class:    'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600'
-      ) do
-        render PhlexIcons::Lucide::Bell.new(class: 'w-[18px] h-[18px]')
-      end
+      render NotificationBellComponent.new(unread_count: @unread_count)
     end
 
     def avatar_link

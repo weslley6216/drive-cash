@@ -65,6 +65,15 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
 
+    it 'renders the notification bell linking to the center on both headers' do
+      create(:notification, user: current_user)
+
+      get root_path
+
+      expect(response.body.scan('href="/notifications"').size).to eq(2)
+      expect(response.body.scan(NotificationBellComponent::BADGE_CLASSES).size).to eq(2)
+    end
+
     it 'renders topbar with greeting and subtitle' do
       get root_path, params: { year: 2025 }
 
