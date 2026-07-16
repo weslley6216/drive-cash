@@ -8,6 +8,10 @@ Rails.application.routes.draw do
   resource :help, only: :show, controller: 'help'
   resource :plan, only: %i[show update], controller: 'plans'
   get '/coming_soon', to: 'application#coming_soon', as: :coming_soon
+  resources :notifications, only: %i[index] do
+    collection { patch :read_all }
+    member     { patch :read }
+  end
   get '/auth/:provider/callback', to: 'sessions#oauth_callback'
   get '/auth/failure',            to: 'sessions#oauth_failure'
   root "dashboard#index"
