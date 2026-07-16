@@ -50,6 +50,41 @@ RSpec.describe 'Plans', type: :request do
         expect(response.body).to include(I18n.t('plans.show_view.mobile_subtitle'))
       end
     end
+
+    context 'when the user is pro' do
+      let(:user) { create(:user, :pro) }
+
+      before { login_as(user) }
+
+      it 'renders the active subscription instead of the sales pitch' do
+        get plan_path
+
+        expect(response.body).to include(I18n.t('plans.subscription_view.brand'))
+        expect(response.body).to include(I18n.t('plans.subscription_view.active_badge'))
+        expect(response.body).not_to include(I18n.t('plans.pro_card.cta'))
+      end
+
+      it 'states the billing period and the next charge date' do
+        get plan_path
+
+        expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: 'R$ 143,00'))
+        expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de março de 2027'))
+      end
+
+      it 'offers subscription management' do
+        get plan_path
+
+        expect(response.body).to include(I18n.t('plans.subscription_view.manage'))
+        expect(response.body).to include(I18n.t('plans.subscription_view.payment_history'))
+      end
+
+      it 'lists the active benefits' do
+        get plan_path
+
+        expect(response.body).to include(I18n.t('plans.subscription_view.benefits_title'))
+        expect(response.body).to include(I18n.t('plans.features.backup'))
+      end
+    end
   end
 
   describe 'PATCH /plan' do
