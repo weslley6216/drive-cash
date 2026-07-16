@@ -14,6 +14,7 @@ class User < ApplicationRecord
   has_many :earnings, dependent: :destroy
   has_many :goals, dependent: :destroy
   has_many :exports, dependent: :destroy
+  has_many :notifications, dependent: :destroy
   has_one :vehicle, dependent: :destroy
 
   generates_token_for :password_reset, expires_in: 15.minutes do
