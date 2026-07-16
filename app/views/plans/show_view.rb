@@ -8,7 +8,9 @@ module Plans
       render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 
-        div(data: { controller: 'plan-billing' }) do
+        div(data: { controller:                'plan-billing',
+                    plan_billing_active_class: PriceToggleComponent::ACTIVE_CLASSES,
+                    plan_billing_idle_class:   PriceToggleComponent::IDLE_CLASSES }) do
           mobile_layout
           desktop_layout
         end

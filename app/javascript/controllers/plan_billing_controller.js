@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["monthlyButton", "yearlyButton", "monthlyPrice", "yearlyPrice"]
+  static classes = ["active", "idle"]
 
   showMonthly() {
     this.select(false)
@@ -19,9 +20,7 @@ export default class extends Controller {
   }
 
   paint(button, active) {
-    button.classList.toggle("bg-white", active)
-    button.classList.toggle("text-slate-900", active)
-    button.classList.toggle("shadow-sm", active)
-    button.classList.toggle("text-slate-500", !active)
+    button.classList.remove(...(active ? this.idleClasses : this.activeClasses))
+    button.classList.add(...(active ? this.activeClasses : this.idleClasses))
   }
 }
