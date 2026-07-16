@@ -64,11 +64,17 @@ RSpec.describe 'Plans', type: :request do
         expect(response.body).not_to include(I18n.t('plans.pro_card.cta'))
       end
 
-      it 'states the billing period and the next charge date' do
-        get plan_path
+      context 'with a yearly subscription started in March' do
+        let(:user) { create(:user, :pro, plan_since: Time.zone.local(2026, 3, 3)) }
 
-        expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: 'R$ 143,00'))
-        expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de março de 2027'))
+        it 'states the billing period and the next charge date' do
+          travel_to Date.new(2026, 7, 16) do
+            get plan_path
+
+            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: 'R$ 143,00'))
+            expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de março de 2027'))
+          end
+        end
       end
 
       it 'offers subscription management' do

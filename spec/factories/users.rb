@@ -9,7 +9,7 @@ FactoryBot.define do
     trait :pro do
       plan { :pro }
       plan_billing { :yearly }
-      plan_since { Time.zone.local(2026, 3, 3) }
+      plan_since { 2.months.ago }
     end
   end
 end
