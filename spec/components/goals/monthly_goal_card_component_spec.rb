@@ -140,11 +140,29 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
   end
 
   context 'edit pencil' do
-    it 'renders an edit link pointing to edit_goal_path inside a modal frame' do
-      html = view_context.render(described_class.new(progress: progress))
+    let(:active_goal) do
+      build_stubbed(:goal, kind:         'monthly',
+                           period_start: Date.current.beginning_of_month,
+                           period_end:   Date.current.end_of_month)
+    end
+    let(:ended_goal) do
+      build_stubbed(:goal, kind:         'monthly',
+                           period_start: Date.current.prev_month.beginning_of_month,
+                           period_end:   Date.current.prev_month.end_of_month)
+    end
 
-      expect(html).to include("href=\"#{view_context.edit_goal_path(goal)}\"")
+    it 'renders the edit link when the goal is active' do
+      html = view_context.render(described_class.new(progress: progress.merge(goal: active_goal)))
+
+      expect(html).to include("href=\"#{view_context.edit_goal_path(active_goal)}\"")
       expect(html).to include('turbo-frame="modal"')
+    end
+
+    it 'hides the edit link when the goal has ended' do
+      html = view_context.render(described_class.new(progress: progress.merge(goal: ended_goal)))
+
+      expect(html).not_to include("href=\"#{view_context.edit_goal_path(ended_goal)}\"")
+      expect(html).not_to include('turbo-frame="modal"')
     end
   end
 end

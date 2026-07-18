@@ -109,11 +109,13 @@ module Goals
             span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full') do
               plain "#{weekly[:percent].to_f.round(1)}%"
             end
-            link_to(helpers.edit_goal_path(goal),
-                    class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
-                    aria_label: t('goals.index.edit_aria'),
-                    data:       { turbo_frame: 'modal' }) do
-              render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
+            unless goal.ended?
+              link_to(helpers.edit_goal_path(goal),
+                      class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+                      aria_label: t('goals.index.edit_aria'),
+                      data:       { turbo_frame: 'modal' }) do
+                render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
+              end
             end
           end
         end

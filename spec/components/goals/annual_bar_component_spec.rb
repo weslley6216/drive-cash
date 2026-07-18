@@ -45,4 +45,14 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
     expect(html).to include("href=\"#{view_context.edit_goal_path(progress[:goal])}\"")
     expect(html).to include('turbo-frame="modal"')
   end
+
+  it 'hides the edit link when the annual goal has ended' do
+    ended_goal = build_stubbed(:goal, kind:         'annual',
+                                      period_start: Date.current.prev_year.beginning_of_year,
+                                      period_end:   Date.current.prev_year.end_of_year)
+
+    output = view_context.render(described_class.new(progress: progress.merge(goal: ended_goal)))
+
+    expect(output).not_to include('turbo-frame="modal"')
+  end
 end

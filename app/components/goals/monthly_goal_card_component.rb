@@ -84,6 +84,8 @@ module Goals
     end
 
     def edit_link
+      return if @progress[:goal].ended?
+
       link_to(helpers.edit_goal_path(@progress[:goal]),
               class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
               aria_label: t('goals.index.edit_aria'),

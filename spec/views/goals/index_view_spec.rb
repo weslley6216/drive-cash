@@ -57,18 +57,18 @@ RSpec.describe Goals::IndexView, type: :component do
   context 'when weekly and annual goals exist' do
     let(:weekly_goal) do
       create(:goal, user: user, kind: 'weekly',
-                    period_start: Date.new(2026, 6, 8), period_end: Date.new(2026, 6, 14))
+                    period_start: Date.current.beginning_of_week, period_end: Date.current.end_of_week)
     end
     let(:annual_goal) do
       create(:goal, user: user, kind: 'annual',
-                    period_start: Date.new(2026, 1, 1), period_end: Date.new(2026, 12, 31))
+                    period_start: Date.current.beginning_of_year, period_end: Date.current.end_of_year)
     end
     let(:progress) do
       {
         weekly:       {
           goal: weekly_goal, current: 500, target: 1400, percent: 35,
-          days: (Date.new(2026, 6, 8)..Date.new(2026, 6, 14)).map { |day|
-            { date: day, value: 100, done: day < Date.new(2026, 6, 10), today: day == Date.new(2026, 6, 10) }
+          days: (weekly_goal.period_start..weekly_goal.period_end).map { |day|
+            { date: day, value: 100, done: day < Date.current, today: day == Date.current }
           }
         },
         monthly:      nil,
@@ -87,7 +87,7 @@ RSpec.describe Goals::IndexView, type: :component do
     end
 
     it 'renders the weekly period date range' do
-      expect(html).to include('8 a 14 de')
+      expect(html).to include("#{weekly_goal.period_start.day} a #{weekly_goal.period_end.day} de")
     end
 
     it 'renders weekly progress amounts side by side' do
@@ -101,6 +101,31 @@ RSpec.describe Goals::IndexView, type: :component do
 
     it 'renders edit links for all visible goals' do
       expect(html).to include("href=\"#{view_context.edit_goal_path(weekly_goal)}\"")
+    end
+  end
+
+  context 'when the weekly goal has ended' do
+    let(:weekly_goal) do
+      create(:goal, user: user, kind: 'weekly',
+                    period_start: Date.current.beginning_of_week - 7, period_end: Date.current.end_of_week - 7)
+    end
+    let(:progress) do
+      {
+        weekly:       {
+          goal: weekly_goal, current: 500, target: 1400, percent: 35,
+          days: (weekly_goal.period_start..weekly_goal.period_end).map { |day|
+            { date: day, value: 100, done: true, today: false }
+          }
+        },
+        monthly:      nil,
+        annual:       nil,
+        achievements: []
+      }
+    end
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+
+    it 'hides the weekly edit link' do
+      expect(html).not_to include(view_context.edit_goal_path(weekly_goal))
     end
   end
 
