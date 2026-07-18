@@ -46,11 +46,55 @@ module Analysis
 
     def content_scroll_region
       div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
-        metrics_grid
-        bar_chart_section
-        breakdown_section
-        insights_section
+        if empty?
+          empty_state
+        else
+          metrics_grid
+          bar_chart_section
+          breakdown_section
+          insights_section
+        end
       end
+    end
+
+    def empty?
+      metrics[:earnings].to_f.zero? && metrics[:expenses].to_f.zero?
+    end
+
+    def empty_state
+      div(class: 'space-y-4') do
+        dimmed_chart_frame
+        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+          render EmptyStateComponent.new(
+            icon:        PhlexIcons::Lucide::ChartColumn,
+            title:       t('empty_states.analysis.title', period: period_label),
+            description: t('empty_states.analysis.description'),
+            cta_label:   t('empty_states.analysis.cta'),
+            cta_path:    helpers.new_record_path,
+            cta_icon:    PhlexIcons::Lucide::Plus,
+            cta_data:    { turbo_frame: 'modal' }
+          )
+        end
+      end
+    end
+
+    def dimmed_chart_frame
+      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5') do
+        p(class: 'text-sm font-semibold text-slate-700 mb-3') { t('.bar_chart.title') }
+        div(class: 'flex items-end justify-between gap-1 h-[90px]') do
+          14.times do
+            div(class: 'flex-1 flex justify-center') do
+              div(class: 'w-1.5 h-[3px] rounded-full bg-slate-200')
+            end
+          end
+        end
+      end
+    end
+
+    def period_label
+      return @filters[:year].to_s unless @filters[:month]
+
+      I18n.t('date.month_names')[@filters[:month]]
     end
 
     def topbar

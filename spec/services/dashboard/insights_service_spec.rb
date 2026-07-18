@@ -25,6 +25,16 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:change_pct].keys).to match_array(%i[per_day per_trip per_km margin])
       end
 
+      it 'exposes the period earnings and expenses totals' do
+        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 800, trips_count: 10)
+        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 200, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:metrics][:earnings]).to eq(800)
+        expect(result[:metrics][:expenses]).to eq(200)
+      end
+
       it 'returns nil for per_km when there are no odometer readings' do
         result = described_class.new(year: 2025, month: 2, user: user).call
 

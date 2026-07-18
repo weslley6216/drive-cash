@@ -10,22 +10,22 @@ pt-BR:
         breakdown: "Para onde foi o dinheiro"
       stats:
         earnings:
-          title: "Total de Receitas"
+          title: "Receitas"
           subtitle: "Média: %{value}/mês"
           subtitle_annual: "Média: %{value}/mês"
           subtitle_monthly: "Média: %{value}/dia"
         expenses:
-          title: "Total de Despesas"
+          title: "Despesas"
           subtitle: "%{percent}% das receitas"
         profit:
-          title: "Lucro Líquido"
+          title: "Lucro líquido"
           subtitle: "%{value}/dia trabalhado"
         days:
-          title: "Dias Trabalhados"
+          title: "Dias trabalhados"
           subtitle: "%{value} dias/mês em média"
           subtitle_annual: "%{value} dias/mês em média"
           subtitle_monthly: "Média: %{value} dias/semana"
         trips:
-          title: "Total de Rotas"
+          title: "Rotas"
           subtitle_annual: "Média: %{value} rotas/mês"
           subtitle_monthly: "Média: %{value} rotas/dia"

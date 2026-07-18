@@ -81,9 +81,32 @@ module History
     end
 
     def empty_state
-      p(class: 'text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-8 text-center') do
-        t('history.index.empty')
+      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+        if filtering?
+          render EmptyStateComponent.new(
+            icon:        PhlexIcons::Lucide::Search,
+            title:       t('empty_states.history.title'),
+            description: t('empty_states.history.description'),
+            cta_label:   t('empty_states.history.cta'),
+            cta_path:    history_path(year: @year, month: @month),
+            cta_icon:    PhlexIcons::Lucide::X
+          )
+        else
+          render EmptyStateComponent.new(
+            icon:        PhlexIcons::Lucide::Receipt,
+            title:       t('empty_states.history.blank.title'),
+            description: t('empty_states.history.blank.description'),
+            cta_label:   t('empty_states.history.blank.cta'),
+            cta_path:    helpers.new_record_path,
+            cta_icon:    PhlexIcons::Lucide::Plus,
+            cta_data:    { turbo_frame: 'modal' }
+          )
+        end
       end
+    end
+
+    def filtering?
+      @query.present? || (@filter.present? && @filter != 'all')
     end
 
     def filter_context

@@ -16,7 +16,6 @@ pt-BR:
         net: "Líquido"
       day_group:
         unpaid_badge: "Pendente"
-      empty: "Sem lançamentos no período."
       edit:
         earning: "Editar receita"
         expense: "Editar despesa"

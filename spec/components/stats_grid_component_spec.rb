@@ -34,6 +34,15 @@ RSpec.describe StatsGridComponent, type: :component do
       expect(html).not_to include(I18n.t('dashboard.index_view.stats.profit.title'))
     end
 
+    it 'renders the prototype stat labels' do
+      html = view_context.render(described_class.new(totals: totals, month: nil, year: 2026))
+
+      expect(html).to include('Receitas')
+      expect(html).to include('Dias trabalhados')
+      expect(html).to include('Rotas')
+      expect(html).not_to include('Total de')
+    end
+
     it 'renders grid container with correct ID' do
       html = view_context.render(StatsGridComponent.new(totals: totals, month: nil))
 

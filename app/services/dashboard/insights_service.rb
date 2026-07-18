@@ -101,6 +101,8 @@ module Dashboard
 
     def metrics
       {
+        earnings:   current_stats[:earnings],
+        expenses:   current_stats[:expenses],
         per_day:    current_stats[:profit_per_day],
         per_trip:   current_calculator.per_trip,
         per_km:     current_calculator.per_km(current_km),

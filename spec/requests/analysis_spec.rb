@@ -32,6 +32,20 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('feed-loading-overlay')
     end
 
+    it 'renders the empty state when the period has no records' do
+      get analysis_path(year: Date.current.year, month: Date.current.month)
+
+      expect(response.body).to include(I18n.t('empty_states.analysis.cta'))
+    end
+
+    it 'renders the charts when the period has records' do
+      create(:earning, user: current_user, date: Date.current)
+
+      get analysis_path(year: Date.current.year, month: Date.current.month)
+
+      expect(response.body).not_to include(I18n.t('empty_states.analysis.cta'))
+    end
+
     it 'renders the four metric cards in a 2x2 grid' do
       create(:earning, user: current_user, date: Date.current, amount: 200, trips_count: 4)
 

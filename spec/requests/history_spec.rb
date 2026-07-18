@@ -130,10 +130,28 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('fixed bottom-24 right-6')
     end
 
-    it 'renders the empty state when there are no records' do
-      get history_path(year: 2020)
+    it 'renders the no-results empty state when a filter matches nothing' do
+      create(:earning, user: current_user, date: Date.current)
 
-      expect(response.body).to include(I18n.t('history.index.empty'))
+      get history_path(q: 'nao-existe-nada-assim')
+
+      expect(response.body).to include(I18n.t('empty_states.history.title'))
+      expect(response.body).to include(I18n.t('empty_states.history.cta'))
+    end
+
+    it 'renders the blank empty state when the period has no records' do
+      get history_path
+
+      expect(response.body).to include(I18n.t('empty_states.history.blank.title'))
+      expect(response.body).to include(I18n.t('empty_states.history.blank.cta'))
+    end
+
+    it 'renders the feed when records exist' do
+      create(:earning, user: current_user, date: Date.current)
+
+      get history_path
+
+      expect(response.body).not_to include(I18n.t('empty_states.history.blank.title'))
     end
 
     it 'falls back to filter "all" when the param is invalid' do
