@@ -46,11 +46,39 @@ module Analysis
 
     def content_scroll_region
       div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
-        metrics_grid
-        bar_chart_section
-        breakdown_section
-        insights_section
+        if empty?
+          empty_state
+        else
+          metrics_grid
+          bar_chart_section
+          breakdown_section
+          insights_section
+        end
       end
+    end
+
+    def empty?
+      metrics[:earnings].to_f.zero? && metrics[:expenses].to_f.zero?
+    end
+
+    def empty_state
+      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+        render EmptyStateComponent.new(
+          icon:        PhlexIcons::Lucide::ChartColumn,
+          title:       t('empty_states.analysis.title', period: period_label),
+          description: t('empty_states.analysis.description'),
+          cta_label:   t('empty_states.analysis.cta'),
+          cta_path:    helpers.new_record_path,
+          cta_icon:    PhlexIcons::Lucide::Plus,
+          cta_data:    { turbo_frame: 'modal' }
+        )
+      end
+    end
+
+    def period_label
+      return @filters[:year].to_s unless @filters[:month]
+
+      I18n.t('date.month_names')[@filters[:month]]
     end
 
     def topbar
