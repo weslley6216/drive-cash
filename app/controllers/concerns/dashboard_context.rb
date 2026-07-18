@@ -22,7 +22,7 @@ module DashboardContext
   end
 
   def filter_reference_date
-    return Date.current unless @month
+    return @year == Date.current.year ? Date.current : nil unless @month
 
     first_day = Date.new(@year, @month, 1)
     Date.current.between?(first_day, first_day.end_of_month) ? Date.current : first_day.end_of_month

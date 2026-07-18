@@ -25,6 +25,10 @@ class Goal < ApplicationRecord
     }
   end
 
+  def ended?
+    period_end < Date.current
+  end
+
   private
 
   def period_consistency

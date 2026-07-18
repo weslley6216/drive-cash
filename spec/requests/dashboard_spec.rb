@@ -263,6 +263,34 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(I18n.t('goals.index.monthly.label'))
     end
 
+    it 'shows the current monthly goal on the current-year Todos view' do
+      travel_to Date.new(2026, 7, 15) do
+        create(:goal, user: current_user, kind: 'monthly',
+                      period_start: Date.current.beginning_of_month,
+                      period_end: Date.current.end_of_month,
+                      target_amount: 5000)
+        create(:earning, user: current_user, date: Date.current)
+
+        get root_path, params: { year: 2026 }
+
+        expect(response.body).to include(I18n.t('goals.index.monthly.label'))
+      end
+    end
+
+    it 'hides the monthly hero on a past-year Todos view' do
+      travel_to Date.new(2026, 7, 15) do
+        create(:goal, user: current_user, kind: 'monthly',
+                      period_start: Date.current.beginning_of_month,
+                      period_end: Date.current.end_of_month,
+                      target_amount: 5000)
+        create(:earning, user: current_user, date: Date.new(2025, 3, 10), amount: 500)
+
+        get root_path, params: { year: 2025 }
+
+        expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
+      end
+    end
+
     it 'renders sign out link in the sidebar' do
       get root_path
 

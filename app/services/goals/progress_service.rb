@@ -65,7 +65,7 @@ module Goals
         projection:        projection_value(current, total_days, days_elapsed, reached),
         on_track:          reached || (current * (total_days.to_f / days_elapsed) >= target),
         reached:           reached,
-        ended:             goal.period_end < Date.current,
+        ended:             goal.ended?,
         tracking:          !reached && days_elapsed < MIN_DAYS_FOR_PROJECTION,
         surplus:           reached ? current - target : 0,
         daily_pace:        days_elapsed.zero? ? 0 : current / days_elapsed,

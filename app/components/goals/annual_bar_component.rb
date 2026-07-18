@@ -39,6 +39,7 @@ module Goals
     def edit_link
       goal = @progress[:goal]
       return unless goal
+      return if goal.ended?
 
       link_to(helpers.edit_goal_path(goal),
               class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
