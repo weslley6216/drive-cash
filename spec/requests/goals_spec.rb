@@ -166,6 +166,24 @@ RSpec.describe 'Goals', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('goals.index.form.title_edit'))
     end
+
+    context 'when the goal has ended' do
+      let(:ended_goal) do
+        create(:goal,
+               user:          current_user,
+               kind:          'monthly',
+               target_amount: 5000,
+               period_start:  Date.current.prev_month.beginning_of_month,
+               period_end:    Date.current.prev_month.end_of_month)
+      end
+
+      it 'redirects to goals and does not render the edit modal' do
+        get edit_goal_path(ended_goal)
+
+        expect(response).to redirect_to(goals_path)
+        expect(flash[:alert]).to eq(I18n.t('goals.index.ended_not_editable'))
+      end
+    end
   end
 
   describe 'PATCH /goals/:id' do
@@ -199,6 +217,32 @@ RSpec.describe 'Goals', type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t('goals.index.form.title_edit'))
+    end
+
+    context 'when the goal has ended' do
+      let(:ended_goal) do
+        create(:goal,
+               user:          current_user,
+               kind:          'monthly',
+               target_amount: 5000,
+               period_start:  Date.current.prev_month.beginning_of_month,
+               period_end:    Date.current.prev_month.end_of_month)
+      end
+
+      it 'rejects the turbo update without persisting' do
+        patch goal_path(ended_goal), params: { goal: { target_amount: '9000.00' } }, as: :turbo_stream
+
+        expect(response.body).to include('action="update"').and include('action="refresh"')
+        expect(ended_goal.reload.target_amount).to eq(5000)
+        expect(flash[:alert]).to eq(I18n.t('goals.index.ended_not_editable'))
+      end
+
+      it 'redirects the html update without persisting' do
+        patch goal_path(ended_goal), params: { goal: { target_amount: '9000.00' } }
+
+        expect(response).to redirect_to(goals_path)
+        expect(ended_goal.reload.target_amount).to eq(5000)
+      end
     end
   end
 

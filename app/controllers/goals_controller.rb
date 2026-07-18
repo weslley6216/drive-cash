@@ -1,5 +1,6 @@
 class GoalsController < ApplicationController
   before_action :find_goal, only: %i[edit update destroy]
+  before_action :reject_ended_goal, only: %i[edit update]
   before_action :load_filters, only: :index
 
   def index
@@ -47,6 +48,13 @@ class GoalsController < ApplicationController
 
   def find_goal
     @goal = current_user.goals.find(params[:id])
+  end
+
+  def reject_ended_goal
+    return unless @goal.ended?
+
+    flash[:alert] = t('goals.index.ended_not_editable')
+    respond_with_modal_refresh(html_redirect: goals_path)
   end
 
   def goal_params
