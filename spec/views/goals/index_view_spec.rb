@@ -13,7 +13,7 @@ RSpec.describe Goals::IndexView, type: :component do
     let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
 
     it 'renders the empty CTA' do
-      expect(html).to include(I18n.t('goals.index.empty.title'))
+      expect(html).to include(I18n.t('empty_states.goals.title'))
       expect(html).to include('href="/goals/new"')
     end
 
