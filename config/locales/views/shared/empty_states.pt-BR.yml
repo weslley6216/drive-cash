@@ -1,0 +1,23 @@
+pt-BR:
+  empty_states:
+    home:
+      title: "Ainda sem lançamentos"
+      description: "Registre o primeiro ganho ou gasto — leva menos de 10 segundos."
+      cta: "Registrar o primeiro"
+      secondary: "Ou fale com o Caju: \"Fiz R$45 no Uber\""
+    goals:
+      title: "Nenhuma meta definida"
+      description: "Defina quanto quer fazer no mês e acompanhe o ritmo dia a dia."
+      cta: "Definir meta do mês"
+    history:
+      title: "Nada encontrado"
+      description: "Nenhum lançamento bate com a busca ou os filtros atuais."
+      cta: "Limpar filtros"
+      blank:
+        title: "Sem lançamentos no período"
+        description: "Registre um ganho ou gasto para ver seu histórico aqui."
+        cta: "Registrar"
+    analysis:
+      title: "Sem dados em %{period}"
+      description: "Registre ganhos e gastos do mês pra ver seus gráficos e métricas aqui."
+      cta: "Registrar lançamento"
