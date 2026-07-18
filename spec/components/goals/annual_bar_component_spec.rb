@@ -53,6 +53,7 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
 
     output = view_context.render(described_class.new(progress: progress.merge(goal: ended_goal)))
 
+    expect(output).not_to include("href=\"#{view_context.edit_goal_path(ended_goal)}\"")
     expect(output).not_to include('turbo-frame="modal"')
   end
 end
