@@ -189,26 +189,47 @@ rtk docker compose up -d db                                          # sobe o ba
 
 ```
 app/services/
-├── dashboard/   # StatsService, calculators, scope counters
-├── ai/          # ParserService, ExpenseFromChat, SummaryBuilder, Tools/
-├── chat/        # RecordPersister, ExpensePersister, EarningPersister
-└── expenses/    # Creator, InstallmentCreator
+├── ai/             # ParserService, ExpenseFromChat, Tools/ (Registry), Readers/, prompts/
+├── chat/           # RecordPersister + persisters por tool, Payload, InstallmentInfo
+├── dashboard/      # StatsService, calculators, insights/, scope counters
+├── earnings/       # Creator
+├── expenses/       # Creator, InstallmentCreator
+├── exports/        # Builder, generators/ (Pdf, Csv, Json), Registry
+├── goals/          # Creator, ProgressService, AchievementsService
+├── history/        # FeedService (registry FILTERS), RecordSearch
+├── notifications/  # generators/ por kind, Registry, Sweeper, Grouping
+├── refuelings/     # Creator, Updater, Moves, VendorEfficiency
+└── vehicles/       # MaintenanceService, TankBalanceService, TankStatus, Statistics
 ```
 
-Value objects de domínio (sem persistência, sem efeito colateral, com invariante própria) vivem em `app/models/{domínio}/`, não em `app/services/`. Ex: `Expenses::InstallmentPlan` (`app/models/expenses/`).
+Camada de apresentação por domínio em `app/presenters/` (chat/answers, chat/summaries, dashboard/insights, history/entry_rows, notifications) — prepara dados crus para as views Phlex; é o lar dos registries "um presenter por variante".
+
+Value objects de domínio (sem persistência, sem efeito colateral, com invariante própria) vivem em `app/models/{domínio}/`, não em `app/services/`. Ex: `Expenses::InstallmentPlan`, `Exports::PeriodRange`, `Plans::Catalog`.
+
+Jobs (`app/jobs/`) são casca fina sobre Solid Queue — hoje só `ExportJob`.
 
 ## Modelos e enums
 
 ```ruby
-Expense.categories  # fuel, maintenance, car_wash, toll, parking,
-                    # documentation, insurance, fine, meals, phone, other
-Earning.platforms   # amazon, ifood, mercado_livre, nine_nine,
-                    # rappi, shopee, uber, other
+Expense.categories      # fuel, maintenance, car_wash, toll, parking,
+                        # documentation, insurance, fine, meals, phone, other
+Earning.platforms       # amazon, ifood, mercado_livre, nine_nine,
+                        # rappi, shopee, uber, other
+Maintenance.categories  # oil_change, oil_filter, air_filter, fuel_filter,
+                        # tire_rotation, brake_pads, spark_plugs, timing_belt
+Goal::KINDS             # weekly, monthly, annual   (enum string)
+Goal::METRICS           # profit, earnings          (enum string)
+Export                  # period_kind: this_month/last_month/year/custom ·
+                        # format: pdf/csv/json · status: pending/processing/done/failed
+User.plans              # free, pro (+ plan_billing: monthly/yearly)
+Notification            # kind validado contra Notifications::Registry::KINDS
 ```
+
+Relações: `User has_many expenses/earnings/goals/exports/notifications` + `has_one :vehicle`; `Vehicle has_many maintenances/refuelings`; `Refueling belongs_to :expense` (opcional). Scopes financeiros compartilhados no concern `FinancialEntry` (`for_year`, `for_month`, `in_period`, `chronological`).
 
 ## Documentação completa
 
-Ver vault Obsidian em `docs/` para regras detalhadas de testes, services, components, convenções e LLM.
+Vault Obsidian em `~/Obsidian/DriveCash/` — regras detalhadas em `rules/` (arquitetura, banco, testes, services, components, LLM, convenções, checklist de revisão), ADRs em `decisions/`, cards em `tasks/`. O diretório `docs/` deste repo não é usado.
 
 ## Design como fonte da verdade
 
