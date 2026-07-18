@@ -48,8 +48,6 @@ pt-BR:
         goal_completed: "Meta de %{period}"
         best_day: "Melhor dia: R$ %{value}"
       empty:
-        title: "Defina sua primeira meta"
-        subtitle: "Acompanhe seu progresso semanal, mensal e anual."
         cta: "Criar meta"
       form:
         title_new: "Nova meta"

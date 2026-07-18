@@ -22,8 +22,22 @@ RSpec.describe 'Goals', type: :request do
     it 'renders empty CTA when user has no goals' do
       get goals_path
 
-      expect(response.body).to include(I18n.t('goals.index.empty.title'))
       expect(response.body).to include(I18n.t('goals.index.empty.cta'))
+    end
+
+    it 'renders the empty state when the user has no goal' do
+      get goals_path
+
+      expect(response.body).to include(I18n.t('empty_states.goals.title'))
+      expect(response.body).to include(I18n.t('empty_states.goals.cta'))
+    end
+
+    it 'renders the goal card when a goal exists' do
+      create(:goal, user: current_user)
+
+      get goals_path
+
+      expect(response.body).not_to include(I18n.t('empty_states.goals.title'))
     end
 
     it 'renders monthly hero when a monthly goal exists' do

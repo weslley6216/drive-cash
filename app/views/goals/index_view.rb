@@ -15,7 +15,17 @@ module Goals
           hero_section
           columns_section
         else
-          render Goals::EmptyStateComponent.new
+          render EmptyStateComponent.new(
+            icon:        PhlexIcons::Lucide::Target,
+            icon_color:  'text-blue-600',
+            ring:        'bg-blue-50 border-blue-100',
+            title:       t('empty_states.goals.title'),
+            description: t('empty_states.goals.description'),
+            cta_label:   t('empty_states.goals.cta'),
+            cta_path:    helpers.new_goal_path,
+            cta_icon:    PhlexIcons::Lucide::Target,
+            cta_data:    { turbo_frame: 'modal' }
+          )
         end
 
         past_goals_section
