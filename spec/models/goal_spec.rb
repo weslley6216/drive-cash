@@ -100,6 +100,20 @@ RSpec.describe Goal, type: :model do
     end
   end
 
+  describe '#ended?' do
+    it 'flags a goal whose period_end is before today' do
+      goal = build(:goal, period_end: Date.current - 1)
+
+      expect(goal.ended?).to be(true)
+    end
+
+    it 'does not flag a goal ending today' do
+      goal = build(:goal, period_end: Date.current)
+
+      expect(goal.ended?).to be(false)
+    end
+  end
+
   describe '.new_form_defaults' do
     it 'returns kind monthly, metric profit, and current month range' do
       travel_to Date.new(2026, 6, 15) do
