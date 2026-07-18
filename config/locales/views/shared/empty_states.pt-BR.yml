@@ -5,6 +5,9 @@ pt-BR:
       description: "Registre o primeiro ganho ou gasto — leva menos de 10 segundos."
       cta: "Registrar o primeiro"
       secondary: "Ou fale com o Caju: \"Fiz R$45 no Uber\""
+      hero_label: "Lucro líquido — %{year}"
+      hero_placeholder: "R$ --"
+      hero_hint: "Aparece aqui assim que você registrar o primeiro dia"
     goals:
       title: "Nenhuma meta definida"
       description: "Defina quanto quer fazer no mês e acompanhe o ritmo dia a dia."

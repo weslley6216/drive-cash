@@ -15,13 +15,29 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body.squish).to include('500,00')
     end
 
-    it 'filters by year and shows zero when no data exists' do
+    it 'renders the dashed hero and the empty state when the period has no records' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('empty_states.home.title'))
+      expect(response.body).to include(I18n.t('empty_states.home.hero_placeholder'))
+    end
+
+    it 'renders the stats grid when the period has records' do
+      create(:earning, user: current_user, date: Date.current)
+
+      get root_path
+
+      expect(response.body).not_to include(I18n.t('empty_states.home.title'))
+      expect(response.body).to include(I18n.t('dashboard.index_view.stats.trips.title'))
+    end
+
+    it 'renders the empty state for a filtered year without records' do
       past_year = Date.current.year - 1
 
       get root_path, params: { year: past_year }
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include('0,00')
+      expect(response.body).to include(I18n.t('empty_states.home.hero_label', year: past_year))
     end
 
     it 'renders bottom nav with home tab active' do
@@ -46,6 +62,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders caju quick access linking to /chat' do
+      create(:earning, user: current_user, date: Date.current)
+
       get root_path
 
       expect(response.body).to include(I18n.t('caju_quick_access_component.title'))
@@ -89,6 +107,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders 12-column grid layout for hero and sidebar' do
+      create(:earning, user: current_user, date: Date.current)
+
       get root_path
 
       expect(response.body).to include('lg:grid-cols-12')
@@ -106,12 +126,18 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'does not render today card when no activity today' do
-      get root_path
+      travel_to Date.new(2026, 6, 15) do
+        create(:earning, user: current_user, date: Date.new(2026, 6, 10))
 
-      expect(response.body).not_to include('tracking-wider text-slate-500')
+        get root_path
+
+        expect(response.body).not_to include('tracking-wider text-slate-500')
+      end
     end
 
     it 'renders secondary grid with 7/5 column split' do
+      create(:earning, user: current_user, date: Date.current)
+
       get root_path
 
       expect(response.body).to include('lg:col-span-7')
@@ -119,6 +145,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders stable IDs on home wrappers for turbo stream targets' do
+      create(:earning, user: current_user, date: Date.current)
+
       get root_path
 
       expect(response.body).to include('id="hero_profit_card"')
@@ -135,12 +163,17 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'keeps today_card wrapper in DOM even without activity today' do
-      get root_path
+      travel_to Date.new(2026, 6, 15) do
+        create(:earning, user: current_user, date: Date.new(2026, 6, 10))
 
-      expect(response.body).to include('id="today_card"')
+        get root_path
+
+        expect(response.body).to include('id="today_card"')
+      end
     end
 
     it 'renders monthly goal card visible only on mobile after stats grid' do
+      create(:earning, user: current_user, date: Date.current)
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.current.beginning_of_month,
                     period_end: Date.current.end_of_month,
@@ -155,6 +188,8 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'keeps mobile monthly_goal wrapper in DOM even without an active goal' do
+      create(:earning, user: current_user, date: Date.current)
+
       get root_path
 
       expect(response.body).to include('class="lg:hidden mb-6"')
@@ -162,6 +197,7 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders monthly goal card when filtered month matches an active goal' do
+      create(:earning, user: current_user, date: Date.new(2026, 3, 10))
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.new(2026, 3, 1),
                     period_end: Date.new(2026, 3, 31),
@@ -175,6 +211,7 @@ RSpec.describe 'Dashboard', type: :request do
 
     it 'counts days remaining from today when the filtered month is the current month' do
       travel_to Date.new(2026, 6, 12) do
+        create(:earning, user: current_user, date: Date.new(2026, 6, 5))
         create(:goal, user: current_user, kind: 'monthly',
                       period_start: Date.new(2026, 6, 1),
                       period_end: Date.new(2026, 6, 30),
@@ -188,6 +225,8 @@ RSpec.describe 'Dashboard', type: :request do
 
     it 'shows the final result without a countdown for a goal from a past month' do
       travel_to Date.new(2026, 7, 15) do
+        create(:earning, user: current_user, date: Date.new(2026, 3, 10), amount: 100)
+        create(:expense, user: current_user, date: Date.new(2026, 3, 10), amount: 100, category: 'fuel', paid: true)
         create(:goal, user: current_user, kind: 'monthly',
                       period_start: Date.new(2026, 3, 1),
                       period_end: Date.new(2026, 3, 31),
@@ -201,6 +240,7 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'does not render monthly goal card when filtered month has no active goal' do
+      create(:earning, user: current_user, date: Date.new(2026, 3, 10))
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.new(2026, 6, 1),
                     period_end: Date.new(2026, 6, 30),
@@ -212,6 +252,7 @@ RSpec.describe 'Dashboard', type: :request do
     end
 
     it 'renders monthly goal card on annual view when current month has an active goal' do
+      create(:earning, user: current_user, date: Date.current)
       create(:goal, user: current_user, kind: 'monthly',
                     period_start: Date.current.beginning_of_month,
                     period_end: Date.current.end_of_month,

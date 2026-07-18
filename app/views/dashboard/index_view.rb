@@ -84,10 +84,39 @@ module Dashboard
           div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
         end
 
-        primary_grid
-        stats_grid_section
-        monthly_goal_mobile_section
-        secondary_grid
+        if empty?
+          empty_region
+        else
+          primary_grid
+          stats_grid_section
+          monthly_goal_mobile_section
+          secondary_grid
+        end
+      end
+    end
+
+    def empty?
+      @totals[:earnings].to_f.zero? && @totals[:expenses].to_f.zero?
+    end
+
+    def empty_region
+      div(class: 'space-y-4') do
+        render Dashboard::EmptyHeroComponent.new(year: @filters[:year])
+        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+          render EmptyStateComponent.new(
+            icon:            PhlexIcons::Lucide::Receipt,
+            icon_color:      'text-blue-600',
+            ring:            'bg-blue-50 border-blue-100',
+            title:           t('empty_states.home.title'),
+            description:     t('empty_states.home.description'),
+            cta_label:       t('empty_states.home.cta'),
+            cta_path:        new_earning_path,
+            cta_icon:        PhlexIcons::Lucide::Plus,
+            cta_data:        { turbo_frame: 'modal' },
+            secondary_label: t('empty_states.home.secondary'),
+            secondary_path:  helpers.chat_root_path
+          )
+        end
       end
     end
 
