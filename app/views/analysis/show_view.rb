@@ -62,16 +62,32 @@ module Analysis
     end
 
     def empty_state
-      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
-        render EmptyStateComponent.new(
-          icon:        PhlexIcons::Lucide::ChartColumn,
-          title:       t('empty_states.analysis.title', period: period_label),
-          description: t('empty_states.analysis.description'),
-          cta_label:   t('empty_states.analysis.cta'),
-          cta_path:    helpers.new_record_path,
-          cta_icon:    PhlexIcons::Lucide::Plus,
-          cta_data:    { turbo_frame: 'modal' }
-        )
+      div(class: 'space-y-4') do
+        dimmed_chart_frame
+        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+          render EmptyStateComponent.new(
+            icon:        PhlexIcons::Lucide::ChartColumn,
+            title:       t('empty_states.analysis.title', period: period_label),
+            description: t('empty_states.analysis.description'),
+            cta_label:   t('empty_states.analysis.cta'),
+            cta_path:    helpers.new_record_path,
+            cta_icon:    PhlexIcons::Lucide::Plus,
+            cta_data:    { turbo_frame: 'modal' }
+          )
+        end
+      end
+    end
+
+    def dimmed_chart_frame
+      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5') do
+        p(class: 'text-sm font-semibold text-slate-700 mb-3') { t('.bar_chart.title') }
+        div(class: 'flex items-end justify-between gap-1 h-[90px]') do
+          14.times do
+            div(class: 'flex-1 flex justify-center') do
+              div(class: 'w-1.5 h-[3px] rounded-full bg-slate-200')
+            end
+          end
+        end
       end
     end
 
