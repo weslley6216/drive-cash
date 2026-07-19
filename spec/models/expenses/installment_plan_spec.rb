@@ -13,15 +13,26 @@ RSpec.describe Expenses::InstallmentPlan do
       expect(plan.valid?).to be true
     end
 
-    it 'is invalid with less than 2 repetitions' do
+    it 'is invalid below the MIN_INSTALLMENTS boundary' do
       plan = described_class.new(
         total_amount: 300,
         start_date:   '2026-01-10',
         period:       'monthly',
-        repetitions:  1
+        repetitions:  Expense::MIN_INSTALLMENTS - 1
       )
 
       expect(plan.valid?).to be false
+    end
+
+    it 'is valid at the MIN_INSTALLMENTS boundary' do
+      plan = described_class.new(
+        total_amount: 300,
+        start_date:   '2026-01-10',
+        period:       'monthly',
+        repetitions:  Expense::MIN_INSTALLMENTS
+      )
+
+      expect(plan.valid?).to be true
     end
 
     it 'is invalid with unknown period' do

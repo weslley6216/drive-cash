@@ -4,7 +4,7 @@ module Ai
       params = ChatExpenseParams.new(raw)
       attrs = params.attributes
 
-      if params.installments >= 2
+      if params.installments >= Expense::MIN_INSTALLMENTS
         return installments_period_error(attrs, user) unless Expense::INSTALLMENT_PERIODS.include?(params.period)
 
         return Expenses::InstallmentCreator.call(attrs, { repetitions: params.installments, period: params.period }, user: user)

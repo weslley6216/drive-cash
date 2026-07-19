@@ -8,10 +8,16 @@ RSpec.describe Chat::InstallmentInfo do
       expect(info.present?).to be(true)
     end
 
-    it 'is false when there is a single installment' do
-      info = described_class.new('installments' => 1, 'installments_period' => 'monthly')
+    it 'is false below the minimum installment count' do
+      info = described_class.new('installments' => Expense::MIN_INSTALLMENTS - 1, 'installments_period' => 'monthly')
 
       expect(info.present?).to be(false)
+    end
+
+    it 'is true at the minimum installment count' do
+      info = described_class.new('installments' => Expense::MIN_INSTALLMENTS, 'installments_period' => 'monthly')
+
+      expect(info.present?).to be(true)
     end
 
     it 'is false when the period is not a known installment period' do

@@ -103,6 +103,28 @@ RSpec.describe Expense, type: :model do
 
       expect(expense).to be_valid
     end
+
+    it 'invalid when installment count is below the minimum' do
+      expense = build(
+        :expense,
+        installment_series_id: SecureRandom.uuid,
+        installment_number:    1,
+        installment_count:     Expense::MIN_INSTALLMENTS - 1
+      )
+
+      expect(expense).not_to be_valid
+    end
+
+    it 'valid at the installment count minimum' do
+      expense = build(
+        :expense,
+        installment_series_id: SecureRandom.uuid,
+        installment_number:    1,
+        installment_count:     Expense::MIN_INSTALLMENTS
+      )
+
+      expect(expense).to be_valid
+    end
   end
 
   describe 'scopes' do

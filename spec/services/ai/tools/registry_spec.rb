@@ -43,6 +43,7 @@ RSpec.describe Ai::Tools::Registry do
 
       expect(tool.kind).to eq(:query)
       expect(tool.declaration[:name]).to eq('query')
+      expect(tool.permitted_keys).to eq([])
     end
 
     it 'resolves create_expense wiring' do
@@ -53,6 +54,7 @@ RSpec.describe Ai::Tools::Registry do
       expect(tool.summary_presenter).to eq(Chat::Summaries::Expense)
       expect(tool.confirm_key).to eq('chat.confirm.success_expense')
       expect(tool.requires_amount).to be(true)
+      expect(tool.permitted_keys).to eq(Ai::ChatExpenseParams::PERMITTED_KEYS)
     end
 
     it 'resolves create_earning wiring' do
@@ -61,6 +63,7 @@ RSpec.describe Ai::Tools::Registry do
       expect(tool.persister).to eq(Chat::EarningPersister)
       expect(tool.summary_presenter).to eq(Chat::Summaries::Earning)
       expect(tool.confirm_key).to eq('chat.confirm.success_earning')
+      expect(tool.permitted_keys).to eq(Chat::EarningPersister::ATTRIBUTE_KEYS)
     end
 
     it 'resolves create_goal without amount requirement' do
@@ -69,6 +72,7 @@ RSpec.describe Ai::Tools::Registry do
       expect(tool.kind).to eq(:create)
       expect(tool.requires_amount).to be(false)
       expect(tool.persister).to eq(Chat::GoalPersister)
+      expect(tool.permitted_keys).to contain_exactly(:kind, :metric, :target_amount)
     end
 
     it 'resolves update_maintenance without amount requirement' do
@@ -77,6 +81,7 @@ RSpec.describe Ai::Tools::Registry do
       expect(tool.kind).to eq(:create)
       expect(tool.requires_amount).to be(false)
       expect(tool.persister).to eq(Chat::MaintenanceUpdater)
+      expect(tool.permitted_keys).to contain_exactly(:category, :done_km)
     end
 
     it 'no longer resolves the legacy per-kind names' do

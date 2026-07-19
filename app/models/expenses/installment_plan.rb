@@ -18,7 +18,7 @@ module Expenses
     end
 
     def valid?
-      @count.between?(2, Expense::MAX_INSTALLMENTS) &&
+      @count.between?(Expense::MIN_INSTALLMENTS, Expense::MAX_INSTALLMENTS) &&
         Expense::INSTALLMENT_PERIODS.include?(@period) &&
         @total_amount.positive?
     end

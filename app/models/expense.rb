@@ -24,11 +24,12 @@ class Expense < ApplicationRecord
   }, prefix: true
 
   INSTALLMENT_PERIODS = %w[weekly biweekly monthly annual].freeze
+  MIN_INSTALLMENTS = 2
   MAX_INSTALLMENTS = 60
 
   validates :category, presence: true
   validates :installment_count,
-            numericality: { greater_than_or_equal_to: 2, less_than_or_equal_to: MAX_INSTALLMENTS },
+            numericality: { greater_than_or_equal_to: MIN_INSTALLMENTS, less_than_or_equal_to: MAX_INSTALLMENTS },
             allow_nil:    true
   validate :installment_fields_consistent
 
