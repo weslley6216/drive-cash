@@ -3,21 +3,21 @@ module Ai
     class Registry
       Tool = Data.define(
         :name, :declaration, :kind,
-        :persister, :summary_presenter, :confirm_key, :requires_amount
+        :persister, :summary_presenter, :confirm_key, :requires_amount, :permitted_keys
       ) do
         def query? = kind == :query
 
-        def self.create_tool(name:, declaration:, persister:, summary_presenter:, confirm_key:, requires_amount: false)
+        def self.create_tool(name:, declaration:, persister:, summary_presenter:, confirm_key:, permitted_keys:, requires_amount: false)
           new(
             name:, declaration:, kind: :create,
-            persister:, summary_presenter:, confirm_key:, requires_amount:
+            persister:, summary_presenter:, confirm_key:, requires_amount:, permitted_keys:
           )
         end
 
         def self.query_tool(declaration:)
           new(
             name: 'query', declaration:, kind: :query,
-            persister: nil, summary_presenter: nil, confirm_key: nil, requires_amount: false
+            persister: nil, summary_presenter: nil, confirm_key: nil, requires_amount: false, permitted_keys: []
           )
         end
       end
@@ -51,7 +51,8 @@ module Ai
           persister:         Chat::EarningPersister,
           summary_presenter: Chat::Summaries::Earning,
           confirm_key:       'chat.confirm.success_earning',
-          requires_amount:   true
+          requires_amount:   true,
+          permitted_keys:    Chat::EarningPersister::ATTRIBUTE_KEYS
         ),
         Tool.create_tool(
           name:              'create_expense',
@@ -59,7 +60,8 @@ module Ai
           persister:         Chat::ExpensePersister,
           summary_presenter: Chat::Summaries::Expense,
           confirm_key:       'chat.confirm.success_expense',
-          requires_amount:   true
+          requires_amount:   true,
+          permitted_keys:    Ai::ChatExpenseParams::PERMITTED_KEYS
         ),
         Tool.create_tool(
           name:              'create_goal',
@@ -67,7 +69,8 @@ module Ai
           persister:         Chat::GoalPersister,
           summary_presenter: Chat::Summaries::Goal,
           confirm_key:       'chat.confirm.success_goal',
-          requires_amount:   false
+          requires_amount:   false,
+          permitted_keys:    %i[kind metric target_amount]
         ),
         Tool.create_tool(
           name:              'update_maintenance',
@@ -75,7 +78,8 @@ module Ai
           persister:         Chat::MaintenanceUpdater,
           summary_presenter: Chat::Summaries::Maintenance,
           confirm_key:       'chat.confirm.success_maintenance',
-          requires_amount:   false
+          requires_amount:   false,
+          permitted_keys:    %i[category done_km]
         ),
         Tool.query_tool(declaration: Query.declaration)
       ].freeze

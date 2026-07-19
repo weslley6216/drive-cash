@@ -203,6 +203,17 @@ RSpec.describe 'Chats', type: :request do
       end
     end
 
+    context 'when the confirmed record carries a key outside the tool whitelist' do
+      it 'persists the record and ignores the unexpected key' do
+        post chat_confirm_path,
+             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', installment_count: 99 } },
+             as:     :turbo_stream
+
+        expect(Expense.last).to be_present
+        expect(Expense.last.installment_count).to be_nil
+      end
+    end
+
     context 'when confirming an installment expense' do
       let(:params) do
         {
