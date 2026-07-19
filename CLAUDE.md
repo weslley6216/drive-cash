@@ -25,7 +25,7 @@ rtk docker compose run --rm app bundle exec rails db:migrate         # migraçõ
 rtk docker compose up -d db                                          # sobe o banco (necessário antes dos specs)
 ```
 
-**Gems**: `docker compose build` NÃO atualiza gems — elas vivem no volume `ruby_gems` (que sobrescreve o bundle da imagem), e o `entrypoint.sh` aborta antes de qualquer comando quando o bundle está defasado. Ao ver `Bundler::GemNotFound`/`Could not find <gem>`, ir direto para:
+**Gems**: `docker compose build` NÃO atualiza gems — elas vivem no volume `ruby_gems` (que sobrescreve o bundle da imagem). `docker compose up` se autocorrige (o `bin/setup` roda `bundle install`); já comandos via `docker compose run` falham com `Bundler::GemNotFound`/`Could not find <gem>` — nesse caso, ir direto para:
 
 ```bash
 rtk docker compose run --rm --entrypoint bundle app install
