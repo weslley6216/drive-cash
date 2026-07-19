@@ -140,7 +140,7 @@ RSpec.describe Dashboard::InsightsService do
         create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 300)
         create(:expense, user: user, date: Date.new(2025, 6, 5), amount: 100, category: 'fuel', paid: true)
 
-        bar = described_class.new(year: 2025, month: nil, user: user).call[:monthly_bars].find { |b| b[:key] == 6 }
+        bar = described_class.new(year: 2025, month: nil, user: user).call[:monthly_bars].find { |bar| bar[:key] == 6 }
 
         expect(bar[:unit]).to eq(:month)
         expect(bar[:earnings].to_f).to eq(300.0)
