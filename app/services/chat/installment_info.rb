@@ -5,7 +5,7 @@ module Chat
     end
 
     def present?
-      count >= 2 && Expense::INSTALLMENT_PERIODS.include?(period)
+      count >= Expense::MIN_INSTALLMENTS && Expense::INSTALLMENT_PERIODS.include?(period)
     end
 
     def count
