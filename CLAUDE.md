@@ -69,7 +69,7 @@ Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
 
 ## Fluxo de trabalho e git
 
-- **Fluxo v2 (desde 17/07/2026, sem PR)**: `/discovery NN` → `/plan NN` → `/execute NN` → `/ship`. Os gates do `/ship` substituem a revisão de PR: um único OK humano, depois `git merge --no-ff` na main + push + cleanup (ADR → `decisions/`, task → `done/`). Handoff via frontmatter `status`; perguntas ao usuário só em discovery/plan — execute é autônomo (desvio tático registra, gap de escopo devolve pro plan).
+- **Fluxo v2 (desde 17/07/2026, sem PR)**: `/discovery NN` → `/plan NN` → `/execute NN` → `/ship`. Os gates do `/ship` substituem a revisão de PR: um único OK humano, depois `git merge --no-ff` na main + push + cleanup (ADR → `decisions/`, task → `done/`). Handoff via frontmatter `status`; perguntas ao usuário só em discovery/plan — execute é autônomo (desvio tático registra, gap de escopo devolve pro plan). As skills do fluxo vivem em `~/Obsidian/DriveCash/skills/` (fonte, editável no Obsidian), symlinkadas em `.claude/skills/<nome>/SKILL.md`.
 - **Commit trivial (docs/chore/fix de 1 linha) vai direto na main + push**, sem branch; branch + `/ship` é para feature de verdade.
 - **Commits**: 100% em inglês, Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`…), sem `Co-authored-by`.
 - **Artefatos do fluxo no vault**: planos em `~/Obsidian/DriveCash/work/plans/` (nunca `docs/plans/`); arquivos de discovery concisos no padrão de `01-bottom-nav-layout.md` — lista simples por camada, ACs em uma linha, máx. 2 decisões de ADR, sem sub-seções nem checklist final.
