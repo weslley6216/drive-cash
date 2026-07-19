@@ -2,16 +2,12 @@
 
 set -e
 
-export TAILWIND_DISABLE_WATCHMAN=1
-
 if [ "$(id -u)" = "0" ]; then
   mkdir -p /usr/local/bundle /app/tmp/pids
-  chown -R appuser:appuser /usr/local/bundle /app
+  chown -R appuser:appuser /usr/local/bundle
+  chown appuser:appuser /app/tmp /app/tmp/pids
+  rm -f /app/tmp/pids/server.pid
 
-  echo "🎨 Building Tailwind CSS..."
-  su -s /bin/bash -c 'bundle exec rails tailwindcss:build' appuser
-
-  su -s /bin/bash -c 'rm -f tmp/pids/server.pid' appuser
   exec su -s /bin/bash -c "$*" appuser
 fi
 
