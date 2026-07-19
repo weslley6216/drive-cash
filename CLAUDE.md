@@ -166,6 +166,14 @@ rtk docker compose run --rm app bundle exec rails db:migrate         # migraçõ
 rtk docker compose up -d db                                          # sobe o banco (necessário antes dos specs)
 ```
 
+**Gems**: `docker compose build` NÃO atualiza gems — elas vivem no volume `ruby_gems` (que sobrescreve o bundle da imagem), e o `entrypoint.sh` aborta antes de qualquer comando quando o bundle está defasado. Ao ver `Bundler::GemNotFound`/`Could not find <gem>`, ir direto para:
+
+```bash
+rtk docker compose run --rm --entrypoint bundle app install
+```
+
+Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
+
 ## Arquitetura em uma linha
 
 `Controller → Service → Model → DB` com Views Phlex como presenters. Concerns para cross-cutting (cache, sessão, turbo streams).
@@ -184,6 +192,28 @@ rtk docker compose up -d db                                          # sobe o ba
 - **i18n**: todas as strings visíveis em `config/locales/pt-BR.yml`.
 - **Namespaces sempre no plural**: diretórios e módulos usam a forma plural (`module Vehicles`, `module Expenses`, `module Maintenances`). Nunca usar `class ModelName` para criar namespace — se o nome do namespace coincidir com um model AR (singular), renomear para plural. Isso evita o `TypeError: X is not a module`.
 - **Variação de domínio estende, não edita (OCP)**: conjunto que cresce (período de parcelamento, tipo de insight, ferramenta de chat, filtro de histórico) despacha via registry de dados ou uma classe por variante resolvida por convenção — nunca `case/when`/`if-elsif` espalhado por vários arquivos. Adicionar uma variante = uma entrada declarativa + suas classes colaboradoras, sem tocar na lógica de despacho. Registries: `Expenses::InstallmentPlan::PERIOD_ADVANCE`, `Dashboard::Insights::Presenters` (um presenter por tipo), `Ai::Tools::Registry`, `History::FeedService::FILTERS`. Mapa de lookup com fallback default (paletas) também conta como registry. **OCP não revoga SRP**: o registry referencia colaboradores, não os contém — cálculo de domínio e apresentação seguem em classes separadas.
+
+## Convenções de código
+
+- **Sem comentários em `.rb`**: nunca escrever `# ...` em arquivos Ruby — nem explicativos, nem de contexto. O código se explica por nomes de métodos e variáveis.
+- **Sem variáveis de bloco de uma letra**: `|record|` não `|r|`, `|group|` não `|g|`, `|offset|` não `|i|`; usar o nome do domínio (`|earning|`, `|expense|`) quando o tipo é conhecido.
+- **Controllers só têm actions**: nenhum método privado — resposta Turbo, session/nonce e orquestração pós-confirm vão para concerns (ex: `ChatSession`); a action fica com params, chamada de service/concern e redirect/head.
+- **Idiomas**: código, commits e símbolos Ruby em inglês; strings visíveis ao usuário via i18n em pt-BR; comunicação humana (descrições, docs de fluxo) em pt-BR.
+
+## Convenções de specs (RSpec)
+
+- **Sem `let!`**: usar `let` + referência explícita, `before { create(...) }` ou create dentro do `it`.
+- **AAA com linha vazia** entre Arrange/Act/Assert quando as três fases estão no `it`; se Arrange/Act estão em `let`, o `it` só tem o Assert. Nunca comentários (`# Arrange`) — nem qualquer outro comentário em spec.
+- **Sem `expect_any_instance_of`/`allow_any_instance_of`**: mockar classe/instância específica (`allow(MyClass).to receive(...)`) ou testar o comportamento resultante.
+- **Sem referência a ACs** (`(AC 1)`) nos nomes dos exemplos — descrever o comportamento; o nome deve fazer sentido sozinho.
+- **Teste só-negativo exige par positivo discriminante**: exemplo cuja única asserção é negativa (`not_to include/match/have_key`) sem um exemplo positivo de estado oposto na mesma área verifica ausência permanente — passa para sempre e não detecta regressão; não escrever, remover se existir. Exceções legítimas (têm estado-par): `not_to be_valid`, isolamento entre usuários, filtros/scopes, elementos condicionais. Detalhe: `rules/03 - Regras de Testes.md` no vault.
+
+## Fluxo de trabalho e git
+
+- **Fluxo v2 (desde 17/07/2026, sem PR)**: `/discovery NN` → `/plan NN` → `/execute NN` → `/ship`. Os gates do `/ship` substituem a revisão de PR: um único OK humano, depois `git merge --no-ff` na main + push + cleanup (ADR → `decisions/`, task → `done/`). Handoff via frontmatter `status`; perguntas ao usuário só em discovery/plan — execute é autônomo (desvio tático registra, gap de escopo devolve pro plan).
+- **Commit trivial (docs/chore/fix de 1 linha) vai direto na main + push**, sem branch; branch + `/ship` é para feature de verdade.
+- **Commits**: 100% em inglês, Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`…), sem `Co-authored-by`.
+- **Artefatos do fluxo no vault**: planos em `~/Obsidian/DriveCash/work/plans/` (nunca `docs/plans/`); arquivos de discovery concisos no padrão de `01-bottom-nav-layout.md` — lista simples por camada, ACs em uma linha, máx. 2 decisões de ADR, sem sub-seções nem checklist final.
 
 ## Estrutura de serviços
 
