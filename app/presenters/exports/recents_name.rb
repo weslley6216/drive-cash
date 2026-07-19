@@ -1,5 +1,14 @@
 module Exports
   class RecentsName
+    INTERPOLATIONS = {
+      'year'   => ->(export) { { year: export.period_start.year } },
+      'custom' => ->(export) { { start: I18n.l(export.period_start), end: I18n.l(export.period_end) } }
+    }.freeze
+
+    DEFAULT_INTERPOLATION = lambda do |export|
+      { month: I18n.t('date.month_names')[export.period_start.month], year: export.period_start.year }
+    end
+
     def initialize(export)
       @export = export
     end
@@ -7,15 +16,8 @@ module Exports
     def call
       return '' if @export.period_start.blank? || @export.period_end.blank?
 
-      key = "exports.recents_name.#{@export.period_kind}"
-      case @export.period_kind
-      when 'year'
-        I18n.t(key, year: @export.period_start.year)
-      when 'custom'
-        I18n.t(key, start: I18n.l(@export.period_start), end: I18n.l(@export.period_end))
-      else
-        I18n.t(key, month: I18n.t('date.month_names')[@export.period_start.month], year: @export.period_start.year)
-      end
+      options = INTERPOLATIONS.fetch(@export.period_kind, DEFAULT_INTERPOLATION).call(@export)
+      I18n.t("exports.recents_name.#{@export.period_kind}", **options)
     end
   end
 end
