@@ -44,8 +44,9 @@
 # Ignore VSCode configs
 /.vscode
 
-# Ignore Claude Code local configs
-/.claude
+# Ignore Claude Code local configs, mas versionar as skills
+/.claude/*
+!/.claude/skills/
 
 # Local only — não commitar
 /.rtk
