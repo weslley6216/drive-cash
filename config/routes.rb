@@ -46,6 +46,8 @@ Rails.application.routes.draw do
   end
   resources :refuelings, only: %i[index new create edit update destroy]
 
+  post '/backups', to: 'backups#create', as: :backups
+
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
