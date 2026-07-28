@@ -56,6 +56,13 @@ RSpec.describe Backups::Requests::Structure do
       expect(chart.position.overlay_position.anchor_cell.sheet_id).to eq(all_ids['Resumo'])
     end
 
+    it 'anchors the chart clear of the summary data columns' do
+      requests = described_class.new(state: state(sheet_ids: all_ids), summary_month_count: 3).decorations
+      anchor = requests.filter_map(&:add_chart).first.chart.position.overlay_position.anchor_cell
+
+      expect(anchor.column_index).to be > Backups::Tabs.find(:summary).width
+    end
+
     it 'points the chart at the month rows only, skipping the annual totals' do
       requests = described_class.new(state: state(sheet_ids: all_ids), summary_month_count: 3).decorations
       basic = requests.filter_map(&:add_chart).first.chart.spec.basic_chart

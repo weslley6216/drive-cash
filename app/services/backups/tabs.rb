@@ -25,6 +25,10 @@ module Backups
       def width
         columns.size
       end
+
+      def index_of(name)
+        columns.index { |column| column.name == name }
+      end
     end
 
     def self.column(name, format = nil)

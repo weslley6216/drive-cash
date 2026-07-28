@@ -3,9 +3,7 @@ module Backups
     class Structure
       State = Data.define(:sheet_ids, :banded_titles, :charted_titles)
 
-      SUMMARY_PROFIT_COLUMN = 3
-      CHART_ANCHOR_COLUMN = 7
-      HEADER_COLOR = { red: 0.92, green: 0.94, blue: 0.96 }.freeze
+      CHART_COLUMN_GAP = 2
       FIRST_BAND_COLOR = { red: 1.0, green: 1.0, blue: 1.0 }.freeze
       SECOND_BAND_COLOR = { red: 0.97, green: 0.98, blue: 0.99 }.freeze
 
@@ -57,19 +55,19 @@ module Backups
 
         Google::Apis::SheetsV4::Request.new(
           add_chart: Google::Apis::SheetsV4::AddChartRequest.new(
-            chart: Google::Apis::SheetsV4::EmbeddedChart.new(spec: chart_spec(sheet_id), position: chart_position(sheet_id))
+            chart: Google::Apis::SheetsV4::EmbeddedChart.new(spec: chart_spec(sheet_id, tab), position: chart_position(sheet_id, tab))
           )
         )
       end
 
-      def chart_spec(sheet_id)
+      def chart_spec(sheet_id, tab)
         Google::Apis::SheetsV4::ChartSpec.new(
           title:       I18n.t('backups.summary.chart_title'),
           basic_chart: Google::Apis::SheetsV4::BasicChartSpec.new(
             chart_type:      'COLUMN',
             legend_position: 'BOTTOM_LEGEND',
             domains:         [Google::Apis::SheetsV4::BasicChartDomain.new(domain: chart_data(sheet_id, 0))],
-            series:          [Google::Apis::SheetsV4::BasicChartSeries.new(series: chart_data(sheet_id, SUMMARY_PROFIT_COLUMN), target_axis: 'LEFT_AXIS')]
+            series:          [Google::Apis::SheetsV4::BasicChartSeries.new(series: chart_data(sheet_id, tab.index_of(:profit)), target_axis: 'LEFT_AXIS')]
           )
         )
       end
@@ -90,10 +88,10 @@ module Backups
         )
       end
 
-      def chart_position(sheet_id)
+      def chart_position(sheet_id, tab)
         Google::Apis::SheetsV4::EmbeddedObjectPosition.new(
           overlay_position: Google::Apis::SheetsV4::OverlayPosition.new(
-            anchor_cell: Google::Apis::SheetsV4::GridCoordinate.new(sheet_id: sheet_id, row_index: 1, column_index: CHART_ANCHOR_COLUMN)
+            anchor_cell: Google::Apis::SheetsV4::GridCoordinate.new(sheet_id: sheet_id, row_index: 1, column_index: tab.width + CHART_COLUMN_GAP)
           )
         )
       end

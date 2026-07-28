@@ -1,8 +1,6 @@
 module Backups
   module Requests
     class Layout
-      HEADER_BACKGROUND = { red: 0.92, green: 0.94, blue: 0.96 }.freeze
-
       def initialize(sheet_ids:)
         @sheet_ids = sheet_ids
       end
@@ -38,7 +36,7 @@ module Backups
             cell:   Google::Apis::SheetsV4::CellData.new(
               user_entered_format: Google::Apis::SheetsV4::CellFormat.new(
                 text_format:      Google::Apis::SheetsV4::TextFormat.new(bold: true),
-                background_color: Google::Apis::SheetsV4::Color.new(**HEADER_BACKGROUND)
+                background_color: Google::Apis::SheetsV4::Color.new(**HEADER_COLOR)
               )
             ),
             fields: 'userEnteredFormat(textFormat,backgroundColor)'

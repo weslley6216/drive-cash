@@ -44,6 +44,10 @@ RSpec.describe Backups::Tabs do
       expect(tab.width).to eq(7)
     end
 
+    it 'locates a column by name' do
+      expect(described_class.find(:summary).index_of(:profit)).to eq(3)
+    end
+
     it 'exposes the summary savings header as an estimate' do
       expect(described_class.find(:summary).headers.last).to eq('% para Conta (estimado)')
     end
