@@ -54,12 +54,22 @@ RSpec.describe Backups::SheetWriter do
         expect(client).to have_received(:batch_update_spreadsheet).once
       end
 
-      it 'clears the data range of every tab before writing' do
+      it 'clears only the rows left over below the snapshot it just wrote' do
         writer.call
 
         expect(client).to have_received(:batch_clear_values) do |_id, request|
-          expect(request.ranges).to eq(Backups::Tabs::ALL.map { |tab| "'#{tab.title}'!A2:ZZ" })
+          expect(request.ranges).to include("'Ganhos'!A3:Z", "'Metas'!A2:Z")
         end
+      end
+
+      it 'writes the new snapshot before clearing the stale rows' do
+        sequence = []
+        allow(client).to receive(:batch_update_values) { sequence << :write }
+        allow(client).to receive(:batch_clear_values) { sequence << :clear }
+
+        writer.call
+
+        expect(sequence).to eq(%i[write clear])
       end
 
       it 'writes the header followed by the data rows starting at A1' do
@@ -136,12 +146,13 @@ RSpec.describe Backups::SheetWriter do
         )
       end
 
-      it 'requests neither banding nor chart again' do
+      it 'requests no banding again and refreshes the chart it found' do
         described_class.new(client: client, spreadsheet_id: spreadsheet_id, rows: rows, summary_month_count: 3).call
 
         expect(client).to have_received(:batch_update_spreadsheet) do |_id, request|
           expect(request.requests.filter_map(&:add_banding)).to eq([])
           expect(request.requests.filter_map(&:add_chart)).to eq([])
+          expect(request.requests.filter_map(&:update_chart_spec).map(&:chart_id)).to eq([9])
         end
       end
     end

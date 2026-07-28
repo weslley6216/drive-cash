@@ -66,13 +66,16 @@ RSpec.describe 'Backups', type: :request do
 
       post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
 
-      expect(Rails.logger).to have_received(:error).with(/MissingUser.*no user with email x@y.com/)
+      expect(Rails.logger).to have_received(:error).with(/no user with email x@y.com \(Backups::SheetSync::MissingUser\)/)
     end
 
-    it 'does not require an authenticated session' do
+    it 'logs where the failure came from' do
+      allow(Backups::SheetSync).to receive(:call).and_raise(Backups::SheetSync::MissingUser, 'no user with email x@y.com')
+      allow(Rails.logger).to receive(:error)
+
       post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
 
-      expect(response).not_to redirect_to(new_session_path)
+      expect(Rails.logger).to have_received(:error).with(/backups_controller\.rb/)
     end
   end
 end

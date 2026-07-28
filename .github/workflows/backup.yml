@@ -13,6 +13,7 @@ jobs:
         run: |
           curl -fsS -X POST "${APP_URL}/backups" \
             -H "Authorization: Bearer ${BACKUP_TRIGGER_TOKEN}" \
+            --proto '=https' \
             --max-time 180 \
             --retry 3 \
             --retry-connrefused \

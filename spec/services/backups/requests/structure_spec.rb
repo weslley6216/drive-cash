@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Backups::Requests::Structure do
-  def state(sheet_ids: {}, banded_titles: [], charted_titles: [])
-    Backups::Requests::Structure::State.new(sheet_ids: sheet_ids, banded_titles: banded_titles, charted_titles: charted_titles)
+  def state(sheet_ids: {}, banded_titles: [], chart_ids: {})
+    Backups::Requests::Structure::State.new(sheet_ids: sheet_ids, banded_titles: banded_titles, chart_ids: chart_ids)
   end
 
   let(:all_ids) { Backups::Tabs::ALL.each_with_index.to_h { |tab, offset| [tab.title, offset] } }
@@ -20,6 +20,12 @@ RSpec.describe Backups::Requests::Structure do
 
       expect(requests.map { |request| request.add_sheet.properties.title })
         .to eq(['Despesas', 'Abastecimentos', 'Manutenções', 'Metas'])
+    end
+
+    it 'places each tab at its registry position so the summary opens first' do
+      requests = described_class.new(state: state, summary_month_count: 0).missing_tabs
+
+      expect(requests.map { |request| request.add_sheet.properties.index }).to eq([0, 1, 2, 3, 4, 5])
     end
 
     it 'requests nothing when every tab already exists' do
@@ -77,10 +83,19 @@ RSpec.describe Backups::Requests::Structure do
       expect(series.end_column_index).to eq(4)
     end
 
-    it 'skips the chart when the summary tab already has one' do
-      requests = described_class.new(state: state(sheet_ids: all_ids, charted_titles: ['Resumo']), summary_month_count: 3).decorations
+    it 'updates the existing chart instead of adding a second one' do
+      requests = described_class.new(state: state(sheet_ids: all_ids, chart_ids: { 'Resumo' => 9 }), summary_month_count: 3).decorations
+      updated = requests.filter_map(&:update_chart_spec).first
 
       expect(requests.filter_map(&:add_chart)).to eq([])
+      expect(updated.chart_id).to eq(9)
+    end
+
+    it 'stretches the existing chart range to cover the months added since it was created' do
+      requests = described_class.new(state: state(sheet_ids: all_ids, chart_ids: { 'Resumo' => 9 }), summary_month_count: 7).decorations
+      series = requests.filter_map(&:update_chart_spec).first.spec.basic_chart.series.first
+
+      expect(series.series.source_range.sources.first.end_row_index).to eq(8)
     end
 
     it 'skips the chart when there is no month to plot' do

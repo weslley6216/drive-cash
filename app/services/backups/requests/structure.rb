@@ -1,7 +1,7 @@
 module Backups
   module Requests
     class Structure
-      State = Data.define(:sheet_ids, :banded_titles, :charted_titles)
+      State = Data.define(:sheet_ids, :banded_titles, :chart_ids)
 
       CHART_COLUMN_GAP = 2
       FIRST_BAND_COLOR = { red: 1.0, green: 1.0, blue: 1.0 }.freeze
@@ -25,7 +25,7 @@ module Backups
       def add_sheet(tab)
         Google::Apis::SheetsV4::Request.new(
           add_sheet: Google::Apis::SheetsV4::AddSheetRequest.new(
-            properties: Google::Apis::SheetsV4::SheetProperties.new(title: tab.title)
+            properties: Google::Apis::SheetsV4::SheetProperties.new(title: tab.title, index: Tabs::ALL.index(tab))
           )
         )
       end
@@ -51,12 +51,23 @@ module Backups
       def chart
         tab = Tabs.find(:summary)
         sheet_id = @state.sheet_ids[tab.title]
-        return nil if sheet_id.nil? || @state.charted_titles.include?(tab.title) || @summary_month_count.zero?
+        return nil if sheet_id.nil? || @summary_month_count.zero?
 
+        chart_id = @state.chart_ids[tab.title]
+        chart_id ? update_chart(chart_id, sheet_id, tab) : add_chart(sheet_id, tab)
+      end
+
+      def add_chart(sheet_id, tab)
         Google::Apis::SheetsV4::Request.new(
           add_chart: Google::Apis::SheetsV4::AddChartRequest.new(
             chart: Google::Apis::SheetsV4::EmbeddedChart.new(spec: chart_spec(sheet_id, tab), position: chart_position(sheet_id, tab))
           )
+        )
+      end
+
+      def update_chart(chart_id, sheet_id, tab)
+        Google::Apis::SheetsV4::Request.new(
+          update_chart_spec: Google::Apis::SheetsV4::UpdateChartSpecRequest.new(chart_id: chart_id, spec: chart_spec(sheet_id, tab))
         )
       end
 

@@ -8,7 +8,7 @@ class BackupsController < ApplicationController
     Backups::SheetSync.call
     head :ok
   rescue StandardError => e
-    Rails.logger.error "[Backups] #{e.class}: #{e.message}"
+    Rails.logger.error "[Backups] #{e.full_message(highlight: false)}"
     head :internal_server_error
   end
 end

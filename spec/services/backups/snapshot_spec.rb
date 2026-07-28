@@ -67,6 +67,33 @@ RSpec.describe Backups::Snapshot do
       expect(row).to eq(['Mensal', 'Lucro', '2026-05-01', '2026-05-31', 7_000.0])
     end
 
+    it 'builds every row with the width its tab declares' do
+      create(:earning, user: user)
+      create(:expense, user: user)
+      create(:refueling, vehicle: vehicle)
+      create(:maintenance, vehicle: vehicle)
+      create(:goal, user: user)
+
+      widths = described_class.call(user: user).rows.transform_values { |rows| rows.map(&:size).uniq }
+
+      expect(widths).to eq(widths.keys.index_with { |key| [Backups::Tabs.find(key).width] })
+    end
+
+    it 'produces a row set for every mirrored tab of the registry' do
+      expect(described_class.call(user: user).rows.keys)
+        .to match_array(Backups::Tabs::ALL.map(&:key) - [:summary])
+    end
+
+    it 'leaves nullable numeric columns empty instead of zeroing them' do
+      create(:refueling, vehicle: vehicle, liters: nil, total_amount: 191.72)
+      create(:maintenance, vehicle: vehicle, estimated_cost: nil)
+
+      payload = described_class.call(user: user)
+
+      expect(payload.rows[:refuelings].first[2..3]).to eq([nil, nil])
+      expect(payload.rows[:maintenances].first.last).to be_nil
+    end
+
     it 'ignores records that belong to another user' do
       create(:earning, user: create(:user), amount: 999.00)
 

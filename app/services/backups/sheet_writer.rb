@@ -1,7 +1,7 @@
 module Backups
   class SheetWriter
     FIELDS = 'sheets(properties(sheetId,title),charts(chartId),bandedRanges(bandedRangeId))'.freeze
-    DATA_RANGE = 'A2:ZZ'.freeze
+    LAST_COLUMN = 'Z'.freeze
 
     def initialize(client:, spreadsheet_id:, rows:, summary_month_count:)
       @client = client
@@ -13,8 +13,8 @@ module Backups
     def call
       state = create_missing_tabs(load_state)
 
-      clear_values
       write_values
+      clear_stale_values
       decorate(state)
     end
 
@@ -25,9 +25,10 @@ module Backups
       sheets = spreadsheet.sheets || []
 
       Requests::Structure::State.new(
-        sheet_ids:      sheets.to_h { |sheet| [sheet.properties.title, sheet.properties.sheet_id] },
-        banded_titles:  sheets.select { |sheet| sheet.banded_ranges.present? }.map { |sheet| sheet.properties.title },
-        charted_titles: sheets.select { |sheet| sheet.charts.present? }.map { |sheet| sheet.properties.title }
+        sheet_ids:     sheets.to_h { |sheet| [sheet.properties.title, sheet.properties.sheet_id] },
+        banded_titles: sheets.select { |sheet| sheet.banded_ranges.present? }.map { |sheet| sheet.properties.title },
+        chart_ids:     sheets.select { |sheet| sheet.charts.present? }
+                             .to_h { |sheet| [sheet.properties.title, sheet.charts.first.chart_id] }
       )
     end
 
@@ -41,11 +42,10 @@ module Backups
       state.with(sheet_ids: state.sheet_ids.merge(created))
     end
 
-    def clear_values
-      @client.batch_clear_values(
-        @spreadsheet_id,
-        Google::Apis::SheetsV4::BatchClearValuesRequest.new(ranges: Tabs::ALL.map { |tab| "'#{tab.title}'!#{DATA_RANGE}" })
-      )
+    def clear_stale_values
+      ranges = Tabs::ALL.map { |tab| "'#{tab.title}'!A#{Array(@rows[tab.key]).size + 2}:#{LAST_COLUMN}" }
+
+      @client.batch_clear_values(@spreadsheet_id, Google::Apis::SheetsV4::BatchClearValuesRequest.new(ranges: ranges))
     end
 
     def write_values
