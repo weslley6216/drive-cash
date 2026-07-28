@@ -12,6 +12,8 @@ gem 'faraday-retry'
 gem 'matrix'
 gem 'prawn'
 gem 'prawn-table'
+gem 'google-apis-sheets_v4'
+gem 'googleauth'
 
 # Transactional email over Resend's HTTP API (port 443) — works on hosts that
 # block outbound SMTP ports, unlike :smtp delivery.

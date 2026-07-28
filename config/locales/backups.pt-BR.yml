@@ -1,0 +1,69 @@
+pt-BR:
+  backups:
+    boolean:
+      "true": "Sim"
+      "false": "Não"
+    goal_kinds:
+      weekly: "Semanal"
+      monthly: "Mensal"
+      annual: "Anual"
+    goal_metrics:
+      profit: "Lucro"
+      earnings: "Receitas"
+    summary:
+      total: "Total %{year}"
+      chart_title: "Lucro mensal"
+    tabs:
+      summary:
+        title: "Resumo"
+        columns:
+          month: "Mês"
+          earnings: "Ganhos"
+          expenses: "Despesas pagas"
+          profit: "Lucro"
+          savings: "% para Conta (estimado)"
+      earnings:
+        title: "Ganhos"
+        columns:
+          date: "Data"
+          platform: "Plataforma"
+          amount: "Valor"
+          trips_count: "Corridas"
+          notes: "Observações"
+          created_at: "Registrado em"
+      expenses:
+        title: "Despesas"
+        columns:
+          date: "Data"
+          category: "Categoria"
+          amount: "Valor"
+          vendor: "Estabelecimento"
+          description: "Descrição"
+          paid: "Pago"
+          installment_number: "Parcela"
+          installment_count: "Total de parcelas"
+      refuelings:
+        title: "Abastecimentos"
+        columns:
+          date: "Data"
+          vendor: "Posto"
+          liters: "Litros"
+          price_per_liter: "Preço/litro"
+          total_amount: "Total"
+          odometer_km: "Odômetro (km)"
+          full_tank: "Tanque cheio"
+      maintenances:
+        title: "Manutenções"
+        columns:
+          category: "Item"
+          interval_km: "Intervalo (km)"
+          last_done_km: "Última feita (km)"
+          estimated_cost: "Custo estimado"
+      goals:
+        title: "Metas"
+        columns:
+          kind: "Tipo"
+          metric: "Métrica"
+          period_start: "Início"
+          period_end: "Fim"
+          target_amount: "Alvo"

@@ -1,0 +1,23 @@
+name: Backup to Google Sheets
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the backup endpoint
+        run: |
+          curl -fsS -X POST "${APP_URL}/backups" \
+            -H "Authorization: Bearer ${BACKUP_TRIGGER_TOKEN}" \
+            --proto '=https' \
+            --max-time 180 \
+            --retry 3 \
+            --retry-connrefused \
+            --retry-delay 30
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          BACKUP_TRIGGER_TOKEN: ${{ secrets.BACKUP_TRIGGER_TOKEN }}
