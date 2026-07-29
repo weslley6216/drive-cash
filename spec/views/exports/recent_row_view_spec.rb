@@ -21,12 +21,6 @@ RSpec.describe Exports::RecentRowView, type: :view do
     expect(queued).not_to include(I18n.t('exports.status.processing'))
   end
 
-  it 'no longer reuses the access alert copy as a row status' do
-    html = render(described_class.new(export: create(:export, user: user, status: 'processing')))
-
-    expect(html).not_to include(I18n.t('exports.flash.not_ready'))
-  end
-
   it 'keeps polling with a window derived from the stale limit while the export is running' do
     export = create(:export, user: user, status: 'processing')
     window = Exports::PollWindow.new

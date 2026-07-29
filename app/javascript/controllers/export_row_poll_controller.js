@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["settled"]
-  static values = { interval: Number, maxAttempts: { type: Number, default: 90 }, exportId: Number }
+  static values = { interval: Number, maxAttempts: Number, exportId: Number }
 
   connect() {
     this.attempts = 0
