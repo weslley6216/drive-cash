@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["message"]
+
   connect() {
     this.pendingRefresh = false
     this.held = false
@@ -12,7 +14,7 @@ export default class extends Controller {
       "turbo:before-stream-render": (event) => this.onStreamRender(event),
       "turbo:frame-load":           (event) => this.onFrameLoad(event),
       "turbo:load":                 ()      => this.hide(),
-      "loading:hold":               ()      => this.hold(),
+      "loading:hold":               (event) => this.hold(event),
       "loading:release":            ()      => this.release()
     }
 
@@ -58,8 +60,9 @@ export default class extends Controller {
     if (event.target?.id === "modal" && !this.pendingRefresh) this.hide()
   }
 
-  hold() {
+  hold(event) {
     this.held = true
+    this.showMessage(event?.detail?.message)
     this.show()
   }
 
@@ -81,7 +84,13 @@ export default class extends Controller {
 
     clearTimeout(this.safetyNet)
     this.pendingRefresh = false
+    this.showMessage(null)
     this.element.classList.add("hidden")
+  }
+
+  showMessage(text) {
+    this.messageTarget.textContent = text || ""
+    this.messageTarget.classList.toggle("hidden", !text)
   }
 
   inPageFrame(element) {

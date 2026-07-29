@@ -12,7 +12,8 @@ module Exports
             controller:                  'export-wait',
             turbo_temporary:             '',
             export_wait_export_id_value: @export.id,
-            export_wait_timeout_value:   TIMEOUT_MS
+            export_wait_timeout_value:   TIMEOUT_MS,
+            export_wait_message_value:   t('exports.async_hint')
           }) do
         download_link
         hint

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["download", "hint"]
-  static values = { exportId: Number, timeout: Number }
+  static values = { exportId: Number, timeout: Number, message: String }
 
   connect() {
     this.onSettled = (event) => this.settled(event)
@@ -33,7 +33,7 @@ export default class extends Controller {
   }
 
   hold() {
-    document.dispatchEvent(new CustomEvent("loading:hold"))
+    document.dispatchEvent(new CustomEvent("loading:hold", { detail: { message: this.messageValue } }))
   }
 
   release() {
