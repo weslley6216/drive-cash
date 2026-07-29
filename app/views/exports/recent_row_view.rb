@@ -1,12 +1,13 @@
 module Exports
   class RecentRowView < ApplicationView
-    def initialize(export:, last:)
+    FRAME_CLASSES = 'block border-b border-slate-100 last:border-b-0'.freeze
+
+    def initialize(export:)
       @export = export
-      @last = last
     end
 
     def view_template
-      turbo_frame_tag("export_#{@export.id}", **frame_attrs) do
+      turbo_frame_tag("export_#{@export.id}", class: FRAME_CLASSES, **frame_attrs) do
         if @export.status_failed?
           failed_row
         else
@@ -22,7 +23,11 @@ module Exports
     def settled_data
       return {} unless settled?
 
-      { export_row_poll_target: 'settled' }
+      { export_row_poll_target: 'settled', export_status: @export.status }
+    end
+
+    def poll_window
+      @poll_window ||= Exports::PollWindow.new
     end
 
     def frame_attrs
@@ -31,15 +36,15 @@ module Exports
       {
         src:  helpers.row_export_path(@export),
         data: {
-          controller:                     'export-row-poll',
-          export_row_poll_interval_value: 4000
+          controller:                         'export-row-poll',
+          export_row_poll_interval_value:     poll_window.interval_ms,
+          export_row_poll_max_attempts_value: poll_window.max_attempts,
+          export_row_poll_export_id_value:    @export.id
         }
       }
     end
 
-    def row_classes
-      "flex items-center gap-3 px-4 py-3 #{'border-b border-slate-100' unless @last}"
-    end
+    def row_classes = 'flex items-center gap-3 px-4 py-3'
 
     def linked_row
       link_to(export_path(@export), class: row_classes, data: { turbo: false, **settled_data }) do
@@ -74,10 +79,9 @@ module Exports
     end
 
     def size_or_status
-      return t('exports.flash.failed') if @export.status_failed?
       return helpers.number_to_human_size(@export.file.byte_size) if @export.file.attached?
 
-      t('exports.flash.not_ready')
+      t("exports.status.#{@export.status}")
     end
   end
 end

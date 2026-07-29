@@ -6,43 +6,68 @@ RSpec.describe Exports::RecentRowView, type: :view do
   it 'wraps the row in a turbo frame per export' do
     export = create(:export, user: user, period_kind: 'year', period_start: Date.new(2026, 1, 1), period_end: Date.new(2026, 12, 31))
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
     expect(html).to include(%(id="export_#{export.id}"))
     expect(html).to include('Ano de 2026')
   end
 
-  it 'shows the generating hint and keeps polling when the export is not done' do
-    export = create(:export, user: user, status: 'processing')
+  it 'separates the queued state from the generating state' do
+    queued = render(described_class.new(export: create(:export, user: user, status: 'pending')))
+    generating = render(described_class.new(export: create(:export, user: user, status: 'processing')))
 
-    html = render(described_class.new(export: export, last: true))
-
-    expect(html).to include(I18n.t('exports.flash.not_ready'))
-    expect(html).to include('export-row-poll')
-    expect(html).not_to include('export-row-poll-target')
+    expect(queued).to include(I18n.t('exports.status.pending'))
+    expect(generating).to include(I18n.t('exports.status.processing'))
+    expect(queued).not_to include(I18n.t('exports.status.processing'))
   end
 
-  it 'marks the row as settled so the client stops polling once it is done' do
+  it 'no longer reuses the access alert copy as a row status' do
+    html = render(described_class.new(export: create(:export, user: user, status: 'processing')))
+
+    expect(html).not_to include(I18n.t('exports.flash.not_ready'))
+  end
+
+  it 'keeps polling with a window derived from the stale limit while the export is running' do
+    export = create(:export, user: user, status: 'processing')
+    window = Exports::PollWindow.new
+
+    html = render(described_class.new(export: export))
+
+    expect(html).to include('export-row-poll')
+    expect(html).to include(%(data-export-row-poll-interval-value="#{window.interval_ms}"))
+    expect(html).to include(%(data-export-row-poll-max-attempts-value="#{window.max_attempts}"))
+    expect(html).to include(%(data-export-row-poll-export-id-value="#{export.id}"))
+  end
+
+  it 'announces the terminal status on the settled element so the client can react to it' do
     export = create(:export, user: user, status: 'done')
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
     expect(html).to include('data-export-row-poll-target="settled"')
+    expect(html).to include('data-export-status="done"')
   end
 
-  it 'marks the row as settled so the client stops polling once it failed' do
+  it 'announces a failed export as settled too' do
     export = create(:export, user: user, status: 'failed')
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
     expect(html).to include('data-export-row-poll-target="settled"')
+    expect(html).to include('data-export-status="failed"')
+  end
+
+  it 'stops polling once the export settled' do
+    html = render(described_class.new(export: create(:export, user: user, status: 'done')))
+
+    expect(html).not_to include('data-controller="export-row-poll"')
   end
 
   it 'shows the human size when the file is attached' do
     export = create(:export, user: user, status: 'done')
     export.file.attach(io: StringIO.new('x' * 2048), filename: 'r.csv', content_type: 'text/csv')
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
     expect(html).to include('2 KB')
   end
@@ -51,19 +76,24 @@ RSpec.describe Exports::RecentRowView, type: :view do
     export = create(:export, user: user, status: 'done')
     export.file.attach(io: StringIO.new('x'), filename: 'r.csv', content_type: 'text/csv')
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
     expect(html).to include(%(href="/exports/#{export.id}"))
     expect(html).to include('data-turbo="false"')
   end
 
-  it 'stops polling and hides the download link when the export failed' do
+  it 'hides the download link when the export failed' do
     export = create(:export, user: user, status: 'failed')
 
-    html = render(described_class.new(export: export, last: true))
+    html = render(described_class.new(export: export))
 
-    expect(html).to include(I18n.t('exports.flash.failed'))
-    expect(html).not_to include('data-controller="export-row-poll"')
+    expect(html).to include(I18n.t('exports.status.failed'))
     expect(html).not_to include(%(href="/exports/#{export.id}"))
+  end
+
+  it 'draws the separator on the frame so the last row has none' do
+    html = render(described_class.new(export: create(:export, user: user)))
+
+    expect(html).to include('border-b border-slate-100 last:border-b-0')
   end
 end

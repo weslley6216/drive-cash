@@ -173,7 +173,7 @@ RSpec.describe 'Exports', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(%(id="export_#{export.id}"))
-      expect(response.body).to include(I18n.t('exports.flash.not_ready'))
+      expect(response.body).to include(I18n.t('exports.status.pending'))
     end
 
     it 'fails an export whose job died before finishing' do
@@ -183,7 +183,7 @@ RSpec.describe 'Exports', type: :request do
       get row_export_path(export)
 
       expect(export.reload).to be_status_failed
-      expect(response.body).to include(I18n.t('exports.flash.failed'))
+      expect(response.body).to include(I18n.t('exports.status.failed'))
     end
 
     it 'returns not found for another user export' do
