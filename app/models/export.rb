@@ -1,6 +1,7 @@
 class Export < ApplicationRecord
   DEFAULT_INCLUDES = { 'earnings' => true, 'expenses' => true, 'refuelings' => true, 'maintenances' => false }.freeze
   INCLUDABLE = %w[earnings expenses refuelings maintenances].freeze
+  STALE_AFTER = 15.minutes
 
   belongs_to :user
   has_one_attached :file
@@ -19,6 +20,10 @@ class Export < ApplicationRecord
 
   def includes_for(kind)
     includes.fetch(kind.to_s, false)
+  end
+
+  def stale?
+    (status_pending? || status_processing?) && updated_at < STALE_AFTER.ago
   end
 
   def resolve_period

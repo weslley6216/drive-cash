@@ -5,3 +5,9 @@ test:
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
+
+google:
+  service: GCS
+  project: <%= ENV["GOOGLE_STORAGE_PROJECT"] %>
+  bucket: <%= ENV["GOOGLE_STORAGE_BUCKET"] %>
+  credentials: <%= (JSON.parse(ENV["GOOGLE_STORAGE_SA_JSON"].presence || ENV["GOOGLE_BACKUP_SA_JSON"].presence || "{}") rescue {}).to_json %>

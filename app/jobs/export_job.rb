@@ -1,6 +1,15 @@
 class ExportJob < ApplicationJob
   queue_as :default
 
+  MAX_ATTEMPTS = 3
+
+  retry_on StandardError, wait: :polynomially_longer, attempts: MAX_ATTEMPTS do |job, error|
+    Export.find_by(id: job.arguments.first)&.update(status: :failed)
+    raise error
+  end
+
+  discard_on ActiveRecord::RecordNotFound
+
   def perform(export_id)
     export = Export.find(export_id)
     export.update!(status: :processing)
@@ -11,8 +20,5 @@ class ExportJob < ApplicationJob
 
     export.file.attach(io: file.io, filename: file.filename, content_type: file.content_type)
     export.update!(status: :done)
-  rescue StandardError
-    export&.update(status: :failed)
-    raise
   end
 end

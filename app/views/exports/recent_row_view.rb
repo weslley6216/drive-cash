@@ -17,8 +17,16 @@ module Exports
 
     private
 
+    def settled? = @export.status_done? || @export.status_failed?
+
+    def settled_data
+      return {} unless settled?
+
+      { export_row_poll_target: 'settled' }
+    end
+
     def frame_attrs
-      return {} if @export.status_done? || @export.status_failed?
+      return {} if settled?
 
       {
         src:  helpers.row_export_path(@export),
@@ -34,7 +42,7 @@ module Exports
     end
 
     def linked_row
-      link_to(export_path(@export), class: row_classes) do
+      link_to(export_path(@export), class: row_classes, data: { turbo: false, **settled_data }) do
         icon
         info
         span(class: 'text-slate-400') { render PhlexIcons::Lucide::Download.new(class: 'w-[18px] h-[18px]') }
@@ -42,7 +50,7 @@ module Exports
     end
 
     def failed_row
-      div(class: row_classes) do
+      div(class: row_classes, data: settled_data) do
         icon
         info
       end

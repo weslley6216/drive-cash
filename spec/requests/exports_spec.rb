@@ -176,6 +176,16 @@ RSpec.describe 'Exports', type: :request do
       expect(response.body).to include(I18n.t('exports.flash.not_ready'))
     end
 
+    it 'fails an export whose job died before finishing' do
+      export = create(:export, user: current_user, status: 'processing')
+      export.update_column(:updated_at, (Export::STALE_AFTER + 1.minute).ago)
+
+      get row_export_path(export)
+
+      expect(export.reload).to be_status_failed
+      expect(response.body).to include(I18n.t('exports.flash.failed'))
+    end
+
     it 'returns not found for another user export' do
       other = create(:export, user: create(:user))
 

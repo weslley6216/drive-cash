@@ -138,4 +138,35 @@ RSpec.describe Export, type: :model do
       expect(export.period_start).to be_nil
     end
   end
+
+  describe '#stale?' do
+    let(:export) { create(:export) }
+
+    it 'is stale when it stays processing past the stale window' do
+      export.update!(status: 'processing')
+      export.update_column(:updated_at, (described_class::STALE_AFTER + 1.minute).ago)
+
+      expect(export.reload).to be_stale
+    end
+
+    it 'is stale when it stays pending past the stale window' do
+      export.update!(status: 'pending')
+      export.update_column(:updated_at, (described_class::STALE_AFTER + 1.minute).ago)
+
+      expect(export.reload).to be_stale
+    end
+
+    it 'is not stale while inside the stale window' do
+      export.update!(status: 'processing')
+
+      expect(export).not_to be_stale
+    end
+
+    it 'is not stale once it is done' do
+      export.update!(status: 'done')
+      export.update_column(:updated_at, (described_class::STALE_AFTER + 1.minute).ago)
+
+      expect(export.reload).not_to be_stale
+    end
+  end
 end

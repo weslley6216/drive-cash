@@ -21,20 +21,20 @@ module Exports
           mobile_layout
           desktop_layout
         end
+        recents_section
       end
     end
 
     private
 
     def mobile_layout
-      div(class: 'lg:hidden pb-28') do
+      div(class: 'lg:hidden') do
         mobile_header
         div(class: 'px-5 space-y-5') do
           why_block
           period_chips_mobile
           format_pills(mobile: true)
           include_card
-          recents_card
         end
         mobile_cta
       end
@@ -220,16 +220,20 @@ module Exports
       render @summary_view
     end
 
-    def recents_card
-      div do
+    def recents_section
+      div(class: 'px-5 pt-5 pb-28 lg:px-0 lg:pt-6 lg:pb-0 lg:max-w-5xl') do
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5') { t('exports.recents') }
-        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden') do
-          if @exports.empty?
-            p(class: 'p-5 text-sm text-slate-500 text-center') { t('exports.empty_recents') }
-          else
-            @exports.each_with_index { |export, index| render RecentRowView.new(export: export, last: index == @exports.size - 1) }
-          end
+        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm lg:border-slate-200 lg:shadow-none overflow-hidden') do
+          recents_rows
         end
+      end
+    end
+
+    def recents_rows
+      if @exports.empty?
+        p(class: 'p-5 text-sm text-slate-500 text-center') { t('exports.empty_recents') }
+      else
+        @exports.each_with_index { |export, index| render RecentRowView.new(export: export, last: index == @exports.size - 1) }
       end
     end
 

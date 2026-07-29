@@ -80,6 +80,6 @@ Rails.application.configure do
     protocol: 'https'
   }
 
-  config.active_storage.service = :local
+  config.active_storage.service = ENV['GOOGLE_STORAGE_BUCKET'].present? ? :google : :local
   config.active_storage.variant_processor = :disabled
 end

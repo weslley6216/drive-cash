@@ -36,7 +36,7 @@ class ExportsController < ApplicationController
     export = current_user.exports.find_by(id: params[:id])
     return head :not_found unless export
 
-    render Exports::RecentRowView.new(export: export, last: true)
+    render Exports::RecentRowView.new(export: Exports::StaleMarker.call(export: export), last: true)
   end
 
   private
