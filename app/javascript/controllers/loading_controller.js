@@ -3,6 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   connect() {
     this.pendingRefresh = false
+    this.held = false
     this.handlers = {
       "turbo:submit-start":         (event) => this.onSubmitStart(event),
       "turbo:submit-end":           (event) => this.onSubmitEnd(event),
@@ -10,7 +11,9 @@ export default class extends Controller {
       "turbo:before-fetch-request": (event) => this.onBeforeFetch(event),
       "turbo:before-stream-render": (event) => this.onStreamRender(event),
       "turbo:frame-load":           (event) => this.onFrameLoad(event),
-      "turbo:load":                 ()      => this.hide()
+      "turbo:load":                 ()      => this.hide(),
+      "loading:hold":               ()      => this.hold(),
+      "loading:release":            ()      => this.release()
     }
 
     Object.entries(this.handlers).forEach(([type, handler]) => {
@@ -55,13 +58,27 @@ export default class extends Controller {
     if (event.target?.id === "modal" && !this.pendingRefresh) this.hide()
   }
 
+  hold() {
+    this.held = true
+    this.show()
+  }
+
+  release() {
+    this.held = false
+    this.hide()
+  }
+
   show() {
     clearTimeout(this.safetyNet)
     this.element.classList.remove("hidden")
+    if (this.held) return
+
     this.safetyNet = setTimeout(() => this.hide(), 8000)
   }
 
   hide() {
+    if (this.held) return
+
     clearTimeout(this.safetyNet)
     this.pendingRefresh = false
     this.element.classList.add("hidden")
