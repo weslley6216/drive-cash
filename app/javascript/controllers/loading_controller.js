@@ -62,7 +62,7 @@ export default class extends Controller {
 
   hold(event) {
     this.held = true
-    this.message(event?.detail?.message)
+    this.showMessage(event?.detail?.message)
     this.show()
   }
 
@@ -84,11 +84,11 @@ export default class extends Controller {
 
     clearTimeout(this.safetyNet)
     this.pendingRefresh = false
-    this.message(null)
+    this.showMessage(null)
     this.element.classList.add("hidden")
   }
 
-  message(text) {
+  showMessage(text) {
     this.messageTarget.textContent = text || ""
     this.messageTarget.classList.toggle("hidden", !text)
   }
