@@ -85,6 +85,24 @@ RSpec.describe Exports::RecentRowView, type: :view do
     expect(html).not_to include(%(href="/exports/#{export.id}"))
   end
 
+  it 'keeps the download link off a row that is still being generated' do
+    export = create(:export, user: user, status: 'processing')
+
+    html = render(described_class.new(export: export))
+
+    expect(html).to include(I18n.t('exports.status.processing'))
+    expect(html).not_to include(%(href="/exports/#{export.id}"))
+  end
+
+  it 'marks a row that is still being generated with a clock' do
+    queued = render(described_class.new(export: create(:export, user: user, status: 'pending')))
+    ready = render(described_class.new(export: create(:export, user: user, status: 'done')))
+    clock = render(PhlexIcons::Lucide::Clock.new(class: 'w-[18px] h-[18px]'))
+
+    expect(queued).to include(clock)
+    expect(ready).not_to include(clock)
+  end
+
   it 'offers a retry on the failed row' do
     export = create(:export, user: user, status: 'failed')
 

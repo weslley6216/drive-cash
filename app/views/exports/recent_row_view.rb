@@ -8,15 +8,18 @@ module Exports
 
     def view_template
       turbo_frame_tag("export_#{@export.id}", class: FRAME_CLASSES, **frame_attrs) do
-        if @export.status_failed?
-          failed_row
-        else
-          linked_row
-        end
+        row
       end
     end
 
     private
+
+    def row
+      return unsettled_row unless settled?
+      return failed_row if @export.status_failed?
+
+      linked_row
+    end
 
     def settled? = @export.status_done? || @export.status_failed?
 
@@ -46,12 +49,24 @@ module Exports
 
     def row_classes = 'flex items-center gap-3 px-4 py-3'
 
+    def unsettled_row
+      div(class: row_classes) do
+        icon
+        info
+        trailing_icon(PhlexIcons::Lucide::Clock)
+      end
+    end
+
     def linked_row
       link_to(export_path(@export), class: row_classes, data: { turbo: false, **settled_data }) do
         icon
         info
-        span(class: 'text-slate-400') { render PhlexIcons::Lucide::Download.new(class: 'w-[18px] h-[18px]') }
+        trailing_icon(PhlexIcons::Lucide::Download)
       end
+    end
+
+    def trailing_icon(icon_class)
+      span(class: 'text-slate-400') { render icon_class.new(class: 'w-[18px] h-[18px]') }
     end
 
     def failed_row
