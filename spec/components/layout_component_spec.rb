@@ -71,7 +71,7 @@ RSpec.describe LayoutComponent, type: :component do
   context 'on an app page' do
     let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
 
-    it 'renders the loading overlay outside the breakpoint layouts' do
+    it 'renders the loading overlay on app pages' do
       expect(html).to include('id="loading-overlay"')
     end
   end

@@ -9,7 +9,7 @@ RSpec.describe LoadingOverlayComponent, type: :component do
     expect(html).to include('data-turbo-permanent')
   end
 
-  it 'stacks the message under the spinner' do
+  it 'stacks a spinner and a message slot in one column' do
     expect(html).to include('flex flex-col items-center gap-3')
     expect(html).to include('animate-spin')
   end

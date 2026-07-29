@@ -94,12 +94,15 @@ RSpec.describe Exports::RecentRowView, type: :view do
     expect(html).not_to include(%(href="/exports/#{export.id}"))
   end
 
-  it 'marks a row that is still being generated with a clock' do
+  it 'marks a row that is still being generated with a clock and a ready one with a download' do
     queued = render(described_class.new(export: create(:export, user: user, status: 'pending')))
     ready = render(described_class.new(export: create(:export, user: user, status: 'done')))
     clock = render(PhlexIcons::Lucide::Clock.new(class: 'w-[18px] h-[18px]'))
+    download = render(PhlexIcons::Lucide::Download.new(class: 'w-[18px] h-[18px]'))
 
     expect(queued).to include(clock)
+    expect(queued).not_to include(download)
+    expect(ready).to include(download)
     expect(ready).not_to include(clock)
   end
 
