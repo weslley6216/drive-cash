@@ -68,6 +68,22 @@ RSpec.describe LayoutComponent, type: :component do
     end
   end
 
+  context 'on an app page' do
+    let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
+
+    it 'renders the loading overlay outside the breakpoint layouts' do
+      expect(html).to include('id="loading-overlay"')
+    end
+  end
+
+  context 'with auth: true' do
+    let(:html) { view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' } }
+
+    it 'leaves the loading overlay out of the auth shell' do
+      expect(html).not_to include('id="loading-overlay"')
+    end
+  end
+
   context 'with sidebar_nav: :home' do
     let(:html) do
       view_context.render(
