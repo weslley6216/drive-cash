@@ -1,7 +1,7 @@
 class Export < ApplicationRecord
   DEFAULT_INCLUDES = { 'earnings' => true, 'expenses' => true, 'refuelings' => true, 'maintenances' => false }.freeze
   INCLUDABLE = %w[earnings expenses refuelings maintenances].freeze
-  STALE_AFTER = 15.minutes
+  STALE_AFTER = 3.minutes
 
   belongs_to :user
   has_one_attached :file
@@ -13,7 +13,7 @@ class Export < ApplicationRecord
   validates :period_kind, :period_start, :period_end, :format, presence: true
   validate :period_end_after_start
 
-  before_validation :apply_period_range
+  before_validation :apply_period_range, on: :create
   after_initialize :apply_defaults, if: :new_record?
 
   scope :recent, -> { order(created_at: :desc).includes(file_attachment: :blob) }

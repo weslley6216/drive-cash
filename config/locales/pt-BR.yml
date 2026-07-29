@@ -463,8 +463,16 @@ pt-BR:
     recents: "Exportações recentes"
     empty_recents: "Nada exportado ainda."
     cta: "Gerar e baixar"
-    generating: "Gerando seu relatório…"
-    async_hint: "Geração assíncrona · você recebe quando ficar pronto"
+    status:
+      pending: "Na fila"
+      processing: "Gerando…"
+      done: "Pronto"
+      failed: "Não foi possível gerar"
+    retry: "Tentar de novo"
+    download: "Baixar relatório"
+    wait:
+      still_running: "Ainda estamos gerando. Assim que ficar pronto, o relatório aparece em Exportações recentes."
+    async_hint: "Leva alguns segundos · o arquivo baixa sozinho quando ficar pronto"
     summary:
       title: "Resumo do relatório"
       period: "Período"

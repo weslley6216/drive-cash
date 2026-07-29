@@ -45,7 +45,15 @@ RSpec.describe 'Exports', type: :request do
       expect { post exports_path, params: valid_params }.to have_enqueued_job(ExportJob)
     end
 
-    it 'redirects to index with a flash notice' do
+    it 'answers with turbo streams instead of leaving the page' do
+      post exports_path, params: valid_params, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('target="export-recents"')
+      expect(response.body).to include('data-controller="export-wait"')
+    end
+
+    it 'still redirects a plain html submit' do
       post exports_path, params: valid_params
 
       expect(response).to redirect_to(exports_path)
@@ -173,7 +181,7 @@ RSpec.describe 'Exports', type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(%(id="export_#{export.id}"))
-      expect(response.body).to include(I18n.t('exports.flash.not_ready'))
+      expect(response.body).to include(I18n.t('exports.status.pending'))
     end
 
     it 'fails an export whose job died before finishing' do
@@ -183,13 +191,56 @@ RSpec.describe 'Exports', type: :request do
       get row_export_path(export)
 
       expect(export.reload).to be_status_failed
-      expect(response.body).to include(I18n.t('exports.flash.failed'))
+      expect(response.body).to include(I18n.t('exports.status.failed'))
     end
 
     it 'returns not found for another user export' do
       other = create(:export, user: create(:user))
 
       get row_export_path(other)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'POST /exports/:id/retry' do
+    it 'sends the failed export back to the queue' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export), as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(export.reload).to be_status_pending
+    end
+
+    it 'replaces the whole frame so the row picks the polling attributes back up' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export), as: :turbo_stream
+
+      expect(response.body).to include('action="replace"')
+      expect(response.body).to include(%(target="export_#{export.id}"))
+      expect(response.body).to include('data-controller="export-row-poll"')
+    end
+
+    it 'still redirects a plain html retry' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export)
+
+      expect(response).to redirect_to(exports_path)
+    end
+
+    it 'enqueues the job again' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      expect { post retry_export_path(export) }.to have_enqueued_job(ExportJob)
+    end
+
+    it 'returns not found for another user export' do
+      other = create(:export, user: create(:user), status: 'failed')
+
+      post retry_export_path(other)
 
       expect(response).to have_http_status(:not_found)
     end
