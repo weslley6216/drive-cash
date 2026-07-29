@@ -472,7 +472,7 @@ pt-BR:
     download: "Baixar relatório"
     wait:
       still_running: "Ainda estamos gerando. Assim que ficar pronto, o relatório aparece em Exportações recentes."
-    async_hint: "Geração assíncrona · você recebe quando ficar pronto"
+    async_hint: "Leva alguns segundos · o arquivo baixa sozinho quando ficar pronto"
     summary:
       title: "Resumo do relatório"
       period: "Período"
