@@ -18,3 +18,8 @@ port ENV.fetch("PORT") { 3000 }
 pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 
 plugin :tmp_restart
+
+if ENV["SOLID_QUEUE_IN_PUMA"]
+  plugin :solid_queue
+  solid_queue_mode :async
+end
