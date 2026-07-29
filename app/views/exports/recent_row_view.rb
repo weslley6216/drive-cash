@@ -24,8 +24,6 @@ module Exports
     def settled? = @export.status_done? || @export.status_failed?
 
     def settled_data
-      return {} unless settled?
-
       { export_row_poll_target: 'settled', export_status: @export.status }
     end
 
