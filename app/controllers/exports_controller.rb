@@ -41,6 +41,13 @@ class ExportsController < ApplicationController
     render Exports::RecentRowView.new(export: Exports::StaleMarker.call(export: export))
   end
 
+  def retry
+    export = current_user.exports.find_by(id: params[:id])
+    return head :not_found unless export
+
+    render Exports::RecentRowView.new(export: Exports::Requeuer.call(export: export))
+  end
+
   private
 
   def build_export

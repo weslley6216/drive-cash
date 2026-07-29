@@ -202,4 +202,30 @@ RSpec.describe 'Exports', type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe 'POST /exports/:id/retry' do
+    it 'sends the failed export back to the queue and re-renders the row' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(id="export_#{export.id}"))
+      expect(export.reload).to be_status_pending
+    end
+
+    it 'enqueues the job again' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      expect { post retry_export_path(export) }.to have_enqueued_job(ExportJob)
+    end
+
+    it 'returns not found for another user export' do
+      other = create(:export, user: create(:user), status: 'failed')
+
+      post retry_export_path(other)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

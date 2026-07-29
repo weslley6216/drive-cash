@@ -58,6 +58,17 @@ module Exports
       div(class: row_classes, data: settled_data) do
         icon
         info
+        retry_button
+      end
+    end
+
+    def retry_button
+      button_to(retry_export_path(@export),
+                class:      'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 cursor-pointer flex-shrink-0',
+                form_class: 'contents',
+                form:       { data: { loading_skip: '' } }) do
+        render PhlexIcons::Lucide::RotateCcw.new(class: 'w-[14px] h-[14px]')
+        plain t('exports.retry')
       end
     end
 

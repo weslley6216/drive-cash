@@ -91,6 +91,23 @@ RSpec.describe Exports::RecentRowView, type: :view do
     expect(html).not_to include(%(href="/exports/#{export.id}"))
   end
 
+  it 'offers a retry on the failed row' do
+    export = create(:export, user: user, status: 'failed')
+
+    html = render(described_class.new(export: export))
+
+    expect(html).to include(%(action="/exports/#{export.id}/retry"))
+    expect(html).to include(I18n.t('exports.retry'))
+  end
+
+  it 'keeps the retry out of a finished row' do
+    export = create(:export, user: user, status: 'done')
+
+    html = render(described_class.new(export: export))
+
+    expect(html).not_to include(I18n.t('exports.retry'))
+  end
+
   it 'draws the separator on the frame so the last row has none' do
     html = render(described_class.new(export: create(:export, user: user)))
 
