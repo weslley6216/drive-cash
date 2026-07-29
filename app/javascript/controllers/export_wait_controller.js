@@ -29,6 +29,7 @@ export default class extends Controller {
   giveUp() {
     this.release()
     this.hintTarget.classList.remove("hidden")
+    this.element.scrollIntoView({ behavior: "smooth", block: "center" })
   }
 
   hold() {
