@@ -38,7 +38,7 @@ class ExportsController < ApplicationController
   end
 
   def retry
-    render Exports::RecentRowView.new(export: Exports::Requeuer.call(export: @export))
+    respond_with_requeued_export(Exports::Requeuer.call(export: @export))
   end
 
   private

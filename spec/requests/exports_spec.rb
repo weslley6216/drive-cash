@@ -204,14 +204,31 @@ RSpec.describe 'Exports', type: :request do
   end
 
   describe 'POST /exports/:id/retry' do
-    it 'sends the failed export back to the queue and re-renders the row' do
+    it 'sends the failed export back to the queue' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export), as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(export.reload).to be_status_pending
+    end
+
+    it 'replaces the whole frame so the row picks the polling attributes back up' do
+      export = create(:export, user: current_user, status: 'failed')
+
+      post retry_export_path(export), as: :turbo_stream
+
+      expect(response.body).to include('action="replace"')
+      expect(response.body).to include(%(target="export_#{export.id}"))
+      expect(response.body).to include('data-controller="export-row-poll"')
+    end
+
+    it 'still redirects a plain html retry' do
       export = create(:export, user: current_user, status: 'failed')
 
       post retry_export_path(export)
 
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include(%(id="export_#{export.id}"))
-      expect(export.reload).to be_status_pending
+      expect(response).to redirect_to(exports_path)
     end
 
     it 'enqueues the job again' do
