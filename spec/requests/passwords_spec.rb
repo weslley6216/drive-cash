@@ -15,22 +15,16 @@ RSpec.describe 'Passwords', type: :request do
   end
 
   describe 'POST /passwords' do
-    before { ActionMailer::Base.deliveries.clear }
-
-    it 'sends a reset email when the address belongs to a user' do
+    it 'enqueues the reset email when the address belongs to a user' do
       expect {
         post passwords_path, params: { email_address: user.email_address }
-      }.to change { ActionMailer::Base.deliveries.size }.by(1)
-
-      mail = ActionMailer::Base.deliveries.last
-      expect(mail.to).to eq([user.email_address])
-      expect(mail.subject).to eq(I18n.t('passwords.mailer.reset.subject'))
+      }.to have_enqueued_mail(PasswordsMailer, :reset).with(user)
     end
 
-    it 'does not send an email when the address is unknown' do
+    it 'does not enqueue an email when the address is unknown' do
       expect {
         post passwords_path, params: { email_address: 'unknown@gmail.com' }
-      }.not_to change { ActionMailer::Base.deliveries.size }
+      }.not_to have_enqueued_mail(PasswordsMailer, :reset)
     end
 
     it 'redirects to the login page with the same neutral notice in both cases' do
