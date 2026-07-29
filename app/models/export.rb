@@ -1,7 +1,7 @@
 class Export < ApplicationRecord
   DEFAULT_INCLUDES = { 'earnings' => true, 'expenses' => true, 'refuelings' => true, 'maintenances' => false }.freeze
   INCLUDABLE = %w[earnings expenses refuelings maintenances].freeze
-  STALE_AFTER = 15.minutes
+  STALE_AFTER = 3.minutes
 
   belongs_to :user
   has_one_attached :file
