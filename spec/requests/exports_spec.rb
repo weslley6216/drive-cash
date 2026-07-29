@@ -45,7 +45,15 @@ RSpec.describe 'Exports', type: :request do
       expect { post exports_path, params: valid_params }.to have_enqueued_job(ExportJob)
     end
 
-    it 'redirects to index with a flash notice' do
+    it 'answers with turbo streams instead of leaving the page' do
+      post exports_path, params: valid_params, as: :turbo_stream
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('target="export-recents"')
+      expect(response.body).to include('data-controller="export-wait"')
+    end
+
+    it 'still redirects a plain html submit' do
       post exports_path, params: valid_params
 
       expect(response).to redirect_to(exports_path)

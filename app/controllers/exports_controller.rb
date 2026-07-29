@@ -1,4 +1,6 @@
 class ExportsController < ApplicationController
+  include ExportStreamResponse
+
   def index
     export = build_export
     render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export))
@@ -9,7 +11,7 @@ class ExportsController < ApplicationController
 
     if export.save
       ExportJob.perform_later(export.id)
-      redirect_to exports_path, notice: t('exports.flash.enqueued')
+      respond_with_enqueued_export(export)
     else
       render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export)),
              status: :unprocessable_content
