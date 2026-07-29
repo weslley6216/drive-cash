@@ -1,5 +1,6 @@
 class ExportsController < ApplicationController
   include ExportStreamResponse
+  include RequiresOwnedExport
 
   def index
     export = build_export
@@ -19,12 +20,10 @@ class ExportsController < ApplicationController
   end
 
   def show
-    export = current_user.exports.find_by(id: params[:id])
-    return head :not_found unless export
-    return redirect_to(exports_path, alert: t('exports.flash.failed')) if export.status_failed?
-    return redirect_to(exports_path, alert: t('exports.flash.not_ready')) unless export.status_done? && export.file.attached?
+    return redirect_to(exports_path, alert: t('exports.flash.failed')) if @export.status_failed?
+    return redirect_to(exports_path, alert: t('exports.flash.not_ready')) unless @export.status_done? && @export.file.attached?
 
-    redirect_to rails_blob_path(export.file, disposition: 'attachment')
+    redirect_to rails_blob_path(@export.file, disposition: 'attachment')
   end
 
   def preview
@@ -35,17 +34,11 @@ class ExportsController < ApplicationController
   end
 
   def row
-    export = current_user.exports.find_by(id: params[:id])
-    return head :not_found unless export
-
-    render Exports::RecentRowView.new(export: Exports::StaleMarker.call(export: export))
+    render Exports::RecentRowView.new(export: Exports::StaleMarker.call(export: @export))
   end
 
   def retry
-    export = current_user.exports.find_by(id: params[:id])
-    return head :not_found unless export
-
-    render Exports::RecentRowView.new(export: Exports::Requeuer.call(export: export))
+    render Exports::RecentRowView.new(export: Exports::Requeuer.call(export: @export))
   end
 
   private
