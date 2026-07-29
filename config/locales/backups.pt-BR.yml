@@ -10,6 +10,18 @@ pt-BR:
     goal_metrics:
       profit: "Lucro"
       earnings: "Receitas"
+    mailer:
+      failure:
+        subject: "DriveCash — o backup da planilha falhou"
+        body: |
+          O backup diário para o Google Sheets não foi concluído.
+
+          Erro: %{error_class}
+          Detalhe: %{message}
+
+          Seus dados continuam salvos no app. O próximo backup reescreve a planilha inteira,
+          então uma falha isolada não perde nada — mas se repetir amanhã, vale conferir as
+          credenciais da conta de serviço e se a planilha ainda existe.
     summary:
       total: "Total %{year}"
       chart_title: "Lucro mensal"

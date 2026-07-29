@@ -5,10 +5,7 @@ class BackupsController < ApplicationController
   skip_forgery_protection
 
   def create
-    Backups::SheetSync.call
-    head :ok
-  rescue StandardError => e
-    Rails.logger.error "[Backups] #{e.full_message(highlight: false)}"
-    head :internal_server_error
+    BackupJob.perform_later
+    head :accepted
   end
 end

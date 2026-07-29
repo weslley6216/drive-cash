@@ -9,73 +9,47 @@ RSpec.describe 'Backups', type: :request do
     ENV.replace(original)
   end
 
-  before do
-    ENV['BACKUP_TRIGGER_TOKEN'] = token
-    allow(Backups::SheetSync).to receive(:call)
-  end
+  before { ENV['BACKUP_TRIGGER_TOKEN'] = token }
 
   describe 'POST /backups' do
-    it 'runs the sync and returns ok with a valid bearer token' do
-      post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
+    it 'enqueues the backup and returns accepted with a valid bearer token' do
+      expect {
+        post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
+      }.to have_enqueued_job(BackupJob)
 
-      expect(response).to have_http_status(:ok)
-      expect(Backups::SheetSync).to have_received(:call)
+      expect(response).to have_http_status(:accepted)
     end
 
     it 'returns unauthorized without an authorization header' do
-      post backups_path
+      expect { post backups_path }.not_to have_enqueued_job(BackupJob)
 
       expect(response).to have_http_status(:unauthorized)
-      expect(Backups::SheetSync).not_to have_received(:call)
     end
 
     it 'returns unauthorized with a wrong token' do
-      post backups_path, headers: { 'Authorization' => 'Bearer wrong-token' }
+      expect {
+        post backups_path, headers: { 'Authorization' => 'Bearer wrong-token' }
+      }.not_to have_enqueued_job(BackupJob)
 
       expect(response).to have_http_status(:unauthorized)
-      expect(Backups::SheetSync).not_to have_received(:call)
     end
 
     it 'returns unauthorized when the token is sent without the bearer scheme' do
-      post backups_path, headers: { 'Authorization' => token }
+      expect {
+        post backups_path, headers: { 'Authorization' => token }
+      }.not_to have_enqueued_job(BackupJob)
 
       expect(response).to have_http_status(:unauthorized)
-      expect(Backups::SheetSync).not_to have_received(:call)
     end
 
     it 'returns unauthorized when the server has no token configured' do
       ENV.delete('BACKUP_TRIGGER_TOKEN')
 
-      post backups_path, headers: { 'Authorization' => 'Bearer anything' }
+      expect {
+        post backups_path, headers: { 'Authorization' => 'Bearer anything' }
+      }.not_to have_enqueued_job(BackupJob)
 
       expect(response).to have_http_status(:unauthorized)
-      expect(Backups::SheetSync).not_to have_received(:call)
-    end
-
-    it 'returns internal server error when the sync fails' do
-      allow(Backups::SheetSync).to receive(:call).and_raise(Backups::ConfigurationError, 'GOOGLE_BACKUP_SA_JSON is not set.')
-
-      post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
-
-      expect(response).to have_http_status(:internal_server_error)
-    end
-
-    it 'logs the failure cause' do
-      allow(Backups::SheetSync).to receive(:call).and_raise(Backups::SheetSync::MissingUser, 'no user with email x@y.com')
-      allow(Rails.logger).to receive(:error)
-
-      post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
-
-      expect(Rails.logger).to have_received(:error).with(/no user with email x@y.com \(Backups::SheetSync::MissingUser\)/)
-    end
-
-    it 'logs where the failure came from' do
-      allow(Backups::SheetSync).to receive(:call).and_raise(Backups::SheetSync::MissingUser, 'no user with email x@y.com')
-      allow(Rails.logger).to receive(:error)
-
-      post backups_path, headers: { 'Authorization' => "Bearer #{token}" }
-
-      expect(Rails.logger).to have_received(:error).with(/backups_controller\.rb/)
     end
   end
 end
