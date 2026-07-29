@@ -6,7 +6,7 @@ module Profiles
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
+      render LayoutComponent.new(title: t('.title'), sidebar_nav: :more) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
         form_with(model: @user, url: helpers.profile_path, method: :patch, class: 'contents') do |form|
           mobile_header
