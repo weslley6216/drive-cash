@@ -10,6 +10,7 @@ module Exports
       div(id:   'export-wait',
           data: {
             controller:                  'export-wait',
+            turbo_temporary:             '',
             export_wait_export_id_value: @export.id,
             export_wait_timeout_value:   TIMEOUT_MS
           }) do
