@@ -31,6 +31,12 @@ RSpec.describe Exports::WaitComponent, type: :component do
     expect(html).to include('data-turbo="false"')
   end
 
+  it 'hands the time expectation to the overlay that holds the screen' do
+    html = view_context.render(described_class.new(export: export))
+
+    expect(html).to include(%(data-export-wait-message-value="#{I18n.t('exports.async_hint')}"))
+  end
+
   it 'carries the long wait hint hidden until the escape fires' do
     html = view_context.render(described_class.new(export: export))
 
