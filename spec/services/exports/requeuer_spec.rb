@@ -29,6 +29,17 @@ RSpec.describe Exports::Requeuer do
     expect(export.includes_for(:earnings)).to be true
   end
 
+  it 'keeps the original period of a relative kind retried in a later year' do
+    export = travel_to(Time.zone.local(2026, 12, 31, 23, 0, 0)) do
+      create(:export, user: user, status: 'failed', period_kind: 'year', period_start: nil, period_end: nil)
+    end
+
+    travel_to(Time.zone.local(2027, 1, 2, 10, 0, 0)) { described_class.call(export: export) }
+
+    expect(export.reload.period_start).to eq(Date.new(2026, 1, 1))
+    expect(export.period_end).to eq(Date.new(2026, 12, 31))
+  end
+
   it 'leaves a finished export untouched' do
     export = create(:export, user: user, status: 'done')
 

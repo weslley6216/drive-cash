@@ -13,7 +13,7 @@ class Export < ApplicationRecord
   validates :period_kind, :period_start, :period_end, :format, presence: true
   validate :period_end_after_start
 
-  before_validation :apply_period_range
+  before_validation :apply_period_range, on: :create
   after_initialize :apply_defaults, if: :new_record?
 
   scope :recent, -> { order(created_at: :desc).includes(file_attachment: :blob) }
