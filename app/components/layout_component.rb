@@ -29,14 +29,14 @@ class LayoutComponent < ApplicationComponent
       meta(name: 'mobile-web-app-capable', content: 'yes')
       meta(name: 'apple-mobile-web-app-capable', content: 'yes')
       meta(name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent')
-      meta(name: 'theme-color', content: '#3b82f6')
+      meta(name: 'theme-color', content: '#2563eb')
       meta(name: 'turbo-refresh-method', content: 'morph')
       meta(name: 'turbo-refresh-scroll', content: 'preserve')
 
       link(rel: 'manifest', href: '/manifest.json')
 
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
-      link(rel: 'apple-touch-icon', href: '/icon-192.png')
+      link(rel: 'apple-touch-icon', href: '/icon.png')
 
       meta(name: 'turbo-cache-control', content: 'no-cache') if @auth
       csrf_meta_tags
