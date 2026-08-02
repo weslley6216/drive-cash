@@ -18,6 +18,15 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('rel="manifest"')
     end
 
+    it 'keeps the iOS status bar opaque so content does not run under the clock and carrier' do
+      expect(html).to include('name="apple-mobile-web-app-status-bar-style" content="default"')
+    end
+
+    it 'lets the status bar follow the device theme instead of forcing an accent color' do
+      expect(html).to include('name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc"')
+      expect(html).to include('name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a"')
+    end
+
     it 'includes the turbo-refresh-method=morph meta tag so page refreshes use morphdom' do
       expect(html).to include('name="turbo-refresh-method"')
       expect(html).to include('content="morph"')
