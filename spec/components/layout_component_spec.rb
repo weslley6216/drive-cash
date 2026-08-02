@@ -22,6 +22,10 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('name="apple-mobile-web-app-status-bar-style" content="default"')
     end
 
+    it 'keeps the viewport inside the safe area so the header clears the notch and clock' do
+      expect(html).to include('name="viewport" content="width=device-width,initial-scale=1"')
+    end
+
     it 'lets the status bar follow the device theme instead of forcing an accent color' do
       expect(html).to include('name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc"')
       expect(html).to include('name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a"')
