@@ -32,6 +32,7 @@ gem 'phlex-rails', '~> 2.4.0'
 gem 'phlex-icons', '~> 2.56'
 
 gem 'bootsnap', require: false
+gem 'thruster', require: false
 
 group :development, :test do
   gem 'debug', platforms: %i[ mri windows ]
