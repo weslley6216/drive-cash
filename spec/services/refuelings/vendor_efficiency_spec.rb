@@ -53,7 +53,7 @@ RSpec.describe Refuelings::VendorEfficiency do
         expect(result.savings).to be_positive
       end
 
-      it 'computes the monthly km delta with a single database query' do
+      it 'computes cheapest with three database queries' do
         query_count = count_queries { described_class.new(vehicle: vehicle, date: reference_date).cheapest }
 
         expect(query_count).to eq(3)

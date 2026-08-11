@@ -124,7 +124,7 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(result).to eq(described_class::EMPTY)
   end
 
-  it 'computes balance and moves with at most two database queries' do
+  it 'computes balance and moves with two database queries' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))

@@ -28,6 +28,10 @@ RSpec.describe Dashboard::EarningsCalculator do
       expect(result[:avg_per_month]).to eq(500.0)
     end
 
+    it 'exposes the distinct month count' do
+      expect(result[:months_count]).to eq(2)
+    end
+
 
     it 'sums trips_count across all earnings' do
       expect(result[:trips_count]).to eq(3)
