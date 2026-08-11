@@ -1,11 +1,22 @@
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `drivecash-${CACHE_VERSION}`;
 
 const ASSETS_TO_CACHE = [
-  '/',
   '<%= asset_path "tailwind.css" %>',
   '/offline.html'
 ];
+
+const STATIC_ASSET_PATTERN = /^\/(assets\/|icon[-.])/;
+
+function isNavigationRequest(request) {
+  return request.mode === 'navigate' || (request.headers.get('Accept') || '').includes('text/html');
+}
+
+function isStaticAsset(request) {
+  const url = new URL(request.url);
+  return url.origin === self.location.origin &&
+    (STATIC_ASSET_PATTERN.test(url.pathname) || ASSETS_TO_CACHE.includes(url.pathname));
+}
 
 // Install - cache assets
 self.addEventListener('install', (event) => {
@@ -29,39 +40,47 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch - network first, fallback to cache
+// Fetch - navigation is network-only, static assets are network-first with cache fallback
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  if (isNavigationRequest(event.request)) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  if (!isStaticAsset(event.request)) return;
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Clone response and cache it
         const responseClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseClone);
-        });
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
         return response;
       })
-      .catch(() => {
-        // Network failed, try cache
-        return caches.match(event.request)
-          .then(response => {
-            return response || caches.match('/offline.html');
-          });
-      })
+      .catch(() => caches.match(event.request))
   );
 });
 
-// Push notifications (opcional)
+// Push notifications (no real push infra yet - guard prevents a crash if a payload arrives)
 self.addEventListener('push', (event) => {
-  const data = event.data.json();
+  let data = { title: 'DriveCash', body: '' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch (error) {
+    // missing or non-JSON payload: keeps the title/body fallback
+  }
+
   const options = {
     body: data.body,
     icon: '/icon-192.png',
-    badge: '/icon-96.png',
+    badge: '/icon-192.png',
     vibrate: [200, 100, 200],
     data: { url: data.url }
   };
-  
+
   event.waitUntil(
     self.registration.showNotification(data.title, options)
   );
