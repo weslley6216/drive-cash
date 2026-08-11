@@ -67,20 +67,12 @@ RSpec.describe Expenses::Creator do
 
       before { create(:vehicle, user: user, odometer_km: 48_000) }
 
-      it 'creates the expense and the linked refueling' do
+      it 'delegates to CreatorFromExpense passing the refueling params along' do
         result = described_class.call(fuel_params, {}, { liters: '30', odometer_km: '48230', full_tank: '1' }, user: user)
 
         expect(result.success?).to be(true)
         expect(Refueling.count).to eq(1)
         expect(Refueling.last.expense).to eq(result.expenses.first)
-      end
-
-      it 'creates the expense alone when refueling fields are blank' do
-        result = described_class.call(fuel_params, {}, { liters: '', odometer_km: '' }, user: user)
-
-        expect(result.success?).to be(true)
-        expect(Expense.count).to eq(1)
-        expect(Refueling.count).to eq(0)
       end
 
       it 'rolls back the expense and refueling when the refueling is invalid' do

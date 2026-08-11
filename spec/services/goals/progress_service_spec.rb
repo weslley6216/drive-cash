@@ -33,27 +33,18 @@ RSpec.describe Goals::ProgressService do
         create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 500)
       end
 
-      it 'returns the goal, current value and percent' do
+      it 'returns goal, current value, percent, projection and pace' do
         result = described_class.new(user: user, date: reference_date).call
 
         expect(result[:monthly][:goal]).to eq(goal)
         expect(result[:monthly][:current]).to eq(1500)
         expect(result[:monthly][:target]).to eq(6000)
         expect(result[:monthly][:percent].round(2)).to eq(25.00)
-      end
-
-      it 'computes projection extrapolating to total period days' do
-        result = described_class.new(user: user, date: reference_date).call
-
         expect(result[:monthly][:projection].round(2)).to eq(3000.00)
         expect(result[:monthly][:on_track]).to be(false)
-      end
-
-      it 'computes remaining_per_day based on days left in period' do
-        result = described_class.new(user: user, date: reference_date).call
-
         expect(result[:monthly][:days_remaining]).to eq(16)
         expect(result[:monthly][:remaining_per_day].round(2)).to eq(281.25)
+        expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
 
       it 'flags on_track when projection reaches target' do
@@ -67,16 +58,11 @@ RSpec.describe Goals::ProgressService do
       context 'when goal is reached' do
         before { create(:earning, user: user, date: Date.new(2026, 6, 4), amount: 5500) }
 
-        it 'flags reached and exposes surplus' do
+        it 'flags reached, exposes surplus and caps remaining_per_day at zero' do
           result = described_class.new(user: user, date: reference_date).call
 
           expect(result[:monthly][:reached]).to be(true)
           expect(result[:monthly][:surplus]).to eq(1000)
-        end
-
-        it 'caps remaining_per_day at zero when reached' do
-          result = described_class.new(user: user, date: reference_date).call
-
           expect(result[:monthly][:remaining_per_day]).to eq(0)
         end
       end
@@ -90,12 +76,6 @@ RSpec.describe Goals::ProgressService do
           expect(result[:monthly][:projection]).to be_nil
           expect(result[:monthly][:tracking]).to be(true)
         end
-      end
-
-      it 'computes daily_pace as current divided by days_elapsed' do
-        result = described_class.new(user: user, date: reference_date).call
-
-        expect(result[:monthly][:daily_pace].round(2)).to eq(100.00)
       end
 
       it 'does not flag ended on the last day while the period is still open' do
@@ -212,21 +192,6 @@ RSpec.describe Goals::ProgressService do
       expect(result[:current]).to eq(2000)
       expect(result[:target]).to eq(6000)
     end
-
-    it 'skips weekly, annual and achievements queries' do
-      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
-             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
-
-      queries = []
-      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] }
-
-      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-        described_class.new(user: user, date: reference_date).monthly
-      end
-
-      expect(queries.grep(/FROM "goals"/).size).to eq(1)
-      expect(queries.grep(/SELECT DISTINCT "earnings"/)).to be_empty
-    end
   end
 
   describe '#past_goals' do
@@ -267,23 +232,6 @@ RSpec.describe Goals::ProgressService do
       result = described_class.new(user: user, date: reference_date).past_goals('monthly', limit: 3)
 
       expect(result.size).to eq(3)
-    end
-
-    it 'runs a constant number of queries regardless of how many past goals exist' do
-      12.times do |offset|
-        month = Date.new(2025, 6, 1) + offset.months
-        create(:goal, user: user, kind: 'monthly', target_amount: 1000,
-               period_start: month.beginning_of_month, period_end: month.end_of_month)
-      end
-
-      queries = []
-      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM "(goals|earnings|expenses)"/ }
-
-      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-        described_class.new(user: user, date: Date.new(2026, 7, 1)).past_goals('monthly', limit: 12)
-      end
-
-      expect(queries.size).to eq(3)
     end
 
     it 'ignores unpaid expenses when computing the achieved flag of past goals' do

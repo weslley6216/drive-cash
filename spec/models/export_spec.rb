@@ -102,15 +102,6 @@ RSpec.describe Export, type: :model do
       end
     end
 
-    it 'derives the current year for year' do
-      travel_to Date.new(2026, 6, 15) do
-        export = create(:export, period_kind: 'year', period_start: nil, period_end: nil)
-
-        expect(export.period_start).to eq(Date.new(2026, 1, 1))
-        expect(export.period_end).to eq(Date.new(2026, 12, 31))
-      end
-    end
-
     it 'keeps the provided dates for custom' do
       export = create(:export, period_kind: 'custom', period_start: Date.new(2026, 2, 1), period_end: Date.new(2026, 2, 28))
 

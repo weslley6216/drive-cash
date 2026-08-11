@@ -79,11 +79,9 @@ RSpec.describe SidebarNavComponent, type: :component do
     end
   end
 
-  context 'when active: :analysis' do
-    let(:active) { :analysis }
+  it 'highlights only the analysis tab when active: :analysis' do
+    html = view_context.render(described_class.new(active: :analysis))
 
-    it 'highlights only the analysis tab' do
-      expect(html.scan('bg-blue-50').size).to eq(6)
-    end
+    expect(html.scan('bg-blue-50').size).to eq(6)
   end
 end

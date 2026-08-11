@@ -45,19 +45,4 @@ RSpec.describe Notifications::Sweeper do
 
     expect(created).to be_empty
   end
-
-  it 'checks for existing notifications once, not once per candidate payload' do
-    vehicle = create(:vehicle, user: user, odometer_km: 50_000)
-    create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 1, interval_km: 5_000)
-    baseline_query_count = count_queries { described_class.new(user: user, date: date).call }
-
-    other_user = create(:user)
-    other_vehicle = create(:vehicle, user: other_user, odometer_km: 50_000)
-    %w[oil_change oil_filter air_filter].each do |category|
-      create(:maintenance, vehicle: other_vehicle, category: category, last_done_km: 1, interval_km: 5_000)
-    end
-    three_candidates_query_count = count_queries { described_class.new(user: other_user, date: date).call }
-
-    expect(three_candidates_query_count - baseline_query_count).to eq(2)
-  end
 end

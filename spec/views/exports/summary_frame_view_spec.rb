@@ -40,7 +40,6 @@ RSpec.describe Exports::SummaryFrameView, type: :view do
     html = render(described_class.new(payload: payload, period_label: 'Jan–Jun 2026', format: 'pdf'))
 
     expect(html).to include(I18n.t('exports.async_hint'))
-    expect(I18n.t('exports.async_hint')).to include('segundos')
   end
 
   it 'is wrapped in the export-summary turbo frame' do

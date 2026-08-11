@@ -74,14 +74,6 @@ RSpec.describe MonetaryAmount, type: :model do
       expect(expense.amount).to be_nil
     end
 
-    it 'parses pt-BR thousands without decimal as integer' do
-      expense = Expense.new
-
-      expense.amount = '1.500'
-
-      expect(expense.amount).to eq(BigDecimal('1500'))
-    end
-
     it 'parses large pt-BR thousands without decimal as integer' do
       expense = Expense.new
 

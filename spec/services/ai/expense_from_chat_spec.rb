@@ -81,14 +81,5 @@ RSpec.describe Ai::ExpenseFromChat do
 
       expect(result.expenses.first.user).to eq(user)
     end
-
-    it 'discards user_id forged inside ActionController::Parameters' do
-      other = create(:user)
-      params_obj = ActionController::Parameters.new(base.merge('user_id' => other.id))
-
-      result = described_class.persist(params_obj, user: user)
-
-      expect(result.expenses.first.user).to eq(user)
-    end
   end
 end

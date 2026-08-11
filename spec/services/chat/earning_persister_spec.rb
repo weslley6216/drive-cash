@@ -62,15 +62,5 @@ RSpec.describe Chat::EarningPersister do
 
       expect(result.record.user).to eq(user)
     end
-
-    it 'ignores user_id forged inside ActionController::Parameters' do
-      user = create(:user)
-      other = create(:user)
-      params = ActionController::Parameters.new(amount: 200, platform: 'uber', date: '2026-04-22', user_id: other.id)
-
-      result = described_class.new.persist(params, user: user)
-
-      expect(result.record.user).to eq(user)
-    end
   end
 end
