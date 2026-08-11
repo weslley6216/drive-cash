@@ -18,7 +18,7 @@ gem 'google-cloud-storage', '~> 1.52'
 
 # Transactional email over Resend's HTTP API (port 443) — works on hosts that
 # block outbound SMTP ports, unlike :smtp delivery.
-gem 'resend', '~> 1.6'
+gem 'resend', '~> 1.7'
 
 # Assets
 gem 'importmap-rails'
