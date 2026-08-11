@@ -11,27 +11,29 @@ module Vehicles
       vehicle = @user.vehicle
       return EMPTY unless vehicle
 
-      anchor = vehicle.refuelings.minimum(:date)
-      return EMPTY unless anchor
+      refuelings = vehicle.refuelings.chronological.to_a
+      return EMPTY if refuelings.empty?
 
-      last_fill = vehicle.refuelings.full_tank.chronological.first
+      anchor = refuelings.map(&:date).min
+      last_fill = refuelings.find(&:full_tank)
       full = last_fill&.total_amount
-      balance = compute_balance(vehicle, anchor)
+      debit_expenses = debit_expenses_since(anchor).chronological.to_a
+      balance = compute_balance(refuelings, debit_expenses)
 
       {
         balance:    balance,
         full:       full,
         status_key: TankStatus.for(balance, full),
         last_fill:  last_fill,
-        moves:      build_moves(vehicle, anchor)
+        moves:      build_moves(refuelings, debit_expenses)
       }
     end
 
     private
 
-    def compute_balance(vehicle, balance_anchor)
-      credits = vehicle.refuelings.where('refuelings.date >= ?', balance_anchor).sum(:total_amount)
-      debits = debit_expenses_since(balance_anchor).sum(:amount)
+    def compute_balance(refuelings, debit_expenses)
+      credits = refuelings.sum(&:total_amount)
+      debits = debit_expenses.sum(&:amount)
       credits - debits
     end
 
@@ -39,12 +41,12 @@ module Vehicles
       @user.expenses.where(category: :fuel).where.missing(:refueling).where('expenses.date >= ?', anchor)
     end
 
-    def build_moves(vehicle, anchor)
-      credits = vehicle.refuelings.chronological.map do |refueling|
+    def build_moves(refuelings, debit_expenses)
+      credits = refuelings.map do |refueling|
         { kind: :credit, date: refueling.date, amount: refueling.total_amount,
           vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter }
       end
-      debits = debit_expenses_since(anchor).chronological.map do |expense|
+      debits = debit_expenses.map do |expense|
         { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }
       end
 
