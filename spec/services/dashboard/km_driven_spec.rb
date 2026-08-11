@@ -66,5 +66,14 @@ RSpec.describe Dashboard::KmDriven do
 
       expect(result).to be_nil
     end
+
+    it 'computes the delta with a single database query' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 6, 1), odometer_km: 10_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 6, 15), odometer_km: 12_500)
+
+      query_count = count_queries { described_class.new(user: user, year: 2025, month: 6).call }
+
+      expect(query_count).to eq(1)
+    end
   end
 end

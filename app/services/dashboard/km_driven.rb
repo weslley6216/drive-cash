@@ -7,9 +7,10 @@ module Dashboard
     end
 
     def call
-      return nil if scope.count < 2
+      count, max_km, min_km = scope.pick(Arel.sql('COUNT(*), MAX(odometer_km), MIN(odometer_km)'))
+      return nil if count.to_i < 2
 
-      delta = scope.maximum(:odometer_km).to_i - scope.minimum(:odometer_km).to_i
+      delta = max_km.to_i - min_km.to_i
       delta.positive? ? delta : nil
     end
 
