@@ -66,6 +66,15 @@ RSpec.describe Goals::DailyTotals do
       expect(totals.metric_for(older_goal)).to eq(100)
       expect(totals.metric_for(newer_goal)).to eq(400)
     end
+
+    it 'returns empty totals without querying when there are no goals' do
+      goal = build(:goal, metric: 'earnings', period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 200)
+
+      totals = described_class.for_goals(user: user, goals: [])
+
+      expect(totals.metric_for(goal)).to eq(0)
+    end
   end
 
   describe '#metric_on' do

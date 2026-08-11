@@ -7,6 +7,8 @@ module Goals
     end
 
     def self.for_goals(user:, goals:)
+      return new({}, {}) if goals.empty?
+
       range = goals.min_by(&:period_start).period_start..goals.max_by(&:period_end).period_end
       self.for(user: user, range: range)
     end
