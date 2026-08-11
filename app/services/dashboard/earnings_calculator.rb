@@ -12,7 +12,8 @@ module Dashboard
         avg_per_month: avg_per_month,
         avg_per_day:   avg_per_day,
         days_count:    days_count,
-        trips_count:   total_trips
+        trips_count:   total_trips,
+        months_count:  months_count
       }
     end
 
@@ -28,10 +29,13 @@ module Dashboard
       @days_count ||= scope.select(:date).distinct.count
     end
 
+    def months_count
+      @months_count ||= ScopeMonthCounter.count_for(scope)
+    end
+
     def avg_per_month
-      months = ScopeMonthCounter.count_for(scope)
-      return 0 if months.zero?
-      total_earnings / months
+      return 0 if months_count.zero?
+      total_earnings / months_count
     end
 
     def avg_per_day

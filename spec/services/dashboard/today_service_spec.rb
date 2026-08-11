@@ -29,6 +29,18 @@ RSpec.describe Dashboard::TodayService do
       expect(result[:net]).to eq(100.0)
     end
 
+    it 'returns totals when only expenses exist on the reference date' do
+      reference = Date.new(2026, 3, 10)
+      create(:expense, user: user, date: reference, amount: 40, paid: true)
+
+      result = described_class.new(user: user, date: reference).call
+
+      expect(result[:earnings]).to eq(0)
+      expect(result[:expenses]).to eq(40.0)
+      expect(result[:net]).to eq(-40.0)
+      expect(result[:trips_count]).to eq(0)
+    end
+
     it 'defaults the reference date to today' do
       create(:earning, user: user, date: Date.current, amount: 100, trips_count: 1)
 
@@ -41,6 +53,16 @@ RSpec.describe Dashboard::TodayService do
       result = described_class.new(user: user, date: Date.new(2026, 3, 10)).call
 
       expect(result).to be_nil
+    end
+
+    it 'computes totals with two database queries' do
+      reference = Date.new(2026, 3, 10)
+      create(:earning, user: user, date: reference, amount: 100, trips_count: 3)
+      create(:expense, user: user, date: reference, amount: 30, paid: true)
+
+      query_count = count_queries { described_class.new(user: user, date: reference).call }
+
+      expect(query_count).to eq(2)
     end
   end
 end

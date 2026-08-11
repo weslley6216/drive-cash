@@ -123,4 +123,15 @@ RSpec.describe Vehicles::TankBalanceService do
 
     expect(result).to eq(described_class::EMPTY)
   end
+
+  it 'computes balance and moves with two database queries' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
+    3.times { |offset| fuel_expense(user, 45, Date.new(2026, 6, 8 + offset)) }
+
+    query_count = count_queries { described_class.new(user: user).call }
+
+    expect(query_count).to eq(2)
+  end
 end

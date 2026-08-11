@@ -87,7 +87,7 @@ module Dashboard
     end
 
     def earnings_months_count
-      @earnings_months_count ||= ScopeMonthCounter.count_for(earnings_scope)
+      memoized_earnings_data[:months_count]
     end
 
     def profit_series

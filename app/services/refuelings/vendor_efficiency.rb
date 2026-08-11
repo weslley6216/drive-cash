@@ -71,8 +71,10 @@ module Refuelings
 
     def monthly_km
       @monthly_km ||= begin
-        recent_scope = @vehicle.refuelings.where(date: (@date - 30.days)..@date)
-        recent_scope.maximum(:odometer_km).to_i - recent_scope.minimum(:odometer_km).to_i
+        max_km, min_km = @vehicle.refuelings
+          .where(date: (@date - 30.days)..@date)
+          .pick(Arel.sql('MAX(odometer_km), MIN(odometer_km)'))
+        max_km.to_i - min_km.to_i
       end
     end
 
