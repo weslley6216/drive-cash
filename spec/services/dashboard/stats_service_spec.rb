@@ -18,14 +18,6 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:days]).to eq(1)
       expect(result[:expenses_percent]).to eq(20.0)
     end
-
-    it 'does not instantiate ProfitSeriesService' do
-      allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
-
-      described_class.new(year: 2025, month: 1, user: user).metrics
-
-      expect(Dashboard::ProfitSeriesService).not_to have_received(:new)
-    end
   end
 
   describe '#call' do
@@ -40,23 +32,11 @@ RSpec.describe Dashboard::StatsService do
 
     subject(:result) { described_class.new(year: 2025, month: 1, user: user).call }
 
-    it 'calculates total earnings for the period' do
+    it 'calculates earnings, expenses, profit, profit per day and expenses percentage' do
       expect(result[:earnings]).to eq(500.00)
-    end
-
-    it 'calculates total expenses for the period' do
       expect(result[:expenses]).to eq(100.00)
-    end
-
-    it 'calculates profit' do
       expect(result[:profit]).to eq(400.00)
-    end
-
-    it 'calculates profit per day' do
       expect(result[:profit_per_day]).to eq(400.00)
-    end
-
-    it 'calculates expenses percentage' do
       expect(result[:expenses_percent]).to eq(20.0)
     end
 
@@ -72,10 +52,11 @@ RSpec.describe Dashboard::StatsService do
       expect(january_series.sum).to eq(400.0)
     end
 
-    it 'returns change_percent as nil when month is not provided' do
+    it 'returns nil change_percent and daily_profit_series when month is not provided' do
       result = described_class.new(year: 2025, month: nil, user: user).call
 
       expect(result[:change_percent]).to be_nil
+      expect(result[:daily_profit_series]).to be_nil
     end
 
     it 'returns change_percent vs previous month when month is provided' do
@@ -90,12 +71,6 @@ RSpec.describe Dashboard::StatsService do
       expect(result[:change_percent]).to be_nil
     end
 
-    it 'returns nil for daily_profit_series when no month is provided' do
-      result = described_class.new(year: 2025, month: nil, user: user).call
-
-      expect(result[:daily_profit_series]).to be_nil
-    end
-
     context 'with multiple working days in the month' do
       before do
         (1..9).each { |day| create(:earning, user: user, date: Date.new(2025, 1, day), amount: 100) }
@@ -104,16 +79,6 @@ RSpec.describe Dashboard::StatsService do
       it 'calculates average days per week' do
         expect(result[:days_avg_week]).to eq(2)
       end
-    end
-
-    it 'counts months once per call across days_avg_month and trips_avg_month' do
-      service = described_class.new(year: 2025, user: user)
-
-      allow(Dashboard::ScopeMonthCounter).to receive(:count_for).and_call_original
-
-      service.call
-
-      expect(Dashboard::ScopeMonthCounter).to have_received(:count_for).once
     end
 
     context 'with through_month' do

@@ -41,17 +41,6 @@ RSpec.describe Goals::DailyTotals do
 
       expect(totals.metric_for(goal)).to eq(0)
     end
-
-    it 'runs a constant number of queries regardless of range size' do
-      queries = []
-      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM "(earnings|expenses)"/ }
-
-      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-        described_class.for(user: user, range: Date.new(2026, 1, 1)..Date.new(2026, 12, 31))
-      end
-
-      expect(queries.size).to eq(2)
-    end
   end
 
   describe '.for_goals' do

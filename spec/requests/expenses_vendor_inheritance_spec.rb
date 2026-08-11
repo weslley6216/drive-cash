@@ -10,29 +10,14 @@ RSpec.describe 'Vendor inheritance on the expense form', type: :request do
     login_as(user)
   end
 
-  it 'passes the active tank vendor as a Stimulus value when re-rendering after a fuel validation error' do
+  it 'passes the active tank vendor and renders the hint/suggest/input target slots' do
     post expenses_path, params: { expense: { amount: 0, category: 'fuel' } }, as: :turbo_stream
 
     expect(response.body).to include('data-refueling-fields-active-vendor-value="Posto Orense"')
-  end
-
-  it 'renders the vendorHint target slot' do
-    post expenses_path, params: { expense: { amount: 0, category: 'fuel' } }, as: :turbo_stream
-
     expect(response.body).to include('data-refueling-fields-target="vendorHint"')
     expect(response.body).to include(I18n.t('expenses.new_view.vendor_inherited'))
-  end
-
-  it 'renders the vendorSuggest target slot with the chip text' do
-    post expenses_path, params: { expense: { amount: 0, category: 'fuel' } }, as: :turbo_stream
-
     expect(response.body).to include('data-refueling-fields-target="vendorSuggest"')
     expect(response.body).to include(I18n.t('expenses.new_view.vendor_from_tank'))
-  end
-
-  it 'renders the vendorInput target on the vendor field' do
-    post expenses_path, params: { expense: { amount: 0, category: 'fuel' } }, as: :turbo_stream
-
     expect(response.body).to include('data-refueling-fields-target="vendorInput"')
   end
 

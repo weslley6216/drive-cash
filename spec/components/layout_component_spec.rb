@@ -72,29 +72,23 @@ RSpec.describe LayoutComponent, type: :component do
     end
   end
 
-  context 'with app_shell: false (default)' do
-    let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
+  it 'keeps the normal min-h-screen body when app_shell: false (default)' do
+    html = view_context.render(LayoutComponent.new(title: 'X')) { 'content' }
 
-    it 'keeps the normal min-h-screen body' do
-      expect(html).to include('min-h-screen')
-      expect(html).not_to include('h-[100dvh]')
-    end
+    expect(html).to include('min-h-screen')
+    expect(html).not_to include('h-[100dvh]')
   end
 
-  context 'on an app page' do
-    let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
+  it 'renders the loading overlay on an app page' do
+    html = view_context.render(LayoutComponent.new(title: 'X')) { 'content' }
 
-    it 'renders the loading overlay on app pages' do
-      expect(html).to include('id="loading-overlay"')
-    end
+    expect(html).to include('id="loading-overlay"')
   end
 
-  context 'with auth: true' do
-    let(:html) { view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' } }
+  it 'leaves the loading overlay out of the auth shell when auth: true' do
+    html = view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' }
 
-    it 'leaves the loading overlay out of the auth shell' do
-      expect(html).not_to include('id="loading-overlay"')
-    end
+    expect(html).not_to include('id="loading-overlay"')
   end
 
   context 'with sidebar_nav: :home' do

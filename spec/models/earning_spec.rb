@@ -47,58 +47,7 @@ RSpec.describe Earning, type: :model do
   end
 
   describe 'scopes' do
-    let(:earning_dec_2024) { create(:earning, date: Date.new(2024, 12, 31)) }
-    let(:earning_jan_2025) { create(:earning, date: Date.new(2025, 1, 1)) }
-    let(:earning_dec_2025) { create(:earning, date: Date.new(2025, 12, 31)) }
-
-    it '.for_year returns earnings with date inside the given year' do
-      earning_jan_2025
-      earning_dec_2025
-      earning_dec_2024
-
-      result = described_class.for_year(2025)
-
-      expect(result).to include(earning_jan_2025, earning_dec_2025)
-      expect(result).not_to include(earning_dec_2024)
-    end
-
-    it '.for_year returns all when year is blank' do
-      earning_jan_2025
-
-      expect(described_class.for_year(nil)).to include(earning_jan_2025)
-      expect(described_class.for_year('')).to include(earning_jan_2025)
-    end
-
-    it '.for_month returns earnings matching the month' do
-      earning_jan_2025
-      earning_dec_2025
-
-      result = described_class.for_month(1)
-
-      expect(result).to include(earning_jan_2025)
-      expect(result).not_to include(earning_dec_2025)
-    end
-
-    it '.in_period filters by year only when month is nil' do
-      earning_jan_2025
-      earning_dec_2025
-      earning_dec_2024
-
-      result = described_class.in_period(2025)
-
-      expect(result).to include(earning_jan_2025, earning_dec_2025)
-      expect(result).not_to include(earning_dec_2024)
-    end
-
-    it '.in_period filters by year and month when month is given' do
-      earning_jan_2025
-      earning_dec_2025
-
-      result = described_class.in_period(2025, 1)
-
-      expect(result).to include(earning_jan_2025)
-      expect(result).not_to include(earning_dec_2025)
-    end
+    it_behaves_like 'a financial entry scope', :earning
   end
 
   describe 'trips_count' do

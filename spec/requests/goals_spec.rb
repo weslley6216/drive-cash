@@ -6,28 +6,13 @@ RSpec.describe 'Goals', type: :request do
   before { login_as(current_user) }
 
   describe 'GET /goals' do
-    it 'renders successfully' do
+    it 'renders successfully with bottom nav, empty CTA and empty state when the user has no goals' do
       get goals_path
 
       expect(response).to have_http_status(:success)
-    end
-
-    it 'highlights goals tab in bottom nav' do
-      get goals_path
-
       expect(response.body).to include('href="/goals"')
       expect(response.body).to include('text-blue-600')
-    end
-
-    it 'renders empty CTA when user has no goals' do
-      get goals_path
-
       expect(response.body).to include(I18n.t('goals.index.empty.cta'))
-    end
-
-    it 'renders the empty state when the user has no goal' do
-      get goals_path
-
       expect(response.body).to include(I18n.t('empty_states.goals.title'))
       expect(response.body).to include(I18n.t('empty_states.goals.cta'))
     end

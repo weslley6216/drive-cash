@@ -50,6 +50,21 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('fixed bottom-24 right-6')
     end
 
+    it 'renders static chrome: topbar greeting, new record button, loading region, and sidebar links' do
+      get root_path, params: { year: 2025 }
+
+      expect(response.body).to include(I18n.t('dashboard.index_view.greeting', name: current_user.first_name))
+      expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
+      expect(response.body).to include(I18n.t('dashboard.index_view.new_record'))
+      expect(response.body).to include('hidden lg:inline-flex')
+      expect(response.body).to include('feed-loading-region')
+      expect(response.body).to include('feed-loading-overlay--page')
+      expect(response.body).to include(I18n.t('sessions.sign_out'))
+      expect(response.body).to include(session_path)
+      expect(response.body).to include('w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm')
+      expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
+    end
+
     it 'renders hero profit card section' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 1), amount: 500, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 2), amount: 100, category: 'fuel', paid: true)
@@ -90,20 +105,6 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response.body.scan('href="/notifications"').size).to eq(2)
       expect(response.body.scan(NotificationBellComponent::BADGE_CLASSES).size).to eq(2)
-    end
-
-    it 'renders topbar with greeting and subtitle' do
-      get root_path, params: { year: 2025 }
-
-      expect(response.body).to include(I18n.t('dashboard.index_view.greeting', name: current_user.first_name))
-      expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
-    end
-
-    it 'renders "Novo lançamento" button hidden on mobile' do
-      get root_path
-
-      expect(response.body).to include(I18n.t('dashboard.index_view.new_record'))
-      expect(response.body).to include('hidden lg:inline-flex')
     end
 
     it 'renders 12-column grid layout for hero and sidebar' do
@@ -153,13 +154,6 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="today_card"')
       expect(response.body).to include('id="recent_activity"')
       expect(response.body).to include('id="category_breakdown"')
-    end
-
-    it 'wraps the content in a page-scoped loading region for filter navigations' do
-      get root_path
-
-      expect(response.body).to include('feed-loading-region')
-      expect(response.body).to include('feed-loading-overlay--page')
     end
 
     it 'keeps today_card wrapper in DOM even without activity today' do
@@ -289,20 +283,6 @@ RSpec.describe 'Dashboard', type: :request do
 
         expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
       end
-    end
-
-    it 'renders sign out link in the sidebar' do
-      get root_path
-
-      expect(response.body).to include(I18n.t('sessions.sign_out'))
-      expect(response.body).to include(session_path)
-    end
-
-    it 'renders bell button and avatar link in the topbar' do
-      get root_path
-
-      expect(response.body).to include('w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm')
-      expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
     end
   end
 

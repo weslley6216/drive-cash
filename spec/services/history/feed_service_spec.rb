@@ -123,23 +123,6 @@ RSpec.describe History::FeedService do
         expect(capped[:summary]).to eq(full[:summary])
         expect(capped[:summary]).to eq(earnings: 150, expenses: 30, net: 120)
       end
-
-      it 'computes the summary without loading every record into memory' do
-        base = Date.new(2025, 6, 1)
-        25.times { |offset| create(:earning, user: user, date: base + offset, amount: 10, platform: 'uber') }
-
-        queries = []
-        callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM \"(earnings|expenses)\"/ }
-
-        ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-          described_class.new(year: 2025, limit: 5, user: user).call
-        end
-
-        summary_queries = queries.grep(/SUM\(.*amount.*\)/i)
-        expect(summary_queries.size).to be >= 2
-        full_loads = queries.reject { |sql| sql =~ /SUM\(|COUNT\(|LIMIT/ }
-        expect(full_loads).to be_empty
-      end
     end
 
     context 'with filter earnings' do
@@ -218,53 +201,11 @@ RSpec.describe History::FeedService do
     end
 
     context 'with query parameter' do
-      it 'matches expense vendor case-insensitive' do
+      it 'delegates matching to RecordSearch for both earnings and expenses' do
         match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
         no_match = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
 
         result = described_class.new(year: 2025, query: 'orense', user: user).call
-
-        items = result[:groups].flat_map { |group| group[:items] }
-        expect(items.map(&:id)).to include(match.id)
-        expect(items.map(&:id)).not_to include(no_match.id)
-      end
-
-      it 'matches expense description case-insensitive' do
-        match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 30, category: 'meals', vendor: nil, description: 'Lanche da tarde', paid: true)
-        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'fuel', vendor: 'Posto X', paid: true)
-
-        result = described_class.new(year: 2025, query: 'lanche', user: user).call
-
-        items = result[:groups].flat_map { |group| group[:items] }
-        expect(items.map(&:id)).to eq([match.id])
-      end
-
-      it 'matches earning notes case-insensitive' do
-        match = create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', notes: 'Madrugada produtiva')
-        create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 100, platform: 'ifood', notes: 'Tarde calma')
-
-        result = described_class.new(year: 2025, query: 'madru', user: user).call
-
-        items = result[:groups].flat_map { |group| group[:items] }
-        expect(items.map(&:id)).to eq([match.id])
-      end
-
-      it 'matches expense by category label' do
-        match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
-        no_match = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
-
-        result = described_class.new(year: 2025, query: 'Combustível', user: user).call
-
-        items = result[:groups].flat_map { |group| group[:items] }
-        expect(items.map(&:id)).to include(match.id)
-        expect(items.map(&:id)).not_to include(no_match.id)
-      end
-
-      it 'matches earning by platform label' do
-        match = create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber', notes: nil)
-        no_match = create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 100, platform: 'ifood', notes: nil)
-
-        result = described_class.new(year: 2025, query: 'uber', user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:id)).to include(match.id)

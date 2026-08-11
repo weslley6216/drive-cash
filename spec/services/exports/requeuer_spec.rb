@@ -3,18 +3,12 @@ require 'rails_helper'
 RSpec.describe Exports::Requeuer do
   let(:user) { create(:user) }
 
-  it 'sends a failed export back to the queue' do
-    export = create(:export, user: user, status: 'failed')
-
-    described_class.call(export: export)
-
-    expect(export.reload).to be_status_pending
-  end
-
-  it 'enqueues the job again' do
+  it 'sends a failed export back to the queue and enqueues the job again' do
     export = create(:export, user: user, status: 'failed')
 
     expect { described_class.call(export: export) }.to have_enqueued_job(ExportJob).with(export.id)
+
+    expect(export.reload).to be_status_pending
   end
 
   it 'preserves period, format and includes' do

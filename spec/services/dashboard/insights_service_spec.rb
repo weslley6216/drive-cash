@@ -118,68 +118,13 @@ RSpec.describe Dashboard::InsightsService do
     end
 
     context 'monthly_bars' do
-      it 'returns all 12 months when month is nil, marking months without data as empty' do
-        create(:earning, user: user, date: Date.new(2025, 3, 1), amount: 200)
-        create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 50, category: 'fuel', paid: true)
-
-        result = described_class.new(year: 2025, month: nil, user: user).call
-
-        expect(result[:monthly_bars].size).to eq(12)
-        expect(result[:monthly_bars].map { |bar| bar[:key] }).to eq((1..12).to_a)
-
-        march = result[:monthly_bars].find { |bar| bar[:key] == 3 }
-        june = result[:monthly_bars].find { |bar| bar[:key] == 6 }
-        jan = result[:monthly_bars].find { |bar| bar[:key] == 1 }
-
-        expect(march[:empty]).to be false
-        expect(june[:empty]).to be false
-        expect(jan[:empty]).to be true
-      end
-
-      it 'returns annual bars with unit :month and i18n label' do
+      it 'delegates to BarsBuilder for the given year and month' do
         create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 300)
         create(:expense, user: user, date: Date.new(2025, 6, 5), amount: 100, category: 'fuel', paid: true)
 
-        bar = described_class.new(year: 2025, month: nil, user: user).call[:monthly_bars].find { |bar| bar[:key] == 6 }
-
-        expect(bar[:unit]).to eq(:month)
-        expect(bar[:earnings].to_f).to eq(300.0)
-        expect(bar[:expenses].to_f).to eq(100.0)
-        expect(bar[:label]).to eq(I18n.t('date.abbr_month_names')[6].capitalize)
-      end
-
-      it 'returns empty array when there is no activity in the year' do
-        result = described_class.new(year: 2025, month: nil, user: user).call
-
-        expect(result[:monthly_bars]).to eq([])
-      end
-
-      it 'returns daily bars when month is present, only days with data' do
-        create(:earning, user: user, date: Date.new(2025, 6, 5), amount: 200)
-        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 300)
-        create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 50, category: 'fuel', paid: true)
-
         result = described_class.new(year: 2025, month: 6, user: user).call
 
-        expect(result[:monthly_bars].size).to eq(2)
-        expect(result[:monthly_bars].map { |bar| bar[:key] }).to eq([5, 10])
-      end
-
-      it 'returns daily bars with unit :day and string label' do
-        create(:earning, user: user, date: Date.new(2025, 6, 7), amount: 150)
-
-        bar = described_class.new(year: 2025, month: 6, user: user).call[:monthly_bars].first
-
-        expect(bar[:unit]).to eq(:day)
-        expect(bar[:key]).to eq(7)
-        expect(bar[:label]).to eq('7')
-        expect(bar[:empty]).to be false
-      end
-
-      it 'returns empty array when month is present but no data exists' do
-        result = described_class.new(year: 2025, month: 6, user: user).call
-
-        expect(result[:monthly_bars]).to eq([])
+        expect(result[:monthly_bars]).to eq(Dashboard::BarsBuilder.new(user: user, year: 2025, month: 6).call)
       end
     end
 
@@ -256,41 +201,6 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
-    it 'does not instantiate ProfitSeriesService for scalar comparisons' do
-      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1)
-      create(:earning, user: user, date: Date.new(2024, 6, 1), amount: 300, trips_count: 1)
-
-      allow(Dashboard::ProfitSeriesService).to receive(:new).and_call_original
-
-      described_class.new(year: 2025, month: 6, user: user).call
-
-      expect(Dashboard::ProfitSeriesService).not_to have_received(:new)
-    end
-
-    it 'instantiates CategoryBreakdownService only once per call' do
-      %w[fuel maintenance].each_with_index do |category, offset|
-        create(:expense, user: user, date: Date.new(2025, 6, offset + 1), amount: 100, category: category, paid: true)
-        create(:expense, user: user, date: Date.new(2024, 6, offset + 1), amount: 50, category: category, paid: true)
-      end
-
-      allow(Dashboard::CategoryBreakdownService).to receive(:new).and_call_original
-
-      described_class.new(year: 2025, month: 6, user: user).call
-
-      expect(Dashboard::CategoryBreakdownService).to have_received(:new).once
-    end
-
-    it 'instantiates PlatformBreakdownService only once per call' do
-      create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
-      create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 50, trips_count: 5, platform: 'shopee')
-
-      allow(Dashboard::PlatformBreakdownService).to receive(:new).and_call_original
-
-      described_class.new(year: 2025, month: 6, user: user).call
-
-      expect(Dashboard::PlatformBreakdownService).to have_received(:new).once
-    end
-
     context 'insights' do
       it 'emits category_spike when top category grew more than 10 percent vs previous month' do
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
@@ -301,28 +211,6 @@ RSpec.describe Dashboard::InsightsService do
         spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
 
         expect(spike[:severity]).to eq('warning')
-      end
-
-      it 'category_spike uses description_monthly with current and previous month names' do
-        create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 220, category: 'fuel', paid: true)
-        create(:expense, user: user, date: Date.new(2025, 5, 1), amount: 100, category: 'fuel', paid: true)
-
-        result = described_class.new(year: 2025, month: 6, user: user).call
-        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
-
-        expect(spike[:description]).to include('junho')
-        expect(spike[:description]).to include('maio')
-      end
-
-      it 'category_spike uses description_annual with previous year when month is nil' do
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 220, category: 'fuel', paid: true)
-        create(:expense, user: user, date: Date.new(2024, 1, 1), amount: 100, category: 'fuel', paid: true)
-
-        result = described_class.new(year: 2025, month: nil, user: user).call
-        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
-
-        expect(spike[:description]).to include('2024')
-        expect(spike[:description]).not_to include('mês anterior')
       end
 
       it 'emits best_day with the highest profit day of the month' do

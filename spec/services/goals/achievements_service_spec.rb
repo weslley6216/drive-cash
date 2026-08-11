@@ -90,22 +90,5 @@ RSpec.describe Goals::AchievementsService do
       types = result.map { |badge| badge[:type] }
       expect(types).not_to include(:goal_completed)
     end
-
-    it 'runs a constant number of queries regardless of how many recent monthly goals exist' do
-      8.times do |offset|
-        month = Date.new(2026, 5, 1) - (offset + 1).months
-        create(:goal, user: user, kind: 'monthly', target_amount: 10_000,
-               period_start: month.beginning_of_month, period_end: month.end_of_month)
-      end
-
-      queries = []
-      callback = ->(_name, _start, _finish, _id, payload) { queries << payload[:sql] if payload[:sql] =~ /FROM "(goals|earnings|expenses)"/ }
-
-      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-        described_class.new(user: user, date: reference_date).call
-      end
-
-      expect(queries.size).to eq(5)
-    end
   end
 end

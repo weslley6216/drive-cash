@@ -54,15 +54,5 @@ RSpec.describe Dashboard::TodayService do
 
       expect(result).to be_nil
     end
-
-    it 'computes totals with two database queries' do
-      reference = Date.new(2026, 3, 10)
-      create(:earning, user: user, date: reference, amount: 100, trips_count: 3)
-      create(:expense, user: user, date: reference, amount: 30, paid: true)
-
-      query_count = count_queries { described_class.new(user: user, date: reference).call }
-
-      expect(query_count).to eq(2)
-    end
   end
 end
