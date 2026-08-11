@@ -27,17 +27,18 @@ module Goals
     end
 
     def goal_completed_badge
-      @user.goals.for_kind('monthly')
+      goals = @user.goals.for_kind('monthly')
         .where('period_end < ?', @date)
         .order(period_end: :desc)
-        .limit(RECENT_GOALS_LIMIT)
-        .each do |goal|
-        next if metric_for(goal) < goal.target_amount
+        .limit(RECENT_GOALS_LIMIT).to_a
+      return nil if goals.empty?
 
-        period_label = I18n.l(goal.period_start, format: '%B').capitalize
-        return { type: :goal_completed, label: I18n.t('goals.index.achievements.goal_completed', period: period_label) }
-      end
-      nil
+      totals = DailyTotals.for_goals(user: @user, goals: goals)
+      goal = goals.find { |candidate| totals.metric_for(candidate) >= candidate.target_amount }
+      return nil unless goal
+
+      period_label = I18n.l(goal.period_start, format: '%B').capitalize
+      { type: :goal_completed, label: I18n.t('goals.index.achievements.goal_completed', period: period_label) }
     end
 
     def best_day_badge
@@ -47,12 +48,6 @@ module Goals
 
       formatted = format('%.2f', best.last.to_f).tr('.', ',')
       { type: :best_day, label: I18n.t('goals.index.achievements.best_day', value: formatted), value: best.last }
-    end
-
-    def metric_for(goal)
-      earnings = @user.earnings.where(date: goal.period_start..goal.period_end).sum(:amount)
-      expenses = @user.expenses.paid_only.where(date: goal.period_start..goal.period_end).sum(:amount)
-      MetricValue.of(goal, earned: earnings, spent: expenses)
     end
   end
 end
