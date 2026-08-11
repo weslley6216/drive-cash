@@ -71,7 +71,7 @@ RSpec.describe 'PWA', type: :request do
       precache_source = response.body[/ASSETS_TO_CACHE = \[(.*?)\]/m, 1]
 
       expect(precache_source).to include('offline.html')
-      expect(precache_source).not_to match(%r{'/'\s*,})
+      expect(precache_source).not_to include("'/'")
     end
 
     it 'guards push payload parsing and points icon/badge at an existing asset' do

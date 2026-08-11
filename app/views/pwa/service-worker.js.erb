@@ -6,7 +6,7 @@ const ASSETS_TO_CACHE = [
   '/offline.html'
 ];
 
-const STATIC_ASSET_PATTERN = /^\/(assets\/|icon)/;
+const STATIC_ASSET_PATTERN = /^\/(assets\/|icon[-.])/;
 
 function isNavigationRequest(request) {
   return request.mode === 'navigate' || (request.headers.get('Accept') || '').includes('text/html');
@@ -64,13 +64,13 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Push notifications (sem infra de push real ainda - guard evita crash se um payload chegar)
+// Push notifications (no real push infra yet - guard prevents a crash if a payload arrives)
 self.addEventListener('push', (event) => {
   let data = { title: 'DriveCash', body: '' };
   try {
     if (event.data) data = event.data.json();
   } catch (error) {
-    // payload ausente ou não-JSON: mantém o fallback de title/body
+    // missing or non-JSON payload: keeps the title/body fallback
   }
 
   const options = {
