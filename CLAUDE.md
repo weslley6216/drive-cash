@@ -10,7 +10,7 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 - **Frontend**: Phlex 2.2 (componentes Ruby, sem ERB), Stimulus, Turbo, Tailwind CSS
 - **LLM**: Groq (primário, llama-3.3-70b) + Gemini (fallback), via Faraday
 - **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório)
-- **Deploy**: Kamal + Docker, Render (free tier — 2 workers Puma)
+- **Deploy**: Northflank (free tier — 0,1 vCPU/256MB, Puma single mode, Solid Queue dentro do Puma), push na `main` dispara build+rollout
 - **Locale**: pt-BR, fuso Brasília
 
 ## Comandos essenciais
@@ -32,6 +32,8 @@ rtk docker compose run --rm --entrypoint bundle app install
 ```
 
 Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
+
+**Porta 5432 ocupada**: outros projetos na máquina (ex.: `zubio-db-1`) publicam a mesma porta, e aí `docker compose up -d db` falha com `port is already allocated` — o container fica criado **sem rede**, e a suíte quebra com `could not translate host name "db"`. Override de Compose não resolve: `ports` é campo de *append*, não de substituição. Subir o outro projeto para baixo ou publicar o Postgres do DriveCash em outra porta são os caminhos; conferir com `rtk docker ps` antes de culpar o código.
 
 ## Arquitetura em uma linha
 

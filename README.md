@@ -19,7 +19,7 @@ Aplicativo para motoristas de delivery e gig workers rastrearem gastos e ganhos 
 | Frontend | Phlex 2, Stimulus, Turbo, Tailwind CSS 4 |
 | IA | Groq (llama-3.3-70b) + Gemini (fallback) |
 | Testes | RSpec, Factory Bot, SimpleCov (100%) |
-| Deploy | Kamal + Docker |
+| Deploy | Docker + Northflank |
 
 ## Rodando localmente
 
