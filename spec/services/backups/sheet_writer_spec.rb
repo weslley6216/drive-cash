@@ -78,7 +78,16 @@ RSpec.describe Backups::SheetWriter do
         expect(client).to have_received(:batch_update_values) do |_id, request|
           earnings = request.data.find { |range| range.range == "'Ganhos'!A1" }
           expect(earnings.values.first).to eq(Backups::Tabs.find(:earnings).headers)
-          expect(earnings.values.last).to eq(['2026-01-02', 'iFood', 50.0, 1, nil, '2026-01-02 10:00:00'])
+          expect(earnings.values.last).to eq(['2026-01-02', 'iFood', 50.0, 1, '', '2026-01-02 10:00:00'])
+        end
+      end
+
+      it 'sends a blank cell for a missing value so the api erases what the cell held before' do
+        writer.call
+
+        expect(client).to have_received(:batch_update_values) do |_id, request|
+          earnings = request.data.find { |range| range.range == "'Ganhos'!A1" }
+          expect(earnings.values.last[4]).to eq('')
         end
       end
 

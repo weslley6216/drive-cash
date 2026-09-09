@@ -2,6 +2,7 @@ module Backups
   class SheetWriter
     FIELDS = 'sheets(properties(sheetId,title),charts(chartId),bandedRanges(bandedRangeId))'.freeze
     LAST_COLUMN = 'Z'.freeze
+    EMPTY_CELL = ''.freeze
 
     def initialize(client:, spreadsheet_id:, rows:, summary_month_count:)
       @client = client
@@ -52,7 +53,7 @@ module Backups
       data = Tabs::ALL.map do |tab|
         Google::Apis::SheetsV4::ValueRange.new(
           range:  "'#{tab.title}'!A1",
-          values: [tab.headers] + Array(@rows[tab.key])
+          values: [tab.headers] + Array(@rows[tab.key]).map { |row| overwritable(row) }
         )
       end
 
@@ -60,6 +61,10 @@ module Backups
         @spreadsheet_id,
         Google::Apis::SheetsV4::BatchUpdateValuesRequest.new(value_input_option: 'USER_ENTERED', data: data)
       )
+    end
+
+    def overwritable(row)
+      row.map { |value| value.nil? ? EMPTY_CELL : value }
     end
 
     def decorate(state)
