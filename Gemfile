@@ -29,7 +29,7 @@ gem 'turbo-rails'
 
 # Phlex for components
 gem 'phlex-rails', '~> 2.4.0'
-gem 'phlex-icons', '~> 2.56'
+gem 'phlex-icons-lucide', '~> 2.56'
 
 gem 'bootsnap', require: false
 gem 'thruster', require: false
