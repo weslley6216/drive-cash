@@ -13,7 +13,6 @@ module Dashboard
         def call
           {
             type:        @raw[:type],
-            severity:    @raw[:severity],
             title:       title,
             description: description
           }

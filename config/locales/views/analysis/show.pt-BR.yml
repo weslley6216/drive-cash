@@ -37,17 +37,8 @@ pt-BR:
         total_label: "Total"
         empty: "Sem receitas no período"
       insights:
-        section_title: "Insights"
-        category_spike:
-          title: "%{category} subiu %{pct}%%"
-          description_monthly: "Você gastou %{value} em %{category} em %{period} — %{pct}%% acima de %{previous_period}."
-          description_annual:  "Você gastou %{value} em %{category} — %{pct}%% acima do mesmo período de %{previous_year}."
-        best_day:
-          title: "Melhor dia: %{value}"
-          description: "Em %{date} você teve seu melhor resultado do período."
-        worst_platform:
-          title: "Pior plataforma: %{platform}"
-          description: "%{platform} rendeu apenas %{value} por rota."
-        margin_drop:
-          title: "Margem caiu %{pp} pp"
-          description: "Sua margem está em %{value}%%, abaixo do período anterior."
+        category_share:
+          title: "%{category} leva %{pct}%% dos seus gastos"
+          description: "Foram %{value} %{period}. É a categoria que mais pesa no seu lucro por km."
+          period_monthly: "no mês"
+          period_annual: "no ano"
