@@ -1,4 +1,6 @@
 class HeroProfitCardComponent < ApplicationComponent
+  include SvgPath
+
   Payload = Data.define(:profit, :change_percent, :profit_per_day, :days_count, :series, :year, :month)
 
   MOBILE_CHART_WIDTH = 320
@@ -6,8 +8,6 @@ class HeroProfitCardComponent < ApplicationComponent
 
   DESKTOP_CHART_WIDTH = 720
   DESKTOP_CHART_HEIGHT = 120
-
-  MONTHS_PT = %w[Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez].freeze
 
   def initialize(hero:)
     @profit = hero.profit
@@ -156,19 +156,6 @@ class HeroProfitCardComponent < ApplicationComponent
     end
   end
 
-  def line_path(pts)
-    pts.each_with_index.map { |(x, y), idx| "#{idx.zero? ? 'M' : 'L'}#{x},#{y}" }.join(' ')
-  end
-
-  def area_path(pts, height)
-    return '' if pts.empty?
-
-    line = line_path(pts)
-    last_x = pts.last.first
-    "#{line} L#{last_x},#{height} L0,#{height} Z"
-  end
-
-
   def label_text
     if @month
       month_name = I18n.t('date.month_names')[@month]
@@ -187,6 +174,6 @@ class HeroProfitCardComponent < ApplicationComponent
   def chart_labels
     return [] if daily_mode?
 
-    MONTHS_PT[leading_zeros_count, series_to_plot.size] || []
+    (1..12).to_a[leading_zeros_count, series_to_plot.size].map { |number| month_abbr(number) }
   end
 end
