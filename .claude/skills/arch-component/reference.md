@@ -110,7 +110,7 @@ garante fallback sem `case/when`.
 ## Protótipo React = única fonte da verdade visual
 
 **Nunca implemente UI de memória.** O protótipo React é a única verdade para qualquer decisão visual.
-Arquivos em `/home/rebase/Downloads/Design System DriveCash/`:
+Arquivos em `/home/rebase/Obsidian/DriveCash/system-design/`:
 
 - `screen-[nome].jsx` — layout mobile de cada tela.
 - `screens-desktop.jsx` — layout desktop de todas as telas.

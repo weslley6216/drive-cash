@@ -130,7 +130,7 @@ O protótipo React é a **única fonte de verdade** para qualquer decisão visua
 ### Arquivos do protótipo
 
 ```
-/home/rebase/Downloads/Design System DriveCash/
+/home/rebase/Obsidian/DriveCash/system-design/
 ├── DriveCash.html          ← navegador visual (abas Telas · Jornada · Marca)
 ├── screen-[nome].jsx       ← layout mobile de cada tela
 ├── screens-desktop.jsx     ← layout desktop de todas as telas
