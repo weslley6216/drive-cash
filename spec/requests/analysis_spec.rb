@@ -46,16 +46,28 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).not_to include(I18n.t('empty_states.analysis.cta'))
     end
 
-    it 'renders the four metric cards in a 2x2 grid' do
+    it 'renders the per km hero and the three compact metric cards' do
       create(:earning, user: current_user, date: Date.current, amount: 200, trips_count: 4)
 
       get analysis_path
 
+      expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_km_hero'))
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_day'))
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_trip'))
-      expect(response.body).to include(I18n.t('analysis.show_view.metrics.per_km'))
       expect(response.body).to include(I18n.t('analysis.show_view.metrics.margin'))
       expect(response.body).to include('grid-cols-2')
+      expect(response.body).not_to include('melhor:')
+    end
+
+    it 'renders the trend footer once there are three months with earnings' do
+      create(:earning, user: current_user, date: Date.new(2025, 1, 10), amount: 100)
+      create(:earning, user: current_user, date: Date.new(2025, 2, 10), amount: 100)
+      create(:earning, user: current_user, date: Date.new(2025, 3, 10), amount: 100)
+
+      get analysis_path, params: { year: 2025 }
+
+      expect(response.body).to include('melhor:')
+      expect(response.body).to include('<svg')
     end
 
     it 'renders the bar chart section' do

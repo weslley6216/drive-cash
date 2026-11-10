@@ -1,11 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Analysis::ShowView, type: :component do
+  let(:empty_series) { { points: [], best: nil } }
   let(:base_insights) do
     {
-      metrics: { earnings: 100, expenses: 0, per_day: 0, per_trip: 0, per_km: nil, margin: 0, change_pct: {} },
-      monthly_bars: [], categories: [], platforms: [], platforms_total: 0, insights: [],
-      period_context: nil
+      metrics: {
+        earnings: 100, expenses: 0, per_day: 0, per_trip: 0, per_km: nil, margin: 0,
+        series: { per_day: empty_series, per_trip: empty_series, per_km: empty_series, margin: empty_series }
+      },
+      monthly_bars: [], categories: [], platforms: [], platforms_total: 0, insights: []
     }
   end
   let(:filters) { { year: 2026, month: nil, available_years: [2026] } }
@@ -20,7 +23,6 @@ RSpec.describe Analysis::ShowView, type: :component do
     html = view_context.render(described_class.new(insights: base_insights, filters: filters))
 
     expect(html).to include('—')
-    expect(html).to include(I18n.t('analysis.show_view.metrics.per_km_empty'))
   end
 
   it 'renders formatted per_km value when present' do
@@ -29,7 +31,23 @@ RSpec.describe Analysis::ShowView, type: :component do
     html = view_context.render(described_class.new(insights: insights_with_km, filters: filters))
 
     expect(html).to include('1,50')
-    expect(html).to include(I18n.t('analysis.show_view.metrics.per_km_hint'))
+  end
+
+  it 'renders the per km card as the hero ahead of the other metrics' do
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+
+    expect(html.index('Lucro por km rodado')).to be < html.index('R$ / dia')
+    expect(html).to include('lg:grid-cols-[1.4fr_1fr_1fr_1fr]')
+  end
+
+  it 'renders the margin as money under the "Sobra a cada R$ 100" label' do
+    insights_with_margin = base_insights.deep_merge(metrics: { margin: 56.1 })
+
+    html = view_context.render(described_class.new(insights: insights_with_margin, filters: filters))
+
+    expect(html).to include('Sobra a cada R$ 100')
+    expect(html).to include('R$ 56,10')
+    expect(html).not_to include('Margem')
   end
 
   it 'renders the platforms total from the service payload, not the sum of displayed rows' do
