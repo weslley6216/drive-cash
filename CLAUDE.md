@@ -18,7 +18,7 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 O projeto roda via Docker. Sempre usar `rtk docker compose run --rm app` para executar comandos:
 
 ```bash
-rtk docker compose run --rm app bundle exec rspec                    # roda toda a suite
+rtk docker compose run --rm -e COVERAGE_GATE=1 app bundle exec rspec # suíte completa com o gate de 100%
 rtk docker compose run --rm app bundle exec rspec spec/path/file     # spec específica
 rtk docker compose run --rm app bundle exec rubocop                  # lint
 rtk docker compose run --rm app bundle exec rails db:migrate         # migrações
@@ -42,7 +42,7 @@ Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
 ## Regras críticas
 
 - **Rota/tela órfã não é feature a construir (perguntar antes)**: um dead-end apontando pra `application#coming_soon` pode ser resíduo a apagar, não buraco a preencher. Diante de um gap de produto, perguntar *se* a ideia é desejada antes de *como* implementá-la — nunca propor feature nova por suposição. Ex. já decidido: **Jornada / monitoramento em tempo real foi descartado** (o app é registro pós-fato, não ao vivo).
-- **Cobertura 100%**: SimpleCov bloqueia PR se cobertura cair. Toda linha nova precisa de spec.
+- **Cobertura 100%**: toda linha nova precisa de spec. O mínimo de 100% só é exigido com `COVERAGE_GATE=1` (ligado no CI e no portão local do `/ship`), para que rodar só os specs da tarefa saia 0. O CI roda em todo push de branch e bloqueia o merge se a cobertura cair.
 - **Sem lógica em controllers**: lógica de negócio vai em Services (`app/services/{domínio}/`).
 - **Service devolve payload semântico, não apresentação**: o retorno é estrutura + dados crus (números, chaves de enum, `Data`/hash). Cor/design token, `number_to_currency` e helpers de view ficam no component Phlex (que é Ruby — é o lar natural disso). Rótulo i18n 1:1 (`platforms.#{platform}`) pode ficar no service. Cálculo de domínio nunca convive com formatação no mesmo arquivo — extrair um calculador puro (ex: `Refuelings::VendorEfficiency`, `Dashboard::EarningsCalculator`).
 - **Onde a lógica mora (Service vs Value Object vs Model)**: *Service* orquestra e tem efeito colateral (persiste, transação, API) — `services/`. *Value Object* de domínio recebe dados, calcula e responde, imutável e sem banco — se nomeia um conceito do domínio e carrega invariante, vive em `models/{domínio}/` (ex: `Expenses::InstallmentPlan`); calculador puro de passo sem invariante (ex: `Dashboard::PercentChange`, `MaintenanceStatus`) pode seguir em `services/`. **Limite de negócio (`MAX_*`, `MIN_*`) é invariante do model AR**: o limite e a `validates` correspondente moram no model (ex: `Expense::MAX_INSTALLMENTS` + `validates :installment_count`), e o value object referencia a constante do model — nunca só no value object/service, senão dá pra criar registro inválido direto pelo model.

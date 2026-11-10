@@ -2,9 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   lint:
@@ -27,6 +28,7 @@ jobs:
     needs: lint
     env:
       CI: 'true'
+      COVERAGE_GATE: "1"
       RAILS_ENV: test
       DATABASE_URL: "postgres://postgres:postgres@localhost:5432/drive_cash_test"
       LLM_PROVIDER: groq

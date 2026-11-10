@@ -6,7 +6,7 @@ SimpleCov.start 'rails' do
   skip 'jobs'
 end
 
-SimpleCov.minimum_coverage 100
+SimpleCov.minimum_coverage 100 if ENV['COVERAGE_GATE']
 
 require_relative '../config/environment'
 
