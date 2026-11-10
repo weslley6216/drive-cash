@@ -67,4 +67,37 @@ RSpec.describe Dashboard::KmDriven do
       expect(result).to be_nil
     end
   end
+
+  describe '#monthly' do
+    it 'returns the odometer delta of each month with at least two readings' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 1, 5), odometer_km: 10_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 1, 20), odometer_km: 10_800)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 3, 2), odometer_km: 11_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 3, 25), odometer_km: 11_500)
+
+      result = described_class.new(user: user, year: 2025).monthly
+
+      expect(result).to eq(1 => 800, 3 => 500)
+    end
+
+    it 'leaves out months with a single reading or a non-positive delta' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 1, 5), odometer_km: 10_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 1, 20), odometer_km: 10_800)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 10), odometer_km: 11_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 4, 1), odometer_km: 12_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2025, 4, 15), odometer_km: 12_000)
+
+      result = described_class.new(user: user, year: 2025).monthly
+
+      expect(result).to eq(1 => 800)
+    end
+
+    it 'returns an empty hash when the user has no vehicle' do
+      no_vehicle_user = create(:user)
+
+      result = described_class.new(user: no_vehicle_user, year: 2025).monthly
+
+      expect(result).to eq({})
+    end
+  end
 end
