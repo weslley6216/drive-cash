@@ -130,7 +130,8 @@ O protótipo React é a **única fonte de verdade** para qualquer decisão visua
 ### Arquivos do protótipo
 
 ```
-/home/rebase/Downloads/Cosmic scale animation/
+/home/rebase/Downloads/Design System DriveCash/
+├── DriveCash.html          ← navegador visual (abas Telas · Jornada · Marca)
 ├── screen-[nome].jsx       ← layout mobile de cada tela
 ├── screens-desktop.jsx     ← layout desktop de todas as telas
 └── lib.jsx                 ← componentes compartilhados (BRL, Icon, etc.)
