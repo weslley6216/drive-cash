@@ -12,4 +12,8 @@ module Formatting
   def format_percentage(value)
     number_with_precision(value, precision: 1)
   end
+
+  def month_abbr(number)
+    I18n.t('date.abbr_month_names')[number].capitalize
+  end
 end
