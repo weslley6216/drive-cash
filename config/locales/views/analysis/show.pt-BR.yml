@@ -7,15 +7,11 @@ pt-BR:
       metrics:
         per_day: "R$ / dia"
         per_trip: "R$ / rota"
-        per_km: "R$ / km"
-        per_km_hint: "lucro por km rodado"
-        per_km_empty: "informe o km no abastecimento"
-        margin: "Margem"
-        vs_previous: "% vs anterior"
-        vs_previous_pp: " p.p. vs anterior"
-        vs_period_annual:     "vs %{year}"
-        vs_period_annual_ytd: "vs jan–%{month}/%{year}"
-        vs_period_monthly:    "vs %{month}/%{year}"
+        per_km_hero: "Lucro por km rodado"
+        margin: "Sobra a cada R$ 100"
+      trend:
+        best: "melhor: %{month}"
+        not_enough: "A tendência aparece a partir de 3 meses com registros."
       bar_chart:
         title: "Receitas vs Despesas"
         subtitle_annual: "Evolução mensal · %{year}"
