@@ -5,15 +5,13 @@ RSpec.describe Dashboard::InsightsService do
 
   describe '#call' do
     context 'metrics' do
-      it 'returns per_day, per_trip, per_km, margin and change_pct hash' do
+      it 'returns per_day, per_trip, per_km and margin' do
         vehicle = create(:vehicle, user: user)
         create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 800, trips_count: 10)
         create(:earning, user: user, date: Date.new(2025, 2, 5), amount: 200, trips_count: 10)
         create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 200, category: 'fuel', paid: true)
         create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 1), odometer_km: 10_000)
         create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 5), odometer_km: 10_800)
-        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 600, trips_count: 20)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, month: 2, user: user).call
 
@@ -21,8 +19,25 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:per_trip].to_f.round(2)).to eq(40.0)
         expect(result[:metrics][:per_km]).to eq(1.0)
         expect(result[:metrics][:margin]).to eq(80.0)
-        expect(result[:metrics][:change_pct]).to be_a(Hash)
-        expect(result[:metrics][:change_pct].keys).to match_array(%i[per_day per_trip per_km margin])
+      end
+
+      it 'exposes the monthly series of each metric' do
+        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 200, trips_count: 2)
+        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 300, trips_count: 3)
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:metrics][:series].keys).to match_array(%i[per_day per_trip per_km margin])
+        expect(result[:metrics][:series][:per_day][:points].map { |point| point[:month] }).to eq([1, 2])
+      end
+
+      it 'does not expose a comparison with another period' do
+        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 300, trips_count: 3)
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:metrics]).not_to have_key(:change_pct)
+        expect(result).not_to have_key(:period_context)
       end
 
       it 'exposes the period earnings and expenses totals' do
@@ -41,79 +56,12 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:metrics][:per_km]).to be_nil
       end
 
-      it 'returns nil for change_pct[:per_km] when previous period has no km' do
-        vehicle = create(:vehicle, user: user)
-        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 200, trips_count: 1)
-        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 1), odometer_km: 10_000)
-        create(:refueling, vehicle: vehicle, date: Date.new(2025, 2, 15), odometer_km: 10_200)
-
-        result = described_class.new(year: 2025, month: 2, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_km]).to be_nil
-      end
-
       it 'returns zero for per_trip when there are no trips' do
         result = described_class.new(year: 2025, month: 2, user: user).call
 
         expect(result[:metrics][:per_trip]).to eq(0)
         expect(result[:metrics][:per_km]).to be_nil
         expect(result[:metrics][:margin]).to eq(0)
-      end
-
-      it 'returns nil for change_pct when previous period is empty' do
-        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 100, trips_count: 1)
-
-        result = described_class.new(year: 2025, month: 2, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_day]).to be_nil
-      end
-
-      it 'compares to previous year when month is nil' do
-        create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 200, trips_count: 1)
-        create(:earning, user: user, date: Date.new(2024, 6, 1), amount: 100, trips_count: 1)
-
-        result = described_class.new(year: 2025, month: nil, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
-      end
-
-      it 'applies YTD cutoff when year is current year and month is nil' do
-        travel_to(Date.new(2025, 10, 15)) do
-          create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 200, trips_count: 1)
-          create(:earning, user: user, date: Date.new(2024, 1, 1), amount: 100, trips_count: 1)
-          create(:earning, user: user, date: Date.new(2024, 12, 1), amount: 9999, trips_count: 1)
-
-          result = described_class.new(year: 2025, month: nil, user: user).call
-
-          expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
-        end
-      end
-
-      it 'does not apply YTD cutoff for past years' do
-        create(:earning, user: user, date: Date.new(2023, 1, 1), amount: 200, trips_count: 1)
-        create(:earning, user: user, date: Date.new(2022, 12, 1), amount: 100, trips_count: 1)
-
-        result = described_class.new(year: 2023, month: nil, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
-      end
-
-      it 'compares to the previous month of the same year in monthly mode' do
-        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 200, trips_count: 1)
-        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 100, trips_count: 1)
-
-        result = described_class.new(year: 2025, month: 2, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
-      end
-
-      it 'compares January to December of the previous year' do
-        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 200, trips_count: 1)
-        create(:earning, user: user, date: Date.new(2024, 12, 1), amount: 100, trips_count: 1)
-
-        result = described_class.new(year: 2025, month: 1, user: user).call
-
-        expect(result[:metrics][:change_pct][:per_day]).to eq(100.0)
       end
     end
 
@@ -167,106 +115,16 @@ RSpec.describe Dashboard::InsightsService do
       end
     end
 
-    context 'period_context' do
-      it 'returns mode :monthly with the previous month name and its year' do
-        result = described_class.new(year: 2025, month: 6, user: user).call
-
-        expect(result[:period_context][:mode]).to eq(:monthly)
-        expect(result[:period_context][:previous_month_name]).to eq(I18n.t('date.abbr_month_names')[5])
-        expect(result[:period_context][:previous_year]).to eq(2025)
-      end
-
-      it 'returns December of the previous year as previous period for January' do
-        result = described_class.new(year: 2025, month: 1, user: user).call
-
-        expect(result[:period_context][:previous_month_name]).to eq(I18n.t('date.abbr_month_names')[12])
-        expect(result[:period_context][:previous_year]).to eq(2024)
-      end
-
-      it 'returns mode :annual with nil cutoff_month_name for past years' do
-        result = described_class.new(year: 2024, month: nil, user: user).call
-
-        expect(result[:period_context][:mode]).to eq(:annual)
-        expect(result[:period_context][:cutoff_month_name]).to be_nil
-        expect(result[:period_context][:previous_year]).to eq(2023)
-      end
-
-      it 'returns mode :annual with cutoff_month_name for current year' do
-        travel_to(Date.new(2025, 6, 15)) do
-          result = described_class.new(year: 2025, month: nil, user: user).call
-
-          expect(result[:period_context][:mode]).to eq(:annual)
-          expect(result[:period_context][:cutoff_month_name]).to eq(I18n.t('date.abbr_month_names')[6])
-        end
-      end
-    end
-
     context 'insights' do
-      it 'emits category_spike when top category grew more than 10 percent vs previous month' do
-        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
+      it 'emits the category with the highest amount of the period' do
+        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 300, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 2, 2), amount: 100, category: 'toll', paid: true)
 
         result = described_class.new(year: 2025, month: 2, user: user).call
+        share = result[:insights].find { |insight| insight[:type] == 'category_share' }
 
-        spike = result[:insights].find { |insight| insight[:type] == 'category_spike' }
-
-        expect(spike[:severity]).to eq('warning')
-      end
-
-      it 'emits best_day with the highest profit day of the month' do
-        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 500, trips_count: 1)
-        create(:earning, user: user, date: Date.new(2025, 6, 15), amount: 200, trips_count: 1)
-
-        result = described_class.new(year: 2025, month: 6, user: user).call
-        best = result[:insights].find { |insight| insight[:type] == 'best_day' }
-
-        expect(best[:title]).to include('500,00')
-      end
-
-      it 'emits worst_platform when more than one platform has earnings in the period' do
-        create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 1, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 50, trips_count: 5, platform: 'shopee')
-
-        result = described_class.new(year: 2025, month: 6, user: user).call
-        worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
-
-        expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
-      end
-
-      it 'worst_platform reuses platforms breakdown trips_count for per-trip calculation' do
-        create(:earning, user: user, date: Date.new(2025, 6, 1), amount: 500, trips_count: 10, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 6, 2), amount: 100, trips_count: 4, platform: 'shopee')
-
-        result = described_class.new(year: 2025, month: 6, user: user).call
-        worst = result[:insights].find { |insight| insight[:type] == 'worst_platform' }
-
-        expect(worst[:title]).to include(I18n.t('activerecord.attributes.earning.platforms.shopee'))
-        expect(worst[:description]).to include('25,00')
-      end
-
-      it 'emits margin_drop with critical severity when margin fell more than 5 pp' do
-        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 1000)
-        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 900, category: 'fuel', paid: true)
-        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 1000)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
-
-        result = described_class.new(year: 2025, month: 2, user: user).call
-        drop = result[:insights].find { |insight| insight[:type] == 'margin_drop' }
-
-        expect(drop[:severity]).to eq('critical')
-      end
-
-      it 'returns at most 3 insights ordered by severity (critical first)' do
-        create(:earning, user: user, date: Date.new(2025, 2, 1), amount: 1000, trips_count: 1, platform: 'uber')
-        create(:earning, user: user, date: Date.new(2025, 2, 2), amount: 50, trips_count: 5, platform: 'shopee')
-        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 900, category: 'fuel', paid: true)
-        create(:earning, user: user, date: Date.new(2025, 1, 1), amount: 1000, trips_count: 1)
-        create(:expense, user: user, date: Date.new(2025, 1, 1), amount: 100, category: 'fuel', paid: true)
-
-        result = described_class.new(year: 2025, month: 2, user: user).call
-
-        expect(result[:insights].size).to be <= 3
-        expect(result[:insights].first[:severity]).to eq('critical')
+        expect(share[:title]).to include('Combustível')
+        expect(share[:title]).to include('75,0%')
       end
 
       it 'returns empty array when there is no data to analyze' do
