@@ -399,6 +399,11 @@ pt-BR:
         save: "Salvar"
         saving: "Salvando..."
         cancel: "Cancelar"
+    mark_done:
+      errors:
+        below_last: "Menor que a última troca registrada (%{km} km)."
+        below_last_companion: "Menor que a última troca de %{item} (%{km} km)."
+        above_max: "Muito acima do odômetro. Máximo: %{km} km."
     flash:
       created: "Manutenção cadastrada."
       updated: "Manutenção atualizada."
