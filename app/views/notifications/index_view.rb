@@ -1,6 +1,6 @@
 module Notifications
   class IndexView < ApplicationView
-    READ_ALL_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 whitespace-nowrap cursor-pointer'
+    READ_ALL_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
     READ_ALL_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-2 ' \
                                'text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
 
@@ -10,11 +10,13 @@ module Notifications
     end
 
     def view_template
-      render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more) do
+      render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more,
+                                 turbo_cache: false) do
         div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
         mobile_header
         desktop_header
         @groups.empty? ? empty_state : groups_list
+        turbo_frame_tag 'modal'
       end
     end
 
@@ -66,7 +68,7 @@ module Notifications
         p(class: 'text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-1') do
           t("notifications.index.groups.#{group.key}")
         end
-        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden') do
+        div(class: 'bg-white rounded-xl shadow-sm border border-slate-100') do
           group.rows.each_with_index do |row, index|
             render RowComponent.new(row: row, bucket: group.key, last: index == group.rows.size - 1)
           end

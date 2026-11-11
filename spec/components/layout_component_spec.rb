@@ -85,6 +85,18 @@ RSpec.describe LayoutComponent, type: :component do
     expect(html).to include('id="loading-overlay"')
   end
 
+  it 'keeps the Turbo cache by default' do
+    html = view_context.render(LayoutComponent.new(title: 'X')) { 'content' }
+
+    expect(html).not_to include('turbo-cache-control')
+  end
+
+  it 'opts out of the Turbo cache when asked' do
+    html = view_context.render(LayoutComponent.new(title: 'X', turbo_cache: false)) { 'content' }
+
+    expect(html).to include('name="turbo-cache-control" content="no-cache"')
+  end
+
   it 'leaves the loading overlay out of the auth shell when auth: true' do
     html = view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' }
 

@@ -7,6 +7,12 @@ RSpec.describe NotificationBellComponent, type: :component do
     expect(html).to include('href="/notifications"')
   end
 
+  it 'escapes the dashboard page frame with a full-page navigation' do
+    html = view_context.render(described_class.new(unread_count: 0))
+
+    expect(html).to include('data-turbo-frame="_top"')
+  end
+
   it 'renders the unread count badge' do
     html = view_context.render(described_class.new(unread_count: 3))
 

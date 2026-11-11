@@ -68,6 +68,13 @@ RSpec.describe 'Vehicles', type: :request do
 
         expect(response.body).to include(I18n.t('vehicle.insight.cheapest.title', vendor: 'PosC'))
       end
+
+      it 'wires the highlight controller on the maintenance list' do
+        get vehicle_path
+
+        expect(response.body).to include('data-controller="highlight"')
+        expect(response.body).to include('ring-amber-400')
+      end
     end
 
     context 'with more maintenances than the mobile limit' do
