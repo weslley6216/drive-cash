@@ -74,6 +74,13 @@ RSpec.describe 'Maintenances', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('maintenances.form.title_edit'))
     end
+
+    it 'hides the category select and offers removal' do
+      get edit_maintenance_path(maintenance)
+
+      expect(response.body).not_to include('name="maintenance[category]"')
+      expect(response.body).to include(I18n.t('maintenances.form.remove'))
+    end
   end
 
   describe 'PATCH /maintenances/:id' do

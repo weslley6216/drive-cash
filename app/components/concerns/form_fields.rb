@@ -37,17 +37,18 @@ module FormFields
     ].join(' ')
   end
 
-  def field_wrapper(label_text, theme: :blue)
+  def field_wrapper(label_text, theme: :blue, help: nil)
     styles = theme_styles(theme)
     div(class: 'mb-4') do
       label(class: "block text-sm font-medium mb-2 #{styles[:label]}") { label_text }
       yield
+      p(class: 'text-xs text-slate-500 mt-1.5') { help } if help
     end
   end
 
-  def money_field(form, attribute, label:, theme: :blue, required: false)
+  def money_field(form, attribute, label:, theme: :blue, required: false, help: nil)
     raw_value = form.object.public_send(attribute)
-    field_wrapper(label, theme: theme) do
+    field_wrapper(label, theme: theme, help: help) do
       div(data: { controller: 'money-field' }) do
         input(
           type:         'text',
@@ -82,9 +83,9 @@ module FormFields
     end
   end
 
-  def integer_field(form, attribute, label:, theme: :blue, **options)
+  def integer_field(form, attribute, label:, theme: :blue, help: nil, **options)
     raw_value = form.object.public_send(attribute)
-    field_wrapper(label, theme: theme) do
+    field_wrapper(label, theme: theme, help: help) do
       div(data: { controller: 'integer-field' }) do
         input(
           type:         'text',

@@ -393,9 +393,16 @@ pt-BR:
       title_edit: "Editar manutenção"
       labels:
         category: "Item"
-        last_done_km: "Última realização (km)"
+        last_done_km: "Última vez feita aos (km)"
         interval_km: "Intervalo (km)"
         estimated_cost: "Custo estimado"
+      help:
+        interval_catalog: "Padrão do catálogo: %{km} km."
+        last_done_km: "Use “Marcar como feita” para registrar uma nova troca."
+        estimated_cost: "Usado só para a previsão de gastos."
+      remove: "Remover do veículo"
+      remove_confirm: "Remover esta manutenção?"
+      remove_description: "O item sai do acompanhamento do veículo."
       buttons:
         save: "Salvar"
         saving: "Salvando..."
