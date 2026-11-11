@@ -57,6 +57,16 @@ RSpec.describe 'Refuelings', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('refuelings.form.title_new'))
     end
+
+    it 'prefills vendor and odometer from the active tank' do
+      vehicle.update!(odometer_km: 160_928)
+      create(:refueling, vehicle: vehicle, full_tank: true, vendor: 'Posto Orense', date: Date.current - 1)
+
+      get new_refueling_path
+
+      expect(response.body).to include('value="Posto Orense"')
+      expect(response.body).to include('value="160928"')
+    end
   end
 
   describe 'POST /refuelings' do

@@ -77,6 +77,22 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include('name="record[date]"')
     end
 
+    it 'prefills the date from the param' do
+      travel_to Date.new(2026, 7, 14) do
+        get new_record_path, params: { date: '2026-07-13' }
+
+        expect(response.body).to include('value="2026-07-13"')
+      end
+    end
+
+    it 'falls back to today for a future date' do
+      travel_to Date.new(2026, 7, 14) do
+        get new_record_path, params: { date: '2026-07-15' }
+
+        expect(response.body).to include('value="2026-07-14"')
+      end
+    end
+
     it 'renders recurring section for expense type' do
       get new_record_path, params: { type: 'expense' }
 
