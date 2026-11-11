@@ -80,6 +80,31 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(find(:link, I18n.t('notifications.index.title'))).to have_text('1')
   end
 
+  it 'mutes a kind from the ⋯ menu and undoes it on a phone' do
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-11' })
+
+    visit notifications_path
+    click_on I18n.t('notifications.menu.label')
+    click_on I18n.t('notifications.menu.mute')
+
+    expect(page).to have_text(I18n.t('notifications.muted.toast', kind: I18n.t('notifications.preferences.kinds.log_reminder.title')))
+    expect(page).to have_no_text(I18n.t('notifications.kinds.log_reminder.title'))
+
+    click_on I18n.t('notifications.muted.undo')
+
+    expect(page).to have_text(I18n.t('notifications.kinds.log_reminder.title'))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens the preferences from the ⚙ on a desktop screen' do
+    emulate_desktop_screen
+
+    visit notifications_path
+    click_on I18n.t('notifications.index.preferences')
+
+    expect(page).to have_current_path(edit_notification_preferences_path)
+  end
+
   it 'opens the refueling form over the center on a desktop screen' do
     emulate_desktop_screen
     create(:refueling, vehicle: @vehicle, full_tank: true, vendor: 'Posto Orense', date: Date.current - 1)
