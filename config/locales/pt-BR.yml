@@ -327,11 +327,12 @@ pt-BR:
       hidden_ok:
         one: "· %{count} em dia oculto"
         other: "· %{count} em dia ocultos"
-      km_remaining: "faltam %{value} km"
+      km_remaining: "faltam"
+      km_value: "%{value} km"
       at_km: "aos %{value} km"
       overdue: "venceu há %{value} km"
-      est_cost: "est. %{value}"
-      mark_done: "Marcar feita"
+      mark_done: "Marcar como feita"
+      edit: "Editar"
       empty: "Nenhuma manutenção cadastrada"
       status:
         ok: "Em dia"

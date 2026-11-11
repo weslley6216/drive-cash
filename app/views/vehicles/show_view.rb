@@ -85,23 +85,23 @@ module Vehicles
       render Vehicles::TankBalanceCardComponent.new(balance: tank[:balance], full: tank[:full], last_fill: tank[:last_fill], variant: variant)
     end
 
-    def maintenances_section(limit: nil, variant: :mobile)
+    def maintenances_section(limit: nil)
       div do
         div(class: 'flex items-center justify-between mb-2 px-1') do
           h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.maintenances.title') }
           span(class: 'text-xs text-slate-400') { t('vehicle.maintenances.by_km') }
         end
-        maintenances_list(limit: limit, variant: variant)
+        maintenances_list(limit: limit)
       end
     end
 
-    def maintenances_list(limit:, variant:)
+    def maintenances_list(limit:)
       shown = limit ? maintenances.first(limit) : maintenances
-      div(class: 'space-y-2') do
+      div(class: 'space-y-2.5') do
         if maintenances.empty?
           empty_row(t('vehicle.maintenances.empty'))
         else
-          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry, variant: variant) }
+          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry) }
         end
         catalog_button(hidden: maintenances.size - shown.size)
       end
@@ -187,7 +187,7 @@ module Vehicles
 
     def desktop_row_two
       div(class: 'grid grid-cols-12 gap-5') do
-        div(class: 'col-span-12 lg:col-span-7') { maintenances_section(variant: :desktop) }
+        div(class: 'col-span-12 lg:col-span-7') { maintenances_section }
         div(class: 'col-span-12 lg:col-span-5') { moves_section }
       end
     end
