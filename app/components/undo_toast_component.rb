@@ -6,8 +6,7 @@ class UndoToastComponent < ApplicationComponent
   end
 
   def view_template
-    div(class: 'fixed left-4 right-4 bottom-24 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:w-96 rounded-xl bg-slate-900 text-white px-4 py-3 flex items-center gap-3 shadow-lg',
-        data:  { controller: 'flash', flash_delay_value: 6000 }) do
+    render ToastShellComponent.new do
       icon_circle
       p(class: 'text-[13px] leading-snug flex-1') { message }
       button_to(t('maintenances.mark_done.undo'), @payload['path'], method: :delete, params: { restore: @payload['restore'] },

@@ -12,8 +12,8 @@ module Notifications
                           'border-slate-200 shadow-lg py-1'
     MENU_BUTTON_CLASSES = 'w-8 h-8 -mt-1 rounded-full flex items-center justify-center text-slate-400 ' \
                           'flex-shrink-0 focus:bg-slate-100 focus:text-slate-600'
-    REMOVE_BUTTON_CLASSES = 'w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 ' \
-                            'hover:bg-slate-50 cursor-pointer'
+    MENU_ITEM_CLASSES = 'w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 ' \
+                        'hover:bg-slate-50 cursor-pointer'
 
     def initialize(row:, bucket:, last: false)
       @row = row
@@ -102,11 +102,24 @@ module Notifications
 
     def menu_panel
       div(class: MENU_PANEL_CLASSES, data: { filter_popover_target: 'panel' }) do
-        button_to(notification_path(notification), method: :delete, class: REMOVE_BUTTON_CLASSES,
-                                                    form_class: 'contents') do
-          render PhlexIcons::Lucide::Trash2.new(class: 'w-[15px] h-[15px] text-slate-400')
-          plain " #{t('notifications.menu.remove')}"
-        end
+        remove_item
+        mute_item
+      end
+    end
+
+    def mute_item
+      button_to(notification_preferences_path, method: :patch, params: { kind: notification.kind, enabled: false },
+                                                class: MENU_ITEM_CLASSES, form_class: 'contents') do
+        render PhlexIcons::Lucide::Bell.new(class: 'w-[15px] h-[15px] text-slate-400')
+        plain " #{t('notifications.menu.mute')}"
+      end
+    end
+
+    def remove_item
+      button_to(notification_path(notification), method: :delete, class: MENU_ITEM_CLASSES,
+                                                  form_class: 'contents') do
+        render PhlexIcons::Lucide::Trash2.new(class: 'w-[15px] h-[15px] text-slate-400')
+        plain " #{t('notifications.menu.remove')}"
       end
     end
   end

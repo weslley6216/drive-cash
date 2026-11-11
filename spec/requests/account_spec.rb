@@ -133,6 +133,13 @@ RSpec.describe 'Account', type: :request do
         expect(response.body).to include('href="/notifications"')
       end
 
+      it 'lists the Avisos item linking to the preferences' do
+        get account_path
+
+        expect(response.body).to include(I18n.t('account.items.notification_preferences.label'))
+        expect(response.body).to include('href="/notification_preferences/edit"')
+      end
+
       it 'renders the sign out button with red border' do
         get account_path
 

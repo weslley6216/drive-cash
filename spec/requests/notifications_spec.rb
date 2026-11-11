@@ -21,6 +21,13 @@ RSpec.describe 'Notifications', type: :request do
         expect(response.body).to include(I18n.t('notifications.index.empty.description'))
       end
 
+      it 'links to the preferences when empty' do
+        get notifications_path
+
+        expect(response.body).to include('href="/notification_preferences/edit"')
+        expect(response.body).to include('aria-label="Preferências"')
+      end
+
       it 'hides the mark-all action when there is nothing to read' do
         get notifications_path
 
@@ -45,6 +52,15 @@ RSpec.describe 'Notifications', type: :request do
         get notifications_path
 
         expect(response.body).to include(I18n.t('notifications.index.unread_count', count: 1))
+      end
+
+      it 'links to the preferences' do
+        create(:notification, user: user)
+
+        get notifications_path
+
+        expect(response.body).to include('href="/notification_preferences/edit"')
+        expect(response.body).to include('aria-label="Preferências"')
       end
 
       it 'generates notifications from the domain on load' do

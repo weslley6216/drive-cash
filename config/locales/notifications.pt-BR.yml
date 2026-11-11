@@ -6,11 +6,13 @@ pt-BR:
       refuel: "Abastecer"
     menu:
       remove: "Remover"
+      mute: "Não avisar mais disso"
       label: "Mais opções"
     index:
       title: "Notificações"
       read_all: "Marcar todas como lidas"
       back: "Voltar"
+      preferences: "Preferências"
       unread_count:
         zero: "Tudo em dia"
         one: "%{count} não lida"
@@ -22,6 +24,9 @@ pt-BR:
       empty:
         title: "Nenhuma notificação por aqui"
         description: "Avisamos quando tiver manutenção chegando, meta batida ou resumo da semana."
+    muted:
+      toast: "Você não vai mais receber “%{kind}”."
+      undo: "Desfazer"
     preferences:
       title: "Avisos"
       mobile_subtitle: "Escolha o que o DriveCash te avisa"

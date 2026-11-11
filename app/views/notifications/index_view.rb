@@ -3,6 +3,10 @@ module Notifications
     READ_ALL_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
     READ_ALL_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-2 ' \
                                'text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
+    PREFERENCES_MOBILE_CLASSES = 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex ' \
+                                 'items-center justify-center text-slate-600'
+    PREFERENCES_DESKTOP_CLASSES = 'w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center ' \
+                                  'justify-center text-slate-600 hover:bg-slate-50'
 
     def initialize(groups:, unread_count:)
       @groups = groups
@@ -23,16 +27,19 @@ module Notifications
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-1 pt-2 pb-3 flex items-start justify-between gap-3') do
-        div(class: 'flex items-start gap-2') do
-          link_to(helpers.account_path,
-                  class: 'p-1 -ml-1 mt-0.5 text-slate-500',
-                  aria:  { label: t('notifications.index.back') }) do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
+      div(class: 'lg:hidden px-1 pt-2 pb-3') do
+        div(class: 'flex items-start justify-between gap-3') do
+          div(class: 'flex items-start gap-2') do
+            link_to(helpers.account_path,
+                    class: 'p-1 -ml-1 mt-0.5 text-slate-500',
+                    aria:  { label: t('notifications.index.back') }) do
+              render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
+            end
+            h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.index.title') }
           end
-          h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.index.title') }
+          preferences_link(css: PREFERENCES_MOBILE_CLASSES)
         end
-        read_all_button(css: READ_ALL_MOBILE_CLASSES) unless @groups.empty?
+        div(class: 'flex justify-end px-1 mb-2') { read_all_button(css: READ_ALL_MOBILE_CLASSES) } unless @groups.empty?
       end
     end
 
@@ -42,11 +49,21 @@ module Notifications
           h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.index.title') }
           p(class: 'text-sm text-slate-500 mt-1') { t('notifications.index.unread_count', count: @unread_count) }
         end
-        unless @groups.empty?
-          read_all_button(css: READ_ALL_DESKTOP_CLASSES) do
-            render PhlexIcons::Lucide::Check.new(class: 'w-[15px] h-[15px] text-slate-500')
+        div(class: 'flex items-center gap-2') do
+          unless @groups.empty?
+            read_all_button(css: READ_ALL_DESKTOP_CLASSES) do
+              render PhlexIcons::Lucide::Check.new(class: 'w-[15px] h-[15px] text-slate-500')
+            end
           end
+          preferences_link(css: PREFERENCES_DESKTOP_CLASSES)
         end
+      end
+    end
+
+    def preferences_link(css:)
+      link_to(helpers.edit_notification_preferences_path, class: css,
+                                                          aria:  { label: t('notifications.index.preferences') }) do
+        render PhlexIcons::Lucide::Settings.new(class: 'w-[17px] h-[17px]')
       end
     end
 

@@ -86,6 +86,17 @@ RSpec.describe Notifications::RowComponent, type: :component do
     expect(html).to include(I18n.t('notifications.menu.remove'))
   end
 
+  it 'offers to mute the notification kind from the menu' do
+    notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+    html = render_row(notification)
+
+    expect(html).to include(I18n.t('notifications.menu.mute'))
+    expect(html).to include('action="/notification_preferences"')
+    expect(html).to include('name="kind" value="tank_low"')
+    expect(html).to include('name="enabled" value="false"')
+  end
+
   it 'shows no destination label' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
