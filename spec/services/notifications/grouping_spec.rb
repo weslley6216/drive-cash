@@ -15,6 +15,16 @@ RSpec.describe Notifications::Grouping do
     expect(groups.map { |group| group.rows.map(&:notification) }).to eq([[today], [this_week], [earlier]])
   end
 
+  it 'leaves the previous sunday out of this week' do
+    previous_sunday = create(:notification, user: user, created_at: Date.new(2026, 7, 12).to_time.change(hour: 18))
+    monday = create(:notification, user: user, created_at: Date.new(2026, 7, 13).to_time.change(hour: 9))
+
+    groups = described_class.new(user.notifications.chronological, date: date).call
+
+    expect(groups.find { |group| group.key == :earlier }.rows.map(&:notification)).to eq([previous_sunday])
+    expect(groups.find { |group| group.key == :week }.rows.map(&:notification)).to eq([monday])
+  end
+
   it 'omits buckets with no notifications' do
     create(:notification, user: user, created_at: date.to_time.change(hour: 9))
 
