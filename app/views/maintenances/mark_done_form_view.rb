@@ -126,7 +126,7 @@ module Maintenances
       p(class: "text-xs text-red-600 mt-1.5 flex items-start gap-1 #{'hidden' if km_error_message.blank?}",
         data:  { mark_done_km_target: 'error' }) do
         render PhlexIcons::Lucide::TriangleAlert.new(class: 'w-[13px] h-[13px] mt-px flex-shrink-0')
-        plain km_error_message
+        span { km_error_message }
       end
     end
 
@@ -138,7 +138,7 @@ module Maintenances
       p(class: "text-xs text-blue-700 mt-1.5 flex items-start gap-1 #{'hidden' unless km_error_message.blank? && done_km_ahead_of_odometer?}",
         data:  { mark_done_km_target: 'info' }) do
         render PhlexIcons::Lucide::Gauge.new(class: 'w-[13px] h-[13px] mt-px flex-shrink-0')
-        plain t('maintenances.mark_done.odometer_advance', km: delimited(@request.done_km || maintenance.vehicle.odometer_km))
+        span { t('maintenances.mark_done.odometer_advance', km: delimited(@request.done_km || maintenance.vehicle.odometer_km)) }
       end
     end
 
