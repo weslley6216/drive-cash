@@ -35,6 +35,12 @@ RSpec.describe Notifications::PreferenceRowComponent, type: :component do
     expect(html).to include('change->auto-submit#submit')
   end
 
+  it 'shows a focus ring on the toggle track for keyboard users' do
+    html = render_row(enabled_row)
+
+    expect(html).to include('peer-focus-visible:ring-2')
+  end
+
   it 'separates rows after the first' do
     expect(render_row(enabled_row, first: true)).not_to include('border-t border-slate-100')
     expect(render_row(enabled_row, first: false)).to include('border-t border-slate-100')

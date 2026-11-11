@@ -15,10 +15,10 @@ RSpec.describe NotificationPreferences::EditView, type: :component do
   it 'renders mobile and desktop headers' do
     html = view_context.render(described_class.new(rows: rows))
 
-    expect(html).to include('Escolha o que o DriveCash te avisa')
-    expect(html).to include('Escolha o que o DriveCash te avisa. Salva na hora.')
-    expect(html).to include('Desligar um aviso não apaga os que já chegaram. Os avisos aparecem na central de notificações (sino).')
-    expect(html).to include('Desligar um aviso não apaga os que já chegaram.')
+    expect(html).to include('>Escolha o que o DriveCash te avisa</p>')
+    expect(html).to include('>Escolha o que o DriveCash te avisa. Salva na hora.</p>')
+    expect(html).to include('>Desligar um aviso não apaga os que já chegaram. Os avisos aparecem na central de notificações (sino).</p>')
+    expect(html).to include('>Desligar um aviso não apaga os que já chegaram.</p>')
     expect(html).to include('Conta')
     expect(html).to include('Notificações')
   end

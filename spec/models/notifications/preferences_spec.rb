@@ -43,6 +43,28 @@ RSpec.describe Notifications::Preferences do
     expect(result.to_h).to eq({})
   end
 
+  it 'is idempotent when disabling a disabled kind' do
+    preferences = described_class.new('tank_low' => false)
+
+    result = preferences.with('tank_low', false)
+
+    expect(result.to_h).to eq('tank_low' => false)
+  end
+
+  it 'does not freeze the hash it was built from' do
+    settings = { 'tank_low' => false }
+
+    described_class.new(settings)
+
+    expect(settings).not_to be_frozen
+  end
+
+  it 'normalizes symbol keys to strings' do
+    preferences = described_class.new(tank_low: false)
+
+    expect(preferences.enabled?('tank_low')).to be(false)
+  end
+
   it 'returns a new instance without mutating the original' do
     preferences = described_class.new('tank_low' => false)
 

@@ -53,7 +53,8 @@ module Notifications
           aria:    { label: @row.title },
           data:    { action: 'change->auto-submit#submit' }
         )
-        span(class: 'absolute inset-0 rounded-full transition bg-slate-300 peer-checked:bg-blue-600')
+        span(class: 'absolute inset-0 rounded-full transition bg-slate-300 peer-checked:bg-blue-600 ' \
+                     'peer-focus-visible:ring-2 peer-focus-visible:ring-blue-400 peer-focus-visible:ring-offset-2')
         span(class: 'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition peer-checked:left-[22px]')
       end
     end

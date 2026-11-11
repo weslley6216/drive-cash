@@ -1,7 +1,7 @@
 module Notifications
   class Preferences
     def initialize(settings = {})
-      @settings = settings.freeze
+      @settings = settings.to_h.transform_keys(&:to_s).freeze
       freeze
     end
 

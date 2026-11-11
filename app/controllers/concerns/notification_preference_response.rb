@@ -1,6 +1,5 @@
 module NotificationPreferenceResponse
   extend ActiveSupport::Concern
-  include ModalRefreshResponse
 
   private
 

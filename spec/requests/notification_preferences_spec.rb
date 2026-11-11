@@ -16,7 +16,9 @@ RSpec.describe 'Notification preferences', type: :request do
       get edit_notification_preferences_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Avisos')
+      Notifications::Registry::KINDS.each do |kind|
+        expect(response.body).to include(I18n.t("notifications.preferences.kinds.#{kind}.title"))
+      end
     end
 
     it 'opts out of the Turbo snapshot cache' do
@@ -64,6 +66,7 @@ RSpec.describe 'Notification preferences', type: :request do
         patch notification_preferences_path, params: { kind: 'foo', enabled: 'false' }
 
         expect(response).to have_http_status(:unprocessable_content)
+        expect(user.reload.notification_preferences).to eq({})
       end
 
       it "changes only the current user's preferences" do
