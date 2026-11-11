@@ -8,7 +8,7 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 
 - **Backend**: Ruby 3.3.5, Rails 8.1.2, PostgreSQL 16
 - **Frontend**: Phlex 2.2 (componentes Ruby, sem ERB), Stimulus, Turbo, Tailwind CSS
-- **LLM**: Groq (primário, llama-3.3-70b) + Gemini (fallback), via Faraday
+- **LLM**: Groq (primário, openai/gpt-oss-120b) + Gemini (fallback), via Faraday
 - **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório), Capybara + Cuprite (system specs de celular/desktop em spec/system)
 - **Deploy**: Northflank (free tier — 0,1 vCPU/256MB, Puma single mode, Solid Queue dentro do Puma), push na `main` dispara build+rollout
 - **Locale**: pt-BR, fuso Brasília
