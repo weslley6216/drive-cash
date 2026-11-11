@@ -63,9 +63,9 @@ module Vehicles
 
     def edit_link
       link_to(helpers.edit_maintenance_path(@maintenance),
-              aria_label: t('vehicle.maintenances.edit'),
-              class:      'w-9 h-9 rounded-full flex items-center justify-center text-slate-400 flex-shrink-0',
-              data:       { turbo_frame: 'modal' }) do
+              aria:  { label: t('vehicle.maintenances.edit') },
+              class: 'w-9 h-9 rounded-full flex items-center justify-center text-slate-400 flex-shrink-0',
+              data:  { turbo_frame: 'modal' }) do
         render PhlexIcons::Lucide::Pencil.new(class: 'w-[16px] h-[16px]')
       end
     end
