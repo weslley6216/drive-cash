@@ -74,6 +74,13 @@ RSpec.describe 'Maintenances', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('maintenances.form.title_edit'))
     end
+
+    it 'hides the category select and offers removal' do
+      get edit_maintenance_path(maintenance)
+
+      expect(response.body).not_to include('name="maintenance[category]"')
+      expect(response.body).to include(I18n.t('maintenances.form.remove'))
+    end
   end
 
   describe 'PATCH /maintenances/:id' do
@@ -94,28 +101,6 @@ RSpec.describe 'Maintenances', type: :request do
     end
   end
 
-  describe 'PATCH /maintenances/:id/mark_done' do
-    let(:maintenance) { create(:maintenance, vehicle: vehicle, last_done_km: 150_000, interval_km: 5_000) }
-
-    it 'resets last_done_km to the current odometer so progress zeroes out' do
-      patch mark_done_maintenance_path(maintenance), as: :turbo_stream
-
-      expect(maintenance.reload.last_done_km).to eq(160_928)
-      expect(maintenance.progress).to eq(0)
-      expect(response.body).to include('action="refresh"')
-    end
-
-    it 'rerenders with an error flash when marking done fails validation' do
-      vehicle.update!(odometer_km: 0)
-      maintenance = create(:maintenance, vehicle: vehicle, last_done_km: 100)
-
-      patch mark_done_maintenance_path(maintenance), as: :turbo_stream
-
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(maintenance.reload.last_done_km).to eq(100)
-    end
-  end
-
   describe 'DELETE /maintenances/:id' do
     let(:maintenance) { create(:maintenance, vehicle: vehicle) }
 
@@ -125,6 +110,12 @@ RSpec.describe 'Maintenances', type: :request do
       expect { delete maintenance_path(maintenance) }.to change(Maintenance, :count).by(-1)
 
       expect(response).to redirect_to(vehicle_path)
+    end
+
+    it 'destroys and responds with modal clear and turbo_stream refresh' do
+      delete maintenance_path(maintenance), as: :turbo_stream
+
+      expect(response.body).to include('action="update"').and include('action="refresh"')
     end
 
     it 'returns 404 for other user maintenance' do

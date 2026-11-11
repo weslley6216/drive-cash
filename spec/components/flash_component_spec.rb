@@ -53,5 +53,13 @@ RSpec.describe FlashComponent, type: :component do
       expect(html).to include('bg-blue-600')
       expect(html).to include('Informação')
     end
+
+    it 'renders the undo toast for the undo key' do
+      flash = { undo: { 'category' => 'oil_change', 'km' => 160_928, 'count' => 3, 'path' => '/maintenances/5/mark_done', 'restore' => { '12' => 155_600 } } }
+      component = FlashComponent.new(flash: flash)
+      html = view_context.render(component)
+
+      expect(html).to include('bg-slate-900')
+    end
   end
 end

@@ -327,11 +327,12 @@ pt-BR:
       hidden_ok:
         one: "· %{count} em dia oculto"
         other: "· %{count} em dia ocultos"
-      km_remaining: "faltam %{value} km"
+      km_remaining: "faltam"
+      km_value: "%{value} km"
       at_km: "aos %{value} km"
       overdue: "venceu há %{value} km"
-      est_cost: "est. %{value}"
-      mark_done: "Marcar feita"
+      mark_done: "Marcar como feita"
+      edit: "Editar"
       empty: "Nenhuma manutenção cadastrada"
       status:
         ok: "Em dia"
@@ -392,18 +393,48 @@ pt-BR:
       title_edit: "Editar manutenção"
       labels:
         category: "Item"
-        last_done_km: "Última realização (km)"
+        last_done_km: "Última vez feita aos (km)"
         interval_km: "Intervalo (km)"
         estimated_cost: "Custo estimado"
+      help:
+        interval_catalog: "Padrão do catálogo: %{km} km."
+        last_done_km: "Use “Marcar como feita” para registrar uma nova troca."
+        estimated_cost: "Usado só para a previsão de gastos."
+      remove: "Remover do veículo"
+      remove_confirm: "Remover esta manutenção?"
+      remove_description: "O item sai do acompanhamento do veículo."
       buttons:
         save: "Salvar"
         saving: "Salvando..."
         cancel: "Cancelar"
+    mark_done:
+      title: "%{item} feita"
+      subtitle: "Última: %{last} km · intervalo de %{interval} km"
+      labels:
+        done_km: "Km do serviço"
+        done_on: "Data"
+        companions: "Também troquei"
+      help: "Preenchido com o odômetro atual. Ajuste se o serviço foi antes."
+      odometer_advance: "Maior que o odômetro: ele será atualizado para %{km} km."
+      companions_hint: "Só aparecem itens do catálogo cadastrados no seu veículo."
+      buttons:
+        cancel: "Cancelar"
+        save: "Salvar"
+        saving: "Salvando..."
+      errors:
+        below_last: "Menor que a última troca registrada (%{km} km)."
+        below_last_companion: "Menor que a última troca de %{item} (%{km} km)."
+        above_max: "Muito acima do odômetro. Máximo: %{km} km."
+      toast:
+        one: "%{item} feita aos %{km} km"
+        other: "%{item} feita aos %{km} km · %{count} itens atualizados"
+      undo: "Desfazer"
+      undone: "Marcação desfeita."
+      undo_failed: "Não foi possível desfazer."
     flash:
       created: "Manutenção cadastrada."
       updated: "Manutenção atualizada."
       destroyed: "Manutenção removida."
-      marked_done: "Manutenção marcada como feita."
   refuelings:
     form:
       title_new: "Novo abastecimento"

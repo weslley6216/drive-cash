@@ -2,37 +2,31 @@ module Vehicles
   class MaintenanceRowComponent < ApplicationComponent
     include MaintenancePalette
 
-    STATUS_STYLES = {
-      overdue: { color: '#dc2626', badge_class: 'text-red-700 bg-red-100 border-red-200', tint_class: 'border-red-200 bg-red-50/60' },
-      soon:    { color: '#f59e0b', badge_class: 'text-amber-700 bg-amber-100 border-amber-200', tint_class: 'border-amber-200 bg-amber-50/50' },
-      ok:      { color: '#10b981', badge_class: 'text-slate-500 bg-slate-100 border-slate-200', tint_class: '' }
-    }.freeze
-
-    def initialize(row:, variant: :mobile)
+    def initialize(row:)
       @maintenance = row.maintenance
       @progress = row.progress
       @km_until = row.km_until
       @target = row.target
       @status_key = row.status_key
-      @variant = variant
-      @style = STATUS_STYLES.fetch(@status_key)
+      @style = MAINTENANCE_STATUS_STYLES.fetch(@status_key)
     end
 
     def view_template
-      div(class: card_classes) do
-        div(class: 'flex items-center gap-3 p-3') do
+      div(id: dom_id(@maintenance), class: card_classes) do
+        div(class: 'flex items-center gap-3 p-3 pb-2') do
           icon_block
           info_block
-          mark_done_button if @variant == :desktop
+          edit_link
         end
         progress_bar
+        action_slot
       end
     end
 
     private
 
     def card_classes
-      base = 'bg-white rounded-2xl border border-slate-100 overflow-hidden'
+      base = 'bg-white rounded-xl shadow-sm border border-slate-100'
       @style[:tint_class].empty? ? base : "#{base} #{@style[:tint_class]}"
     end
 
@@ -57,27 +51,44 @@ module Vehicles
 
     def meta_line
       if @km_until >= 0
-        plain t('vehicle.maintenances.km_remaining', value: helpers.number_with_delimiter(@km_until, delimiter: '.'))
-        plain ' · '
-        plain t('vehicle.maintenances.at_km', value: helpers.number_with_delimiter(@target, delimiter: '.'))
+        plain "#{t('vehicle.maintenances.km_remaining')} "
+        span(class: 'font-semibold text-slate-600') { t('vehicle.maintenances.km_value', value: helpers.number_with_delimiter(@km_until, delimiter: '.')) }
+        plain " · #{t('vehicle.maintenances.at_km', value: helpers.number_with_delimiter(@target, delimiter: '.'))}"
       else
         span(class: 'font-semibold text-red-600') do
           t('vehicle.maintenances.overdue', value: helpers.number_with_delimiter(@km_until.abs, delimiter: '.'))
         end
       end
-      span(class: 'text-slate-400') { " · #{t('vehicle.maintenances.est_cost', value: format_currency(@maintenance.estimated_cost || 0))}" }
     end
 
-    def mark_done_button
-      link_to(t('vehicle.maintenances.mark_done'), helpers.mark_done_maintenance_path(@maintenance),
-              class: 'text-xs font-medium text-slate-600 border border-slate-200 rounded-lg px-3 py-1.5 hover:bg-slate-50 flex-shrink-0',
-              data:  { turbo_method: :patch })
+    def edit_link
+      link_to(helpers.edit_maintenance_path(@maintenance),
+              aria:  { label: t('vehicle.maintenances.edit') },
+              class: 'w-9 h-9 rounded-full flex items-center justify-center text-slate-400 flex-shrink-0',
+              data:  { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-[16px] h-[16px]')
+      end
     end
 
     def progress_bar
       fill = [[4, @progress].max, 100].min
-      div(class: 'h-1.5 bg-slate-100 mx-3 mb-3 rounded-full overflow-hidden') do
+      div(class: 'h-1.5 bg-slate-100 mx-3 rounded-full overflow-hidden') do
         div(class: 'h-full rounded-full', style: "width: #{fill}%; background: #{@style[:color]};")
+      end
+    end
+
+    def action_slot
+      return div(class: 'h-3') if @status_key == :ok
+
+      div(class: 'p-3 pt-2.5') { mark_done_link }
+    end
+
+    def mark_done_link
+      link_to(helpers.new_maintenance_mark_done_path(@maintenance),
+              class: 'w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 py-2 text-xs font-semibold text-slate-700 shadow-sm',
+              data:  { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Check.new(class: 'w-[14px] h-[14px]')
+        plain " #{t('vehicle.maintenances.mark_done')}"
       end
     end
   end

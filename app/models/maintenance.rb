@@ -12,6 +12,9 @@ class Maintenance < ApplicationRecord
     timing_belt:   7
   }, prefix: true
 
+  MAX_KM_AHEAD_OF_ODOMETER = 2_000
+  COMPANIONS = { 'oil_change' => %w[oil_filter air_filter] }.freeze
+
   CATALOG = {
     'oil_change'    => { interval_km: 5_000, estimated_cost: 280 },
     'oil_filter'    => { interval_km: 10_000, estimated_cost: 45 },
@@ -25,6 +28,7 @@ class Maintenance < ApplicationRecord
 
   validates :last_done_km, :interval_km, presence:     true,
                                          numericality: { greater_than: 0, only_integer: true }
+  validates :last_done_km, numericality: { less_than_or_equal_to: :max_done_km }, if: -> { vehicle.present? }
   validates :estimated_cost, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
   validates :category, uniqueness: { scope: :vehicle_id }
 
@@ -58,5 +62,17 @@ class Maintenance < ApplicationRecord
     self.interval_km ||= defaults[:interval_km]
     self.estimated_cost ||= defaults[:estimated_cost]
     self
+  end
+
+  def max_done_km
+    vehicle.odometer_km + MAX_KM_AHEAD_OF_ODOMETER
+  end
+
+  def companions
+    order = COMPANIONS.fetch(category, [])
+    return vehicle.maintenances.none if order.empty?
+
+    case_sql = order.each_with_index.map { |item, index| "WHEN #{self.class.categories.fetch(item)} THEN #{index}" }.join(' ')
+    vehicle.maintenances.where(category: order).order(Arel.sql("CASE category #{case_sql} END"))
   end
 end

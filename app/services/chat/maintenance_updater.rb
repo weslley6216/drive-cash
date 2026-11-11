@@ -7,12 +7,13 @@ module Chat
       maintenance = vehicle.maintenances.find_by(category: payload['category'])
       return PersistedResult.failure(errors: [I18n.t('chat.errors.maintenance_not_found')]) unless maintenance
 
-      done_km = payload['done_km']&.to_i || vehicle.odometer_km
+      request = Maintenances::MarkDoneRequest.new(maintenance: maintenance, done_km: payload['done_km']&.to_i, companion_ids: [])
+      result = Maintenances::MarkDone.call(request: request)
 
-      if maintenance.update(last_done_km: done_km)
-        PersistedResult.success(record: maintenance, action: 'update_maintenance')
+      if result.success?
+        PersistedResult.success(record: maintenance.reload, action: 'update_maintenance')
       else
-        PersistedResult.failure(errors: maintenance.errors.full_messages)
+        PersistedResult.failure(errors: result.request.errors[:done_km])
       end
     end
   end
