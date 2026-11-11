@@ -1,4 +1,6 @@
 class FlashComponent < ApplicationComponent
+  TOAST_COMPONENTS = { 'undo' => UndoToastComponent }.freeze
+
   def initialize(flash:, inline: false)
     @flash = flash
     @inline = inline
@@ -26,6 +28,9 @@ class FlashComponent < ApplicationComponent
   end
 
   def flash_message(type, message)
+    component = TOAST_COMPONENTS[type.to_s]
+    return render component.new(payload: message) if component
+
     div(
       class: flash_classes(type),
       data:  { controller: 'flash' },
