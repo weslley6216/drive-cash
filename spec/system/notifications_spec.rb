@@ -73,6 +73,7 @@ RSpec.describe 'Notifications', type: :system, js: true do
 
     click_on I18n.t('notifications.index.title')
     click_on I18n.t('notifications.kinds.goal_reached.title')
+    expect(page).to have_current_path(goals_path)
     page.go_back
     page.go_back
 
