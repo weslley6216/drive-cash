@@ -18,6 +18,14 @@ RSpec.describe 'Notification preferences', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Avisos')
     end
+
+    it 'opts out of the Turbo snapshot cache' do
+      login_as(user)
+
+      get edit_notification_preferences_path
+
+      expect(response.body).to include('name="turbo-cache-control" content="no-cache"')
+    end
   end
 
   describe 'PATCH /notification_preferences' do

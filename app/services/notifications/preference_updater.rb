@@ -15,9 +15,20 @@ module Notifications
     end
 
     def call
-      success = @user.update(notification_settings: @user.notification_settings.with(@kind, @enabled))
+      success = known_kind? && save_preferences
 
       Result.new(kind: @kind, enabled: @enabled, success: success)
+    end
+
+    private
+
+    def known_kind?
+      Registry::KINDS.include?(@kind)
+    end
+
+    def save_preferences
+      @user.notification_settings = @user.notification_settings.with(@kind, @enabled)
+      @user.save(validate: false)
     end
   end
 end

@@ -5,7 +5,8 @@ module NotificationPreferences
     end
 
     def view_template
-      render LayoutComponent.new(title: t('notifications.preferences.title'), bottom_nav: :more, sidebar_nav: :more) do
+      render LayoutComponent.new(title: t('notifications.preferences.title'), bottom_nav: :more, sidebar_nav: :more,
+                                 turbo_cache: false) do
         div(class: 'lg:max-w-2xl lg:mx-auto') do
           mobile_header
           desktop_header
