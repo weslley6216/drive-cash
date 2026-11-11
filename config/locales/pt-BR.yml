@@ -402,8 +402,18 @@ pt-BR:
         cancel: "Cancelar"
     mark_done:
       title: "%{item} feita"
+      subtitle: "Última: %{last} km · intervalo de %{interval} km"
+      labels:
+        done_km: "Km do serviço"
+        done_on: "Data"
+        companions: "Também troquei"
+      help: "Preenchido com o odômetro atual. Ajuste se o serviço foi antes."
+      odometer_advance: "Maior que o odômetro: ele será atualizado para %{km} km."
+      companions_hint: "Só aparecem itens do catálogo cadastrados no seu veículo."
       buttons:
+        cancel: "Cancelar"
         save: "Salvar"
+        saving: "Salvando..."
       errors:
         below_last: "Menor que a última troca registrada (%{km} km)."
         below_last_companion: "Menor que a última troca de %{item} (%{km} km)."
