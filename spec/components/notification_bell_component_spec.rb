@@ -19,4 +19,12 @@ RSpec.describe NotificationBellComponent, type: :component do
 
     expect(html).not_to include('rounded-full bg-blue-600')
   end
+
+  it 'mounts the badge on the bell edge like an iOS app badge' do
+    html = view_context.render(described_class.new(unread_count: 3))
+
+    expect(html).to include('-top-1.5 -right-1.5 min-w-[18px] h-[18px]')
+    expect(html).to include('text-[10px] leading-none')
+    expect(html).to include('border-2 border-slate-50')
+  end
 end
