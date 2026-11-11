@@ -5,7 +5,8 @@ class Account::ShowView < ApplicationView
       items:     [
         { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :edit_profile, badge: false },
         { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :plan, badge: true },
-        { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :notifications, badge: false }
+        { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :notifications, badge: false },
+        { icon: PhlexIcons::Lucide::Settings, key: 'notification_preferences', path_name: :edit_notification_preferences, badge: false }
       ]
     },
     {

@@ -49,4 +49,24 @@ RSpec.describe Notifications::Sweeper do
 
     expect(created).to be_empty
   end
+
+  it 'skips the generator of a disabled kind' do
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
+    user.update!(notification_settings: user.notification_settings.with('log_reminder', false))
+
+    created = described_class.new(user: user, date: date).call
+
+    expect(created.map(&:kind)).to eq(['weekly_summary'])
+  end
+
+  it 'keeps generating a kind another user disabled' do
+    create(:user, notification_preferences: { 'log_reminder' => false })
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
+
+    created = described_class.new(user: user, date: date).call
+
+    expect(created.map(&:kind)).to include('log_reminder')
+  end
 end

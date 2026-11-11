@@ -6,11 +6,13 @@ pt-BR:
       refuel: "Abastecer"
     menu:
       remove: "Remover"
+      mute: "Não avisar mais disso"
       label: "Mais opções"
     index:
       title: "Notificações"
       read_all: "Marcar todas como lidas"
       back: "Voltar"
+      preferences: "Preferências"
       unread_count:
         zero: "Tudo em dia"
         one: "%{count} não lida"
@@ -22,6 +24,35 @@ pt-BR:
       empty:
         title: "Nenhuma notificação por aqui"
         description: "Avisamos quando tiver manutenção chegando, meta batida ou resumo da semana."
+    muted:
+      toast: "Você não vai mais receber “%{kind}”."
+      undo: "Desfazer"
+    preferences:
+      title: "Avisos"
+      mobile_subtitle: "Escolha o que o DriveCash te avisa"
+      desktop_subtitle: "Escolha o que o DriveCash te avisa. Salva na hora."
+      mobile_note: "Desligar um aviso não apaga os que já chegaram. Os avisos aparecem na central de notificações (sino)."
+      desktop_note: "Desligar um aviso não apaga os que já chegaram."
+      back: "Voltar"
+      breadcrumb:
+        account: "Conta"
+        notifications: "Notificações"
+      kinds:
+        maintenance_due:
+          title: "Manutenção"
+          when: "Quando um item passa de 80% do intervalo ou vence."
+        tank_low:
+          title: "Tanque no vermelho"
+          when: "Quando o tanque estimado cai abaixo de 1/4 ou você roda além do último abastecimento."
+        goal_reached:
+          title: "Meta batida"
+          when: "No dia em que você bate a meta do mês."
+        weekly_summary:
+          title: "Resumo semanal"
+          when: "Toda segunda, com o lucro da semana anterior."
+        log_reminder:
+          title: "Lembrete de registrar"
+          when: "No máximo 1 por dia, só em dias que você costuma rodar."
     kinds:
       maintenance_due:
         title_overdue: "Manutenção vencida: %{item}"

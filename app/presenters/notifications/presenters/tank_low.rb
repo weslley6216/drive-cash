@@ -1,11 +1,11 @@
 module Notifications
   module Presenters
     class TankLow < Base
+      def self.icon = PhlexIcons::Lucide::Fuel
+
+      def self.palette_key = :danger
+
       private
-
-      def icon = PhlexIcons::Lucide::Fuel
-
-      def palette_key = :danger
 
       def path = new_refueling_path
 

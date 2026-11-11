@@ -116,6 +116,16 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('>1<')
     end
 
+    it 'ignores disabled kinds in the bell badge' do
+      create(:notification, user: current_user, kind: 'tank_low', data: { 'status' => 'negative' })
+      create(:notification, user: current_user, kind: 'log_reminder')
+      current_user.update!(notification_settings: current_user.notification_settings.with('log_reminder', false))
+
+      get root_path
+
+      expect(response.body).to include('>1<')
+    end
+
     it 'renders 12-column grid layout for hero and sidebar' do
       create(:earning, user: current_user, date: Date.current)
 

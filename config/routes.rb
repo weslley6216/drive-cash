@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resource :help, only: :show, controller: 'help'
   resource :plan, only: %i[show update], controller: 'plans'
   get '/coming_soon', to: 'application#coming_soon', as: :coming_soon
+  resource :notification_preferences, only: %i[edit update]
   resources :notifications, only: %i[index destroy] do
     collection { patch :read_all }
     member { patch :open }

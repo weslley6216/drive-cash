@@ -289,4 +289,65 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
   end
+
+  describe 'notification preferences' do
+    it 'defaults to every kind enabled' do
+      user = create(:user)
+
+      expect(user.notification_settings.disabled_kinds).to eq([])
+    end
+
+    it 'persists a disabled kind through the value object' do
+      user = create(:user)
+
+      user.notification_settings = user.notification_settings.with('log_reminder', false)
+      user.save!
+
+      expect(user.reload.notification_preferences).to eq('log_reminder' => false)
+    end
+
+    it 'rejects an unknown kind' do
+      user = build(:user, notification_preferences: { 'foo' => false })
+
+      expect(user).not_to be_valid
+    end
+
+    it 'accepts a known disabled kind' do
+      user = build(:user, notification_preferences: { 'tank_low' => false })
+
+      expect(user).to be_valid
+    end
+
+    it 'rejects a true value for a known kind' do
+      user = build(:user, notification_preferences: { 'tank_low' => true })
+
+      expect(user).not_to be_valid
+    end
+  end
+
+  describe '#visible_notifications' do
+    it 'hides every notification of a disabled kind, read or unread' do
+      user = create(:user, notification_preferences: { 'log_reminder' => false })
+      create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+      create(:notification, user: user, kind: 'log_reminder', read_at: Time.current)
+
+      expect(user.visible_notifications.pluck(:kind)).to contain_exactly('tank_low')
+    end
+
+    it 'shows them again once the kind is re-enabled' do
+      user = create(:user, notification_preferences: { 'log_reminder' => false })
+      create(:notification, user: user, kind: 'log_reminder')
+
+      user.update!(notification_settings: user.notification_settings.with('log_reminder', true))
+
+      expect(user.visible_notifications.pluck(:kind)).to contain_exactly('log_reminder')
+    end
+
+    it 'keeps dismissed notifications hidden' do
+      user = create(:user)
+      create(:notification, user: user, dismissed_at: Time.current)
+
+      expect(user.visible_notifications).to be_empty
+    end
+  end
 end

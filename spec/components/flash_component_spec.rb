@@ -61,5 +61,13 @@ RSpec.describe FlashComponent, type: :component do
 
       expect(html).to include('bg-slate-900')
     end
+
+    it 'renders the muted toast for the muted key' do
+      flash = { muted: { 'kind' => 'log_reminder' } }
+      component = FlashComponent.new(flash: flash)
+      html = view_context.render(component)
+
+      expect(html).to include('text-blue-300')
+    end
   end
 end

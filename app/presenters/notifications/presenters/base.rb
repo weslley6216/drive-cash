@@ -35,6 +35,10 @@ module Notifications
 
       def body = translate('body')
 
+      def icon = self.class.icon
+
+      def palette_key = self.class.palette_key
+
       def frame = '_top'
 
       def inline_action = nil

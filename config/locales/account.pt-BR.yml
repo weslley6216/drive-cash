@@ -31,6 +31,9 @@ pt-BR:
       notifications:
         label: "Notificações"
         sub: "Alertas de manutenção, metas e resumos"
+      notification_preferences:
+        label: "Avisos"
+        sub: "Escolha o que o DriveCash te avisa"
       vehicle:
         label: "Veículo"
         sub: "Dados do seu veículo"

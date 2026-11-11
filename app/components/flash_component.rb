@@ -1,5 +1,5 @@
 class FlashComponent < ApplicationComponent
-  TOAST_COMPONENTS = { 'undo' => UndoToastComponent }.freeze
+  TOAST_COMPONENTS = { 'undo' => UndoToastComponent, 'muted' => Notifications::MutedToastComponent }.freeze
 
   def initialize(flash:, inline: false)
     @flash = flash
