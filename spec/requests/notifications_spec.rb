@@ -78,41 +78,72 @@ RSpec.describe 'Notifications', type: :request do
     end
   end
 
-  describe 'PATCH /notifications/:id/read' do
+  describe 'PATCH /notifications/:id/open' do
     before { login_as(user) }
 
-    it 'marks a single notification as read' do
-      notification = create(:notification, user: user)
+    it 'marks the notification read and redirects to its destination' do
+      notification = create(:notification, user: user, kind: 'log_reminder', data: { 'date' => '2026-07-14' })
 
-      patch read_notification_path(notification)
+      patch open_notification_path(notification)
 
+      expect(response).to redirect_to('/records/new?date=2026-07-13')
+      expect(response).to have_http_status(:see_other)
       expect(notification.reload.read_at).to be_present
     end
 
-    it 'responds with a turbo refresh stream' do
-      notification = create(:notification, user: user)
+    it 'redirects to the inline destination when tapped inline' do
+      notification = create(:notification, user: user, kind: 'maintenance_due',
+                                           data: { 'maintenance_id' => 1, 'status' => 'overdue',
+                                                   'category' => 'oil_change', 'km_until' => -412,
+                                                   'interval_km' => 5_000 })
 
-      patch read_notification_path(notification), headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+      patch open_notification_path(notification, via: 'inline')
 
-      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-      expect(response.body).to include('action="refresh"')
+      expect(response).to redirect_to('/maintenances/1/mark_done/new')
     end
 
-    it 'redirects back to the center on an html request' do
-      notification = create(:notification, user: user)
-
-      patch read_notification_path(notification)
-
-      expect(response).to redirect_to(notifications_path)
-    end
-
-    it 'does not mark a notification belonging to another user' do
+    it 'returns 404 for another user notification on open' do
       notification = create(:notification, user: create(:user))
 
-      patch read_notification_path(notification)
+      patch open_notification_path(notification)
 
       expect(response).to have_http_status(:not_found)
       expect(notification.reload.read_at).to be_nil
+    end
+  end
+
+  describe 'DELETE /notifications/:id' do
+    before { login_as(user) }
+
+    it 'dismisses the notification' do
+      notification = create(:notification, user: user)
+
+      delete notification_path(notification)
+
+      expect(notification.reload.dismissed_at).to be_present
+      expect(Notification.count).to eq(1)
+      expect(response).to redirect_to(notifications_path)
+    end
+
+    it 'returns 404 for another user notification on destroy' do
+      notification = create(:notification, user: create(:user))
+
+      delete notification_path(notification)
+
+      expect(response).to have_http_status(:not_found)
+      expect(notification.reload.dismissed_at).to be_nil
+    end
+
+    it 'does not recreate a dismissed notification on the next visit' do
+      travel_to Date.new(2026, 7, 14) do
+        create(:earning, user: user, date: Date.new(2026, 7, 10))
+
+        get notifications_path
+        user.notifications.each(&:dismiss!)
+        get notifications_path
+
+        expect(user.notifications.visible.count).to eq(0)
+      end
     end
   end
 

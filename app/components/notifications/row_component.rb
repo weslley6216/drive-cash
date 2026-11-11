@@ -23,7 +23,7 @@ module Notifications
     end
 
     def view_template
-      button_to(read_notification_path(notification), method: :patch, class: row_classes, form_class: 'contents') do
+      button_to(open_notification_path(notification), method: :patch, class: row_classes, form_class: 'contents') do
         icon_tile
         content
         span(class: 'text-[10px] text-slate-400 whitespace-nowrap mt-0.5') { timestamp }

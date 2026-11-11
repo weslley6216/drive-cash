@@ -1,5 +1,5 @@
 class NotificationsController < ApplicationController
-  before_action :find_notification, only: :read
+  include RequiresOwnedNotification
 
   def index
     Notifications::Sweeper.new(user: current_user).call
@@ -9,21 +9,18 @@ class NotificationsController < ApplicationController
     )
   end
 
-  def read
+  def open
     @notification.mark_read!
+    redirect_to Notifications::Presenters.present(@notification).destination(params[:via]), status: :see_other
+  end
+
+  def destroy
+    @notification.dismiss!
     respond_with_refresh(html_redirect: notifications_path)
   end
 
   def read_all
     current_user.notifications.unread.mark_all_read!
     respond_with_refresh(html_redirect: notifications_path)
-  end
-
-  private
-
-  def find_notification
-    @notification = current_user.notifications.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    head :not_found
   end
 end

@@ -38,12 +38,12 @@ RSpec.describe Notifications::RowComponent, type: :component do
     expect(html).to include('text-red-600')
   end
 
-  it 'submits a PATCH to the read route' do
+  it 'submits a PATCH to the open route' do
     notification = create(:notification, user: user)
 
     html = render_row(notification)
 
-    expect(html).to include("action=\"/notifications/#{notification.id}/read\"")
+    expect(html).to include("action=\"/notifications/#{notification.id}/open\"")
     expect(html).to include('name="_method" value="patch"')
   end
 
