@@ -45,7 +45,7 @@ Rails.application.routes.draw do
   end
   resource :vehicle, only: %i[show edit update]
   resources :maintenances, only: %i[new create edit update destroy] do
-    member { patch :mark_done }
+    resource :mark_done, only: %i[new update destroy], module: :maintenances
   end
   resources :refuelings, only: %i[index new create edit update destroy]
 

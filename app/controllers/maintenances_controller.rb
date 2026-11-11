@@ -1,7 +1,7 @@
 class MaintenancesController < ApplicationController
   include RequiresVehicle
 
-  before_action :find_maintenance, only: %i[edit update destroy mark_done]
+  before_action :find_maintenance, only: %i[edit update destroy]
 
   def new
     @maintenance = current_user.vehicle.maintenances.new
@@ -34,20 +34,10 @@ class MaintenancesController < ApplicationController
     end
   end
 
-  def mark_done
-    if @maintenance.update(last_done_km: current_user.vehicle.odometer_km)
-      flash[:notice] = t('maintenances.flash.marked_done')
-      respond_with_modal_refresh(html_redirect: vehicle_path)
-    else
-      flash.now[:alert] = @maintenance.errors.full_messages.to_sentence
-      render Maintenances::FormView.new(maintenance: @maintenance), status: :unprocessable_content
-    end
-  end
-
   def destroy
     @maintenance.destroy
     flash[:notice] = t('maintenances.flash.destroyed')
-    respond_with_refresh(html_redirect: vehicle_path)
+    respond_with_modal_refresh(html_redirect: vehicle_path)
   end
 
   private

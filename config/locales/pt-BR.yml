@@ -400,15 +400,23 @@ pt-BR:
         saving: "Salvando..."
         cancel: "Cancelar"
     mark_done:
+      title: "%{item} feita"
+      buttons:
+        save: "Salvar"
       errors:
         below_last: "Menor que a última troca registrada (%{km} km)."
         below_last_companion: "Menor que a última troca de %{item} (%{km} km)."
         above_max: "Muito acima do odômetro. Máximo: %{km} km."
+      toast:
+        one: "%{item} feita aos %{km} km"
+        other: "%{item} feita aos %{km} km · %{count} itens atualizados"
+      undo: "Desfazer"
+      undone: "Marcação desfeita."
+      undo_failed: "Não foi possível desfazer."
     flash:
       created: "Manutenção cadastrada."
       updated: "Manutenção atualizada."
       destroyed: "Manutenção removida."
-      marked_done: "Manutenção marcada como feita."
   refuelings:
     form:
       title_new: "Novo abastecimento"

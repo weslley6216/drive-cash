@@ -50,7 +50,7 @@ RSpec.describe 'Vehicle flow', type: :request do
     vehicle = create(:vehicle, user: current_user, odometer_km: 160_928)
     maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 150_000, interval_km: 5_000)
 
-    patch mark_done_maintenance_path(maintenance), as: :turbo_stream
+    patch maintenance_mark_done_path(maintenance), params: { mark_done: { done_km: 160_928 } }, as: :turbo_stream
 
     expect(maintenance.reload.progress).to eq(0)
   end
