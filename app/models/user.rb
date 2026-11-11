@@ -37,6 +37,8 @@ class User < ApplicationRecord
 
   def first_name = name.split.first
 
+  def visible_notifications = notifications.visible.where.not(kind: notification_settings.disabled_kinds)
+
   def changing_credentials?
     will_save_change_to_email_address? || will_save_change_to_password_digest?
   end

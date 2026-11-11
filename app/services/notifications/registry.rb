@@ -2,12 +2,14 @@ module Notifications
   module Registry
     GENERATORS = [
       Generators::MaintenanceDue,
-      Generators::GoalReached,
       Generators::TankLow,
+      Generators::GoalReached,
       Generators::WeeklySummary,
       Generators::LogReminder
     ].freeze
 
-    KINDS = GENERATORS.map { |generator| generator.name.demodulize.underscore }.freeze
+    def self.kind_for(generator) = generator.name.demodulize.underscore
+
+    KINDS = GENERATORS.map { |generator| kind_for(generator) }.freeze
   end
 end

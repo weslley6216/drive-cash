@@ -75,6 +75,18 @@ RSpec.describe 'Notifications', type: :request do
 
         expect(response.body).not_to include('Tanque no vermelho')
       end
+
+      it 'hides notifications of a disabled kind from the list and the unread count' do
+        create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+        create(:notification, user: user, kind: 'log_reminder')
+        user.update!(notification_settings: user.notification_settings.with('log_reminder', false))
+
+        get notifications_path
+
+        expect(response.body).to include('Tanque no vermelho')
+        expect(response.body).not_to include('Registre o seu dia')
+        expect(response.body).to include(I18n.t('notifications.index.unread_count', count: 1))
+      end
     end
   end
 

@@ -324,4 +324,30 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
   end
+
+  describe '#visible_notifications' do
+    it 'hides every notification of a disabled kind, read or unread' do
+      user = create(:user, notification_preferences: { 'log_reminder' => false })
+      create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+      create(:notification, user: user, kind: 'log_reminder', read_at: Time.current)
+
+      expect(user.visible_notifications.pluck(:kind)).to contain_exactly('tank_low')
+    end
+
+    it 'shows them again once the kind is re-enabled' do
+      user = create(:user, notification_preferences: { 'log_reminder' => false })
+      create(:notification, user: user, kind: 'log_reminder')
+
+      user.update!(notification_settings: user.notification_settings.with('log_reminder', true))
+
+      expect(user.visible_notifications.pluck(:kind)).to contain_exactly('log_reminder')
+    end
+
+    it 'keeps dismissed notifications hidden' do
+      user = create(:user)
+      create(:notification, user: user, dismissed_at: Time.current)
+
+      expect(user.visible_notifications).to be_empty
+    end
+  end
 end

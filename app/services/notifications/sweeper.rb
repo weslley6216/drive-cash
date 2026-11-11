@@ -15,8 +15,12 @@ module Notifications
     def payloads
       @payloads ||= begin
         context = Context.new(user: @user, date: @date)
-        Registry::GENERATORS.flat_map { |generator| generator.new(context).call }
+        enabled_generators.flat_map { |generator| generator.new(context).call }
       end
+    end
+
+    def enabled_generators
+      Registry::GENERATORS.select { |generator| @user.notification_settings.enabled?(Registry.kind_for(generator)) }
     end
 
     def already_notified?(payload)

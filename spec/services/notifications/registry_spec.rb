@@ -22,4 +22,12 @@ RSpec.describe Notifications::Registry do
       expect { Notifications::Presenters.const_get(kind.camelize, false) }.not_to raise_error
     end
   end
+
+  it 'orders kinds as the preferences screen shows them' do
+    expect(described_class::KINDS).to eq(%w[maintenance_due tank_low goal_reached weekly_summary log_reminder])
+  end
+
+  it 'derives the kind for a single generator' do
+    expect(described_class.kind_for(Notifications::Generators::TankLow)).to eq('tank_low')
+  end
 end
