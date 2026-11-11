@@ -6,14 +6,14 @@ module Notifications
       end
 
       def call
-        return [] unless earnings.exists?
+        return [] unless builder.days_worked.positive?
 
         [{
           kind:  'weekly_summary',
           data:  {
             'week_start' => week_start,
-            'profit'     => (earnings.sum(:amount) - expenses_total).to_f,
-            'trips'      => earnings.sum(:trips_count)
+            'profit'     => builder.profit.to_f,
+            'trips'      => builder.trips
           },
           dedup: { 'week_start' => week_start }
         }]
@@ -27,12 +27,8 @@ module Notifications
 
       def week_start = week.first.to_s
 
-      def earnings
-        @earnings ||= @context.user.earnings.where(date: week)
-      end
-
-      def expenses_total
-        @context.user.expenses.paid_only.where(date: week).sum(:amount)
+      def builder
+        @builder ||= WeeklySummaries::Builder.new(user: @context.user, week: week)
       end
     end
   end

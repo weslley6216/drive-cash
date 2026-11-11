@@ -38,6 +38,17 @@ RSpec.describe Goals::Creator do
       expect(result.goal.period_end).to eq(date.end_of_week)
     end
 
+    it 'closes a weekly goal on sunday' do
+      user = create(:user)
+      date = Date.new(2026, 7, 12)
+      attrs = { 'kind' => 'weekly', 'target_amount' => 700.0 }
+
+      result = described_class.new(attrs, user: user, date: date).call
+
+      expect(result.goal.period_start).to eq(Date.new(2026, 7, 6))
+      expect(result.goal.period_end).to eq(Date.new(2026, 7, 12))
+    end
+
     it 'defaults metric to profit when not provided' do
       user = create(:user)
       attrs = { 'kind' => 'monthly', 'target_amount' => 1000.0 }

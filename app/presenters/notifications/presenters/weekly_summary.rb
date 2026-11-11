@@ -11,10 +11,7 @@ module Notifications
 
       def palette_key = :info
 
-      def path
-        week_start = Date.parse(data['week_start'])
-        analysis_path(year: week_start.year, month: week_start.month)
-      end
+      def path = weekly_summary_path(data['week_start'])
     end
   end
 end

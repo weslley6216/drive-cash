@@ -99,10 +99,10 @@ RSpec.describe Notifications::Presenters do
       expect(row.icon).to eq(PhlexIcons::Lucide::ChartColumn)
     end
 
-    it 'links to the analysis of the month the summarized week falls in' do
-      row = present('weekly_summary', { 'week_start' => '2026-06-29', 'profit' => 987.4, 'trips' => 32 })
+    it 'links to the summary screen of the week' do
+      row = present('weekly_summary', { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 })
 
-      expect(row.path).to eq('/analysis?month=6&year=2026')
+      expect(row.path).to eq('/weekly_summaries/2026-07-06')
     end
   end
 

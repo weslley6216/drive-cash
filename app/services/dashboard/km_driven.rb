@@ -1,9 +1,10 @@
 module Dashboard
   class KmDriven
-    def initialize(user:, year:, month: nil)
+    def initialize(user:, year: nil, month: nil, range: nil)
       @user = user
       @year = year
       @month = month
+      @range = range
     end
 
     def call
@@ -35,6 +36,10 @@ module Dashboard
     end
 
     def date_range
+      @range || period_range
+    end
+
+    def period_range
       if @month
         start = Date.new(@year, @month, 1)
         start..start.end_of_month

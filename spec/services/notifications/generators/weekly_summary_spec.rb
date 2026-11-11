@@ -15,10 +15,18 @@ RSpec.describe Notifications::Generators::WeeklySummary do
     expect(payloads).to contain_exactly(
       hash_including(
         kind:  'weekly_summary',
-        data:  { 'week_start' => '2026-07-05', 'profit' => 750.0, 'trips' => 30 },
-        dedup: { 'week_start' => '2026-07-05' }
+        data:  { 'week_start' => '2026-07-06', 'profit' => 750.0, 'trips' => 30 },
+        dedup: { 'week_start' => '2026-07-06' }
       )
     )
+  end
+
+  it 'counts the sunday that closes last week' do
+    create(:earning, user: user, date: Date.new(2026, 7, 12), amount: 500, trips_count: 10)
+
+    payloads = described_class.new(context).call
+
+    expect(payloads.first[:data]['week_start']).to eq('2026-07-06')
   end
 
   it 'emits nothing when the user did not work last week' do
