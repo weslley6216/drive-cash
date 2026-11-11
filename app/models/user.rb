@@ -17,6 +17,10 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_one :vehicle, dependent: :destroy
 
+  composed_of :notification_settings,
+              class_name: 'Notifications::Preferences',
+              mapping:    { notification_preferences: :to_h }
+
   generates_token_for :password_reset, expires_in: 15.minutes do
     password_salt.last(10)
   end
@@ -27,6 +31,7 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
   validates :plan_billing, :plan_since, presence: true, if: :pro?
+  validate :notification_preferences_known
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
@@ -71,5 +76,10 @@ class User < ApplicationRecord
   def email_domain_allowed
     domain = email_address.to_s.split('@').last.downcase
     errors.add(:email_address, :domain_not_allowed) unless ALLOWED_EMAIL_DOMAINS.include?(domain)
+  end
+
+  def notification_preferences_known
+    valid = notification_preferences.all? { |kind, enabled| Notifications::Registry::KINDS.include?(kind) && enabled == false }
+    errors.add(:notification_preferences, :invalid) unless valid
   end
 end
