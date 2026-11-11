@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     collection { patch :read_all }
     member { patch :open }
   end
+  resources :weekly_summaries, only: :show, param: :week_start
   get '/auth/:provider/callback', to: 'sessions#oauth_callback'
   get '/auth/failure',            to: 'sessions#oauth_failure'
   root "dashboard#index"
