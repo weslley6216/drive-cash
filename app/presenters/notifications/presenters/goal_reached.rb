@@ -11,6 +11,8 @@ module Notifications
 
       def palette_key = :success
 
+      def path = goals_path
+
       def month_label
         I18n.l(Date.parse(data['month']), format: '%B').capitalize
       end

@@ -10,6 +10,11 @@ module Notifications
       def icon = PhlexIcons::Lucide::ChartColumn
 
       def palette_key = :info
+
+      def path
+        week_start = Date.parse(data['week_start'])
+        analysis_path(year: week_start.year, month: week_start.month)
+      end
     end
   end
 end

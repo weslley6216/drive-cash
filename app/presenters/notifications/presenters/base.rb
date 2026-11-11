@@ -2,6 +2,7 @@ module Notifications
   module Presenters
     class Base
       include Formatting
+      include Rails.application.routes.url_helpers
 
       I18N_SCOPE = 'notifications.kinds'
 
@@ -11,11 +12,14 @@ module Notifications
 
       def call
         Row.new(
-          notification: @notification,
-          title:        title,
-          body:         body,
-          icon:         icon,
-          palette_key:  palette_key
+          notification:  @notification,
+          title:         title,
+          body:          body,
+          icon:          icon,
+          palette_key:   palette_key,
+          path:          path,
+          frame:         frame,
+          inline_action: inline_action
         )
       end
 
@@ -30,6 +34,10 @@ module Notifications
       def title = translate('title')
 
       def body = translate('body')
+
+      def frame = '_top'
+
+      def inline_action = nil
     end
   end
 end
