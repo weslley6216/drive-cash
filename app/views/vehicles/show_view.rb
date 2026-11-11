@@ -1,6 +1,7 @@
 module Vehicles
   class ShowView < ApplicationView
     MOBILE_MAINTENANCE_LIMIT = 5
+    HIGHLIGHT_ACTIVE_CLASS = 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-50'
 
     def initialize(payload:, vehicle_form: nil)
       @payload = payload
@@ -97,7 +98,7 @@ module Vehicles
 
     def maintenances_list(limit:)
       shown = limit ? maintenances.first(limit) : maintenances
-      div(class: 'space-y-2.5') do
+      div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_ACTIVE_CLASS }) do
         if maintenances.empty?
           empty_row(t('vehicle.maintenances.empty'))
         else

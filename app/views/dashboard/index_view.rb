@@ -13,7 +13,7 @@ module Dashboard
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home) do
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home, turbo_cache: false) do
         turbo_frame_tag 'page' do
           div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
 

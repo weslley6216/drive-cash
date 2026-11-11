@@ -1,6 +1,6 @@
 class RecordsController < ApplicationController
   def new
-    render new_view(type: params[:type].presence || 'earning')
+    render new_view(type: params[:type].presence || 'earning', date: Records::RequestedDate.call(params[:date]))
   end
 
   def create
@@ -18,11 +18,11 @@ class RecordsController < ApplicationController
 
   private
 
-  def new_view(type:, earning: nil, expense: nil)
+  def new_view(type:, earning: nil, expense: nil, date: Date.current)
     Records::NewView.new(
       type:          type,
-      earning:       earning || Earning.new(date: Date.current),
-      expense:       expense || Expense.new(date: Date.current),
+      earning:       earning || Earning.new(date: date),
+      expense:       expense || Expense.new(date: date),
       context:       params[:context],
       active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
     )

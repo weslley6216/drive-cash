@@ -9,7 +9,7 @@ class RefuelingsController < ApplicationController
   end
 
   def new
-    @refueling = current_user.vehicle.refuelings.new(date: Date.current, full_tank: true)
+    @refueling = Refuelings::Prefill.call(user: current_user)
     render Refuelings::FormView.new(refueling: @refueling)
   end
 

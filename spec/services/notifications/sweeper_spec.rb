@@ -5,7 +5,8 @@ RSpec.describe Notifications::Sweeper do
   let(:date) { Date.new(2026, 7, 14) }
 
   it 'creates a notification for each detected condition' do
-    create(:earning, user: user, date: Date.new(2026, 7, 10))
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
 
     created = described_class.new(user: user, date: date).call
 
@@ -13,7 +14,8 @@ RSpec.describe Notifications::Sweeper do
   end
 
   it 'does not duplicate a notification already created for the same window' do
-    create(:earning, user: user, date: Date.new(2026, 7, 10))
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
     described_class.new(user: user, date: date).call
 
     created = described_class.new(user: user, date: date).call
@@ -23,16 +25,18 @@ RSpec.describe Notifications::Sweeper do
   end
 
   it 'creates a new notification once the dedup window moves on' do
-    create(:earning, user: user, date: Date.new(2026, 7, 10))
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
     described_class.new(user: user, date: date).call
 
-    described_class.new(user: user, date: date + 1).call
+    described_class.new(user: user, date: date + 1.week).call
 
     expect(user.notifications.where(kind: 'log_reminder').count).to eq(2)
   end
 
   it 'ignores an identical notification belonging to another user' do
-    create(:earning, user: user, date: Date.new(2026, 7, 10))
+    create(:earning, user: user, date: Date.new(2026, 7, 6))
+    create(:earning, user: user, date: Date.new(2026, 6, 29))
     create(:notification, user: create(:user), kind: 'log_reminder', data: { 'date' => '2026-07-14' })
 
     created = described_class.new(user: user, date: date).call

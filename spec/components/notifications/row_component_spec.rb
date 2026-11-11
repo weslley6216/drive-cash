@@ -38,13 +38,61 @@ RSpec.describe Notifications::RowComponent, type: :component do
     expect(html).to include('text-red-600')
   end
 
-  it 'submits a PATCH to the read route' do
+  it 'links the whole row to open with a patch method' do
     notification = create(:notification, user: user)
 
     html = render_row(notification)
 
-    expect(html).to include("action=\"/notifications/#{notification.id}/read\"")
-    expect(html).to include('name="_method" value="patch"')
+    expect(html).to include("href=\"/notifications/#{notification.id}/open\"")
+    expect(html).to include('data-turbo-method="patch"')
+    expect(html).to include('data-turbo-frame="_top"')
+  end
+
+  it 'targets the modal frame for tank_low' do
+    notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+    html = render_row(notification)
+
+    expect(html).to include('data-turbo-frame="modal"')
+  end
+
+  it 'renders the inline action for maintenance_due and tank_low' do
+    maintenance_due = create(:notification, user: user, kind: 'maintenance_due',
+                                            data: { 'maintenance_id' => 1, 'status' => 'overdue',
+                                                    'category' => 'oil_change', 'km_until' => -412,
+                                                    'interval_km' => 5_000 })
+    tank_low = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+    expect(render_row(maintenance_due)).to include('Marcar como feita').and include('via=inline')
+    expect(render_row(tank_low)).to include('Abastecer').and include('via=inline')
+  end
+
+  it 'renders no inline action for goal_reached' do
+    notification = create(:notification, user: user, kind: 'goal_reached',
+                                         data: { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+
+    html = render_row(notification)
+
+    expect(html).not_to include('via=inline')
+  end
+
+  it 'renders the remove action in the ⋯ menu' do
+    notification = create(:notification, user: user)
+
+    html = render_row(notification)
+
+    expect(html).to include("action=\"/notifications/#{notification.id}\"")
+    expect(html).to include('name="_method" value="delete"')
+    expect(html).to include(I18n.t('notifications.menu.remove'))
+  end
+
+  it 'shows no destination label' do
+    notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+    html = render_row(notification)
+
+    expect(html).not_to include('Ver ')
+    expect(html).to include('Tanque no vermelho')
   end
 
   it 'formats the timestamp as a clock time in the today bucket' do

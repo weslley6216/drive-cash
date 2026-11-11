@@ -7,6 +7,12 @@ RSpec.describe NotificationBellComponent, type: :component do
     expect(html).to include('href="/notifications"')
   end
 
+  it 'escapes the dashboard page frame with a full-page navigation' do
+    html = view_context.render(described_class.new(unread_count: 0))
+
+    expect(html).to include('data-turbo-frame="_top"')
+  end
+
   it 'renders the unread count badge' do
     html = view_context.render(described_class.new(unread_count: 3))
 
@@ -18,5 +24,13 @@ RSpec.describe NotificationBellComponent, type: :component do
     html = view_context.render(described_class.new(unread_count: 0))
 
     expect(html).not_to include('rounded-full bg-blue-600')
+  end
+
+  it 'mounts the badge on the bell edge like an iOS app badge' do
+    html = view_context.render(described_class.new(unread_count: 3))
+
+    expect(html).to include('-top-1.5 -right-1.5 min-w-[18px] h-[18px]')
+    expect(html).to include('text-[10px] leading-none')
+    expect(html).to include('border-2 border-slate-50')
   end
 end

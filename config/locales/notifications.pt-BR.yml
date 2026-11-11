@@ -1,6 +1,12 @@
 ---
 pt-BR:
   notifications:
+    actions:
+      mark_done: "Marcar como feita"
+      refuel: "Abastecer"
+    menu:
+      remove: "Remover"
+      label: "Mais opções"
     index:
       title: "Notificações"
       read_all: "Marcar todas como lidas"

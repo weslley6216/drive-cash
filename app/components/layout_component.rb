@@ -4,12 +4,13 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false)
+  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false, turbo_cache: true)
     @title = title
     @bottom_nav = bottom_nav
     @sidebar_nav = sidebar_nav
     @app_shell = app_shell
     @auth = auth
+    @turbo_cache = turbo_cache
   end
 
   def view_template(&block)
@@ -39,7 +40,7 @@ class LayoutComponent < ApplicationComponent
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
       link(rel: 'apple-touch-icon', href: '/icon.png')
 
-      meta(name: 'turbo-cache-control', content: 'no-cache') if @auth
+      meta(name: 'turbo-cache-control', content: 'no-cache') if @auth || !@turbo_cache
       csrf_meta_tags
       csp_meta_tag
       stylesheet_link_tag('tailwind', "data-turbo-track": 'reload')

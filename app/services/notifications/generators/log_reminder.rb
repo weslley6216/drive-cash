@@ -1,14 +1,15 @@
 module Notifications
   module Generators
     class LogReminder
-      ACTIVE_WINDOW_DAYS = 7
+      HABIT_WEEKS = 4
+      HABIT_MIN_DAYS = 2
 
       def initialize(context)
         @context = context
       end
 
       def call
-        return [] unless active_driver?
+        return [] unless habit?
         return [] if logged_yesterday?
 
         [{
@@ -22,8 +23,12 @@ module Notifications
 
       def yesterday = @context.date - 1
 
-      def active_driver?
-        @context.user.earnings.where(date: (yesterday - ACTIVE_WINDOW_DAYS)...yesterday).exists?
+      def habit_dates
+        (1..HABIT_WEEKS).map { |weeks| yesterday - weeks.weeks }
+      end
+
+      def habit?
+        @context.user.earnings.where(date: habit_dates).distinct.count(:date) >= HABIT_MIN_DAYS
       end
 
       def logged_yesterday?
