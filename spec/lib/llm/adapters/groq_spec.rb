@@ -12,7 +12,7 @@ RSpec.describe Llm::Adapters::Groq do
   before do
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with('GROQ_API_KEY').and_return('fake-key')
-    allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('llama-test')
+    allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('groq-test-model')
     allow(Faraday).to receive(:new).and_yield(builder_mock).and_return(connection_mock)
     allow(connection_mock).to receive(:post).and_return(response_mock)
   end
@@ -156,6 +156,64 @@ RSpec.describe Llm::Adapters::Groq do
         result = adapter.chat(messages: messages)
 
         expect(result[:text_before]).to be_nil
+      end
+    end
+
+    context 'when GROQ_MODEL is not set' do
+      before do
+        allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything) { |_key, default| default }
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({})
+      end
+
+      it 'sends the default gpt-oss-120b model in the payload' do
+        adapter.chat(messages: messages)
+
+        expect(connection_mock).to have_received(:post).with('chat/completions', hash_including(model: 'openai/gpt-oss-120b'))
+      end
+    end
+
+    context 'when GROQ_MODEL is set' do
+      before do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({})
+      end
+
+      it 'sends the configured model in the payload' do
+        adapter.chat(messages: messages)
+
+        expect(connection_mock).to have_received(:post).with('chat/completions', hash_including(model: 'groq-test-model'))
+      end
+    end
+
+    context 'when the response carries a separate reasoning field' do
+      before { allow(response_mock).to receive(:status).and_return(200) }
+
+      it 'keeps the reasoning out of text_before on a tool call' do
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{ 'message' => {
+            'reasoning'  => 'The user spent 50 on fuel, call create_expense.',
+            'content'    => nil,
+            'tool_calls' => [{ 'function' => { 'name' => 'create_expense', 'arguments' => '{"amount":50}' } }]
+          } }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result).to include(type: :tool_use, tool_name: 'create_expense', tool_input: { 'amount' => 50 }, text_before: nil)
+      end
+
+      it 'returns only the content on a text answer' do
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{ 'message' => {
+            'reasoning' => 'The user asks about earnings.',
+            'content'   => 'Você ganhou R$ 120 este mês.'
+          } }]
+        })
+
+        result = adapter.chat(messages: messages)
+
+        expect(result).to eq({ type: :text, content: 'Você ganhou R$ 120 este mês.' })
       end
     end
 

@@ -18,7 +18,7 @@ module Llm
       private
 
       def model
-        ENV.fetch('GROQ_MODEL', 'llama-3.3-70b-versatile')
+        ENV.fetch('GROQ_MODEL', 'openai/gpt-oss-120b')
       end
 
       def connection(api_key)
