@@ -23,7 +23,7 @@ module Notifications
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-5 pt-2 pb-3 flex items-start justify-between gap-3') do
+      div(class: 'lg:hidden px-1 pt-2 pb-3 flex items-start justify-between gap-3') do
         div(class: 'flex items-start gap-2') do
           link_to(helpers.account_path,
                   class: 'p-1 -ml-1 mt-0.5 text-slate-500',
@@ -58,7 +58,7 @@ module Notifications
     end
 
     def groups_list
-      div(class: 'px-5 lg:px-0 pb-10 max-w-2xl space-y-5') do
+      div(class: 'px-1 lg:px-0 pb-10 max-w-2xl space-y-5') do
         @groups.each { |group| group_block(group) }
       end
     end
