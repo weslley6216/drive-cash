@@ -58,7 +58,7 @@ RSpec.describe Chat::MaintenanceUpdater do
 
       result = described_class.new.persist({ 'category' => 'oil_change', 'done_km' => 40_000 }, user: user)
 
-      expect(result.errors.join).to include(I18n.t('maintenances.mark_done.errors.below_last', km: '45.000'))
+      expect(result.errors).to eq([I18n.t('maintenances.mark_done.errors.below_last', km: '45.000')])
     end
 
     it 'syncs the odometer when done_km is ahead' do

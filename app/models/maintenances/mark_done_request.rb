@@ -20,7 +20,7 @@ module Maintenances
       super()
       @maintenance = maintenance
       self.done_km = done_km.nil? ? maintenance.vehicle.odometer_km : done_km
-      self.done_on = done_on.nil? ? Date.current : done_on
+      self.done_on = done_on.presence || Date.current
       @companion_ids = normalized_companion_ids(companion_ids)
     end
 

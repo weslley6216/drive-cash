@@ -13,7 +13,7 @@ module Chat
       if result.success?
         PersistedResult.success(record: maintenance.reload, action: 'update_maintenance')
       else
-        PersistedResult.failure(errors: result.request.errors.full_messages)
+        PersistedResult.failure(errors: result.request.errors[:done_km])
       end
     end
   end

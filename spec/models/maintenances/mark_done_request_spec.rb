@@ -21,6 +21,16 @@ RSpec.describe Maintenances::MarkDoneRequest do
       end
     end
 
+    it 'falls back to today when done_on comes blank from the form' do
+      travel_to Time.zone.local(2026, 11, 10, 10, 0) do
+        maintenance = create(:maintenance)
+
+        request = described_class.new(maintenance: maintenance, done_on: '')
+
+        expect(request.done_on).to eq(Date.new(2026, 11, 10))
+      end
+    end
+
     it 'preselects the first companion' do
       vehicle = create(:vehicle, odometer_km: 160_928)
       oil_change = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 155_600)
@@ -61,6 +71,15 @@ RSpec.describe Maintenances::MarkDoneRequest do
       request.valid?
 
       expect(request.errors[:done_km]).to include(a_string_including('Filtro de óleo'))
+    end
+
+    it 'is valid exactly at odometer plus margin' do
+      vehicle = create(:vehicle, odometer_km: 160_928)
+      maintenance = create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 155_600)
+
+      request = described_class.new(maintenance: maintenance, done_km: 162_928, companion_ids: [])
+
+      expect(request).to be_valid
     end
 
     it 'is invalid above odometer plus margin' do

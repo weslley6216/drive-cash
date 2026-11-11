@@ -98,6 +98,15 @@ RSpec.describe Maintenance, type: :model do
       expect(oil_change.companions).to eq([oil_filter])
     end
 
+    it 'orders companions as declared in the registry, not by creation' do
+      vehicle = create(:vehicle)
+      oil_change = create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      air_filter = create(:maintenance, vehicle: vehicle, category: 'air_filter')
+      oil_filter = create(:maintenance, vehicle: vehicle, category: 'oil_filter')
+
+      expect(oil_change.companions).to eq([oil_filter, air_filter])
+    end
+
     it 'has no companions outside the registry' do
       vehicle = create(:vehicle)
       tire_rotation = create(:maintenance, vehicle: vehicle, category: 'tire_rotation')
