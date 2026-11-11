@@ -17,7 +17,7 @@ Aplicativo para motoristas de delivery e gig workers rastrearem gastos e ganhos 
 | Backend | Ruby 3.3.5, Rails 8.1 |
 | Banco de dados | PostgreSQL 16 |
 | Frontend | Phlex 2, Stimulus, Turbo, Tailwind CSS 4 |
-| IA | Groq (llama-3.3-70b) + Gemini (fallback) |
+| IA | Groq (openai/gpt-oss-120b) + Gemini (fallback) |
 | Testes | RSpec, Factory Bot, SimpleCov (100%) |
 | Deploy | Docker + Northflank |
 
@@ -50,7 +50,7 @@ Acesse `http://localhost:3000`.
 | `DATABASE_URL` | URL de conexão com o PostgreSQL | Sim |
 | `GROQ_API_KEY` | Chave da API Groq (LLM primário) | Para o chat |
 | `GEMINI_API_KEY` | Chave da API Gemini (fallback) | Para o chat |
-| `GROQ_MODEL` | Modelo Groq (padrão: `llama-3.3-70b-versatile`) | Não |
+| `GROQ_MODEL` | Modelo Groq (padrão: `openai/gpt-oss-120b`) | Não |
 | `GEMINI_MODEL` | Modelo Gemini (padrão: `gemini-2.0-flash`) | Não |
 
 ## Comandos úteis
