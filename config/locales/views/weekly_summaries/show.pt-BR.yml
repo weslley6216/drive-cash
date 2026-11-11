@@ -1,0 +1,19 @@
+pt-BR:
+  weekly_summaries:
+    show:
+      title: Sua semana
+      back: Voltar para notificações
+      range:
+        same_month: "%{start_day} a %{end_day} de %{month}"
+        cross_month: "%{start_day} de %{start_month} a %{end_day} de %{end_month}"
+        cross_year: "%{start_day} de %{start_month} de %{start_year} a %{end_day} de %{end_month} de %{end_year}"
+      profit: Lucro líquido
+      trips: Corridas
+      days_worked: Dias rodados
+      per_km: R$ / km
+      empty_value: "—"
+      daily_title: Lucro por dia
+      best_day: "%{day} foi o melhor dia:"
+      top_expense: Maior gasto
+      cta: Ver análise completa
+      weekdays: [Domingo, Segunda, Terça, Quarta, Quinta, Sexta, Sábado]
