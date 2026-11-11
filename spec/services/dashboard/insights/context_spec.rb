@@ -26,5 +26,20 @@ RSpec.describe Dashboard::Insights::Context do
       expect(context.categories.first[:id]).to eq('fuel')
       expect(context.platforms.first[:id]).to eq('uber')
     end
+
+    it 'defaults the previous period fields to nil' do
+      context = described_class.new(
+        user:          create(:user),
+        year:          2025,
+        month:         6,
+        current_stats: { profit: 100 },
+        categories:    [],
+        platforms:     []
+      )
+
+      expect(context.previous_year).to be_nil
+      expect(context.previous_month).to be_nil
+      expect(context.previous_stats).to be_nil
+    end
   end
 end

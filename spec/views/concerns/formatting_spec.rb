@@ -16,4 +16,10 @@ RSpec.describe Formatting do
       expect(helper.format_percentage(33.3333)).to eq('33,3')
     end
   end
+
+  describe '#month_abbr' do
+    it 'returns the capitalized month abbreviation' do
+      expect(helper.month_abbr(5)).to eq('Mai')
+    end
+  end
 end

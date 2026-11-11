@@ -1,9 +1,8 @@
 module Dashboard
   class StatsService
-    def initialize(year: Date.current.year, month: nil, through_month: nil, user: Current.user)
+    def initialize(year: Date.current.year, month: nil, user: Current.user)
       @year = year
       @month = month
-      @through_month = through_month
       @user = user
     end
 
@@ -37,7 +36,7 @@ module Dashboard
 
     private
 
-    attr_reader :year, :month, :through_month
+    attr_reader :year, :month
 
     def memoized_earnings_data
       @memoized_earnings_data ||= earnings_calculator.call
@@ -48,21 +47,11 @@ module Dashboard
     end
 
     def earnings_scope
-      @earnings_scope ||= scoped(@user.earnings.in_period(year, month))
+      @earnings_scope ||= @user.earnings.in_period(year, month)
     end
 
     def expenses_scope
-      @expenses_scope ||= scoped(@user.expenses.paid_in_period(year, month))
-    end
-
-    def scoped(relation)
-      return relation unless year_to_date?
-
-      relation.where('EXTRACT(MONTH FROM date) <= ?', through_month)
-    end
-
-    def year_to_date?
-      through_month.present? && month.nil?
+      @expenses_scope ||= @user.expenses.paid_in_period(year, month)
     end
 
     def earnings_calculator

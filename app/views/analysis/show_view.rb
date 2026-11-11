@@ -124,11 +124,13 @@ module Analysis
     end
 
     def metrics_grid
-      div(class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
-        metric_card(:per_day, format_currency(metrics[:per_day]))
-        metric_card(:per_trip, format_currency(metrics[:per_trip]))
-        metric_card(:per_km, per_km_value, hint: per_km_hint)
-        metric_card(:margin, "#{format_percentage(metrics[:margin])}%")
+      div(class: 'space-y-3 lg:space-y-0 lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-4 mb-6') do
+        metric_card(:per_km, per_km_value, label_key: :per_km_hero, variant: :hero)
+        div(class: 'grid grid-cols-2 gap-3 lg:contents') do
+          metric_card(:per_day, format_currency(metrics[:per_day]))
+          metric_card(:per_trip, format_currency(metrics[:per_trip]))
+          metric_card(:margin, format_currency(metrics[:margin]), class_name: 'col-span-2 lg:col-span-1')
+        end
       end
     end
 
@@ -139,37 +141,15 @@ module Analysis
       format_currency(value)
     end
 
-    def per_km_hint
-      metrics[:per_km].nil? ? t('.metrics.per_km_empty') : t('.metrics.per_km_hint')
-    end
-
-    def metric_card(key, value, hint: nil, pp: false)
+    def metric_card(key, value, label_key: key, variant: :compact, class_name: nil)
       render Analysis::MetricCardComponent.new(
-        label:        t(".metrics.#{key}"),
-        icon:         METRIC_ICONS[key],
-        value:        value,
-        hint:         hint,
-        change_pct:   metrics[:change_pct][key],
-        pp:           pp,
-        period_label: period_label_for(pp)
+        label:      t(".metrics.#{label_key}"),
+        icon:       METRIC_ICONS[key],
+        value:      value,
+        series:     metrics[:series][key],
+        variant:    variant,
+        class_name: class_name
       )
-    end
-
-    def period_label_for(_pp)
-      period_context = @insights[:period_context]
-      return nil unless period_context
-
-      if period_context[:mode] == :monthly
-        I18n.t('analysis.show_view.metrics.vs_period_monthly',
-               month: period_context[:previous_month_name],
-               year:  period_context[:previous_year])
-      elsif period_context[:cutoff_month_name]
-        I18n.t('analysis.show_view.metrics.vs_period_annual_ytd',
-               month: period_context[:cutoff_month_name],
-               year:  period_context[:previous_year])
-      else
-        I18n.t('analysis.show_view.metrics.vs_period_annual', year: period_context[:previous_year])
-      end
     end
 
     def bar_chart_section

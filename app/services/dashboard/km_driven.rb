@@ -8,13 +8,24 @@ module Dashboard
 
     def call
       count, max_km, min_km = scope.pick(Arel.sql('COUNT(*), MAX(odometer_km), MIN(odometer_km)'))
-      return nil if count.to_i < 2
+      delta(count, max_km, min_km)
+    end
 
-      delta = max_km.to_i - min_km.to_i
-      delta.positive? ? delta : nil
+    def monthly
+      scope.group(Arel.sql('EXTRACT(MONTH FROM date)::int'))
+        .pluck(Arel.sql('EXTRACT(MONTH FROM date)::int, COUNT(*), MAX(odometer_km), MIN(odometer_km)'))
+        .to_h { |month, *readings| [month, delta(*readings)] }
+        .compact
     end
 
     private
+
+    def delta(count, max_km, min_km)
+      return nil if count.to_i < 2
+
+      difference = max_km.to_i - min_km.to_i
+      difference.positive? ? difference : nil
+    end
 
     def scope
       vehicle = @user.vehicle

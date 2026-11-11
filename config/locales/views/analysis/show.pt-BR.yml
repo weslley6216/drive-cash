@@ -7,15 +7,11 @@ pt-BR:
       metrics:
         per_day: "R$ / dia"
         per_trip: "R$ / rota"
-        per_km: "R$ / km"
-        per_km_hint: "lucro por km rodado"
-        per_km_empty: "informe o km no abastecimento"
-        margin: "Margem"
-        vs_previous: "% vs anterior"
-        vs_previous_pp: " p.p. vs anterior"
-        vs_period_annual:     "vs %{year}"
-        vs_period_annual_ytd: "vs jan–%{month}/%{year}"
-        vs_period_monthly:    "vs %{month}/%{year}"
+        per_km_hero: "Lucro por km rodado"
+        margin: "Sobra a cada R$ 100"
+      trend:
+        best: "melhor: %{month}"
+        not_enough: "A tendência aparece a partir de 3 meses com registros."
       bar_chart:
         title: "Receitas vs Despesas"
         subtitle_annual: "Evolução mensal · %{year}"
@@ -37,17 +33,8 @@ pt-BR:
         total_label: "Total"
         empty: "Sem receitas no período"
       insights:
-        section_title: "Insights"
-        category_spike:
-          title: "%{category} subiu %{pct}%%"
-          description_monthly: "Você gastou %{value} em %{category} em %{period} — %{pct}%% acima de %{previous_period}."
-          description_annual:  "Você gastou %{value} em %{category} — %{pct}%% acima do mesmo período de %{previous_year}."
-        best_day:
-          title: "Melhor dia: %{value}"
-          description: "Em %{date} você teve seu melhor resultado do período."
-        worst_platform:
-          title: "Pior plataforma: %{platform}"
-          description: "%{platform} rendeu apenas %{value} por rota."
-        margin_drop:
-          title: "Margem caiu %{pp} pp"
-          description: "Sua margem está em %{value}%%, abaixo do período anterior."
+        category_share:
+          title: "%{category} leva %{pct}%% dos seus gastos"
+          description: "Foram %{value} %{period}. É a categoria que mais pesa no seu lucro por km."
+          period_monthly: "no mês"
+          period_annual: "no ano"

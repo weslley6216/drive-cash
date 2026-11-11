@@ -10,6 +10,10 @@ module Dashboard
       :previous_stats,
       :categories,
       :platforms
-    )
+    ) do
+      def initialize(previous_year: nil, previous_month: nil, previous_stats: nil, **attributes)
+        super
+      end
+    end
   end
 end
