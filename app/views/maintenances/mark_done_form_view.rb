@@ -171,7 +171,7 @@ module Maintenances
       companion_status_key = Vehicles::MaintenanceStatus.for(companion.progress)
       style = MAINTENANCE_STATUS_STYLES.fetch(companion_status_key)
 
-      div(class: 'flex items-center gap-3 py-2.5') do
+      label(class: 'flex items-center gap-3 py-2.5') do
         input(type: 'checkbox', name: 'mark_done[companion_ids][]', value: companion.id,
               checked: @request.companion_ids.include?(companion.id),
               class:   'w-5 h-5 rounded-md accent-blue-600',
