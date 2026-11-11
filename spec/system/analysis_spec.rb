@@ -19,7 +19,7 @@ RSpec.describe 'Analysis', type: :system, js: true do
   end
 
   def card_box(label)
-    find('span', text: label, exact_text: true).evaluate_script("this.closest('.rounded-xl').getBoundingClientRect().toJSON()")
+    find('span', text: label, exact_text: true).evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
   end
 
   it 'puts the per km hero on top, two compact cards side by side and Sobra across the row on a phone' do
