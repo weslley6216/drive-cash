@@ -14,28 +14,28 @@ Rails.application.routes.draw do
   end
   resources :weekly_summaries, only: :show, param: :week_start
   get '/auth/:provider/callback', to: 'sessions#oauth_callback'
-  get '/auth/failure',            to: 'sessions#oauth_failure'
-  root "dashboard#index"
+  get '/auth/failure', to: 'sessions#oauth_failure'
+  root 'dashboard#index'
 
-  get "dashboard/earnings_detail", to: "dashboard#earnings_detail", as: :dashboard_earnings_detail
-  get "dashboard/expenses_detail", to: "dashboard#expenses_detail", as: :dashboard_expenses_detail
+  get 'dashboard/earnings_detail', to: 'dashboard#earnings_detail', as: :dashboard_earnings_detail
+  get 'dashboard/expenses_detail', to: 'dashboard#expenses_detail', as: :dashboard_expenses_detail
 
   resources :expenses, only: %i[new create edit update destroy]
   resources :earnings, only: %i[new create edit update destroy]
 
-  get  '/records/new', to: 'records#new',    as: :new_record
-  post '/records',     to: 'records#create', as: :records
+  get '/records/new', to: 'records#new', as: :new_record
+  post '/records', to: 'records#create', as: :records
 
   scope '/chat', module: nil, as: :chat do
     root to: 'chat#index'
     post 'message', to: 'chat#message', as: :message
     post 'confirm', to: 'chat#confirm', as: :confirm
-    post 'cancel',  to: 'chat#cancel_preview', as: :cancel_preview
-    delete 'clear', to: 'chat#clear',   as: :clear
+    post 'cancel', to: 'chat#cancel_preview', as: :cancel_preview
+    delete 'clear', to: 'chat#clear', as: :clear
   end
 
   resource :analysis, only: :show, controller: 'analysis'
-  get '/history',      to: 'history#index',           as: :history
+  get '/history', to: 'history#index', as: :history
   resources :goals, only: %i[index new create edit update destroy]
   resources :exports, only: %i[index create show] do
     collection { get :preview }
@@ -52,8 +52,8 @@ Rails.application.routes.draw do
 
   post '/backups', to: 'backups#create', as: :backups
 
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker, defaults: { format: :js }
+  get 'manifest' => 'rails/pwa#manifest', as: :pwa_manifest
+  get 'service-worker' => 'rails/pwa#service_worker', as: :pwa_service_worker, defaults: { format: :js }
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end
