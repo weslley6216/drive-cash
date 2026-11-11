@@ -28,7 +28,7 @@ module Notifications
 
     def save_preferences
       @user.notification_settings = @user.notification_settings.with(@kind, @enabled)
-      @user.save(validate: false)
+      @user.update_column(:notification_preferences, @user.notification_preferences)
     end
   end
 end
