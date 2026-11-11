@@ -1,15 +1,15 @@
 module Notifications
   module Presenters
     class GoalReached < Base
+      def self.icon = PhlexIcons::Lucide::Target
+
+      def self.palette_key = :success
+
       private
 
       def body
         translate('body', month: month_label, value: format_currency(data['current']))
       end
-
-      def icon = PhlexIcons::Lucide::Target
-
-      def palette_key = :success
 
       def path = goals_path
 

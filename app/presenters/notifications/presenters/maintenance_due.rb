@@ -1,6 +1,10 @@
 module Notifications
   module Presenters
     class MaintenanceDue < Base
+      def self.icon = PhlexIcons::Lucide::Wrench
+
+      def self.palette_key = :danger
+
       private
 
       def title
@@ -13,9 +17,7 @@ module Notifications
                   interval: delimited(data['interval_km']))
       end
 
-      def icon = PhlexIcons::Lucide::Wrench
-
-      def palette_key = data['status'] == 'overdue' ? :danger : :warning
+      def palette_key = data['status'] == 'overdue' ? super : :warning
 
       def path = vehicle_path(highlight: "maintenance_#{data['maintenance_id']}")
 
