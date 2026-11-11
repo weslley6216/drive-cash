@@ -7,7 +7,7 @@ export default class extends Controller {
     const id = new URLSearchParams(location.search).get("highlight")
     if (!id) return
 
-    const target = this.element.querySelector(`[id="${id}"]`)
+    const target = this.element.querySelector(`#${CSS.escape(id)}`)
     if (!target || !target.checkVisibility()) return
 
     target.scrollIntoView({ block: "center" })

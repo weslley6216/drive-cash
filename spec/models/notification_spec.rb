@@ -118,5 +118,14 @@ RSpec.describe Notification, type: :model do
         expect(described_class.visible).not_to include(notification)
       end
     end
+
+    it 'keeps the first dismissal time when dismissed again' do
+      first_dismissal = 1.hour.ago.change(usec: 0)
+      notification = create(:notification, user: user, dismissed_at: first_dismissal)
+
+      notification.dismiss!
+
+      expect(notification.reload.dismissed_at).to eq(first_dismissal)
+    end
   end
 end

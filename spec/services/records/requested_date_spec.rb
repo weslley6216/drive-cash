@@ -9,6 +9,12 @@ RSpec.describe Records::RequestedDate do
     expect(result).to eq(Date.new(2026, 7, 13))
   end
 
+  it 'accepts today itself' do
+    result = described_class.call('2026-07-14', today: today)
+
+    expect(result).to eq(today)
+  end
+
   it 'falls back to today when the requested date is in the future' do
     result = described_class.call('2026-07-15', today: today)
 

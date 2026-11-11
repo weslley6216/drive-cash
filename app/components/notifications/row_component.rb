@@ -18,6 +18,10 @@ module Notifications
 
     MENU_PANEL_CLASSES = 'hidden absolute right-1 top-9 z-10 w-[210px] bg-white rounded-xl border ' \
                           'border-slate-200 shadow-lg py-1'
+    MENU_BUTTON_CLASSES = 'w-8 h-8 -mt-1 rounded-full flex items-center justify-center text-slate-400 ' \
+                          'flex-shrink-0 focus:bg-slate-100 focus:text-slate-600'
+    REMOVE_BUTTON_CLASSES = 'w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 ' \
+                            'hover:bg-slate-50 cursor-pointer'
 
     def initialize(row:, bucket:, last: false)
       @row = row
@@ -100,12 +104,6 @@ module Notifications
         menu_panel
       end
     end
-
-    MENU_BUTTON_CLASSES = 'w-8 h-8 -mt-1 rounded-full flex items-center justify-center text-slate-400 ' \
-                           'flex-shrink-0 focus:bg-slate-100 focus:text-slate-600'
-
-    REMOVE_BUTTON_CLASSES = 'w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 ' \
-                             'hover:bg-slate-50 cursor-pointer'
 
     def menu_button
       button(

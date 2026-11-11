@@ -21,6 +21,6 @@ class Notification < ApplicationRecord
   end
 
   def dismiss!
-    update!(dismissed_at: Time.current)
+    update!(dismissed_at: Time.current) unless dismissed_at
   end
 end
