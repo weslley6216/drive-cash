@@ -9,7 +9,7 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 - **Backend**: Ruby 3.3.5, Rails 8.1.2, PostgreSQL 16
 - **Frontend**: Phlex 2.2 (componentes Ruby, sem ERB), Stimulus, Turbo, Tailwind CSS
 - **LLM**: Groq (primário, llama-3.3-70b) + Gemini (fallback), via Faraday
-- **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório)
+- **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório), Capybara + Cuprite (system specs de celular/desktop em spec/system)
 - **Deploy**: Northflank (free tier — 0,1 vCPU/256MB, Puma single mode, Solid Queue dentro do Puma), push na `main` dispara build+rollout
 - **Locale**: pt-BR, fuso Brasília
 
@@ -20,10 +20,13 @@ O projeto roda via Docker. Sempre usar `rtk docker compose run --rm app` para ex
 ```bash
 rtk docker compose run --rm -e COVERAGE_GATE=1 app bundle exec rspec # suíte completa com o gate de 100%
 rtk docker compose run --rm app bundle exec rspec spec/path/file     # spec específica
+rtk docker compose run --rm app bash -c "bin/rails tailwindcss:build && bundle exec rspec spec/system" # system specs (celular/desktop)
 rtk docker compose run --rm app bundle exec rubocop                  # lint
 rtk docker compose run --rm app bundle exec rails db:migrate         # migrações
 rtk docker compose up -d db                                          # sobe o banco (necessário antes dos specs)
 ```
+
+**System specs (Capybara + Cuprite)**: rodam Chromium real via CDP; depois de mudar `Dockerfile.dev`, `rtk docker compose build app` é obrigatório — sem rebuild, `Ferrum::BinaryNotFoundError` (imagem sem Chromium). Custo medido no spec da Análise (`spec/system/analysis_spec.rb`, dois exemplos): 2.62s com boot do Chromium + 1.82s de custo marginal por exemplo (`:deletion` no DatabaseCleaner para `js: true`, trocado de `:truncation` por custo).
 
 **Gems**: `docker compose build` NÃO atualiza gems — elas vivem no volume `ruby_gems` (que sobrescreve o bundle da imagem). `docker compose up` se autocorrige (o `bin/setup` roda `bundle install`); já comandos via `docker compose run` falham com `Bundler::GemNotFound`/`Could not find <gem>` — nesse caso, ir direto para:
 
@@ -69,6 +72,7 @@ Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
 - **Sem `expect_any_instance_of`/`allow_any_instance_of`**: mockar classe/instância específica (`allow(MyClass).to receive(...)`) ou testar o comportamento resultante.
 - **Sem referência a ACs** (`(AC 1)`) nos nomes dos exemplos — descrever o comportamento; o nome deve fazer sentido sozinho.
 - **Teste só-negativo exige par positivo discriminante**: exemplo cuja única asserção é negativa (`not_to include/match/have_key`) sem um exemplo positivo de estado oposto na mesma área verifica ausência permanente — passa para sempre e não detecta regressão; não escrever, remover se existir. Exceções legítimas (têm estado-par): `not_to be_valid`, isolamento entre usuários, filtros/scopes, elementos condicionais. Detalhe: `rules/03 - Regras de Testes.md` no vault.
+- **System spec obrigatório para toda tela nova ou alterada**: `spec/system/`, celular como padrão do driver (`emulate_phone`, 390×844 com emulação mobile e toque) com `expect(page).to fit_the_phone_width`; layout que muda no desktop ganha também um exemplo com `emulate_desktop_screen` (1280×800, sem toque).
 
 ## Fluxo de trabalho e git
 
@@ -148,4 +152,4 @@ Vault Obsidian em `~/Obsidian/DriveCash/system-design/` — abrir com alias `des
 
 Se uma linha do plan não tem referência ao protótipo, é suposição — revisar antes de executar.
 
-**Execute**: antes de fechar qualquer tarefa de UI, tirar screenshot da tela e comparar item a item com o protótipo. Listar divergências explicitamente. Só marcar como concluído quando não houver diferença visual relevante.
+**Execute**: antes de fechar qualquer tarefa de UI, system spec de celular com `fit_the_phone_width` (+ desktop quando o layout muda) e canvas-compare do 6b do `/ship` (ferramental em `.claude/skills/ship/canvas-compare/`). Listar divergências explicitamente. Só marcar como concluído quando não houver diferença visual relevante.
