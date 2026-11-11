@@ -97,4 +97,26 @@ RSpec.describe Notification, type: :model do
       expect(build(:notification, read_at: Time.current)).not_to be_unread
     end
   end
+
+  describe '.visible' do
+    it 'excludes dismissed notifications' do
+      visible = create(:notification, user: user)
+      create(:notification, user: user, dismissed_at: Time.current)
+
+      expect(described_class.visible).to contain_exactly(visible)
+    end
+  end
+
+  describe '#dismiss!' do
+    it 'stamps dismissed_at and drops it from visible' do
+      notification = create(:notification, user: user)
+
+      freeze_time do
+        notification.dismiss!
+
+        expect(notification.dismissed_at).to eq(Time.current)
+        expect(described_class.visible).not_to include(notification)
+      end
+    end
+  end
 end

@@ -6,6 +6,7 @@ class Notification < ApplicationRecord
   validates :kind, presence: true, inclusion: { in: Notifications::Registry::KINDS }
 
   scope :unread, -> { where(read_at: nil) }
+  scope :visible, -> { where(dismissed_at: nil) }
   scope :chronological, -> { order(created_at: :desc) }
   scope :recent, -> { chronological.limit(INDEX_LIMIT) }
 
@@ -17,5 +18,9 @@ class Notification < ApplicationRecord
 
   def mark_read!
     update!(read_at: Time.current) if unread?
+  end
+
+  def dismiss!
+    update!(dismissed_at: Time.current)
   end
 end

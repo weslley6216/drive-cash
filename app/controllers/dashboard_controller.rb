@@ -12,7 +12,7 @@ class DashboardController < ApplicationController
     render Dashboard::IndexView.new(
       totals:          @totals,
       first_name:      current_user.first_name,
-      unread_count:    current_user.notifications.unread.count,
+      unread_count:    current_user.notifications.visible.unread.count,
       filters:         @filters,
       recent_activity: @recent_activity,
       categories:      @categories,

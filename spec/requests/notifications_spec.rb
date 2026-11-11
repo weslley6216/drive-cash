@@ -67,6 +67,14 @@ RSpec.describe 'Notifications', type: :request do
 
         expect(response.body).not_to include('Tanque no vermelho')
       end
+
+      it 'hides a dismissed notification from the list' do
+        create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' }, dismissed_at: Time.current)
+
+        get notifications_path
+
+        expect(response.body).not_to include('Tanque no vermelho')
+      end
     end
   end
 
