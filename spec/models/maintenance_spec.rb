@@ -88,7 +88,41 @@ RSpec.describe Maintenance, type: :model do
     end
   end
 
+  describe '#companions' do
+    it 'lists existing companions for an oil change' do
+      vehicle = create(:vehicle)
+      oil_change = create(:maintenance, vehicle: vehicle, category: 'oil_change')
+      oil_filter = create(:maintenance, vehicle: vehicle, category: 'oil_filter')
+      create(:maintenance, vehicle: vehicle, category: 'tire_rotation')
+
+      expect(oil_change.companions).to eq([oil_filter])
+    end
+
+    it 'has no companions outside the registry' do
+      vehicle = create(:vehicle)
+      tire_rotation = create(:maintenance, vehicle: vehicle, category: 'tire_rotation')
+      create(:maintenance, vehicle: vehicle, category: 'oil_filter')
+
+      expect(tire_rotation.companions).to be_empty
+    end
+  end
+
   describe 'validations' do
+    it 'is invalid when last_done_km is beyond odometer plus the allowed margin' do
+      vehicle = create(:vehicle, odometer_km: 160_000)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 162_001)
+
+      expect(maintenance).not_to be_valid
+      expect(maintenance.errors[:last_done_km]).to be_present
+    end
+
+    it 'accepts last_done_km exactly at the margin' do
+      vehicle = create(:vehicle, odometer_km: 160_000)
+      maintenance = build(:maintenance, vehicle: vehicle, last_done_km: 162_000)
+
+      expect(maintenance).to be_valid
+    end
+
     it 'requires last_done_km and interval_km' do
       maintenance = described_class.new
 

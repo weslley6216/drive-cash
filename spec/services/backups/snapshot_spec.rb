@@ -49,6 +49,7 @@ RSpec.describe Backups::Snapshot do
     end
 
     it 'mirrors the vehicle maintenance plan with a translated item' do
+      vehicle.update!(odometer_km: 160_000)
       create(:maintenance, vehicle: vehicle, category: 'oil_change', interval_km: 5_000,
                            last_done_km: 158_318, estimated_cost: 280.00)
 
