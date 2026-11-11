@@ -3,6 +3,23 @@ require 'rails_helper'
 RSpec.describe 'Notification preferences', type: :request do
   let(:user) { create(:user) }
 
+  describe 'GET /notification_preferences/edit' do
+    it 'redirects to login when unauthenticated' do
+      get edit_notification_preferences_path
+
+      expect(response).to redirect_to(new_session_path)
+    end
+
+    it 'renders the five kinds for the current user' do
+      login_as(user)
+
+      get edit_notification_preferences_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Avisos')
+    end
+  end
+
   describe 'PATCH /notification_preferences' do
     it 'redirects to login when unauthenticated' do
       patch notification_preferences_path, params: { kind: 'tank_low', enabled: 'false' }

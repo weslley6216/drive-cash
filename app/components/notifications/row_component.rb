@@ -2,14 +2,6 @@ module Notifications
   class RowComponent < ApplicationComponent
     include Phlex::Rails::Helpers::ButtonTo
 
-    PALETTES = {
-      danger:  'bg-red-50 text-red-600',
-      warning: 'bg-amber-50 text-amber-500',
-      success: 'bg-emerald-50 text-emerald-500',
-      info:    'bg-blue-50 text-blue-600',
-      neutral: 'bg-slate-100 text-slate-500'
-    }.freeze
-
     TIME_FORMATS = {
       today:   :notification_time,
       week:    :notification_weekday,
@@ -50,13 +42,7 @@ module Notifications
     end
 
     def icon_tile
-      div(class: "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 #{palette_classes}") do
-        render @row.icon.new(class: 'w-[17px] h-[17px]')
-      end
-    end
-
-    def palette_classes
-      PALETTES.fetch(@row.palette_key, PALETTES[:neutral])
+      render IconTileComponent.new(icon: @row.icon, palette_key: @row.palette_key)
     end
 
     def content
