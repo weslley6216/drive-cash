@@ -14,7 +14,7 @@ gem 'prawn'
 gem 'prawn-table'
 gem 'google-apis-sheets_v4'
 gem 'googleauth'
-gem 'google-cloud-storage', '~> 1.52'
+gem 'google-cloud-storage', '~> 1.62'
 
 # Transactional email over Resend's HTTP API (port 443) — works on hosts that
 # block outbound SMTP ports, unlike :smtp delivery.
