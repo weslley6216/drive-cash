@@ -40,10 +40,13 @@ todo spec, de qualquer camada.
 | **SimpleCov** | `minimum_coverage 100` — toda linha nova precisa de spec (bloqueia abaixo de 100%) |
 | **FactoryBot** | `FactoryBot::Syntax::Methods` incluído — `build(:x)`/`create(:x)` diretos; factories em `spec/factories/<plural>.rb` |
 | **shoulda-matchers** | `validate_presence_of`, `define_enum_for`, etc. (rspec + rails) |
-| **DatabaseCleaner** | transação por exemplo; truncation no boot e em `js: true` |
+| **DatabaseCleaner** | transação por exemplo; deletion no boot e em `js: true` (visível pra thread do servidor Capybara) |
 | **Time helpers** | `ActiveSupport::Testing::TimeHelpers` — `travel_to`, `freeze_time` |
-| **`login_as(user)`** | `type: :request` — autentica via `POST session_path` (senha `password123`) |
+| **`login_as(user)`** | `type: :request` — autentica via `POST session_path` (senha `password123`); `type: :system` — mesmo nome, preenche o formulário (`new_session_path`) |
 | **`view_context`** | `type: :component` — renderiza Phlex via `view_context.render(...)` |
+| **`emulate_phone`/`emulate_desktop_screen`/`fit_the_phone_width`** | `type: :system` — padrão do driver já é celular (390×844); `emulate_desktop_screen` muda para 1280×800 sem toque; matcher `fit_the_phone_width` cobre `scrollWidth <= screen.width` |
+| **`emulate_color_scheme`/`computed`** | `type: :system` — `emulate_color_scheme('dark'\|'light')` e `computed(selector, property)` para `getComputedStyle` |
+| **`wait_until(&condition)`** | `type: :system` — espera condição custom até `Capybara.default_max_wait_time` |
 | **`verify_partial_doubles`** | ligado — mock precisa bater com a assinatura real do método |
 
 ## Tipo e diretório por camada
@@ -56,6 +59,7 @@ todo spec, de qualquer camada.
 | Controller | `spec/requests/` | `:request` | FactoryBot + `login_as` | **arch-controller** |
 | Component/View | `spec/components/` | `:component` | `view_context.render` | **arch-component** |
 | Presenter | `spec/presenters/<domínio>/` | — | payload cru / FactoryBot | **arch-presenter** |
+| Tela (celular/desktop) | `spec/system/` | `:system, js: true` | FactoryBot + `login_as` + `travel_to` | **arch-spec** |
 
 ## Exemplares reais (canônicos, atuais)
 
