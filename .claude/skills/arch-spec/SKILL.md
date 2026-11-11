@@ -40,7 +40,7 @@ todo spec, de qualquer camada.
 | **SimpleCov** | `minimum_coverage 100` — toda linha nova precisa de spec (bloqueia abaixo de 100%) |
 | **FactoryBot** | `FactoryBot::Syntax::Methods` incluído — `build(:x)`/`create(:x)` diretos; factories em `spec/factories/<plural>.rb` |
 | **shoulda-matchers** | `validate_presence_of`, `define_enum_for`, etc. (rspec + rails) |
-| **DatabaseCleaner** | transação por exemplo; deletion no boot e em `js: true` (visível pra thread do servidor Capybara) |
+| **DatabaseCleaner** | transação por exemplo; truncation no boot; deletion em `js: true` (visível pra thread do servidor Capybara; exige usuário do banco com permissão de `DISABLE TRIGGER`) |
 | **Time helpers** | `ActiveSupport::Testing::TimeHelpers` — `travel_to`, `freeze_time` |
 | **`login_as(user)`** | `type: :request` — autentica via `POST session_path` (senha `password123`); `type: :system` — mesmo nome, preenche o formulário (`new_session_path`) |
 | **`view_context`** | `type: :component` — renderiza Phlex via `view_context.render(...)` |
