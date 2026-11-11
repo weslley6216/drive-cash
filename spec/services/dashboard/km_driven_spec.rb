@@ -58,6 +58,16 @@ RSpec.describe Dashboard::KmDriven do
       expect(result).to be_nil
     end
 
+    it 'measures the odometer delta inside an arbitrary date range' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 7, 6), odometer_km: 10_000)
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 7, 12), odometer_km: 10_400)
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 7, 13), odometer_km: 11_000)
+
+      result = described_class.new(user: user, range: Date.new(2026, 7, 6)..Date.new(2026, 7, 12)).call
+
+      expect(result).to eq(400)
+    end
+
     it 'returns nil when delta is not positive' do
       create(:refueling, vehicle: vehicle, date: Date.new(2025, 6, 1), odometer_km: 10_000)
       create(:refueling, vehicle: vehicle, date: Date.new(2025, 6, 15), odometer_km: 10_000)
