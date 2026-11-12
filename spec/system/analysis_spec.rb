@@ -22,6 +22,16 @@ RSpec.describe 'Analysis', type: :system, js: true do
     find('span', text: label, exact_text: true).evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
   end
 
+  it 'starts the analysis title below the iOS status bar on a phone' do
+    visit analysis_path
+
+    title = find('h1', text: I18n.t('analysis.show_view.title'))
+
+    expect(computed('turbo-frame#page', 'paddingTop')).to eq('16px')
+    expect(title.evaluate_script('this.getBoundingClientRect().top').round).to eq(24)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'puts the per km hero on top, two compact cards side by side and Sobra across the row on a phone' do
     visit analysis_path
 

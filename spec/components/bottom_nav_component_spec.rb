@@ -20,6 +20,10 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include('z-30')
     end
 
+    it 'keeps the tabs above the iOS home indicator' do
+      expect(html).to include('pb-[max(1.5rem,env(safe-area-inset-bottom))]')
+    end
+
     it 'hides on desktop via lg:hidden' do
       expect(html).to include('lg:hidden')
     end

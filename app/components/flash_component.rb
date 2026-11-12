@@ -16,7 +16,7 @@ class FlashComponent < ApplicationComponent
   private
 
   def render_fixed
-    div(id: 'flash', class: 'fixed top-4 right-4 z-50 flex flex-col gap-2') do
+    div(id: 'flash', class: 'fixed top-[calc(env(safe-area-inset-top)+1rem)] right-4 z-50 flex flex-col gap-2') do
       @flash.each { |type, message| flash_message(type, message) }
     end
   end

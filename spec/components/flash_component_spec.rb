@@ -9,6 +9,12 @@ RSpec.describe FlashComponent, type: :component do
       expect(html).to be_empty
     end
 
+    it 'drops the toast below the iOS status bar' do
+      html = view_context.render(FlashComponent.new(flash: { notice: 'Salvo!' }))
+
+      expect(html).to include('fixed top-[calc(env(safe-area-inset-top)+1rem)] right-4 z-50')
+    end
+
     it 'renders success flash message' do
       flash = { notice: 'Operação realizada com sucesso!' }
       component = FlashComponent.new(flash: flash)

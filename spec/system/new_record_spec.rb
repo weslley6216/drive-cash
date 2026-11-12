@@ -46,6 +46,16 @@ RSpec.describe 'New record', type: :system, js: true do
     expect(page).to have_text('Segunda-feira · 18 mai 2026', normalize_ws: true)
   end
 
+  it 'starts the new record top bar below the iOS status bar on a phone' do
+    visit new_record_path(type: 'expense')
+
+    close = find("a[aria-label='#{I18n.t('records.new_view.close')}']")
+
+    expect(computed('.safe-top', 'paddingTop')).to eq('16px')
+    expect(box(close)['top'].round).to eq(24)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'centers the form as a modal with the amount and date side by side on a desktop screen' do
     emulate_desktop_screen
 
@@ -60,6 +70,7 @@ RSpec.describe 'New record', type: :system, js: true do
     expect(card_box['width'].round).to eq(672)
     expect(box(amount_box)['y'].round).to eq(box(date_box)['y'].round)
     expect(amount_box.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(254, 242, 242)')
+    expect(computed('.safe-top', 'paddingTop')).to eq('32px')
     expect(page).to have_link(I18n.t('records.new_view.cancel'), href: root_path)
   end
 

@@ -14,7 +14,7 @@ class BottomNavComponent < ApplicationComponent
   def view_template
     nav(
       id:    'bottom-nav',
-      class: 'fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 pt-2 pb-6 z-30 lg:hidden',
+      class: 'fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] z-30 lg:hidden',
       data:  { turbo_permanent: '', controller: 'nav-active' }
     ) do
       div(class: 'flex items-stretch justify-around max-w-md mx-auto') do
