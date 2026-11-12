@@ -2,9 +2,10 @@ module Goals
   class ProgressService
     MIN_DAYS_FOR_PROJECTION = 3
 
-    def initialize(user:, date: Date.current)
+    def initialize(user:, date: Date.current, daily_totals: nil)
       @user = user
       @date = date
+      @daily_totals = daily_totals
     end
 
     def call
@@ -88,18 +89,23 @@ module Goals
     end
 
     def compute_metric_for_period(goal)
-      earnings = @user.earnings.where(date: goal.period_start..goal.period_end).sum(:amount)
-      expenses = @user.expenses.paid_only.where(date: goal.period_start..goal.period_end).sum(:amount)
-      MetricValue.of(goal, earned: earnings, spent: expenses)
+      range = goal.period_start..goal.period_end
+      totals_for(range).metric_for(goal)
     end
 
     def days_breakdown(goal)
       range = goal.period_start..goal.period_end
-      totals = DailyTotals.for(user: @user, range: range)
+      totals = totals_for(range)
 
       range.map do |day|
         { date: day, today: day == @date, done: day < @date, value: totals.metric_on(goal, day) }
       end
+    end
+
+    def totals_for(range)
+      return @daily_totals if @daily_totals&.covers?(range)
+
+      DailyTotals.for(user: @user, range: range)
     end
   end
 end

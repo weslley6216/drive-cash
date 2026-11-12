@@ -66,6 +66,20 @@ RSpec.describe Goals::DailyTotals do
     end
   end
 
+  describe '#covers?' do
+    it 'covers a period inside its range' do
+      totals = described_class.for(user: user, range: Date.new(2026, 1, 1)..Date.new(2026, 12, 31))
+
+      expect(totals.covers?(Date.new(2026, 3, 1)..Date.new(2026, 3, 31))).to be(true)
+    end
+
+    it 'does not cover a period crossing the end of its range' do
+      totals = described_class.for(user: user, range: Date.new(2026, 1, 1)..Date.new(2026, 12, 31))
+
+      expect(totals.covers?(Date.new(2026, 12, 15)..Date.new(2027, 1, 14))).to be(false)
+    end
+  end
+
   describe '#metric_on' do
     it 'returns the metric value for a single day' do
       goal = build(:goal, metric: 'profit', period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
