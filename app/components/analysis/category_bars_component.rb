@@ -9,9 +9,9 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4') do
-        h3(class: 'text-sm font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.categories.title') }
-        p(class: 'text-xs text-slate-500 mb-3') { total_subtitle }
+      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full') do
+        h3(class: 'text-sm lg:text-base font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.categories.title') }
+        p(class: 'text-xs text-slate-500 mb-3 lg:mb-5') { total_subtitle }
         @categories.empty? ? empty_state : list
       end
     end
@@ -23,26 +23,28 @@ module Analysis
       I18n.t(key, value: format_currency(@total))
     end
 
+    MOBILE_ROWS = 4
+
     def list
-      div(class: 'space-y-3') do
-        @categories.each { |row| category_row(row) }
+      div(class: 'flex flex-col gap-3') do
+        @categories.each_with_index { |row, index| category_row(row, desktop_only: index >= MOBILE_ROWS) }
       end
     end
 
-    def category_row(row)
+    def category_row(row, desktop_only:)
       color = category_color(row[:id])
-      div(data: { category_row: row[:id] }) do
+      div(data: { category_row: row[:id] }, class: desktop_only ? 'hidden lg:block' : nil) do
         div(class: 'flex items-center justify-between mb-1') do
-          div(class: 'flex items-center gap-2 min-w-0') do
-            div(class: 'w-6 h-6 rounded flex items-center justify-center',
+          div(class: 'flex items-center gap-2.5 min-w-0') do
+            div(class: 'hidden lg:flex w-7 h-7 rounded-lg items-center justify-center flex-shrink-0',
                 style: "background: #{color}20; color: #{color}") do
-              render category_icon(row[:id]).new(class: 'w-[13px] h-[13px]')
+              render category_icon(row[:id]).new(class: 'w-3.5 h-3.5')
             end
-            span(class: 'text-sm text-slate-700') { row[:label] }
+            span(class: 'text-sm text-slate-700 truncate') { row[:label] }
           end
-          div(class: 'flex items-center gap-2 whitespace-nowrap') do
-            span(class: 'text-xs text-slate-500') { "#{row[:percent]}%" }
-            span(class: 'text-sm font-semibold text-slate-800') { format_currency(row[:amount]) }
+          div(class: 'flex items-center gap-4 text-sm whitespace-nowrap') do
+            span(class: 'hidden lg:inline text-slate-400 w-12 text-right tabular-nums') { "#{format_percentage(row[:percent])}%" }
+            span(class: 'font-semibold text-slate-800 lg:text-slate-900 lg:tabular-nums lg:w-24 lg:text-right') { format_currency(row[:amount]) }
           end
         end
         div(class: 'h-1.5 bg-slate-100 rounded-full overflow-hidden') do

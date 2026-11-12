@@ -59,8 +59,8 @@ RSpec.describe Analysis::PlatformDonutComponent, type: :component do
 
     expect(html).to include('Uber')
     expect(html).to include('iFood')
-    expect(html).to include('75.0%')
-    expect(html).to include('25.0%')
+    expect(html).to include('75,0%')
+    expect(html).to include('25,0%')
     expect(html).not_to include('750,00')
   end
 
@@ -68,5 +68,13 @@ RSpec.describe Analysis::PlatformDonutComponent, type: :component do
     html = view_context.render(Analysis::PlatformDonutComponent.new(platforms: [], total: 0, month: nil))
 
     expect(html).to include(I18n.t('analysis.show_view.platforms.empty'))
+  end
+
+  it 'writes the platform share with a decimal comma and uses the prototype donut size on desktops' do
+    html = view_context.render(described_class.new(platforms: [{ id: 'uber', label: 'Uber', amount: 100.0, percent: 48.3 }], total: 100.0))
+
+    expect(html).to include('48,3%')
+    expect(html).to include('width: 140px; height: 140px')
+    expect(html).to include('lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full')
   end
 end

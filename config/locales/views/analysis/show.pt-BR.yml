@@ -2,6 +2,7 @@ pt-BR:
   analysis:
     show_view:
       title: "Análise"
+      export: "Exportar"
       subtitle_annual: "%{year} · todos os meses"
       subtitle_monthly: "%{month_name} · %{year}"
       metrics:

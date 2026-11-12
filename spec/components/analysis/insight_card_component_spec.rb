@@ -38,4 +38,12 @@ RSpec.describe Analysis::InsightCardComponent, type: :component do
     expect(html).to include('text-amber-900')
     expect(html).to include('text-amber-800')
   end
+
+  it 'grows into the desktop insight card of the prototype' do
+    html = view_context.render(described_class.new(insight: { title: 'T', description: 'D' }))
+
+    expect(html).to include('rounded-2xl lg:rounded-xl bg-amber-50 border border-amber-200 p-4 lg:p-5 flex items-start gap-3 lg:gap-4')
+    expect(html).to include('w-9 h-9 lg:w-11 lg:h-11')
+    expect(html).to include('text-xs lg:text-sm text-amber-800 mt-0.5 lg:mt-1 leading-relaxed')
+  end
 end

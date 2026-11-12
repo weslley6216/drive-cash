@@ -1,8 +1,8 @@
 module Analysis
   class BarChartComponent < ApplicationComponent
-    CHART_HEIGHT = 130
-    STUB_HEIGHT = 3
-    MAX_BARS_BEFORE_TIGHT_GAP = 15
+    PLOT_HEIGHT = 'h-[118px] lg:h-[206px]'.freeze
+    BAR_WIDTH = { month: 'w-[5px] lg:w-3', day: 'w-[3px] lg:w-1.5' }.freeze
+    DAY_LABELS = 8
 
     def initialize(bars:, month:, year:)
       @bars = bars
@@ -14,7 +14,7 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4') do
+      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6') do
         header
         @bars.empty? ? empty_state : chart
       end
@@ -24,15 +24,18 @@ module Analysis
 
     def header
       div(class: 'flex items-center justify-between mb-1') do
-        h2(class: 'text-sm font-semibold text-slate-800') { I18n.t('analysis.show_view.bar_chart.title') }
+        div do
+          h2(class: 'text-sm lg:text-base font-semibold text-slate-800') { I18n.t('analysis.show_view.bar_chart.title') }
+          p(class: 'hidden lg:block text-xs text-slate-500 mt-0.5') { subtitle }
+        end
         unless @bars.empty?
-          div(class: 'flex items-center gap-3 text-[11px]') do
-            legend_item('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'))
-            legend_item('bg-red-400', I18n.t('analysis.show_view.bar_chart.legend_expenses'))
+          div(class: 'flex items-center gap-3 text-[11px] lg:gap-4 lg:text-xs') do
+            legend_item('bg-emerald-500', I18n.t('analysis.show_view.bar_chart.legend_earnings'))
+            legend_item('bg-red-500', I18n.t('analysis.show_view.bar_chart.legend_expenses'))
           end
         end
       end
-      p(class: 'text-xs text-slate-500 mb-3') { subtitle }
+      p(class: 'text-xs text-slate-500 mb-3 lg:hidden') { subtitle }
     end
 
     def subtitle
@@ -45,55 +48,72 @@ module Analysis
     end
 
     def chart
-      gap = @bars.size > MAX_BARS_BEFORE_TIGHT_GAP ? 'gap-1' : 'gap-2'
-      div(class: 'relative', data: { controller: 'bar-tooltip' }) do
+      gap = daily? ? 'gap-0.5' : 'gap-[3px]'
+      div(class: 'relative lg:mt-6', data: { controller: 'bar-tooltip' }) do
         tooltip_node
-        div(class: "flex items-end #{gap}", style: 'height: 140px') do
+        div(class: "flex items-end justify-between #{gap}") do
           @bars.each_with_index { |bar_row, index| bar_column(bar_row, index) }
         end
       end
     end
 
+    def daily?
+      @bars.first[:unit] == :day
+    end
+
+    def bar_width
+      BAR_WIDTH[daily? ? :day : :month]
+    end
+
     def bar_column(bar_row, index)
-      return future_bar_column(bar_row) if bar_row[:future]
+      return future_bar_column(bar_row, index) if bar_row[:future]
 
       bar_row[:empty] ? empty_bar_column(bar_row, index) : data_bar_column(bar_row, index)
     end
 
-    def future_bar_column(bar_row)
-      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5', aria_hidden: 'true', data: { future: 'true' }) do
-        stub_bars
-        span(class: 'block overflow-hidden text-center text-[10px] text-slate-300 font-medium') { bar_row[:label] }
-      end
-    end
-
-    def stub_bars
-      div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
-        2.times { div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px") }
-      end
+    def column_classes
+      'flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5 rounded-md'
     end
 
     def data_bar_column(bar_row, index)
-      earn_height = bar_height(bar_row[:earnings])
-      exp_height = bar_height(bar_row[:expenses])
-
-      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5 cursor-pointer rounded', **column_data(bar_row, index)) do
-        div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
-          div(class: 'flex-1 min-w-0 rounded-t bg-emerald-500', data: { bar_tooltip_target: 'fill' }, style: "height: #{earn_height}px")
-          div(class: 'flex-1 min-w-0 rounded-t bg-red-500', data: { bar_tooltip_target: 'fill' }, style: "height: #{exp_height}px")
+      div(class: "#{column_classes} cursor-pointer", **column_data(bar_row, index)) do
+        div(class: "flex items-end justify-center gap-px #{PLOT_HEIGHT}") do
+          div(class: "rounded-t bg-emerald-500 #{bar_width}", data: { bar_tooltip_target: 'fill' }, style: "height: #{bar_share(bar_row[:earnings])}%")
+          div(class: "rounded-t bg-red-500 #{bar_width}", data: { bar_tooltip_target: 'fill' }, style: "height: #{bar_share(bar_row[:expenses])}%")
         end
-        span(class: 'block overflow-hidden text-center text-[10px] text-slate-500 font-medium') { bar_row[:label] }
+        bar_label(bar_row, index, 'text-slate-500')
       end
     end
 
     def empty_bar_column(bar_row, index)
-      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5 cursor-pointer rounded', **column_data(bar_row, index)) do
-        div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
-          div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', data: { bar_tooltip_target: 'fill' }, style: "height: #{STUB_HEIGHT}px")
-          div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', data: { bar_tooltip_target: 'fill' }, style: "height: #{STUB_HEIGHT}px")
-        end
-        span(class: 'block overflow-hidden text-center text-[10px] text-slate-300 font-medium') { bar_row[:label] }
+      div(class: "#{column_classes} cursor-pointer", **column_data(bar_row, index)) do
+        stub_bar
+        bar_label(bar_row, index, 'text-slate-300')
       end
+    end
+
+    def future_bar_column(bar_row, index)
+      div(class: 'flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5', aria_hidden: 'true', data: { future: 'true' }) do
+        stub_bar
+        bar_label(bar_row, index, 'text-slate-300')
+      end
+    end
+
+    def stub_bar
+      div(class: "flex items-end justify-center #{PLOT_HEIGHT}") do
+        div(class: "rounded-full bg-slate-200 h-[3px] #{bar_width}", data: { bar_tooltip_target: 'fill' })
+      end
+    end
+
+    def bar_label(bar_row, index, color)
+      span(class: "text-[9px] leading-none min-h-[10px] #{color} font-medium") { label_shown?(index) ? bar_row[:label] : '' }
+    end
+
+    def label_shown?(index)
+      return true unless daily?
+
+      every = (@bars.size / DAY_LABELS.to_f).ceil
+      (index % every).zero? || index == @bars.size - 1
     end
 
     def column_data(bar_row, index)
@@ -161,15 +181,15 @@ module Analysis
       helpers.number_to_currency(value, unit: 'R$ ', format: '%u%n', separator: ',', delimiter: '.', precision: 2)
     end
 
-    def bar_height(value)
-      return 0 if @max_value.zero?
+    def bar_share(value)
+      return 0 if @max_value.zero? || value.to_f.zero?
 
-      [(value.to_f / @max_value * CHART_HEIGHT).round, 1].max
+      [(value.to_f / @max_value * 100).round(1), 1.5].max
     end
 
     def legend_item(color_class, label)
-      span(class: 'flex items-center gap-1 text-slate-600') do
-        span(class: "w-2 h-2 rounded-sm #{color_class}")
+      span(class: 'flex items-center gap-1 lg:gap-1.5 text-slate-600 lg:text-slate-700') do
+        span(class: "w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-sm #{color_class}")
         plain label
       end
     end

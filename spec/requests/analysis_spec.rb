@@ -119,6 +119,25 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('text-amber-900')
     end
 
+    it 'renders the prototype topbar with the white desktop bar and the export shortcut' do
+      get analysis_path
+
+      expect(response.body).to include('flex-none px-5 pt-2 pb-3 sm:px-6 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
+      expect(response.body).to include('text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight')
+      expect(response.body).to include(%(href="#{exports_path}"))
+      expect(response.body).to include(I18n.t('analysis.show_view.export'))
+    end
+
+    it 'keeps the platform donut for desktops and spaces the sections like the prototype' do
+      create(:earning, user: current_user, date: Date.current, amount: 500, platform: 'uber')
+      create(:expense, user: current_user, date: Date.current, amount: 100, category: 'fuel', paid: true)
+
+      get analysis_path
+
+      expect(response.body).to include('id="platform_breakdown" class="hidden lg:block lg:col-span-5"')
+      expect(response.body).to include('px-5 sm:px-6 pb-24 lg:px-0 lg:pt-8 lg:pb-8 space-y-4 lg:space-y-6')
+    end
+
     it 'filters by year and month query params' do
       create(:earning, user: current_user, date: Date.new(2024, 6, 1), amount: 999)
       create(:earning, user: current_user, date: Date.new(2025, 2, 1), amount: 111)

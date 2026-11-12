@@ -42,8 +42,8 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
   it 'renders one earnings bar and one expense bar per non-empty entry' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 
-    expect(html.scan('bg-emerald-500').size).to eq(daily_bars.size)
-    expect(html.scan('bg-red-500').size).to eq(daily_bars.size)
+    expect(html.scan('rounded-t bg-emerald-500').size).to eq(daily_bars.size)
+    expect(html.scan('rounded-t bg-red-500').size).to eq(daily_bars.size)
   end
 
   it 'renders a stub gray bar for empty months in annual mode' do
@@ -73,10 +73,41 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(html).to include(I18n.t('analysis.show_view.bar_chart.legend_expenses'))
   end
 
-  it 'scales bar heights proportionally to the max value' do
+  it 'scales bar heights as a share of the prototype plot height' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 
-    expect(html).to include('height: 130px')
+    expect(html).to include('h-[118px] lg:h-[206px]')
+    expect(html).to include('height: 100.0%')
+    expect(html).to include('height: 16.7%')
+  end
+
+  it 'draws thin bars like the prototype for months and days' do
+    annual = view_context.render(Analysis::BarChartComponent.new(bars: annual_bars, month: nil, year: 2025))
+    daily = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
+
+    expect(annual).to include('rounded-t bg-emerald-500 w-[5px] lg:w-3')
+    expect(daily).to include('rounded-t bg-emerald-500 w-[3px] lg:w-1.5')
+    expect(annual).to include('rounded-full bg-slate-200 h-[3px] w-[5px] lg:w-3')
+  end
+
+  it 'uses 9px labels and labels about eight days in the daily view' do
+    many_bars = (1..20).map do |day|
+      { unit: :day, key: day, label: day.to_s, earnings: 100.0, expenses: 20.0, empty: false }
+    end
+
+    html = view_context.render(Analysis::BarChartComponent.new(bars: many_bars, month: 3, year: 2025))
+
+    expect(html).to include('text-[9px] leading-none min-h-[10px]')
+    expect(html).to include('font-medium">4</span>')
+    expect(html).not_to include('font-medium">2</span>')
+    expect(html).to include('font-medium">20</span>')
+  end
+
+  it 'uses the prototype legend colors and the wider desktop card' do
+    html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
+
+    expect(html).to include('w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-sm bg-emerald-500')
+    expect(html).to include('lg:border-slate-200 lg:shadow-none lg:p-6')
   end
 
   it 'renders many daily bars using fluid flex-1 min-w-0 columns without overflow wrappers' do
@@ -88,14 +119,14 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
 
     expect(html).to include('flex-1 min-w-0')
     expect(html).not_to include('overflow-x-auto')
-    expect(html.scan('bg-emerald-500').size).to eq(31)
+    expect(html.scan('rounded-t bg-emerald-500').size).to eq(31)
   end
 
   it 'wraps the chart in a relative container wired to the bar-tooltip controller' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 
     expect(html).to include('data-controller="bar-tooltip"')
-    expect(html).to include('class="relative"')
+    expect(html).to include('class="relative lg:mt-6"')
   end
 
   it 'renders the dark tooltip node with an arrow and colored dots, hidden by default' do
@@ -163,7 +194,7 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     html = view_context.render(Analysis::BarChartComponent.new(bars: bars, month: nil, year: 2026))
     july = I18n.t('date.abbr_month_names')[7].capitalize
 
-    expect(html).to include(%(<div class="flex-1 min-w-0 flex flex-col gap-0.5" aria-hidden="true" data-future="true">))
+    expect(html).to include(%(<div class="flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5" aria-hidden="true" data-future="true">))
     expect(html).to include(%(text-slate-300 font-medium">#{july}</span>))
     expect(html).not_to include(%(aria-label="#{july}: Sem dados"))
     expect(html.scan('role="button"').size).to eq(6)

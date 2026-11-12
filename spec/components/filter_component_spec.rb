@@ -82,6 +82,10 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to include('name="year"')
     end
 
+    it 'puts a calendar icon on both desktop pills' do
+      expect(html.scan('absolute left-3 w-3.5 h-3.5 text-slate-500').size).to eq(2)
+    end
+
     it 'highlights every month when no month is selected' do
       annual = render_filter(variant: :popover, action_path: '/analysis')
 

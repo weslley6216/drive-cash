@@ -68,7 +68,7 @@ RSpec.describe 'Dashboard', type: :request do
       get root_path, params: { year: 2025 }
 
       expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
-      expect(response.body).to include('lg:-mx-8 lg:-mt-8 lg:mb-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
+      expect(response.body).to include('lg:-mt-8 lg:mb-8 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
       expect(response.body).to include(%(<p class="hidden lg:block text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
       expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
     end

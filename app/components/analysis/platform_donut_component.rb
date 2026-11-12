@@ -2,7 +2,7 @@ module Analysis
   class PlatformDonutComponent < ApplicationComponent
     include PlatformPalette
 
-    DEFAULT_SIZE = 120
+    DEFAULT_SIZE = 140
     STROKE_WIDTH = 14
 
     def initialize(platforms:, total:, month: nil, size: DEFAULT_SIZE)
@@ -13,9 +13,9 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4') do
-        h3(class: 'text-sm font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.platforms.title') }
-        p(class: 'text-xs text-slate-500 mb-3') { total_subtitle }
+      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full') do
+        h3(class: 'text-sm lg:text-base font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.platforms.title') }
+        p(class: 'text-xs text-slate-500 mb-3 lg:mb-5') { total_subtitle }
         @platforms.empty? ? empty_state : body
       end
     end
@@ -28,7 +28,7 @@ module Analysis
     end
 
     def body
-      div(class: 'flex items-center gap-4') do
+      div(class: 'flex items-center gap-5') do
         div(class: 'relative shrink-0', style: "width: #{@size}px; height: #{@size}px") do
           donut
           center_label
@@ -38,7 +38,7 @@ module Analysis
     end
 
     def donut
-      radius = (@size / 2.0) - (STROKE_WIDTH / 2.0)
+      radius = (@size / 2.0) - 8
       circumference = 2 * Math::PI * radius
       offset = 0
 
@@ -68,16 +68,16 @@ module Analysis
     end
 
     def legend
-      ul(class: 'flex-1 space-y-2') do
+      ul(class: 'flex-1 space-y-2.5') do
         @platforms.each { |platform| legend_row(platform) }
       end
     end
 
     def legend_row(platform)
-      li(class: 'flex items-center gap-2') do
+      li(class: 'flex items-center gap-2 text-sm') do
         span(class: 'w-2.5 h-2.5 rounded-sm shrink-0', style: "background-color: #{platform_color(platform[:id])}")
-        span(class: 'text-sm text-slate-700 flex-1 truncate') { platform[:label] }
-        span(class: 'text-sm font-semibold text-slate-800 whitespace-nowrap') { "#{platform[:percent]}%" }
+        span(class: 'text-slate-700 flex-1 truncate') { platform[:label] }
+        span(class: 'font-semibold text-slate-900 tabular-nums whitespace-nowrap') { "#{format_percentage(platform[:percent])}%" }
       end
     end
 

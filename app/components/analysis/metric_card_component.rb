@@ -32,7 +32,7 @@ module Analysis
         p(class: 'font-bold text-slate-900 text-2xl lg:text-3xl') { @value }
 
         if trend?
-          div(class: 'mt-2') { render sparkline(color: '#2563eb', height: 34, height_class: 'h-[34px] lg:h-9', fill: true) }
+          div(class: 'mt-2 lg:min-w-[300px]') { render sparkline(color: '#2563eb', height: 34, height_class: 'h-[34px] lg:h-9', fill: true) }
           trend_footer(big: true)
         else
           p(class: 'text-[11px] text-slate-400 mt-1.5') { t('analysis.show_view.trend.not_enough') }
@@ -49,7 +49,7 @@ module Analysis
         p(class: 'font-bold text-slate-800 text-[15px] lg:text-2xl') { @value }
 
         if trend?
-          div(class: 'mt-1.5') { render sparkline(color: '#94a3b8', height: 20, height_class: 'h-5', fill: false) }
+          div(class: 'mt-1.5 lg:min-w-[160px]') { render sparkline(color: '#94a3b8', height: 20, height_class: 'h-5', fill: false) }
           trend_footer(big: false)
         end
       end

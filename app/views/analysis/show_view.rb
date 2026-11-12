@@ -1,5 +1,7 @@
 module Analysis
   class ShowView < ApplicationView
+    include TopbarStyles
+
     METRIC_ICONS = {
       per_day:  PhlexIcons::Lucide::Zap,
       per_trip: PhlexIcons::Lucide::Package,
@@ -32,7 +34,7 @@ module Analysis
     private
 
     def pinned_topbar
-      div(class: 'flex-none px-4 sm:px-6 pt-4') { topbar }
+      div(class: "flex-none px-5 pt-2 pb-3 sm:px-6 #{DESKTOP_BAR}") { topbar }
     end
 
     def loading_region
@@ -45,7 +47,7 @@ module Analysis
     end
 
     def content_scroll_region
-      div(class: 'flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pt-2 pb-24 lg:pb-6') do
+      div(class: 'flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-24 lg:px-0 lg:pt-8 lg:pb-8 space-y-4 lg:space-y-6') do
         if empty?
           empty_state
         else
@@ -98,19 +100,30 @@ module Analysis
     end
 
     def topbar
-      div(class: 'flex items-center justify-between gap-4') do
-        div do
-          h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.title') }
+      div(class: 'flex items-start justify-between gap-3 lg:items-center lg:gap-6') do
+        div(class: 'min-w-0') do
+          h1(class: 'text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight') { t('.title') }
           p(class: 'text-sm text-slate-500 mt-0.5') { subtitle }
         end
 
-        render FilterComponent.new(
-          selected_year:   @filters[:year],
-          selected_month:  @filters[:month],
-          available_years: @filters[:available_years],
-          variant:         :popover,
-          action_path:     helpers.analysis_path
-        )
+        div(class: 'flex items-center gap-3 flex-shrink-0') do
+          render FilterComponent.new(
+            selected_year:   @filters[:year],
+            selected_month:  @filters[:month],
+            available_years: @filters[:available_years],
+            variant:         :popover,
+            action_path:     helpers.analysis_path
+          )
+          export_link
+        end
+      end
+    end
+
+    def export_link
+      a(href: helpers.exports_path, class: 'hidden lg:flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 ' \
+                                           'text-sm font-medium text-slate-700 hover:bg-slate-50') do
+        render PhlexIcons::Lucide::Download.new(class: 'w-3.5 h-3.5 text-slate-500')
+        plain t('.export')
       end
     end
 
@@ -124,7 +137,7 @@ module Analysis
     end
 
     def metrics_grid
-      div(class: 'space-y-3 lg:space-y-0 lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-4 mb-6') do
+      div(class: 'space-y-3 lg:space-y-0 lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-4') do
         metric_card(:per_km, per_km_value, label_key: :per_km_hero, variant: :hero)
         div(class: 'grid grid-cols-2 gap-3 lg:contents') do
           metric_card(:per_day, format_currency(metrics[:per_day]))
@@ -153,19 +166,17 @@ module Analysis
     end
 
     def bar_chart_section
-      div(class: 'mb-6') do
-        render Analysis::BarChartComponent.new(
-          bars:  @insights[:monthly_bars],
-          month: @filters[:month],
-          year:  @filters[:year]
-        )
-      end
+      render Analysis::BarChartComponent.new(
+        bars:  @insights[:monthly_bars],
+        month: @filters[:month],
+        year:  @filters[:year]
+      )
     end
 
     def breakdown_section
-      div(class: 'grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6') do
-        div { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories], month: @filters[:month]) }
-        div do
+      div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5') do
+        div(class: 'lg:col-span-7') { render Analysis::CategoryBarsComponent.new(categories: @insights[:categories], month: @filters[:month]) }
+        div(id: 'platform_breakdown', class: 'hidden lg:block lg:col-span-5') do
           render Analysis::PlatformDonutComponent.new(
             platforms: @insights[:platforms],
             total:     @insights[:platforms_total],
@@ -178,7 +189,7 @@ module Analysis
     def insights_section
       return if @insights[:insights].empty?
 
-      section(class: 'mb-6 space-y-3') do
+      section(class: 'space-y-3') do
         @insights[:insights].each { |insight| render Analysis::InsightCardComponent.new(insight: insight) }
       end
     end

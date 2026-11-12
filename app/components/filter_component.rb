@@ -34,18 +34,18 @@ class FilterComponent < ApplicationComponent
 
   def popover_view
     div(class: 'lg:hidden') { popover }
-    div(class: 'hidden lg:block') { pills_form }
+    div(class: 'hidden lg:block') { pills_form(month_icon: PhlexIcons::Lucide::Calendar) }
   end
 
-  def pills_form
+  def pills_form(month_icon: nil)
     form(action: target_path, method: 'get', class: 'flex items-center gap-3', data: { controller: 'filter' }) do
       pill(icon: PhlexIcons::Lucide::Calendar) do
         select(name: 'year', class: "#{PILL} pl-8 pr-8", data: { filter_target: 'year', action: 'change->filter#handleYearChange' }) do
           year_options
         end
       end
-      pill do
-        select(name: 'month', class: "#{PILL} pl-3 pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
+      pill(icon: month_icon) do
+        select(name: 'month', class: "#{PILL} #{month_icon ? 'pl-8' : 'pl-3'} pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
           month_options
         end
       end

@@ -1,5 +1,7 @@
 module Dashboard
   class IndexView < ApplicationComponent
+    include TopbarStyles
+
     def initialize(totals:, first_name:, unread_count:, filters: {}, recent_activity: [], categories: [], today: nil,
                    monthly_goal: nil)
       @totals = totals
@@ -29,8 +31,7 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: 'mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 ' \
-                 'lg:-mx-8 lg:-mt-8 lg:mb-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200') do
+      div(class: "mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
         div(class: 'flex items-center justify-between') do
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }

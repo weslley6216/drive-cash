@@ -54,4 +54,43 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(per_day['x']).to be < per_trip['x']
     expect(per_trip['x']).to be < margin['x']
   end
+
+  it 'keeps the prototype gutter, thin bars and no platform donut on a phone in dark mode' do
+    emulate_color_scheme('dark')
+
+    visit analysis_path
+
+    title = find('h1', text: I18n.t('analysis.show_view.title'))
+    earnings_bar = first('.rounded-t.bg-emerald-500')
+
+    expect(title.evaluate_script('this.getBoundingClientRect().x').round).to eq(20)
+    expect(earnings_bar.evaluate_script('this.getBoundingClientRect().width').round).to eq(5)
+    expect(page).to have_no_css('#platform_breakdown', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'leaves the months after today out of the tab order and without a tooltip' do
+    visit analysis_path
+
+    future = first('[data-future="true"]', visible: :all)
+    past = find('[data-bar-tooltip-target="column"]', text: 'Mai')
+
+    expect(future['tabindex']).to be_nil
+    expect(future['role']).to be_nil
+    expect(past['tabindex']).to eq('0')
+  end
+
+  it 'shows the white topbar with the export shortcut and the platform donut beside the categories on a desktop screen' do
+    emulate_desktop_screen
+
+    visit analysis_path
+
+    topbar = find('h1', text: I18n.t('analysis.show_view.title')).find(:xpath, 'ancestor::div[contains(@class, "lg:bg-white")][1]')
+    categories = find('h3', text: I18n.t('analysis.show_view.categories.title')).find(:xpath, '..')
+    platforms = find('#platform_breakdown section')
+
+    expect(topbar.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
+    expect(page).to have_link(I18n.t('analysis.show_view.export'), href: exports_path)
+    expect(platforms.evaluate_script('this.getBoundingClientRect().height')).to eq(categories.evaluate_script('this.getBoundingClientRect().height'))
+  end
 end
