@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    touch-action: manipulation;
+  }
+}
+
 @layer components {
   @keyframes slide-down-toast {
     from { 

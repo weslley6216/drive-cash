@@ -23,7 +23,7 @@ RSpec.describe LayoutComponent, type: :component do
     end
 
     it 'keeps the viewport inside the safe area so the header clears the notch and clock' do
-      expect(html).to include('name="viewport" content="width=device-width,initial-scale=1"')
+      expect(html).to include('name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"')
     end
 
     it 'lets the status bar follow the device theme instead of forcing an accent color' do
