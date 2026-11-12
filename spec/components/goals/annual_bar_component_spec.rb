@@ -25,9 +25,18 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
     expect(html).to include(I18n.t('goals.index.annual.remaining_months', count: expected_months))
   end
 
-  it 'shows percentage and remaining months together in purple' do
+  it 'shows the months left phrase on a phone' do
+    expect(html).to include(I18n.t('goals.index.annual.months_left', count: 7))
+  end
+
+  it 'shows the percentage with a decimal comma in purple' do
     expect(html).to include('text-purple-700')
-    expect(html).to include('25.0%')
+    expect(html).to include('25,0%')
+  end
+
+  it 'names the metric and year on a phone and calls it the annual goal on a desktop' do
+    expect(html).to include(I18n.t('goals.index.annual.metric_year', metric: 'Lucro', year: 2026))
+    expect(html).to include(I18n.t('goals.index.annual.label_desktop'))
   end
 
   it 'renders gradient bar from purple-400 to purple-600' do

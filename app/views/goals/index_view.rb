@@ -1,5 +1,8 @@
 module Goals
   class IndexView < ApplicationComponent
+    include CardStyles
+    include TopbarStyles
+
     def initialize(progress:, filters: {}, past_monthly: [])
       @progress = progress
       @filters = filters
@@ -15,7 +18,7 @@ module Goals
           hero_section
           columns_section
         else
-          div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+          div(class: CARD) do
             render EmptyStateComponent.new(
               icon:        PhlexIcons::Lucide::Target,
               icon_color:  'text-blue-600',
@@ -30,7 +33,7 @@ module Goals
           end
         end
 
-        past_goals_section
+        past_goals_section if @past_monthly.any?
 
         turbo_frame_tag 'modal'
       end
@@ -43,19 +46,26 @@ module Goals
     end
 
     def header_section
-      div(class: 'mb-6 flex items-center justify-between') do
-        div do
-          h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('goals.index.title') }
+      div(class: "mb-3 flex items-start justify-between gap-3 lg:items-center lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
+        div(class: 'min-w-0') do
+          h1(class: 'text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight') { t('goals.index.title') }
           p(class: 'text-sm text-slate-500 mt-0.5') { subtitle_text }
         end
-        link_to(
-          helpers.new_goal_path,
-          data:  { turbo_frame: 'modal' },
-          class: 'inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold'
-        ) do
-          render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
-          plain t('goals.index.empty.cta')
-        end
+        new_goal_button
+        link_to(t('goals.index.new_goal'), helpers.new_goal_path,
+                data:  { turbo_frame: 'modal' },
+                class: 'hidden lg:inline text-sm font-medium text-blue-600 hover:underline')
+      end
+    end
+
+    def new_goal_button
+      link_to(helpers.new_goal_path,
+              data:  { turbo_frame: 'modal', new_goal_button: true },
+              aria:  { label: t('goals.index.new_goal_aria') },
+              class: 'relative lg:hidden w-9 h-9 flex-shrink-0 rounded-full bg-white border border-slate-200 shadow-sm ' \
+                          'flex items-center justify-center text-slate-600') do
+        span(class: 'absolute -inset-[5px]')
+        render PhlexIcons::Lucide::Plus.new(class: 'w-[18px] h-[18px]')
       end
     end
 
@@ -75,7 +85,7 @@ module Goals
     end
 
     def columns_section
-      div(class: 'grid grid-cols-12 gap-4 mb-6') do
+      div(class: 'grid grid-cols-12 gap-4 lg:gap-5 mb-6') do
         div(class: 'col-span-12 lg:hidden') do
           render Goals::MonthlyGoalCardComponent.new(progress: @progress[:monthly]) if @progress[:monthly]
         end
@@ -91,29 +101,27 @@ module Goals
       weekly = @progress[:weekly]
       goal = weekly[:goal]
 
-      div(class: 'col-span-12 lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-5') do
+      div(class: "col-span-12 lg:col-span-5 #{CARD} #{DESKTOP_FLAT} p-4 lg:p-5") do
         div(class: 'flex items-center justify-between mb-3') do
           div(class: 'flex items-center gap-2') do
             div(class: 'w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600') do
-              render PhlexIcons::Lucide::Calendar.new(class: 'w-4 h-4')
+              render PhlexIcons::Lucide::Calendar.new(class: 'w-4 h-4 lg:w-3.5 lg:h-3.5')
             end
             div do
               p(class: 'text-sm font-semibold text-slate-800') { t('goals.index.weekly.label') }
               p(class: 'text-xs text-slate-500 lg:hidden') { weekly_period_label(goal) }
-              p(class: 'hidden lg:block text-xs text-slate-500') do
-                plain "#{weekly_period_label(goal)} · #{t('goals.index.weekly.progress', value: format_currency(weekly[:current]), target: format_currency(weekly[:target]))}"
-              end
+              p(class: 'hidden lg:block text-xs text-slate-500') { weekly_desktop_summary(weekly) }
             end
           end
           div(class: 'flex items-center gap-2') do
-            span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full') do
-              plain "#{weekly[:percent].to_f.round(1)}%"
+            span(class: 'text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 lg:py-0.5 rounded-full') do
+              plain "#{format_percentage(weekly[:percent].to_f)}%"
             end
             unless goal.ended?
               link_to(helpers.edit_goal_path(goal),
-                      class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
-                      aria_label: t('goals.index.edit_aria'),
-                      data:       { turbo_frame: 'modal' }) do
+                      class: 'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+                      aria:  { label: t('goals.index.edit_aria') },
+                      data:  { turbo_frame: 'modal' }) do
                 render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
               end
             end
@@ -145,6 +153,15 @@ module Goals
       end
     end
 
+    def weekly_desktop_summary(weekly)
+      goal = weekly[:goal]
+      t('goals.index.weekly.desktop_summary',
+        start:  goal.period_start.day,
+        end:    I18n.l(goal.period_end, format: '%-d %B'),
+        value:  format_currency_short(weekly[:current]),
+        target: format_currency_short(weekly[:target]))
+    end
+
     def weekly_period_label(goal)
       start_day = I18n.l(goal.period_start, format: '%-d')
       end_label = I18n.l(goal.period_end, format: t('goals.index.weekly.date_format'))
@@ -154,14 +171,8 @@ module Goals
     def past_goals_section
       div(class: 'mt-8') do
         h2(class: 'text-lg font-semibold text-slate-800 mb-3') { t('goals.index.past_goals.title') }
-        if @past_monthly.empty?
-          div(class: 'bg-white rounded-2xl border border-slate-100 p-6 text-center text-sm text-slate-500') do
-            plain t('goals.index.past_goals.empty')
-          end
-        else
-          div(class: 'bg-white rounded-2xl border border-slate-100 overflow-hidden divide-y divide-slate-100') do
-            @past_monthly.each { |row| past_goal_row(row) }
-          end
+        div(class: 'bg-white rounded-2xl border border-slate-100 overflow-hidden divide-y divide-slate-100') do
+          @past_monthly.each { |row| past_goal_row(row) }
         end
       end
     end

@@ -1,12 +1,14 @@
 module Goals
   class WeeklyBarsComponent < ApplicationComponent
+    TARGET_SHARE_PER_BAR = 5
+
     def initialize(days:, target:)
       @days = days
       @target = target
     end
 
     def view_template
-      div(class: 'grid grid-cols-7 gap-1.5') do
+      div(class: 'grid grid-cols-7 gap-1.5 lg:gap-2 lg:mt-4') do
         @days.first(7).each { |day_data| render_bar(day_data) }
       end
     end
@@ -14,17 +16,14 @@ module Goals
     private
 
     def render_bar(day_data)
-      ratio = @target.to_f.positive? ? (day_data[:value].to_f / @target).clamp(0, 1) : 0
-      height_pct = (ratio * 100).round
-      height_style = height_pct.positive? ? "height: #{height_pct}%" : 'height: 8px'
       state = bar_state(day_data)
 
       div(class: 'flex flex-col items-center gap-1') do
-        div(class: 'w-full flex items-end justify-center', style: 'height: 60px') do
+        div(class: 'w-full flex items-end justify-center h-[60px] lg:h-[70px]') do
           div(
             data:  { day_bar: day_data[:date].iso8601 },
             class: bar_classes(state),
-            style: height_style
+            style: "height: #{height_percent(day_data[:value])}%"
           )
         end
         span(class: "lg:hidden text-[10px] font-medium #{label_color(state)}") do
@@ -36,6 +35,13 @@ module Goals
       end
     end
 
+    def height_percent(value)
+      bar_reference = @target.to_f / TARGET_SHARE_PER_BAR
+      return 0 unless bar_reference.positive?
+
+      ((value.to_f / bar_reference).clamp(0, 1) * 100).round
+    end
+
     def bar_state(day_data)
       return :today if day_data[:today]
       return :done if day_data[:done]
@@ -44,7 +50,7 @@ module Goals
     end
 
     def bar_classes(state)
-      base = 'w-full rounded'
+      base = 'w-full rounded min-h-2'
       case state
       when :done then "#{base} bg-emerald-500"
       when :today then "#{base} bg-blue-200 border-2 border-blue-500 border-dashed"

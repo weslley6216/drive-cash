@@ -35,6 +35,15 @@ RSpec.describe Goals::WeeklyBarsComponent, type: :component do
     expect(html).to include(three_letters)
   end
 
+  it 'scales each bar against a fifth of the weekly target' do
+    expect(html).to include('height: 36%')
+    expect(html).to include('height: 71%')
+  end
+
+  it 'caps the bar at the full column height' do
+    expect(html.scan('height: 100%').size).to eq(5)
+  end
+
   it 'labels today with blue text' do
     expect(html).to include('text-blue-600')
   end

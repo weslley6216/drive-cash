@@ -11,7 +11,7 @@ RSpec.describe Goals::ProgressRingComponent, type: :component do
     end
 
     it 'shows the percent value as label' do
-      expect(html).to include('60</span>')
+      expect(html).to include('>60<span')
     end
   end
 
@@ -31,19 +31,19 @@ RSpec.describe Goals::ProgressRingComponent, type: :component do
     it 'clamps percent above 100 to 100' do
       output = view_context.render(described_class.new(percent: 150))
 
-      expect(output).to include('100</span>')
+      expect(output).to include('>100<span')
     end
 
     it 'clamps percent below 0 to 0' do
       output = view_context.render(described_class.new(percent: -5))
 
-      expect(output).to include('0</span>')
+      expect(output).to include('>0<span')
     end
 
     it 'accepts string-like numeric input' do
       output = view_context.render(described_class.new(percent: '42'))
 
-      expect(output).to include('42</span>')
+      expect(output).to include('>42<span')
     end
   end
 

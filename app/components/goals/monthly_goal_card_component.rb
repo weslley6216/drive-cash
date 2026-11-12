@@ -1,6 +1,9 @@
 module Goals
   class MonthlyGoalCardComponent < ApplicationComponent
-    RING_SIZES = { compact: 120, wide: 200 }.freeze
+    BADGE_SIZES = {
+      compact: { box: 'mt-3 px-2.5 py-1.5 gap-1.5', icon: 'w-3 h-3', text: 'text-xs' },
+      wide:    { box: 'mt-4 px-3 py-2 gap-2', icon: 'w-3.5 h-3.5', text: 'text-sm' }
+    }.freeze
 
     def initialize(progress:, variant: :compact)
       @progress = progress
@@ -14,7 +17,7 @@ module Goals
     private
 
     def compact_template
-      div(class: 'bg-white rounded-2xl border-2 border-blue-200 shadow-sm p-6 space-y-4') do
+      div(class: 'bg-white rounded-2xl border-2 border-blue-200 p-5 shadow-sm') do
         card_header
         ring_section
         metrics_grid
@@ -36,8 +39,10 @@ module Goals
               edit_link
             end
             p(class: 'text-4xl font-bold text-slate-900 tracking-tight tabular-nums') { format_currency(@progress[:current]) }
-            p(class: 'text-sm text-slate-500 mt-1') { t('goals.index.monthly.of_target', target: format_currency(@progress[:target])) }
-            projection_badge(mt: 'mt-4')
+            p(class: 'text-sm text-slate-500 mt-1') do
+              t('goals.index.monthly.of_target_metric', target: format_currency(@progress[:target]), metric: metric_label.downcase)
+            end
+            projection_badge
           end
           div(class: 'col-span-12 lg:col-span-4') do
             wide_metrics
@@ -62,14 +67,14 @@ module Goals
     end
 
     def card_header
-      div(class: 'flex items-center justify-between') do
+      div(class: 'flex items-center justify-between mb-3') do
         div(class: 'flex items-center gap-2') do
           div(class: 'w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600') do
             render PhlexIcons::Lucide::Target.new(class: 'w-4 h-4')
           end
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider') { t('goals.index.monthly.label') }
-            p(class: 'text-sm font-semibold text-slate-700') { I18n.l(@progress[:goal].period_start, format: '%B') }
+            p(class: 'text-sm font-semibold text-slate-700') { metric_label }
           end
         end
         div(class: 'flex items-center gap-2') do
@@ -87,9 +92,9 @@ module Goals
       return if @progress[:goal].ended?
 
       link_to(helpers.edit_goal_path(@progress[:goal]),
-              class:      'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
-              aria_label: t('goals.index.edit_aria'),
-              data:       { turbo_frame: 'modal' }) do
+              class: 'w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700',
+              aria:  { label: t('goals.index.edit_aria') },
+              data:  { turbo_frame: 'modal' }) do
         render PhlexIcons::Lucide::Pencil.new(class: 'w-[14px] h-[14px]')
       end
     end
@@ -105,47 +110,56 @@ module Goals
       end
     end
 
-    def projection_badge(mt: 'mt-3')
-      return reached_badge(mt) if @progress[:reached]
-      return missed_badge(mt) if @progress[:ended]
-      return tracking_badge(mt) if @progress[:tracking]
+    def projection_badge
+      return reached_badge if @progress[:reached]
+      return missed_badge if @progress[:ended]
+      return tracking_badge if @progress[:tracking]
 
-      classic_projection_badge(mt)
+      classic_projection_badge
     end
 
-    def reached_badge(mt)
-      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-emerald-50 border-emerald-200 text-emerald-700") do
-        render PhlexIcons::Lucide::Check.new(class: 'w-3 h-3', 'stroke-width': '2.5')
-        span(class: 'text-xs font-medium') { t('goals.index.monthly.reached', surplus: format_currency(@progress[:surplus])) }
+    def reached_badge
+      badge('bg-emerald-50 border-emerald-200 text-emerald-700', PhlexIcons::Lucide::Check) do
+        t('goals.index.monthly.reached', surplus: format_currency(@progress[:surplus]))
       end
     end
 
-    def missed_badge(mt)
-      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-rose-50 border-rose-200 text-rose-700") do
-        span(class: 'text-xs font-medium') { t('goals.index.monthly.missed', shortfall: format_currency([@progress[:target] - @progress[:current], 0].max)) }
+    def missed_badge
+      badge('bg-rose-50 border-rose-200 text-rose-700') do
+        t('goals.index.monthly.missed', shortfall: format_currency([@progress[:target] - @progress[:current], 0].max))
       end
     end
 
-    def tracking_badge(mt)
-      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 bg-slate-50 border-slate-200 text-slate-600") do
-        render PhlexIcons::Lucide::Clock.new(class: 'w-3 h-3', 'stroke-width': '2.5')
-        span(class: 'text-xs font-medium') { t('goals.index.monthly.tracking') }
-      end
+    def tracking_badge
+      badge('bg-slate-50 border-slate-200 text-slate-600', PhlexIcons::Lucide::Clock) { t('goals.index.monthly.tracking') }
     end
 
-    def classic_projection_badge(mt)
+    def classic_projection_badge
       on_track = @progress[:on_track]
       key = on_track ? 'goals.index.monthly.on_track_projection' : 'goals.index.monthly.at_risk_projection'
       colors = on_track ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'
 
-      div(class: "#{mt} px-2.5 py-1.5 border rounded-lg inline-flex items-center gap-1.5 #{colors}") do
-        render PhlexIcons::Lucide::TrendingUp.new(class: 'w-3 h-3', 'stroke-width': '2.5')
-        span(class: 'text-xs font-medium') { t(key, value: format_currency(@progress[:projection])) }
+      badge(colors, PhlexIcons::Lucide::TrendingUp) { t(key, value: projection_text) }
+    end
+
+    def badge(colors, icon = nil, &)
+      size = BADGE_SIZES.fetch(@variant)
+      div(class: "#{size[:box]} border rounded-lg inline-flex items-center #{colors}") do
+        render icon.new(class: size[:icon], 'stroke-width': '2.5') if icon
+        span(class: "#{size[:text]} font-medium", &)
       end
     end
 
+    def projection_text
+      @variant == :wide ? format_currency(@progress[:projection]) : format_currency_short(@progress[:projection])
+    end
+
+    def metric_label
+      t("goals.index.monthly.sublabel_#{@progress[:goal].metric}")
+    end
+
     def metrics_grid
-      div(class: 'grid grid-cols-3 pt-4 border-t border-slate-100') do
+      div(class: 'mt-4 pt-4 border-t border-slate-100 grid grid-cols-3 gap-3') do
         metric_block(t('goals.index.monthly.remaining'), format_currency([@progress[:target] - @progress[:current], 0].max))
         metric_block(t('goals.index.monthly.per_day'), format_currency(@progress[:remaining_per_day]), middle: true)
         metric_block(t('goals.index.monthly.current_pace'), format_currency(pace))
@@ -155,7 +169,7 @@ module Goals
     def metric_block(label, value, middle: false)
       border = middle ? ' border-x border-slate-100' : ''
       div(class: "text-center#{border}") do
-        p(class: 'text-[10px] font-semibold uppercase tracking-wide text-slate-500') { label }
+        p(class: 'text-[10px] font-medium uppercase tracking-wide text-slate-500') { label }
         p(class: 'text-sm font-bold text-slate-800 mt-0.5') { value }
       end
     end

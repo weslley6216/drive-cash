@@ -17,6 +17,15 @@ RSpec.describe Goals::IndexView, type: :component do
       expect(html).to include('href="/goals/new"')
     end
 
+    it 'omits the past goals section without past goals' do
+      expect(html).not_to include(I18n.t('goals.index.past_goals.title'))
+    end
+
+    it 'offers a new goal from the header' do
+      expect(html).to include(I18n.t('goals.index.new_goal'))
+      expect(html).to include(%(aria-label="#{I18n.t('goals.index.new_goal_aria')}"))
+    end
+
     it 'renders bottom nav with goals active' do
       expect(html).to include('href="/goals"')
       expect(html).to include('text-blue-600')
@@ -83,11 +92,19 @@ RSpec.describe Goals::IndexView, type: :component do
 
     it 'renders weekly label and percentage' do
       expect(html).to include(I18n.t('goals.index.weekly.label'))
-      expect(html).to include('35.0%')
+      expect(html).to include('35,0%')
     end
 
     it 'renders the weekly period date range' do
       expect(html).to include("#{weekly_goal.period_start.day} a #{weekly_goal.period_end.day} de")
+    end
+
+    it 'renders the compact desktop period with rounded amounts' do
+      start_day = weekly_goal.period_start.day
+      end_label = I18n.l(weekly_goal.period_end, format: '%-d %B')
+      expected = I18n.t('goals.index.weekly.desktop_summary', start: start_day, end: end_label, value: 'R$ 500', target: 'R$ 1.400')
+
+      expect(html).to include(expected)
     end
 
     it 'renders weekly progress amounts side by side' do
@@ -143,6 +160,7 @@ RSpec.describe Goals::IndexView, type: :component do
     end
 
     it 'renders the missed chip with percentage' do
+      expect(html).to include(I18n.t('goals.index.past_goals.title'))
       expect(html).to include(I18n.t('goals.index.past_goals.achieved_no', percent: 60))
     end
   end

@@ -12,7 +12,7 @@ RSpec.describe 'Goals', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('href="/goals"')
       expect(response.body).to include('text-blue-600')
-      expect(response.body).to include(I18n.t('goals.index.empty.cta'))
+      expect(response.body).to include(I18n.t('goals.index.new_goal'))
       expect(response.body).to include(I18n.t('empty_states.goals.title'))
       expect(response.body).to include(I18n.t('empty_states.goals.cta'))
     end
