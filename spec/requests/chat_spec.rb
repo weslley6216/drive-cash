@@ -172,6 +172,13 @@ RSpec.describe 'Chats', type: :request do
   end
 
   describe 'POST /chat/confirm' do
+    let(:parser_mock) { instance_double(Ai::ParserService) }
+
+    before do
+      allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
+      allow(parser_mock).to receive(:call).and_return({ type: :text, content: 'Posso ajudar com mais alguma coisa?' })
+    end
+
     context 'when persisting a confirmed expense' do
       it 'associates the expense to current_user' do
         post chat_confirm_path,
@@ -354,6 +361,17 @@ RSpec.describe 'Chats', type: :request do
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
         expect(response.body).to include(I18n.t('expenses.installments.errors.invalid_repeat_max'))
+      end
+    end
+
+    context 'when the confirmation triggers the auto-continue' do
+      let(:params) { { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } } }
+
+      it 'asks the parser to continue and renders its answer' do
+        post chat_confirm_path, params: params, as: :turbo_stream
+
+        expect(parser_mock).to have_received(:call)
+        expect(response.body).to include('Posso ajudar com mais alguma coisa?')
       end
     end
   end
