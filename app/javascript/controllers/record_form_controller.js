@@ -6,13 +6,17 @@ const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
 const TOGGLE_INACTIVE = ['text-slate-500']
 
 export default class extends Controller {
-  static values = { type: String, activeVendor: String, selectedCategory: String }
+  static values = {
+    type: String, activeVendor: String, selectedCategory: String,
+    months: Array, dayNames: Array, today: String, todayLabel: String, yesterdayLabel: String
+  }
   static targets = [
     'typeInput', 'earningFields', 'expenseFields',
     'submit', 'tripsValue', 'tripsInput',
     'earningToggle', 'expenseToggle', 'amountTheme',
     'amountDisplay', 'amountInput',
-    'vendorInput', 'vendorHint', 'vendorSuggest', 'vendorSuggestLabel'
+    'vendorInput', 'vendorHint', 'vendorSuggest', 'vendorSuggestLabel',
+    'dateRelative', 'dateText'
   ]
 
   connect() {
@@ -100,8 +104,29 @@ export default class extends Controller {
     return this.selectedCategoryValue === 'fuel'
   }
 
+  refreshDate(event) {
+    const value = event.target.value
+    if (!value || !this.hasDateTextTarget) return
+
+    const [year, month, day] = value.split('-').map(Number)
+    const picked = Date.UTC(year, month - 1, day)
+    const [todayYear, todayMonth, todayDay] = this.todayValue.split('-').map(Number)
+    const daysAgo = Math.round((Date.UTC(todayYear, todayMonth - 1, todayDay) - picked) / 86400000)
+    const weekday = this.dayNamesValue[new Date(picked).getUTCDay()]
+
+    this.dateTextTarget.textContent = `${day} ${this.monthsValue[month - 1]} ${year}`
+    if (daysAgo === 0) this.dateRelativeTarget.textContent = this.todayLabelValue
+    else if (daysAgo === 1) this.dateRelativeTarget.textContent = this.yesterdayLabelValue
+    else this.dateRelativeTarget.textContent = weekday.charAt(0).toUpperCase() + weekday.slice(1)
+  }
+
+  openDatePicker(event) {
+    try { event.target.showPicker() } catch { }
+  }
+
   applyType(type) {
     const isEarn = type === 'earning'
+    this.element.dataset.type = type
     this.earningFieldsTarget.classList.toggle('hidden', !isEarn)
     this.expenseFieldsTarget.classList.toggle('hidden', isEarn)
     this.toggleFieldset(this.earningFieldsTarget, !isEarn)

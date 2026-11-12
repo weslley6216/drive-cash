@@ -4,20 +4,20 @@ pt-BR:
       title: "Metas"
       subtitle: "%{month_name} · %{year}"
       edit_aria: "Editar meta"
+      new_goal: "+ Nova meta"
+      new_goal_aria: "Nova meta"
       past_goals:
         title: "Metas anteriores"
-        empty: "Nenhuma meta passada ainda."
         target_label: "Alvo"
         achieved_label: "Atingido"
         achieved_yes: "✅ batida"
         achieved_no: "❌ %{percent}%%"
       monthly:
         label: "Meta do mês"
-        sublabel: "Lucro líquido"
         sublabel_profit: "Lucro líquido"
         sublabel_earnings: "Receita bruta"
-        sublabel_expenses: "Despesas"
         of_target: "de %{target}"
+        of_target_metric: "de %{target} de %{metric}"
         days_left:
           one: "%{count} dia restante"
           other: "%{count} dias restantes"
@@ -35,8 +35,14 @@ pt-BR:
         remaining: "%{value} restantes"
         period_range: "%{start} a %{end}"
         date_format: "%-d de %B"
+        desktop_summary: "%{start}-%{end} · %{value} de %{target}"
       annual:
         label: "Meta do ano"
+        label_desktop: "Meta anual"
+        metric_year: "%{metric} %{year}"
+        months_left:
+          one: "falta %{count} mês"
+          other: "faltam %{count} meses"
         of_target: "de %{target}"
         remaining_months:
           one: "%{count} mês restante"
@@ -47,8 +53,6 @@ pt-BR:
         streak_7d: "Sequência %{days} dias"
         goal_completed: "Meta de %{period}"
         best_day: "Melhor dia: R$ %{value}"
-      empty:
-        cta: "Criar meta"
       form:
         title_new: "Nova meta"
         title_edit: "Editar meta"

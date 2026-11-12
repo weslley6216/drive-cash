@@ -10,7 +10,7 @@ module History
     end
 
     def view_template
-      div(class: 'flex items-center gap-2 mt-2 overflow-x-auto pb-1') do
+      div(class: 'flex gap-2 overflow-x-auto -mx-1 px-1 lg:flex-wrap lg:overflow-visible lg:mx-0 lg:px-0') do
         FILTERS.each { |filter| chip(filter) }
       end
     end
@@ -26,7 +26,7 @@ module History
     end
 
     def base_classes
-      'whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors'
+      'whitespace-nowrap rounded-full lg:rounded-lg px-3 py-1.5 text-xs font-medium transition-colors'
     end
 
     def active_classes

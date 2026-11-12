@@ -38,10 +38,8 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025)
 
-      expect(response.body).to include('+ R$')
-      expect(response.body).to include('− R$')
-      expect(response.body).to include('200,00')
-      expect(response.body).to include('80,00')
+      expect(response.body).to include('+R$ 200<')
+      expect(response.body).to include('−R$ 80<')
     end
 
     it 'filters by earnings only' do
@@ -127,7 +125,7 @@ RSpec.describe 'History', type: :request do
     it 'renders the FAB positioned above the bottom nav' do
       get history_path
 
-      expect(response.body).to include('fixed bottom-24 right-6')
+      expect(response.body).to include('fixed bottom-24 right-5')
     end
 
     it 'renders the no-results empty state when a filter matches nothing' do

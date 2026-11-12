@@ -4,6 +4,8 @@ pt-BR:
       title: "Novo lançamento"
       close: "Fechar"
       save: "Salvar"
+      cancel: "Cancelar"
+      date_label: "Data"
       type_toggle:
         earning: "Receita"
         expense: "Despesa"
@@ -13,6 +15,7 @@ pt-BR:
       category_label: "Categoria"
       details: "Detalhes"
       trips_count: "Qtd. de rotas"
+      trips_count_long: "Quantidade de rotas"
       vendor_label: "Estabelecimento"
       vendor_placeholder: "Ex: Posto Orense"
       vendor_inherited: "Preenchido do seu último abastecimento"
@@ -31,7 +34,6 @@ pt-BR:
       installment:
         period_label: "Período entre parcelas"
         repetitions_label: "Número de parcelas"
-        repeat_label: "Parcelar ou repetir (compromissos futuros)"
         repeat_hint: "Cada parcela fica como \"a pagar\" até você marcar como paga."
         periods:
           weekly: "Semanal"

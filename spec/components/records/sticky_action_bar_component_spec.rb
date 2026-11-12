@@ -21,6 +21,13 @@ RSpec.describe Records::StickyActionBarComponent, type: :component do
     expect(html).to include('border-t border-slate-100 bg-white')
   end
 
+  it 'offers a cancel link back home on desktop' do
+    html = view_context.render(described_class.new(theme: :red))
+
+    expect(html).to include(I18n.t('records.new_view.cancel'))
+    expect(html).to include('href="/"')
+  end
+
   it 'exposes Stimulus target for theming' do
     html = view_context.render(described_class.new(theme: :red))
 

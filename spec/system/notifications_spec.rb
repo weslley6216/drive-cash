@@ -21,7 +21,8 @@ RSpec.describe 'Notifications', type: :system, js: true do
     click_on I18n.t('notifications.kinds.log_reminder.title')
 
     expect(page).to have_current_path('/records/new?date=2026-11-10')
-    expect(page).to have_field('record[date]', with: '2026-11-10')
+    expect(page).to have_field('record[date]', with: '2026-11-10', visible: :all)
+    expect(page).to have_text('10 nov 2026')
     expect(notification.reload.read_at).to be_present
   end
 

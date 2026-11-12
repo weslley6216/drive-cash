@@ -35,7 +35,9 @@ RSpec.describe History::PeriodSummaryComponent, type: :component do
     expect(html).to include('grid-cols-3')
   end
 
-  it 'uses compact value size to prevent overflow in the 3-column layout' do
-    expect(html).to include('text-sm')
+  it 'uses the compact phone sizes and the larger desktop value' do
+    expect(html).to include('text-[10px]')
+    expect(html).to include('text-sm font-bold text-emerald-900')
+    expect(html).to include('lg:text-2xl')
   end
 end

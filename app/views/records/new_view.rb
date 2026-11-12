@@ -1,5 +1,12 @@
 module Records
   class NewView < ApplicationView
+    include CardStyles
+
+    DETAIL_CARD = "#{CardStyles::CARD} p-3 lg:bg-slate-50 lg:border-slate-200 lg:shadow-none".freeze
+    DETAIL_LABEL = 'text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-1 block lg:font-semibold lg:mb-0'.freeze
+    INSTALLMENT_INPUT = 'w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all border-slate-300 ' \
+                        'text-slate-900 focus:ring-red-500 focus:border-red-500 bg-white'.freeze
+
     def initialize(type:, earning: nil, expense: nil, context: nil, active_vendor: nil)
       @type = type.to_s
       @earning = earning || Earning.new(date: Date.current)
@@ -10,15 +17,20 @@ module Records
 
     def view_template
       render LayoutComponent.new(title: t('records.new_view.title'), app_shell: true) do
-        div(class: 'h-full flex flex-col bg-white max-w-[640px] mx-auto w-full', data: stimulus_data) do
-          form_with(url: records_path, method: :post, scope: :record, html: { class: 'h-full flex flex-col' }) do
-            input(type: 'hidden', name: 'context[year]', value: @context[:year])
-            input(type: 'hidden', name: 'context[month]', value: @context[:month])
+        div(class: 'h-full flex flex-col bg-white max-w-[640px] mx-auto w-full lg:max-w-none lg:bg-black/30 lg:items-center lg:justify-center lg:p-8') do
+          div(class: 'group/record h-full flex flex-col w-full min-h-0 lg:h-auto lg:max-h-full lg:max-w-2xl lg:bg-white lg:rounded-2xl ' \
+                     'lg:shadow-2xl lg:border lg:border-slate-200 lg:overflow-hidden',
+              data:  stimulus_data) do
+            form_with(url: records_path, method: :post, scope: :record, html: { class: 'h-full flex flex-col min-h-0' }) do
+              input(type: 'hidden', name: 'context[year]', value: @context[:year])
+              input(type: 'hidden', name: 'context[month]', value: @context[:month])
 
-            top_bar
-            type_toggle_section
-            scrollable_body
-            render Records::StickyActionBarComponent.new(theme: cta_theme)
+              top_bar
+              desktop_header
+              type_toggle_section
+              scrollable_body
+              render Records::StickyActionBarComponent.new(theme: cta_theme)
+            end
           end
         end
       end
@@ -31,9 +43,15 @@ module Records
 
     def stimulus_data
       { controller:                          'record-form',
+        type:                                @type,
         record_form_type_value:              @type,
         record_form_active_vendor_value:     @active_vendor,
-        record_form_selected_category_value: @expense.category.to_s }
+        record_form_selected_category_value: @expense.category.to_s,
+        record_form_months_value:            I18n.t('date.abbr_month_names').compact.to_json,
+        record_form_day_names_value:         I18n.t('date.day_names').to_json,
+        record_form_today_value:             Date.current.iso8601,
+        record_form_today_label_value:       t('records.new_view.today'),
+        record_form_yesterday_label_value:   t('common.yesterday') }
     end
 
     def cta_theme
@@ -41,7 +59,7 @@ module Records
     end
 
     def top_bar
-      div(class: 'px-5 pt-2 pb-3 flex items-center justify-between') do
+      div(class: 'px-5 pt-2 pb-3 flex items-center justify-between lg:hidden') do
         link_to(root_path, class: 'p-1 -ml-1 text-slate-500', aria: { label: t('records.new_view.close') }) do
           render PhlexIcons::Lucide::X.new(class: 'w-6 h-6')
         end
@@ -53,14 +71,23 @@ module Records
       end
     end
 
+    def desktop_header
+      div(class: 'hidden lg:flex items-center justify-between px-6 py-4 border-b border-slate-100') do
+        h2(class: 'text-lg font-bold text-slate-900') { t('records.new_view.title') }
+        link_to(root_path, class: 'text-slate-400 hover:text-slate-700', aria: { label: t('records.new_view.close') }) do
+          render PhlexIcons::Lucide::X.new(class: 'w-5 h-5')
+        end
+      end
+    end
+
     def type_toggle_section
-      div(class: 'px-5 pb-3') do
+      div(class: 'px-5 pb-3 lg:px-6 lg:pt-6 lg:pb-0') do
         render Records::EntryTypeToggleComponent.new(active: @type)
       end
     end
 
     def scrollable_body
-      div(class: 'flex-1 overflow-y-auto px-5 pb-6 space-y-5') do
+      div(class: 'flex-1 min-h-0 overflow-y-auto px-5 pb-6 space-y-5 lg:px-6 lg:pt-5') do
         amount_and_date_section
         earning_block
         expense_block
@@ -69,25 +96,38 @@ module Records
     end
 
     def amount_and_date_section
-      div(class: 'sm:grid sm:grid-cols-2 sm:gap-4 sm:items-start') do
+      div(class: 'py-4 text-center lg:py-0 lg:text-left lg:grid lg:grid-cols-3 lg:gap-4') do
         render Records::AmountInputComponent.new(amount: shared_amount, theme: cta_theme)
         date_cell
       end
     end
 
     def date_cell
-      label(class: 'block cursor-pointer py-4') do
-        div(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 text-center flex items-center justify-center gap-1') do
-          render PhlexIcons::Lucide::Calendar.new(class: 'w-3 h-3')
-          plain t('records.new_view.today')
+      label(class: 'relative mt-2 inline-flex cursor-pointer lg:mt-0 lg:flex lg:flex-col') do
+        span(class: 'hidden lg:block text-xs font-semibold uppercase tracking-wide text-slate-600 mb-1.5') { t('records.new_view.date_label') }
+        span(class: 'inline-flex items-center gap-1 text-xs text-slate-400 lg:flex lg:flex-col lg:items-start lg:justify-center lg:gap-0 ' \
+                    'lg:w-full lg:h-[78px] lg:rounded-xl lg:border lg:border-slate-200 lg:bg-white lg:px-3 lg:text-sm') do
+          render PhlexIcons::Lucide::Calendar.new(class: 'w-3 h-3 lg:hidden')
+          span(class: 'lg:text-[11px] lg:leading-5', data: { record_form_target: 'dateRelative' }) { relative_date_label }
+          span(class: 'lg:hidden') { '·' }
+          span(class: 'lg:text-slate-900 lg:font-medium', data: { record_form_target: 'dateText' }) { I18n.l(shared_date, format: '%-d %b %Y') }
         end
         input(
           type:  'date',
           name:  'record[date]',
           value: shared_date.to_s,
-          class: 'w-full text-sm text-slate-700 bg-transparent border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400'
+          aria:  { label: t('records.new_view.date_label') },
+          class: 'absolute inset-0 w-full h-full opacity-0 cursor-pointer',
+          data:  { action: 'change->record-form#refreshDate click->record-form#openDatePicker' }
         )
       end
+    end
+
+    def relative_date_label
+      return t('records.new_view.today') if shared_date == Date.current
+      return t('common.yesterday') if shared_date == Date.current - 1
+
+      I18n.t('date.day_names')[shared_date.wday].capitalize
     end
 
     def shared_amount
@@ -115,32 +155,34 @@ module Records
         details_section do
           vendor_card
           description_card
+        end
+        div(class: 'mt-3 space-y-3') do
           paid_toggle
           installment_section
         end
       end
     end
 
-    def details_section(&block)
-      div(class: 'mt-4 space-y-3') do
-        p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider') { t('records.new_view.details') }
-        yield
+    def details_section(&)
+      div(class: 'mt-5 space-y-3') do
+        p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider lg:hidden') { t('records.new_view.details') }
+        div(class: 'space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3', &)
       end
     end
 
     def notes_card
-      div(class: 'rounded-xl border border-slate-200 bg-white p-3') do
-        label(class: 'text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-1 block') { t('records.new_view.notes_label') }
+      div(class: DETAIL_CARD) do
+        label(class: DETAIL_LABEL) { t('records.new_view.notes_label') }
         textarea(name: 'record[notes]', rows: 2, class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none resize-none', placeholder: t('records.new_view.notes_placeholder')) { @earning.notes }
       end
     end
 
     def vendor_card
-      div(class: 'rounded-xl border border-slate-200 bg-white p-3') do
-        label(class: 'text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-1 block') { t('records.new_view.vendor_label') }
+      div(class: DETAIL_CARD) do
+        label(class: DETAIL_LABEL) { t('records.new_view.vendor_label') }
         input(type: 'text', name: 'record[vendor]', value: @expense.vendor,
               placeholder: t('records.new_view.vendor_placeholder'),
-              class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none',
+              class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none lg:mt-1 lg:font-medium lg:text-slate-900',
               data: { record_form_target: 'vendorInput',
                       action:             'input->record-form#refreshVendorUi' })
         vendor_inheritance_hint
@@ -170,8 +212,8 @@ module Records
     end
 
     def description_card
-      div(class: 'rounded-xl border border-slate-200 bg-white p-3') do
-        label(class: 'text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-1 block') { t('records.new_view.description_label') }
+      div(class: DETAIL_CARD) do
+        label(class: DETAIL_LABEL) { t('records.new_view.description_label') }
         textarea(name: 'record[description]', rows: 2, class: 'w-full text-sm text-slate-800 bg-transparent focus:outline-none resize-none', placeholder: t('records.new_view.description_placeholder')) { @expense.description }
       end
     end
@@ -194,41 +236,36 @@ module Records
 
     def installment_section
       div(
-        class: 'rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3',
+        class: 'rounded-xl border border-slate-200 bg-slate-50 px-4 py-3',
         data:  { controller: 'expense-installment', action: 'change->expense-installment#toggle' }
       ) do
-        p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-2') do
-          t('records.new_view.recurring_toggle.title')
-        end
-        div(class: 'flex items-start gap-3') do
-          raw helpers.check_box_tag('installment[repeat]', '1', false, id: 'installment_repeat', class: 'mt-1 rounded border-slate-300 text-red-600 focus:ring-red-500')
-          label(for: 'installment_repeat', class: 'text-sm text-slate-700 cursor-pointer leading-relaxed') { t('records.new_view.installment.repeat_label') }
-        end
-        div(class: 'hidden space-y-3 pl-7 border-l-2 border-slate-200 ml-2', data: { expense_installment_target: 'fields' }) do
-          div(class: 'mb-4') do
-            label(class: 'block text-sm font-medium mb-2 text-slate-700') { t('records.new_view.installment.period_label') }
-            raw helpers.select_tag(
-              'installment[period]',
-              helpers.options_for_select(
-                Expense::INSTALLMENT_PERIODS.map { |period| [t("records.new_view.installment.periods.#{period}"), period] },
-                'monthly'
-              ),
-              class: 'w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all border-slate-300 text-slate-900 focus:ring-red-500 focus:border-red-500 bg-white'
-            )
+        label(for: 'installment_repeat', class: 'flex items-center justify-between gap-3 cursor-pointer') do
+          div do
+            p(class: 'text-sm font-semibold text-slate-800') { t('records.new_view.recurring_toggle.title') }
+            p(class: 'text-xs text-slate-500') { t('records.new_view.recurring_toggle.subtitle') }
           end
-          div(class: 'mb-4') do
-            label(class: 'block text-sm font-medium mb-2 text-slate-700') { t('records.new_view.installment.repetitions_label') }
-            raw helpers.number_field_tag(
-              'installment[repetitions]',
-              3,
-              min:   2,
-              step:  1,
-              class: 'w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all border-slate-300 text-slate-900 focus:ring-red-500 focus:border-red-500'
-            )
+          span(class: 'relative inline-flex flex-shrink-0 items-center') do
+            raw helpers.check_box_tag('installment[repeat]', '1', false, id: 'installment_repeat', class: 'peer sr-only')
+            span(class: 'h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-red-500')
+            span(class: 'pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5')
+          end
+        end
+        div(class: 'hidden mt-3 pt-3 space-y-3 border-t border-slate-200', data: { expense_installment_target: 'fields' }) do
+          div do
+            label(for: 'installment_period', class: 'block text-sm font-medium mb-2 text-slate-700') { t('records.new_view.installment.period_label') }
+            raw helpers.select_tag('installment[period]', helpers.options_for_select(installment_periods, 'monthly'), class: INSTALLMENT_INPUT)
+          end
+          div do
+            label(for: 'installment_repetitions', class: 'block text-sm font-medium mb-2 text-slate-700') { t('records.new_view.installment.repetitions_label') }
+            raw helpers.number_field_tag('installment[repetitions]', 3, min: 2, step: 1, class: INSTALLMENT_INPUT)
           end
           p(class: 'text-xs text-slate-500') { t('records.new_view.installment.repeat_hint') }
         end
       end
+    end
+
+    def installment_periods
+      Expense::INSTALLMENT_PERIODS.map { |period| [t("records.new_view.installment.periods.#{period}"), period] }
     end
 
     def flash_errors

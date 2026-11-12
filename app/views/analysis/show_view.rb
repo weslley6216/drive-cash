@@ -75,7 +75,7 @@ module Analysis
             cta_label:   t('empty_states.analysis.cta'),
             cta_path:    helpers.new_record_path,
             cta_icon:    PhlexIcons::Lucide::Plus,
-            cta_data:    { turbo_frame: 'modal' }
+            cta_data:    { turbo_frame: '_top' }
           )
         end
       end

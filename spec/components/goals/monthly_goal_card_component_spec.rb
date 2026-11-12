@@ -48,8 +48,8 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
       expect(html).to include('R$ 6.000,00')
     end
 
-    it 'shows at_risk projection badge when on_track is false' do
-      expect(html).to include(I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000,00'))
+    it 'shows at_risk projection badge without cents when on_track is false' do
+      expect(html).to include("#{I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000')}</span>")
       expect(html).to include('bg-amber-50')
     end
 
@@ -57,8 +57,16 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
       expect(html).to include(I18n.t('goals.index.monthly.days_left', count: 15))
     end
 
-    it 'shows the month name from period_start' do
-      expect(html).to include(I18n.l(goal.period_start, format: '%B'))
+    it 'names the goal metric under the label' do
+      expect(html).to include(I18n.t('goals.index.monthly.sublabel_profit'))
+    end
+
+    it 'names the earnings metric for an earnings goal' do
+      earnings_goal = build_stubbed(:goal, metric: 'earnings', period_start: goal.period_start, period_end: goal.period_end)
+
+      output = view_context.render(described_class.new(progress: progress.merge(goal: earnings_goal)))
+
+      expect(output).to include(I18n.t('goals.index.monthly.sublabel_earnings'))
     end
   end
 
@@ -74,6 +82,14 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     it 'uses 3-column grid layout' do
       expect(html).to include('grid-cols-12')
     end
+
+    it 'spells out the target with the metric' do
+      expect(html).to include(I18n.t('goals.index.monthly.of_target_metric', target: 'R$ 6.000,00', metric: 'lucro líquido'))
+    end
+
+    it 'keeps the cents in the projection' do
+      expect(html).to include(I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000,00'))
+    end
   end
 
   context 'on_track projection' do
@@ -81,7 +97,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
       good = progress.merge(projection: 7000, on_track: true)
       html = view_context.render(described_class.new(progress: good))
 
-      expect(html).to include(I18n.t('goals.index.monthly.on_track_projection', value: 'R$ 7.000,00'))
+      expect(html).to include("#{I18n.t('goals.index.monthly.on_track_projection', value: 'R$ 7.000')}</span>")
       expect(html).to include('bg-emerald-50')
     end
   end
@@ -156,6 +172,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
 
       expect(html).to include("href=\"#{view_context.edit_goal_path(active_goal)}\"")
       expect(html).to include('turbo-frame="modal"')
+      expect(html).to include(%(aria-label="#{I18n.t('goals.index.edit_aria')}"))
     end
 
     it 'hides the edit link when the goal has ended' do

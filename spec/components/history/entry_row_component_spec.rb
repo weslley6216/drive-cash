@@ -12,9 +12,13 @@ RSpec.describe History::EntryRowComponent, type: :component do
     end
 
     it 'shows the amount with + prefix and emerald color' do
-      expect(html).to include('+ R$')
-      expect(html).to include('200,00')
+      expect(html).to include('+R$ 200,00')
       expect(html).to include('text-emerald-700')
+    end
+
+    it 'shows the platform badge with its palette colors and a four letter label' do
+      expect(html).to include('background-color: #000000; color: #ffffff')
+      expect(html).to include('>Uber</div>')
     end
 
     it 'links to the earning edit path inside the modal turbo frame' do
@@ -43,9 +47,13 @@ RSpec.describe History::EntryRowComponent, type: :component do
     end
 
     it 'shows the amount with − prefix and red color' do
-      expect(html).to include('− R$')
-      expect(html).to include('80,00')
+      expect(html).to include('−R$ 80,00')
       expect(html).to include('text-red-700')
+    end
+
+    it 'shows the category icon on a red tile' do
+      expect(html).to include('bg-red-50 text-red-600')
+      expect(html).to include(view_context.render(PhlexIcons::Lucide::Fuel.new(class: 'w-[18px] h-[18px]')))
     end
 
     it 'links to the expense edit path inside the modal turbo frame' do

@@ -22,8 +22,8 @@ module Goals
           )
         end
         div(class: 'absolute inset-0 flex flex-col items-center justify-center') do
-          div(class: 'flex items-end') do
-            span(class: 'text-2xl font-bold text-slate-800') { plain @percent.round.to_s }
+          span(class: 'text-2xl font-bold text-slate-800') do
+            plain @percent.round.to_s
             span(class: 'text-sm font-medium text-slate-500') { '%' }
           end
         end
