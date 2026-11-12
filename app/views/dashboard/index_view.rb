@@ -49,8 +49,8 @@ module Dashboard
 
         div(class: first_use? ? 'hidden lg:flex items-center gap-3' : 'flex items-center gap-3') do
           period_filter unless first_use?
-          link_to(new_earning_path,
-                  data:  { turbo_frame: 'modal' },
+          link_to(new_record_path,
+                  data:  { turbo_frame: '_top' },
                   class: new_record_button_classes) do
             render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
             plain t('.new_record')

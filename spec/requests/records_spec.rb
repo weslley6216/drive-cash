@@ -97,6 +97,7 @@ RSpec.describe 'Records', type: :request do
       get new_record_path, params: { type: 'expense' }
 
       expect(response.body).to include(I18n.t('records.new_view.recurring_toggle.title'))
+      expect(response.body).to include(I18n.t('records.new_view.recurring_toggle.subtitle'))
     end
 
     it 'renders earningFields Stimulus target for JS toggling' do
@@ -106,10 +107,28 @@ RSpec.describe 'Records', type: :request do
       expect(response.body).to include('data-record-form-target="expenseFields"')
     end
 
-    it 'applies sm:grid-cols-2 two-column desktop layout for amount and date' do
+    it 'lays the amount and the date side by side on desktop' do
       get new_record_path
 
-      expect(response.body).to include('sm:grid-cols-2')
+      expect(response.body).to include('lg:grid-cols-3')
+    end
+
+    it 'labels the date as today with the short month' do
+      travel_to Date.new(2026, 5, 22) do
+        get new_record_path
+      end
+
+      expect(response.body).to include(">#{I18n.t('records.new_view.today')}<")
+      expect(response.body).to include('>22 mai 2026<')
+    end
+
+    it 'labels a past date with its weekday' do
+      travel_to Date.new(2026, 5, 22) do
+        get new_record_path, params: { date: '2026-05-18' }
+      end
+
+      expect(response.body).to include('>Segunda-feira<')
+      expect(response.body).to include('>18 mai 2026<')
     end
 
     context 'when the user has a vehicle with a full_tank refueling' do

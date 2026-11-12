@@ -56,6 +56,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(I18n.t('dashboard.index_view.greeting', name: current_user.first_name))
       expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
       expect(response.body).to include(I18n.t('dashboard.index_view.new_record'))
+      expect(response.body).to match(%r{<a data-turbo-frame="_top" class="hidden lg:inline-flex[^>]*href="/records/new"})
       expect(response.body).to include('hidden lg:inline-flex')
       expect(response.body).to include('feed-loading-region')
       expect(response.body).to include('feed-loading-overlay--page')

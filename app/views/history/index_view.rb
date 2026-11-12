@@ -58,7 +58,7 @@ module History
 
     def new_record_link
       link_to(helpers.new_record_path,
-              data:  { turbo_frame: 'modal' },
+              data:  { turbo_frame: '_top' },
               class: 'hidden lg:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold') do
         render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4', 'stroke-width': '2.4')
         plain t('history.index.new_record')
@@ -115,7 +115,7 @@ module History
             cta_label:   t('empty_states.history.blank.cta'),
             cta_path:    helpers.new_record_path,
             cta_icon:    PhlexIcons::Lucide::Plus,
-            cta_data:    { turbo_frame: 'modal' }
+            cta_data:    { turbo_frame: '_top' }
           )
         end
       end
