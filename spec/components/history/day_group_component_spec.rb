@@ -16,11 +16,10 @@ RSpec.describe History::DayGroupComponent, type: :component do
 
   let(:html) { view_context.render(described_class.new(group: group, context: context)) }
 
-  it 'renders the day totals with + and − signs' do
-    expect(html).to include('+ R$')
-    expect(html).to include('200,00')
-    expect(html).to include('− R$')
-    expect(html).to include('80,00')
+  it 'renders the rounded day totals with + and − signs and a separator' do
+    expect(html).to include('+R$ 200<')
+    expect(html).to include('−R$ 80<')
+    expect(html).to include('text-slate-300 mx-1.5')
   end
 
   it 'colors earnings total in emerald and expenses in red' do
@@ -32,18 +31,18 @@ RSpec.describe History::DayGroupComponent, type: :component do
     today_group = group.merge(date: Date.current)
     today_html = view_context.render(described_class.new(group: today_group, context: context))
 
-    expect(today_html).to include(I18n.t('common.today'))
+    expect(today_html).to include("#{I18n.t('common.today')} · #{I18n.l(Date.current, format: '%-d %b')}")
   end
 
   it 'labels yesterday as Ontem' do
     yesterday_group = group.merge(date: Date.current - 1)
     yesterday_html = view_context.render(described_class.new(group: yesterday_group, context: context))
 
-    expect(yesterday_html).to include(I18n.t('common.yesterday'))
+    expect(yesterday_html).to include("#{I18n.t('common.yesterday')} · #{I18n.l(Date.current - 1, format: '%-d %b')}")
   end
 
-  it 'falls back to localized short date' do
-    expect(html).to include(I18n.l(Date.new(2025, 6, 12), format: :short))
+  it 'labels older days with the day, month and weekday' do
+    expect(html).to include('12 jun · quinta')
   end
 
   it 'renders one EntryRow per item' do
@@ -59,15 +58,15 @@ RSpec.describe History::DayGroupComponent, type: :component do
     earnings_only = group.merge(items: [earning], expenses_total: 0)
     earnings_only_html = view_context.render(described_class.new(group: earnings_only, context: context))
 
-    expect(earnings_only_html).to include('+ R$')
-    expect(earnings_only_html).not_to include('− R$')
+    expect(earnings_only_html).to include('+R$')
+    expect(earnings_only_html).not_to include('−R$')
   end
 
   it 'omits the earnings total when zero' do
     expenses_only = group.merge(items: [expense], earnings_total: 0)
     expenses_only_html = view_context.render(described_class.new(group: expenses_only, context: context))
 
-    expect(expenses_only_html).to include('− R$')
-    expect(expenses_only_html).not_to include('+ R$')
+    expect(expenses_only_html).to include('−R$')
+    expect(expenses_only_html).not_to include('+R$')
   end
 end

@@ -8,8 +8,12 @@ RSpec.describe FabComponent, type: :component do
   describe '#view_template' do
     it 'renders container with correct controller and position' do
       expect(html).to include('data-controller="fab"')
-      expect(html).to include('fixed bottom-6 right-6')
+      expect(html).to include('fixed bottom-6 right-5')
       expect(html).to include('z-40')
+    end
+
+    it 'hides on desktop, where the topbar carries the new record button' do
+      expect(html).to include('gap-3 lg:hidden')
     end
 
     it 'renders main button with blue color' do
@@ -62,8 +66,8 @@ RSpec.describe FabComponent, type: :component do
     let(:html) { view_context.render(component) }
 
     it 'positions container at bottom-24 instead of bottom-6' do
-      expect(html).to include('fixed bottom-24 right-6')
-      expect(html).not_to include('fixed bottom-6 right-6')
+      expect(html).to include('fixed bottom-24 right-5')
+      expect(html).not_to include('fixed bottom-6 right-5')
     end
   end
 end

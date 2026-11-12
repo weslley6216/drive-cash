@@ -15,6 +15,8 @@ pt-BR:
     history:
       title: "Nada encontrado"
       description: "Nenhum lançamento bate com a busca ou os filtros atuais."
+      description_query: "Nenhum lançamento bate com \"%{query}\"."
+      description_query_filter: "Nenhum lançamento bate com \"%{query}\" em %{filter}."
       cta: "Limpar filtros"
       blank:
         title: "Sem lançamentos no período"

@@ -45,11 +45,39 @@ RSpec.describe History::IndexView, type: :component do
     expect(html).to include('data-controller="filter"')
   end
 
+  it 'offers a new record from the desktop topbar' do
+    expect(html).to include(I18n.t('history.index.new_record'))
+  end
+
   it 'shows the empty state inside the scroll region when there are no groups' do
     expect(html).to include(I18n.t('empty_states.history.blank.title'))
   end
 
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
     expect(html).to include('id="page"')
+  end
+
+  context 'when a search finds nothing' do
+    def render_with(query:, filter:)
+      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, filter: filter, available_years: [2025]))
+    end
+
+    it 'echoes the search term' do
+      expect(render_with(query: 'posto ipiranga', filter: 'all')).to include(CGI.escapeHTML(I18n.t('empty_states.history.description_query', query: 'posto ipiranga')))
+    end
+
+    it 'echoes the search term and the active filter' do
+      expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: I18n.t('history.index.filters.expenses'))
+
+      expect(render_with(query: 'posto', filter: 'expenses')).to include(CGI.escapeHTML(expected))
+    end
+
+    it 'hides the period summary' do
+      expect(render_with(query: 'posto', filter: 'all')).not_to include(I18n.t('history.index.summary.net'))
+    end
+
+    it 'keeps the generic message when only a filter is active' do
+      expect(render_with(query: nil, filter: 'unpaid')).to include(I18n.t('empty_states.history.description'))
+    end
   end
 end

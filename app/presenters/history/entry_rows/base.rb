@@ -6,6 +6,7 @@ module History
       end
 
       def unpaid? = false
+      def platform = nil
     end
   end
 end
