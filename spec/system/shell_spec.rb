@@ -5,11 +5,7 @@ RSpec.describe 'App shell', type: :system, js: true do
 
   before { login_as(current_user) }
 
-  def box(selector)
-    find(selector).evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
-  def box_of(element)
+  def box(element)
     element.evaluate_script('this.getBoundingClientRect().toJSON()')
   end
 
@@ -20,7 +16,7 @@ RSpec.describe 'App shell', type: :system, js: true do
 
     expect(page).to have_css('#bottom-nav', visible: true)
     expect(active_tab.evaluate_script('getComputedStyle(this).color')).to eq('rgb(37, 99, 235)')
-    expect(box('h1')['x'].round).to eq(20)
+    expect(box(find('h1'))['x'].round).to eq(20)
     expect(page).to fit_the_phone_width
   end
 
@@ -38,7 +34,7 @@ RSpec.describe 'App shell', type: :system, js: true do
 
     eyebrow = find('p', text: I18n.t('dashboard.index_view.eyebrow').upcase)
 
-    expect(box_of(eyebrow)['top'].round).to eq(24)
+    expect(box(eyebrow)['top'].round).to eq(24)
     expect(computed('#safe-top-bar', 'position')).to eq('fixed')
     expect(computed('#safe-top-bar', 'backgroundColor')).to eq('rgb(248, 250, 252)')
     expect(computed('#safe-top-bar', 'zIndex')).to eq('40')
@@ -52,7 +48,7 @@ RSpec.describe 'App shell', type: :system, js: true do
     visit vehicle_path
 
     expect(page).to have_css('h1', text: I18n.t('vehicle.title'))
-    expect(box('h1')['top'].round).to eq(24)
+    expect(box(find('h1'))['top'].round).to eq(24)
     expect(page).to fit_the_phone_width
   end
 
@@ -63,7 +59,7 @@ RSpec.describe 'App shell', type: :system, js: true do
 
     footer = find('#sidebar-nav a[href="/account"]')
 
-    expect(box('#sidebar-nav')['width'].round).to eq(240)
+    expect(box(find('#sidebar-nav'))['width'].round).to eq(240)
     expect(page).to have_no_css('#bottom-nav', visible: true)
     expect(footer).to have_text('Weslley')
     expect(footer).to have_text(I18n.t('sidebar_nav_component.account_hint'))
