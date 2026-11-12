@@ -2,16 +2,14 @@ module Dashboard
   class CategoryBreakdownService < BreakdownService
     def initialize(ledger: nil, **)
       super(**)
-      @ledger = ledger
+      @ledger = ledger || YearLedger.new(user: user, year: year)
     end
 
     private
 
-    def default_limit = 5
+    attr_reader :ledger
 
-    def ledger
-      @ledger ||= YearLedger.new(user: user, year: year)
-    end
+    def default_limit = 5
 
     def aggregates
       ledger.spent_by_category(month).map { |category, amount| { id: category, amount: amount } }
