@@ -119,4 +119,31 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to have_field('refueling[odometer_km]', with: '160928', type: 'hidden')
     expect(page).to have_text(I18n.t('notifications.index.title'))
   end
+
+  it 'marks all as read and then clears the center on a phone' do
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-11' })
+
+    visit notifications_path
+    click_on I18n.t('notifications.index.read_all')
+
+    expect(page).to have_button(I18n.t('notifications.index.clear_all'))
+    expect(page).to fit_the_phone_width
+
+    click_on I18n.t('notifications.index.clear_all')
+
+    expect(page).to have_text(I18n.t('notifications.index.empty.title'))
+    expect(page).to have_no_button(I18n.t('notifications.index.clear_all'))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'clears the read notifications from the header on a desktop screen' do
+    emulate_desktop_screen
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-11' },
+                          read_at: Time.current)
+
+    visit notifications_path
+    click_on I18n.t('notifications.index.clear_all')
+
+    expect(page).to have_text(I18n.t('notifications.index.empty.title'))
+  end
 end
