@@ -4,17 +4,18 @@ RSpec.describe Dashboard::CategoryBreakdownService do
   let(:user) { create(:user) }
 
   describe '#call' do
-    it 'groups expenses by category and returns top 4 by amount' do
+    it 'groups expenses by category and returns top 5 by amount' do
       create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 300, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 5), amount: 200, category: 'maintenance', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 100, category: 'meals', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 15), amount: 80, category: 'phone', paid: true)
       create(:expense, user: user, date: Date.new(2025, 6, 20), amount: 10, category: 'parking', paid: true)
+      create(:expense, user: user, date: Date.new(2025, 6, 21), amount: 5, category: 'toll', paid: true)
 
       result = described_class.new(year: 2025, month: 6, user: user).call
 
-      expect(result.size).to eq(4)
-      expect(result.map { |row| row[:id] }).to eq(%w[fuel maintenance meals phone])
+      expect(result.size).to eq(5)
+      expect(result.map { |row| row[:id] }).to eq(%w[fuel maintenance meals phone parking])
     end
 
     it 'computes percent of total per category' do

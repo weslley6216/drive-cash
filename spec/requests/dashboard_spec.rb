@@ -59,10 +59,43 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('hidden lg:inline-flex')
       expect(response.body).to include('feed-loading-region')
       expect(response.body).to include('feed-loading-overlay--page')
-      expect(response.body).to include(I18n.t('sessions.sign_out'))
-      expect(response.body).to include(session_path)
+      expect(response.body).to include(I18n.t('sidebar_nav_component.account_hint'))
       expect(response.body).to include('w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm')
       expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
+    end
+
+    it 'renders the prototype header: brand eyebrow on phones, white topbar on desktops' do
+      get root_path, params: { year: 2025 }
+
+      expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
+      expect(response.body).to include('lg:-mt-8 lg:mb-8 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
+      expect(response.body).to include(%(<p class="hidden lg:block text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
+      expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
+    end
+
+    it 'hides the period filter on the first use, before any record exists' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('empty_states.home.title'))
+      expect(response.body).not_to include('data-controller="filter"')
+      expect(response.body).to include('<div class="bg-white rounded-xl shadow-sm border border-slate-100">')
+    end
+
+    it 'keeps the period filter on an empty year when the user has records in another year' do
+      create(:earning, user: current_user, date: Date.new(2024, 3, 1), amount: 100)
+
+      get root_path
+
+      expect(response.body).to include(I18n.t('empty_states.home.title'))
+      expect(response.body).to include('data-controller="filter"')
+    end
+
+    it 'shows the today card on desktops only' do
+      create(:earning, user: current_user, date: Date.current, amount: 100, platform: 'uber')
+
+      get root_path
+
+      expect(response.body).to include('id="today_card" class="hidden lg:block"')
     end
 
     it 'renders hero profit card section' do
@@ -194,9 +227,9 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path
 
-      expect(response.body).to include('class="lg:hidden mb-6"')
+      expect(response.body).to include('class="lg:hidden mb-4"')
       stats_position = response.body.index('grid-cols-2') || response.body.index(I18n.t('stats_grid_component.income'))
-      mobile_card_position = response.body.index('class="lg:hidden mb-6"')
+      mobile_card_position = response.body.index('class="lg:hidden mb-4"')
       expect(mobile_card_position).to be > stats_position
     end
 
@@ -205,7 +238,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path
 
-      expect(response.body).to include('class="lg:hidden mb-6"')
+      expect(response.body).to include('class="lg:hidden mb-4"')
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
 
@@ -314,7 +347,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title_month'))
       expect(response.body).to include('100,50')
       expect(response.body).to include('250,00')
       expect(response.body).to include('350,50')
@@ -338,12 +371,49 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.columns.month'))
-      expect(response.body).to include(I18n.t('date.month_names')[1])
-      expect(response.body).to include(I18n.t('date.month_names')[2])
+      expect(response.body).to include(I18n.t('date.month_names')[1].capitalize)
+      expect(response.body).to include(I18n.t('date.month_names')[2].capitalize)
       expect(response.body).to include('100,00')
       expect(response.body).to include('300,00')
       expect(response.body).to include('400,00')
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.total'))
+    end
+  end
+
+  describe 'detail modal chrome' do
+    it 'draws the annual earnings card like the prototype: accent top border, total title, chevrons and tight paddings' do
+      create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100)
+
+      get dashboard_earnings_detail_path(year: 2025)
+
+      expect(response.body).to include('bg-white rounded-2xl shadow-2xl w-full max-w-[380px]')
+      expect(response.body).to include('border-t-4 border-t-blue-600')
+      expect(response.body).to include(%(<h2 class="text-lg font-bold tracking-tight text-blue-600 truncate">#{I18n.t('dashboard.earnings_detail_view.title')}</h2>))
+      expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">2025</p>')
+      expect(response.body).to include('w-[15px] h-[15px] text-slate-300')
+      expect(response.body).to include('class="text-green-700">R$ 100,00</span>')
+      expect(response.body).to include('px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium')
+    end
+
+    it 'lists the month earnings as day/month with the actions before the amount' do
+      create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100)
+
+      get dashboard_earnings_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('>15/01</td>')
+      expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">Janeiro · 2025</p>')
+      expect(response.body).to include('overflow-y-auto px-5 py-3 max-h-[360px]')
+      expect(response.body).to match(/aria-label="#{I18n.t('dashboard.earnings_detail_view.edit')}".*R\$ 100,00/m)
+    end
+
+    it 'groups the month expenses under a short day label in the red theme' do
+      create(:expense, user: current_user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', vendor: 'Posto Shell')
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('>15 jan</p>')
+      expect(response.body).to include('border-t-4 border-t-red-600')
+      expect(response.body).to include('class="text-red-700">R$ 80,00</span>')
     end
   end
 
@@ -357,7 +427,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title_month'))
       expect(response.body).to include('Posto Shell')
       expect(response.body).to include('Lanchonete')
       expect(response.body).to include('Oficina')
@@ -412,8 +482,8 @@ RSpec.describe 'Dashboard', type: :request do
       get dashboard_expenses_detail_path(year: 2025)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(I18n.t('date.month_names')[1])
-      expect(response.body).to include(I18n.t('date.month_names')[2])
+      expect(response.body).to include(I18n.t('date.month_names')[1].capitalize)
+      expect(response.body).to include(I18n.t('date.month_names')[2].capitalize)
       expect(response.body).to include('100,00')
       expect(response.body).to include('200,00')
       expect(response.body).to include('300,00')

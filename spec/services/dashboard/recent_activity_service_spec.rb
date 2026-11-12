@@ -102,13 +102,13 @@ RSpec.describe Dashboard::RecentActivityService do
         expect(row[:date_label]).to eq(I18n.t('common.today'))
       end
 
-      it 'labels other dates using :short format' do
+      it 'labels other dates with the day and abbreviated month' do
         date = Date.new(2025, 6, 15)
         create(:earning, user: user, date: date, amount: 100, platform: 'uber')
 
         row = described_class.new(year: 2025, month: 6, user: user).call.first
 
-        expect(row[:date_label]).to eq(I18n.l(date, format: :short))
+        expect(row[:date_label]).to eq('15/jun')
       end
     end
 

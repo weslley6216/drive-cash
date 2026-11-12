@@ -2,7 +2,7 @@ module Dashboard
   class CategoryBreakdownService < BreakdownService
     private
 
-    def default_limit = 4
+    def default_limit = 5
 
     def aggregates
       user.expenses.paid_in_period(year, month)

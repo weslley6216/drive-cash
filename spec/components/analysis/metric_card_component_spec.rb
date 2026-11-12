@@ -72,4 +72,14 @@ RSpec.describe Analysis::MetricCardComponent, type: :component do
     expect(html).to include('border-slate-100')
     expect(html).to include('text-[15px]')
   end
+
+  it 'keeps the prototype sparkline widths on desktops so the hero column grows' do
+    series = { points: [{ month: 1, value: 1.0 }, { month: 2, value: 2.0 }, { month: 3, value: 3.0 }], best: { month: 3, value: 3.0 } }
+
+    hero = view_context.render(described_class.new(label: 'L', icon: PhlexIcons::Lucide::Route, value: 'V', series: series, variant: :hero))
+    compact = view_context.render(described_class.new(label: 'L', icon: PhlexIcons::Lucide::Zap, value: 'V', series: series))
+
+    expect(hero).to include('mt-2 lg:min-w-[300px]')
+    expect(compact).to include('mt-1.5 lg:min-w-[160px]')
+  end
 end

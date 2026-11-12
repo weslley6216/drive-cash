@@ -120,7 +120,7 @@ RSpec.describe LayoutComponent, type: :component do
     end
 
     it 'wraps content in a desktop-aware container' do
-      expect(html).to include('lg:ml-64')
+      expect(html).to include('lg:ml-60')
     end
 
     it 'hides BottomNavComponent on desktop' do

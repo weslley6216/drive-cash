@@ -15,7 +15,7 @@ class Sessions::NewView < ApplicationView
       class: 'hidden lg:flex w-[46%] flex-col justify-between p-12 relative overflow-hidden',
       style: 'background: linear-gradient(150deg,#1d4ed8 0%,#2563eb 55%,#3b82f6 100%)'
     ) do
-      render BrandMarkComponent.new(size: :lg, light: true)
+      render BrandMarkComponent.new(light: true)
       hero_block
       p(class: 'text-xs text-blue-200/80') { t('.copyright') }
     end
@@ -46,8 +46,9 @@ class Sessions::NewView < ApplicationView
   end
 
   def form_panel
-    div(class: 'flex-1 flex items-center justify-center p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100') do
-      div(class: 'w-full max-w-sm') do
+    div(class: 'flex-1 flex flex-col px-6 pt-10 pb-8 bg-gradient-to-br from-slate-50 to-slate-100 ' \
+               'lg:items-center lg:justify-center lg:p-8 lg:bg-none lg:bg-slate-50') do
+      div(class: 'w-full flex-1 flex flex-col lg:flex-none lg:max-w-sm') do
         mobile_brand_header
         flash_banner
         form_block
@@ -56,22 +57,27 @@ class Sessions::NewView < ApplicationView
   end
 
   def mobile_brand_header
-    div(class: 'pt-4 pb-8 lg:hidden') do
+    div(class: 'pb-8 lg:hidden') do
       render BrandMarkComponent.new(size: :lg)
     end
   end
 
   def form_block
     h1(class: 'text-3xl font-bold text-slate-900 tracking-tight') { t('.welcome') }
-    p(class: 'text-sm text-slate-500 mt-2') { t('.welcome_subtitle') }
+    p(class: 'text-sm text-slate-500 mt-2') do
+      span(class: 'lg:hidden') { t('.welcome_subtitle') }
+      span(class: 'hidden lg:inline') { t('.welcome_subtitle_desktop') }
+    end
     form_with(url: helpers.session_path, data: { turbo: false }, class: 'space-y-4 mt-8') do |form|
       email_field(form)
       password_field(form)
       remember_me_block
       submit_button
     end
-    divider_block
-    google_button
+    div(class: 'space-y-4 mt-4') do
+      divider_block
+      google_button
+    end
     footer_links
   end
 
@@ -141,7 +147,8 @@ class Sessions::NewView < ApplicationView
   def submit_button
     button(
       type:  'submit',
-      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mt-2 cursor-pointer'
+      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 lg:py-3 text-sm font-semibold shadow-lg shadow-blue-600/25 ' \
+             'flex items-center justify-center gap-2 mt-2 lg:mt-1 cursor-pointer'
     ) do
       plain t('.sign_in')
       render PhlexIcons::Lucide::ArrowRight.new(class: 'w-4 h-4 stroke-[2.4]')
@@ -170,7 +177,7 @@ class Sessions::NewView < ApplicationView
   end
 
   def footer_links
-    p(class: 'text-sm text-slate-500 text-center mt-8') do
+    p(class: 'text-sm text-slate-500 text-center mt-auto pt-8 lg:mt-8 lg:pt-0') do
       plain "#{t('.no_account')} "
       link_to(t('.create_account'), helpers.new_registration_path, class: 'font-semibold text-blue-600 hover:underline')
     end

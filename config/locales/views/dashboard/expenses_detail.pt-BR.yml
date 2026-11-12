@@ -1,7 +1,8 @@
 pt-BR:
   dashboard:
     expenses_detail_view:
-      title: "Detalhamento de Despesas"
+      title: "Total de Despesas"
+      title_month: "Despesas"
       columns:
         date: "Data"
         month: "Mês"

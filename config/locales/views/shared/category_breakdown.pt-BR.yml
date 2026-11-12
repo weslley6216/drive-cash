@@ -3,3 +3,4 @@ pt-BR:
     title: "Para onde foi o dinheiro"
     empty: "Nenhuma despesa no período."
     percent: "%{value}%"
+    see_analysis: "Análise →"

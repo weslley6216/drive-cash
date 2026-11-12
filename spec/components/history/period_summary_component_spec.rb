@@ -17,8 +17,8 @@ RSpec.describe History::PeriodSummaryComponent, type: :component do
   end
 
   it 'uses green styling for earnings card' do
-    expect(html).to include('bg-green-50')
-    expect(html).to include('border-green-200')
+    expect(html).to include('bg-emerald-50')
+    expect(html).to include('border-emerald-200')
   end
 
   it 'uses red styling for expenses card' do

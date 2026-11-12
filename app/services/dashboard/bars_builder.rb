@@ -29,7 +29,8 @@ module Dashboard
           label:    I18n.t('date.abbr_month_names')[month_number].capitalize,
           earnings: earnings_by[month_number].to_f,
           expenses: expenses_by[month_number].to_f,
-          empty:    earnings_by[month_number].nil? && expenses_by[month_number].nil?
+          empty:    earnings_by[month_number].nil? && expenses_by[month_number].nil?,
+          future:   Date.new(@year, month_number, 1) > Date.current
         }
       end
     end
@@ -50,7 +51,8 @@ module Dashboard
           label:    day.to_s,
           earnings: earnings_by[day].to_f,
           expenses: expenses_by[day].to_f,
-          empty:    false
+          empty:    false,
+          future:   false
         }
       end
     end

@@ -86,8 +86,34 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     expect(html).to include('hidden lg:block')
   end
 
-  it 'uses mobile viewBox 320x70' do
-    expect(html).to include('viewBox="0 0 320 70"')
+  it 'uses mobile viewBox 320x64' do
+    expect(html).to include('viewBox="0 0 320 64"')
+  end
+
+  it 'scales the annual chart from zero like the prototype' do
+    flat = view_context.render(described_class.new(hero: payload(series: [50.0, 100.0] + Array.new(10, 0.0))))
+
+    expect(flat).to include('<circle cx="0.0" cy="35.0"')
+    expect(flat).to include('<circle cx="320.0" cy="10.0"')
+    expect(flat).to include('<circle cx="0.0" cy="65.0"')
+  end
+
+  it 'draws solid mobile dots and white desktop dots' do
+    expect(html).to include('fill="#2563eb"')
+    expect(html).to include('fill="#fff" stroke="#1d4ed8"')
+  end
+
+  it 'writes the year label with a dash on phones and a dot on desktops' do
+    expect(html).to include(%(<span class="lg:hidden">#{I18n.t('hero_profit_card_component.label_year', year: 2025)}</span>))
+    expect(html).to include(%(<span class="hidden lg:inline">#{I18n.t('hero_profit_card_component.label_year_desktop', year: 2025)}</span>))
+  end
+
+  it 'compares with the previous year in the desktop badge' do
+    expect(html).to include(%(<span class="hidden lg:inline">#{I18n.t('hero_profit_card_component.versus', year: 2024)}</span>))
+  end
+
+  it 'keeps the per day line tight to the value on phones' do
+    expect(html).to include('<p class="text-sm text-blue-700/80 lg:mt-2">')
   end
 
   it 'uses desktop viewBox 720x120' do
@@ -139,7 +165,7 @@ RSpec.describe HeroProfitCardComponent, type: :component do
     let(:html) { view_context.render(component) }
 
     it 'renders chart including zero-value days' do
-      expect(html).to include('viewBox="0 0 320 70"')
+      expect(html).to include('viewBox="0 0 320 64"')
       expect(html).to include('<path')
     end
 

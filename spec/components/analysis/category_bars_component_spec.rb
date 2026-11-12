@@ -47,7 +47,7 @@ RSpec.describe Analysis::CategoryBarsComponent, type: :component do
     html = view_context.render(Analysis::CategoryBarsComponent.new(categories: categories, month: nil))
     fuel_row = html[html.index('Combustível')..html.index('Manutenção')]
 
-    expect(fuel_row.index('60.0')).to be < fuel_row.index('300,00')
+    expect(fuel_row.index('60,0')).to be < fuel_row.index('300,00')
   end
 
   it 'renders the bar width proportional to the percent' do
@@ -67,5 +67,18 @@ RSpec.describe Analysis::CategoryBarsComponent, type: :component do
     html = view_context.render(Analysis::CategoryBarsComponent.new(categories: [], month: nil))
 
     expect(html).to include(I18n.t('analysis.show_view.categories.empty'))
+  end
+
+  it 'shows only the label and amount of four categories on phones and everything on desktops' do
+    rows = %w[fuel maintenance meals toll car_wash].each_with_index.map do |id, index|
+      { id: id, label: id, amount: 100.0 - index, percent: 52.7 }
+    end
+
+    html = view_context.render(described_class.new(categories: rows))
+
+    expect(html).to include('data-category-row="car_wash" class="hidden lg:block"')
+    expect(html).to include('hidden lg:flex w-7 h-7 rounded-lg')
+    expect(html).to include('<span class="hidden lg:inline text-slate-400 w-12 text-right tabular-nums">52,7%</span>')
+    expect(html).to include('lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full')
   end
 end

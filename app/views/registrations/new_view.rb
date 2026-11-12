@@ -19,7 +19,7 @@ class Registrations::NewView < ApplicationView
       class: 'hidden lg:flex w-[46%] flex-col justify-between p-12 relative overflow-hidden',
       style: 'background: linear-gradient(150deg,#1d4ed8 0%,#2563eb 55%,#3b82f6 100%)'
     ) do
-      render BrandMarkComponent.new(size: :lg, light: true)
+      render BrandMarkComponent.new(light: true)
       div(class: 'relative') do
         h2(class: 'text-4xl font-bold text-white tracking-tight leading-[1.15]') do
           plain t('sessions.new_view.brand_headline_line1')

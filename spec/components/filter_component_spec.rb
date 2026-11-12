@@ -1,179 +1,106 @@
 require 'rails_helper'
 
 RSpec.describe FilterComponent, type: :component do
-  let(:available_years) { [2025, 2024, 2023] }
+  let(:available_years) { [2026, 2025, 2024] }
 
-  describe '#view_template' do
-    it 'renders the available year options' do
-      component = FilterComponent.new(
-        selected_year:   2024,
-        selected_month:  nil,
-        available_years: available_years
-      )
+  before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
 
-      html = view_context.render(component)
+  def render_filter(**options)
+    view_context.render(described_class.new(selected_year: 2026, selected_month: nil, available_years: available_years, **options))
+  end
 
-      expect(html).to include('<option value="2025">2025</option>')
-      expect(html).to include('<option value="2023">2023</option>')
+  context 'when variant: :compact' do
+    let(:html) { render_filter(selected_month: 2, action_path: '/history') }
+
+    it 'renders the year and month selects as prototype filter pills' do
+      expect(html).to include('rounded-lg py-2 text-sm font-medium text-slate-700')
+      expect(html.scan('m6 9 6 6 6-6').size).to eq(2)
+      expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-500')
     end
 
-    it 'selects the correct year' do
-      component = FilterComponent.new(
-        selected_year:   2024,
-        selected_month:  nil,
-        available_years: available_years
-      )
+    it 'labels the months with full names and the empty option as every month' do
+      expect(html).to include('value="2" selected>Fevereiro</option>')
+      expect(html).to include(">#{I18n.t('filter_component.all_months')}</option>")
+    end
 
-      html = view_context.render(component)
+    it 'offers only the elapsed months of the current year in the month select' do
+      expect(html).to include('value="5">Maio</option>')
+      expect(html).not_to include('value="6">Junho</option>')
+    end
 
-      expect(html).to include('value="2024" selected')
+    it 'offers every month of a past year in the month select' do
+      past = render_filter(selected_year: 2025)
+
+      expect(past).to include('value="12">Dezembro</option>')
+    end
+
+    it 'selects the chosen year' do
+      expect(html).to include('value="2026" selected')
       expect(html).not_to include('value="2025" selected')
     end
 
-    it "selects 'TODOS' when month is nil" do
-      component = FilterComponent.new(
-        selected_year:   2024,
-        selected_month:  nil,
-        available_years: available_years
-      )
+    it 'submits the form through the filter controller on the given path' do
+      expect(html).to include('action="/history"')
+      expect(html).to include('data-controller="filter"')
+      expect(html).to include('change->filter#handleYearChange')
+    end
+  end
 
-      html = view_context.render(component)
+  context 'when variant: :chips' do
+    let(:html) { render_filter(variant: :chips, selected_month: 3) }
 
-      expect(html).to include('value="" selected>TODOS</option>')
+    it 'renders a funnel year pill and one chip per elapsed month on phones' do
+      expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-700')
+      expect(html).to include(">#{I18n.t('filter_component.all_chip')}</span></a>")
+      expect(html).to include('href="/?month=5&year=2026"')
+      expect(html).not_to include('month=6')
     end
 
-    it 'selects a specific month correctly' do
-      component = FilterComponent.new(
-        selected_year:   2024,
-        selected_month:  5,
-        available_years: available_years
-      )
+    it 'highlights the selected month chip' do
+      expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
+    end
 
-      html = view_context.render(component)
+    it 'keeps the pills for desktop screens' do
+      expect(html).to include('hidden lg:block')
+      expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-500')
+    end
 
-      expect(html).to include('value="5" selected>MAI</option>')
+    it 'lists every month for a past year' do
+      past = render_filter(variant: :chips, selected_year: 2025)
+
+      expect(past).to include('href="/?month=12&year=2025"')
     end
   end
 
   context 'when variant: :popover' do
-    let(:component) do
-      FilterComponent.new(
-        selected_year:   2025,
-        selected_month:  3,
-        available_years: available_years,
-        variant:         :popover
-      )
-    end
-    let(:html) { view_context.render(component) }
+    let(:html) { render_filter(variant: :popover, selected_month: 2, action_path: '/analysis') }
 
-    it 'renders a button as the popover trigger' do
-      expect(html).to include('<button')
-      expect(html).to include('click->filter-popover#toggle')
-    end
-
-    it 'renders the panel hidden by default' do
-      expect(html).to match(/class="hidden[^"]*absolute/)
-    end
-
-    it 'uses filter-popover controller with window click-outside action' do
+    it 'renders a funnel button that toggles a hidden panel' do
       expect(html).to include('data-controller="filter-popover"')
       expect(html).to include('click@window->filter-popover#closeOnOutsideClick')
+      expect(html).to include('click->filter-popover#toggle')
+      expect(html).to match(/class="hidden absolute right-0 top-full/)
     end
 
-    it 'attaches the filter controller to the form so requestSubmit works' do
-      expect(html).to match(/form[^>]*data-controller="filter"/)
+    it 'offers every month and the elapsed months as links in the panel' do
+      expect(html).to include(">#{I18n.t('filter_component.all_months')}</a>")
+      expect(html).to include('href="/analysis?month=2&year=2026"')
+      expect(html).to include('bg-blue-600 text-white font-semibold">Fev</a>')
     end
 
-    it 'uses handleYearChange on year select to reset month before submitting' do
-      expect(html).to include('handleYearChange')
-    end
-
-    it 'renders the funnel icon inside the button' do
-      expect(html).to include('<button')
-      expect(html).to include('svg')
-    end
-
-    it 'renders year and month selects inside the panel' do
+    it 'keeps a year select in the panel caption' do
+      expect(html).to include(%(aria-label="#{I18n.t('filter_component.year')}"))
       expect(html).to include('name="year"')
-      expect(html).to include('name="month"')
     end
 
-    it 'selects the correct year option' do
-      expect(html).to include('value="2025" selected')
+    it 'puts a calendar icon on both desktop pills' do
+      expect(html.scan('absolute left-3 w-3.5 h-3.5 text-slate-500').size).to eq(2)
     end
 
-    it 'selects the correct month option' do
-      expect(html).to include('value="3" selected')
-    end
+    it 'highlights every month when no month is selected' do
+      annual = render_filter(variant: :popover, action_path: '/analysis')
 
-    it 'renders labels for each field' do
-      expect(html).to include(I18n.t('filter_component.year'))
-      expect(html).to include(I18n.t('filter_component.month'))
-    end
-
-    it 'uses the provided action_path when given' do
-      component = FilterComponent.new(
-        selected_year:   2025,
-        selected_month:  nil,
-        available_years: available_years,
-        variant:         :popover,
-        action_path:     '/analysis'
-      )
-
-      expect(view_context.render(component)).to include('action="/analysis"')
-    end
-
-    it 'does not render the full card wrapper' do
-      expect(html).not_to include('bg-white rounded-lg shadow-md')
-    end
-  end
-
-  context 'when variant: :compact' do
-    let(:component) do
-      FilterComponent.new(
-        selected_year:   2025,
-        selected_month:  5,
-        available_years: available_years,
-        variant:         :compact
-      )
-    end
-    let(:html) { view_context.render(component) }
-
-    it 'does not render the full card wrapper' do
-      expect(html).not_to include('bg-white rounded-lg shadow-md')
-      expect(html).not_to include('shadow-md')
-    end
-
-    it 'renders inline selects without labels' do
-      expect(html).to include('value="2025" selected')
-      expect(html).to include('value="5" selected')
-      expect(html).not_to include(I18n.t('filter_component.year'))
-      expect(html).not_to include(I18n.t('filter_component.title'))
-    end
-
-    it 'uses pill styling classes' do
-      expect(html).to include('border-slate-200')
-    end
-
-    it 'renders a form so filter#submit can call requestSubmit()' do
-      expect(html).to include('<form')
-      expect(html).to include('data-controller="filter"')
-    end
-
-    it 'uses handleYearChange on year select to reset month before submitting' do
-      expect(html).to include('handleYearChange')
-    end
-
-    it 'uses the provided action_path when given' do
-      component = FilterComponent.new(
-        selected_year:   2025,
-        selected_month:  nil,
-        available_years: available_years,
-        variant:         :compact,
-        action_path:     '/history'
-      )
-
-      expect(view_context.render(component)).to include('action="/history"')
+      expect(annual).to include("bg-blue-50 text-blue-700 font-semibold\">#{I18n.t('filter_component.all_months')}</a>")
     end
   end
 end

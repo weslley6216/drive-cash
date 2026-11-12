@@ -2,6 +2,8 @@ pt-BR:
   analysis:
     show_view:
       title: "Análise"
+      export: "Exportar"
+      empty_chart_title: "Receita × Despesa"
       subtitle_annual: "%{year} · todos os meses"
       subtitle_monthly: "%{month_name} · %{year}"
       metrics:

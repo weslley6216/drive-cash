@@ -21,7 +21,7 @@ class StatsGridComponent < ApplicationComponent
   end
 
   def view_template
-    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6') do
+    div(id: 'stats_grid', class: 'grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4 lg:mb-6') do
       TILES.each { |tile| render_card(tile) }
     end
   end
@@ -32,11 +32,12 @@ class StatsGridComponent < ApplicationComponent
 
   def render_card(tile)
     config = {
-      title:    t("dashboard.index_view.stats.#{tile[:key]}.title"),
-      value:    send("#{tile[:key]}_value"),
-      subtitle: send("#{tile[:key]}_subtitle"),
-      color:    tile[:color],
-      icon:     ICONS[tile[:icon]]
+      title:       t("dashboard.index_view.stats.#{tile[:key]}.title"),
+      short_title: t("dashboard.index_view.stats.#{tile[:key]}.short_title", default: nil),
+      value:       send("#{tile[:key]}_value"),
+      subtitle:    send("#{tile[:key]}_subtitle"),
+      color:       tile[:color],
+      icon:        ICONS[tile[:icon]]
     }
     config[:href] = send(tile[:detail], year: @year, month: @month) if tile[:detail]
 
@@ -51,7 +52,7 @@ class StatsGridComponent < ApplicationComponent
   def earnings_subtitle
     key = annual_view? ? 'subtitle_annual' : 'subtitle_monthly'
     value = annual_view? ? @totals[:earnings_avg_month] : @totals[:earnings_avg_day]
-    t("dashboard.index_view.stats.earnings.#{key}", value: format_currency(value))
+    t("dashboard.index_view.stats.earnings.#{key}", value: format_currency_short(value))
   end
 
   def expenses_subtitle

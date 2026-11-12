@@ -1,5 +1,6 @@
 module Analysis
   class MetricCardComponent < ApplicationComponent
+    include CardStyles
     def initialize(label:, icon:, value:, series:, variant: :compact, class_name: nil)
       @label = label
       @icon = icon
@@ -32,7 +33,7 @@ module Analysis
         p(class: 'font-bold text-slate-900 text-2xl lg:text-3xl') { @value }
 
         if trend?
-          div(class: 'mt-2') { render sparkline(color: '#2563eb', height: 34, height_class: 'h-[34px] lg:h-9', fill: true) }
+          div(class: 'mt-2 lg:min-w-[300px]') { render sparkline(color: '#2563eb', height: 34, height_class: 'h-[34px] lg:h-9', fill: true) }
           trend_footer(big: true)
         else
           p(class: 'text-[11px] text-slate-400 mt-1.5') { t('analysis.show_view.trend.not_enough') }
@@ -41,7 +42,7 @@ module Analysis
     end
 
     def compact_card
-      div(class: class_names('bg-white rounded-xl shadow-sm border border-slate-100 min-w-0 p-3.5 lg:p-5', @class_name)) do
+      div(class: class_names("#{CARD} min-w-0 p-3.5 lg:p-5", @class_name)) do
         div(class: 'flex items-center gap-1.5 text-slate-500 mb-1') do
           render @icon.new(class: 'lucide w-3 h-3')
           span(class: 'text-[11px] font-medium truncate') { @label }
@@ -49,7 +50,7 @@ module Analysis
         p(class: 'font-bold text-slate-800 text-[15px] lg:text-2xl') { @value }
 
         if trend?
-          div(class: 'mt-1.5') { render sparkline(color: '#94a3b8', height: 20, height_class: 'h-5', fill: false) }
+          div(class: 'mt-1.5 lg:min-w-[160px]') { render sparkline(color: '#94a3b8', height: 20, height_class: 'h-5', fill: false) }
           trend_footer(big: false)
         end
       end

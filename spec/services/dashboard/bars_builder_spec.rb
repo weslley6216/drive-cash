@@ -28,6 +28,26 @@ RSpec.describe Dashboard::BarsBuilder do
         expect(march[:empty]).to be false
       end
 
+      it 'marks the months after the current one as future' do
+        travel_to Time.zone.local(2026, 6, 15, 10, 0)
+        create(:earning, user: user, date: Date.new(2026, 3, 1), amount: 100)
+
+        result = described_class.new(user: user, year: 2026, month: nil).call
+
+        expect(result.find { |bar| bar[:key] == 6 }[:future]).to be false
+        expect(result.find { |bar| bar[:key] == 7 }[:future]).to be true
+        expect(result.find { |bar| bar[:key] == 1 }[:future]).to be false
+      end
+
+      it 'marks no month as future for a past year' do
+        travel_to Time.zone.local(2026, 6, 15, 10, 0)
+        create(:earning, user: user, date: Date.new(2025, 3, 1), amount: 100)
+
+        result = described_class.new(user: user, year: 2025, month: nil).call
+
+        expect(result.map { |bar| bar[:future] }.uniq).to eq([false])
+      end
+
       it 'returns an empty array when there is no activity in the year' do
         result = described_class.new(user: user, year: 2025, month: nil).call
 

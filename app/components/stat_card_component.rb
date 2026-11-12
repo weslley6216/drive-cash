@@ -1,16 +1,16 @@
 class StatCardComponent < ApplicationComponent
   SIZES = {
-    default: 'text-xl lg:text-2xl',
+    default: 'text-lg lg:text-2xl',
     sm:      'text-sm lg:text-xl'
   }.freeze
 
   COLORS = {
     green:  {
-      bg:       'bg-green-50',
-      border:   'border-green-200',
-      title:    'text-green-700',
-      value:    'text-green-900',
-      subtitle: 'text-green-600'
+      bg:       'bg-emerald-50',
+      border:   'border-emerald-200',
+      title:    'text-emerald-700',
+      value:    'text-emerald-900',
+      subtitle: 'text-emerald-600'
     },
     red:    {
       bg:       'bg-red-50',
@@ -42,8 +42,9 @@ class StatCardComponent < ApplicationComponent
     }
   }.freeze
 
-  def initialize(title:, value:, subtitle: nil, color:, icon:, href: nil, size: :default)
+  def initialize(title:, value:, color:, icon:, subtitle: nil, short_title: nil, href: nil, size: :default)
     @title = title
+    @short_title = short_title
     @value = value
     @subtitle = subtitle
     @color = color
@@ -54,21 +55,32 @@ class StatCardComponent < ApplicationComponent
 
   def view_template
     container_tag(class: card_classes) do
-      div(class: 'flex items-start justify-between gap-2') do
-        p(class: title_classes) { @title }
+      div(class: 'flex items-start justify-between lg:gap-3') do
+        div(class: 'min-w-0 flex-1') do
+          p(class: title_classes) { title_content }
+          p(class: value_classes) { @value }
+          p(class: subtitle_classes) { @subtitle } if @subtitle
+        end
         icon_section
       end
-      p(class: value_classes) { @value }
-      p(class: subtitle_classes) { @subtitle } if @subtitle
     end
   end
 
   private
 
+  def title_content
+    return plain(@title) unless @short_title
+
+    span(class: 'lg:hidden') { @short_title }
+    span(class: 'hidden lg:inline') { @title }
+  end
+
   def icon_section
     return unless @icon
 
-    render @icon.new(class: 'w-5 h-5 lg:w-6 lg:h-6 opacity-50')
+    div(class: class_names('flex-shrink-0 lg:w-9 lg:h-9 lg:rounded-lg flex items-center justify-center', colors[:title])) do
+      render @icon.new(class: 'w-5 h-5 opacity-50')
+    end
   end
 
   def container_tag(**attributes, &block)
@@ -80,19 +92,19 @@ class StatCardComponent < ApplicationComponent
   end
 
   def card_classes
-    class_names('border-2 rounded-xl p-3 shadow-sm', colors[:bg], colors[:border])
+    class_names('border-2 rounded-xl p-3 lg:p-4', colors[:bg], colors[:border])
   end
 
   def title_classes
-    class_names('text-sm font-medium opacity-75', colors[:title])
+    class_names('text-xs font-medium opacity-75 lg:font-semibold lg:uppercase lg:tracking-wide lg:opacity-80', colors[:title])
   end
 
   def value_classes
-    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-1 whitespace-nowrap", colors[:value])
+    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-0.5 lg:mt-1.5 lg:tabular-nums lg:tracking-tight truncate", colors[:value])
   end
 
   def subtitle_classes
-    class_names('text-xs mt-1 opacity-60 whitespace-nowrap', colors[:subtitle])
+    class_names('text-[10px] lg:text-xs mt-0.5 lg:mt-1 opacity-60 lg:opacity-70 truncate', colors[:subtitle])
   end
 
   def colors

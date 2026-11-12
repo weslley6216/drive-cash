@@ -1,7 +1,8 @@
 pt-BR:
   dashboard:
     earnings_detail_view:
-      title: "Detalhamento de Receitas"
+      title: "Total de Receitas"
+      title_month: "Receitas"
       columns:
         date: "Data"
         month: "Mês"
