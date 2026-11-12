@@ -23,4 +23,9 @@ class NotificationsController < ApplicationController
     current_user.notifications.unread.mark_all_read!
     respond_with_refresh(html_redirect: notifications_path)
   end
+
+  def clear
+    current_user.visible_notifications.read.dismiss_all!
+    respond_with_refresh(html_redirect: notifications_path)
+  end
 end

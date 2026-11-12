@@ -10,7 +10,10 @@ Rails.application.routes.draw do
   get '/coming_soon', to: 'application#coming_soon', as: :coming_soon
   resource :notification_preferences, only: %i[edit update]
   resources :notifications, only: %i[index destroy] do
-    collection { patch :read_all }
+    collection do
+      patch :read_all
+      delete :clear
+    end
     member { patch :open }
   end
   resources :weekly_summaries, only: :show, param: :week_start
