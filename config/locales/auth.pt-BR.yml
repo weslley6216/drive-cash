@@ -4,6 +4,7 @@ pt-BR:
       title: "Entrar — DriveCash"
       welcome: "Bem-vindo de volta"
       welcome_subtitle: "Entre para acompanhar seus ganhos e despesas."
+      welcome_subtitle_desktop: "Entre na sua conta para continuar."
       email_label: "E-mail"
       password_label: "Senha"
       forgot_password: "Esqueci a senha"
