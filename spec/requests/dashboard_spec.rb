@@ -59,8 +59,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('hidden lg:inline-flex')
       expect(response.body).to include('feed-loading-region')
       expect(response.body).to include('feed-loading-overlay--page')
-      expect(response.body).to include(I18n.t('sessions.sign_out'))
-      expect(response.body).to include(session_path)
+      expect(response.body).to include(I18n.t('sidebar_nav_component.account_hint'))
       expect(response.body).to include('w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm')
       expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
     end

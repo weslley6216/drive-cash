@@ -46,7 +46,7 @@ module Dashboard
             selected_year:   @filters[:year],
             selected_month:  @filters[:month],
             available_years: @filters[:available_years],
-            variant:         :compact
+            variant:         :chips
           )
           link_to(new_earning_path,
                   data:  { turbo_frame: 'modal' },

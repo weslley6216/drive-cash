@@ -1,6 +1,6 @@
 pt-BR:
   filter_component:
-    title: "Filtros:"
-    year: "Ano:"
-    month: "Mês:"
-    all_months: "TODOS"
+    title: "Filtros"
+    year: "Ano"
+    all_months: "Todos os meses"
+    all_chip: "Todos"
