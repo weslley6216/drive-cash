@@ -41,8 +41,11 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include(I18n.t('sidebar_nav_component.brand_subtitle'))
     end
 
-    it 'renders the settings link at the bottom' do
-      expect(html).to include(I18n.t('sidebar_nav_component.settings'))
+    it 'renders the account footer with the first name and the account hint' do
+      allow(Current).to receive(:user).and_return(build(:user, name: 'Weslley Campos'))
+
+      expect(html).to include('Weslley')
+      expect(html).to include(I18n.t('sidebar_nav_component.account_hint'))
       expect(html).to include('href="/account"')
     end
 
@@ -54,12 +57,6 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('href="/vehicle"')
     end
 
-    it 'renders the sign-out button with confirm-action controller' do
-      expect(html).to include(I18n.t('sessions.sign_out'))
-      expect(html).to include('data-controller="confirm-action"')
-      expect(html).to include('data-action="click->confirm-action#open"')
-    end
-
     it 'marks the nav as turbo-permanent with a stable id' do
       expect(html).to include('id="sidebar-nav"')
       expect(html).to include('data-turbo-permanent')
@@ -69,14 +66,19 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('data-controller="nav-active"')
       expect(html.scan('data-nav-active-target="tab"').size).to eq(5)
       expect(html).to include('data-active-classes="bg-blue-50 text-blue-700"')
-      expect(html).to include('data-inactive-classes="text-slate-600 hover:bg-slate-50 hover:text-slate-900"')
+      expect(html).to include('data-inactive-classes="text-slate-600 hover:bg-slate-50"')
     end
 
-    it 'exposes icon targets so the controller can swap icon color' do
-      expect(html.scan('data-nav-active-target="icon"').size).to eq(5)
-      expect(html).to include('data-active-classes="text-blue-600"')
-      expect(html).to include('data-inactive-classes="text-slate-400"')
+    it 'sizes the tab icons at 18px so they inherit the tab color' do
+      expect(html.scan('w-[18px] h-[18px]').size).to eq(5)
     end
+  end
+
+  it 'highlights the account footer when active: :more' do
+    html = view_context.render(described_class.new(active: :more))
+
+    expect(html).to include('rounded-lg bg-blue-50')
+    expect(html).to include('text-blue-700')
   end
 
   it 'highlights only the analysis tab when active: :analysis' do

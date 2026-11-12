@@ -4,6 +4,8 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
+  PHONE_GUTTER = 'px-5 pt-2 pb-4 sm:p-6'.freeze
+
   def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false, turbo_cache: true)
     @title = title
     @bottom_nav = bottom_nav
@@ -66,7 +68,7 @@ class LayoutComponent < ApplicationComponent
       'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
     else
       base = 'min-h-screen bg-gradient-to-br from-slate-50 to-slate-100'
-      @sidebar_nav ? "#{base} p-4 sm:p-6 lg:p-0" : "#{base} p-4 sm:p-6"
+      @sidebar_nav ? "#{base} #{PHONE_GUTTER} lg:p-0" : "#{base} #{PHONE_GUTTER}"
     end
   end
 
@@ -74,7 +76,7 @@ class LayoutComponent < ApplicationComponent
     return nil if @auth
 
     classes = []
-    classes << 'lg:ml-64' if @sidebar_nav
+    classes << 'lg:ml-60' if @sidebar_nav
     classes << 'h-full' if @app_shell
     classes.presence&.join(' ')
   end

@@ -190,7 +190,7 @@ RSpec.describe 'Account', type: :request do
       it 'renders the desktop sidebar' do
         get account_path
 
-        expect(response.body).to include('lg:flex lg:flex-col lg:w-64')
+        expect(response.body).to include('lg:flex lg:flex-col lg:w-60')
       end
 
       it 'submits the logout via a DELETE /session form' do

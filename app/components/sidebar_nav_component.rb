@@ -7,6 +7,9 @@ class SidebarNavComponent < ApplicationComponent
     { id: :vehicle, icon: PhlexIcons::Lucide::Truck, path_method: :vehicle_path }
   ].freeze
 
+  ACTIVE_TAB = 'bg-blue-50 text-blue-700'.freeze
+  INACTIVE_TAB = 'text-slate-600 hover:bg-slate-50'.freeze
+
   def initialize(active:)
     @active = active
   end
@@ -14,31 +17,31 @@ class SidebarNavComponent < ApplicationComponent
   def view_template
     nav(
       id:    'sidebar-nav',
-      class: 'hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-30',
+      class: 'hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-30',
       data:  { turbo_permanent: '', controller: 'nav-active' }
     ) do
       brand_section
       nav_tabs
-      settings_section
+      account_section
     end
   end
 
   private
 
   def brand_section
-    div(class: 'p-5 border-b border-slate-100') do
-      div(class: 'flex items-center gap-3') do
+    div(class: 'px-5 py-5 border-b border-slate-100') do
+      div(class: 'flex items-center gap-2') do
         render BrandMarkComponent.new(size: :sm, wordmark: false)
         div do
-          p(class: 'font-bold text-slate-800 text-sm') { I18n.t('sidebar_nav_component.brand') }
-          p(class: 'text-xs text-slate-500') { I18n.t('sidebar_nav_component.brand_subtitle') }
+          p(class: 'text-base font-bold text-slate-900 leading-tight') { I18n.t('sidebar_nav_component.brand') }
+          p(class: 'text-[11px] text-slate-500') { I18n.t('sidebar_nav_component.brand_subtitle') }
         end
       end
     end
   end
 
   def nav_tabs
-    div(class: 'flex-1 py-4 px-3 space-y-1') do
+    div(class: 'flex-1 p-3 space-y-1') do
       TABS.each { |tab| tab_link(tab) }
     end
   end
@@ -47,53 +50,36 @@ class SidebarNavComponent < ApplicationComponent
     active = tab[:id] == @active
     link_to(
       helpers.public_send(tab[:path_method]),
-      class: "sidebar-tab flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors #{active ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}",
-      data:  {
-        nav_active_target: 'tab',
-        active_classes:    'bg-blue-50 text-blue-700',
-        inactive_classes:  'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-      }
+      class: "sidebar-tab w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors #{active ? ACTIVE_TAB : INACTIVE_TAB}",
+      data:  { nav_active_target: 'tab', active_classes: ACTIVE_TAB, inactive_classes: INACTIVE_TAB }
     ) do
-      render tab[:icon].new(
-        class: "w-5 h-5 #{active ? 'text-blue-600' : 'text-slate-400'}",
-        data:  {
-          nav_active_target: 'icon',
-          active_classes:    'text-blue-600',
-          inactive_classes:  'text-slate-400'
-        }
-      )
+      render tab[:icon].new(class: 'w-[18px] h-[18px]')
       span { I18n.t("sidebar_nav_component.tabs.#{tab[:id]}") }
     end
   end
 
-  def settings_section
-    div(class: 'p-4 border-t border-slate-100 space-y-2') do
+  def account_section
+    active = @active == :more
+    div(class: 'p-3 border-t border-slate-100') do
       link_to(
         helpers.account_path,
-        class: 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+        class: "w-full flex items-center gap-3 px-3 py-2 rounded-lg #{active ? 'bg-blue-50' : 'hover:bg-slate-50'}"
       ) do
-        div(class: 'w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center') do
-          span(class: 'text-white text-xs font-medium') { 'W' }
+        div(class: 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold') do
+          plain first_name.first&.upcase
         end
-        span { I18n.t('sidebar_nav_component.settings') }
-      end
-
-      render ConfirmActionComponent.new(
-        title:          I18n.t('account.show_view.logout_modal.headline'),
-        icon:           PhlexIcons::Lucide::LogOut,
-        confirm_path:   helpers.session_path,
-        confirm_method: :delete,
-        confirm_label:  I18n.t('account.show_view.logout_modal.confirm'),
-        cancel_label:   I18n.t('account.show_view.logout_modal.cancel'),
-        description:    I18n.t('account.show_view.logout_modal.description'),
-        turbo:          false
-      ) do
-        button(
-          type:  'button',
-          class: 'w-full cursor-pointer text-left px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900',
-          data:  { action: 'click->confirm-action#open' }
-        ) { plain I18n.t('sessions.sign_out') }
+        div(class: 'flex-1 text-left') do
+          p(class: "text-sm font-medium leading-tight #{active ? 'text-blue-700' : 'text-slate-800'}") { first_name }
+          p(class: "text-[11px] #{active ? 'text-blue-600/80' : 'text-slate-500'}") do
+            I18n.t('sidebar_nav_component.account_hint')
+          end
+        end
+        render PhlexIcons::Lucide::ChevronRight.new(class: "w-3.5 h-3.5 #{active ? 'text-blue-400' : 'text-slate-400'}")
       end
     end
+  end
+
+  def first_name
+    Current.user&.first_name.to_s
   end
 end
