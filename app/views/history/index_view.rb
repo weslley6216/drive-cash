@@ -19,7 +19,7 @@ module History
         sidebar_nav: :history,
         app_shell:   true
       ) do
-        turbo_frame_tag 'page', class: 'flex-1 flex flex-col min-h-0' do
+        turbo_frame_tag 'page', class: 'flex-1 flex flex-col min-h-0 safe-top sm:pt-0' do
           div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
 
           static_header

@@ -15,6 +15,16 @@ RSpec.describe 'History', type: :system, js: true do
     element.evaluate_script('this.getBoundingClientRect().toJSON()')
   end
 
+  it 'starts the history title below the iOS status bar on a phone' do
+    visit history_path(year: 2026, month: 5)
+
+    title = find('h1', text: I18n.t('history.index.title'))
+
+    expect(computed('turbo-frame#page', 'paddingTop')).to eq('16px')
+    expect(box(title)['top'].round).to eq(24)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'lists the day groups with the platform badge and fits a five digit expense on a phone' do
     visit history_path(year: 2026, month: 5)
 
