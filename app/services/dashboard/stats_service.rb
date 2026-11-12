@@ -1,16 +1,16 @@
 module Dashboard
   class StatsService
-    def initialize(year: Date.current.year, month: nil, user: Current.user)
+    def initialize(year: Date.current.year, month: nil, user: Current.user, ledger: nil)
       @year = year
       @month = month
       @user = user
+      @ledger = ledger || YearLedger.new(user: user, year: year)
     end
 
     def metrics
       earnings_data = memoized_earnings_data
-      expenses_data = memoized_expenses_data
       earnings_total = earnings_data[:total]
-      expenses_total = expenses_data[:total]
+      expenses_total = ledger.spent_in(month)
       days_worked = earnings_data[:days_count]
       trips = earnings_data[:trips_count]
       profit_value = earnings_total - expenses_total
@@ -36,30 +36,10 @@ module Dashboard
 
     private
 
-    attr_reader :year, :month
+    attr_reader :year, :month, :ledger
 
     def memoized_earnings_data
-      @memoized_earnings_data ||= earnings_calculator.call
-    end
-
-    def memoized_expenses_data
-      @memoized_expenses_data ||= expenses_calculator.call
-    end
-
-    def earnings_scope
-      @earnings_scope ||= @user.earnings.in_period(year, month)
-    end
-
-    def expenses_scope
-      @expenses_scope ||= @user.expenses.paid_in_period(year, month)
-    end
-
-    def earnings_calculator
-      @earnings_calculator ||= EarningsCalculator.new(earnings_scope)
-    end
-
-    def expenses_calculator
-      @expenses_calculator ||= ExpensesCalculator.new(expenses_scope)
+      @memoized_earnings_data ||= EarningsCalculator.new(ledger.earning_days(month)).call
     end
 
     def derived_metrics(earnings, expenses, profit, days, trips)
@@ -80,7 +60,7 @@ module Dashboard
     end
 
     def profit_series
-      @profit_series ||= ProfitSeriesService.new(year: year, month: month, user: @user)
+      @profit_series ||= ProfitSeriesService.new(year: year, month: month, user: @user, ledger: ledger)
     end
 
     def change_percent

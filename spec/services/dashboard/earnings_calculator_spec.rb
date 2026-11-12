@@ -1,12 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Dashboard::EarningsCalculator do
-  subject(:calculator) { described_class.new(Earning.all) }
+  subject(:calculator) { described_class.new(earning_days) }
 
-  before do
-    create(:earning, date: '2025-01-01', amount: 200, platform: 'shopee')
-    create(:earning, date: '2025-01-01', amount: 300, platform: 'uber')
-    create(:earning, date: '2025-02-01', amount: 500, platform: 'shopee')
+  let(:earning_days) do
+    {
+      Date.new(2025, 1, 1) => Dashboard::YearLedger::EarningDay.new(amount: 500, trips: 2),
+      Date.new(2025, 2, 1) => Dashboard::YearLedger::EarningDay.new(amount: 500, trips: 1)
+    }
   end
 
   describe '#call' do
@@ -32,25 +33,19 @@ RSpec.describe Dashboard::EarningsCalculator do
       expect(result[:months_count]).to eq(2)
     end
 
-
     it 'sums trips_count across all earnings' do
       expect(result[:trips_count]).to eq(3)
     end
-  end
 
-  describe '#monthly_totals' do
-    it 'returns a 12-month array of profit-eligible earnings sums' do
-      create(:earning, date: Date.new(2026, 1, 10), amount: 100)
-      create(:earning, date: Date.new(2026, 1, 20), amount: 50)
-      create(:earning, date: Date.new(2026, 6, 5), amount: 200)
+    context 'without earnings' do
+      let(:earning_days) { {} }
 
-      scope = Earning.for_year(2026)
-      result = described_class.new(scope).monthly_totals
-
-      expect(result.size).to eq(12)
-      expect(result[0]).to eq(150.0)
-      expect(result[5]).to eq(200.0)
-      expect(result[11]).to eq(0.0)
+      it 'floors months_count at 1 and zeroes the averages and the total' do
+        expect(result[:months_count]).to eq(1)
+        expect(result[:avg_per_month]).to eq(0)
+        expect(result[:avg_per_day]).to eq(0)
+        expect(result[:total]).to eq(0)
+      end
     end
   end
 end

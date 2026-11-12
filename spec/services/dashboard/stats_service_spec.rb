@@ -80,5 +80,13 @@ RSpec.describe Dashboard::StatsService do
         expect(result[:days_avg_week]).to eq(2)
       end
     end
+
+    it 'computes the month and both series from a single injected ledger in two queries' do
+      ledger = Dashboard::YearLedger.new(user: user, year: 2025)
+
+      queries = count_queries { described_class.new(year: 2025, month: 1, user: user, ledger: ledger).call }
+
+      expect(queries).to eq(2)
+    end
   end
 end

@@ -69,5 +69,16 @@ RSpec.describe Dashboard::CategoryBreakdownService do
 
       expect(result.size).to eq(2)
     end
+
+    it 'reads the categories from an injected ledger' do
+      create(:expense, user: user, date: Date.new(2025, 6, 1), amount: 100, category: 'fuel', paid: true)
+      ledger = Dashboard::YearLedger.new(user: user, year: 2025)
+
+      result = nil
+      queries = count_queries { result = described_class.new(year: 2025, month: 6, user: user, ledger: ledger).call }
+
+      expect(result.first[:amount]).to eq(100)
+      expect(queries).to eq(1)
+    end
   end
 end
