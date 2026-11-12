@@ -6,10 +6,14 @@ module Dashboard
     end
 
     def call
-      earnings_count, earnings_sum, trips_sum = @user.earnings.where(date: @date)
-        .pick(Arel.sql('COUNT(*), SUM(amount), SUM(trips_count)'))
-      expenses_count, expenses_sum = @user.expenses.where(date: @date)
-        .pick(Arel.sql('COUNT(*), SUM(amount)'))
+      earnings_sql = @user.earnings.where(date: @date)
+        .select(Arel.sql('COUNT(*) AS earnings_count, SUM(amount) AS earnings_sum, SUM(trips_count) AS trips_sum')).to_sql
+      expenses_sql = @user.expenses.where(date: @date)
+        .select(Arel.sql('COUNT(*) AS expenses_count, SUM(amount) AS expenses_sum')).to_sql
+
+      earnings_count, earnings_sum, trips_sum, expenses_count, expenses_sum = Earning
+        .from("(#{earnings_sql}) AS earned CROSS JOIN (#{expenses_sql}) AS spent")
+        .pick(Arel.sql('earnings_count, earnings_sum, trips_sum, expenses_count, expenses_sum'))
 
       return nil if earnings_count.zero? && expenses_count.zero?
 

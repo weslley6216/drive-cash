@@ -1,10 +1,11 @@
 module Dashboard
   class AvailableYears
     def self.fetch(user: Current.user, date: Date.current)
-      earning_years = user.earnings.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::int'))
-      expense_years = user.expenses.distinct.pluck(Arel.sql('EXTRACT(YEAR FROM date)::int'))
+      union_sql = [user.earnings, user.expenses]
+        .map { |scope| scope.select(Arel.sql('EXTRACT(YEAR FROM date)::int AS year')).to_sql }
+        .join(' UNION ')
 
-      years = (earning_years + expense_years).uniq.sort.reverse
+      years = Earning.from("(#{union_sql}) AS years").pluck(Arel.sql('years.year'))
 
       (years + [date.year]).uniq.sort.reverse
     end
