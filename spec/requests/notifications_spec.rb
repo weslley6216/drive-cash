@@ -243,10 +243,13 @@ RSpec.describe 'Notifications', type: :request do
         create(:earning, user: user, date: Date.new(2026, 7, 10))
         get notifications_path
         patch read_all_notifications_path
+        generated = user.notifications.read.count
 
         delete clear_notifications_path
         get notifications_path
 
+        expect(generated).to be_positive
+        expect(user.notifications.count).to eq(generated)
         expect(user.notifications.visible.count).to eq(0)
         expect(response.body).to include(I18n.t('notifications.index.empty.title'))
       end
