@@ -103,6 +103,16 @@ RSpec.describe 'Notifications', type: :request do
         expect(response.body).not_to include('Registre o seu dia')
         expect(response.body).to include(I18n.t('notifications.index.unread_count', count: 1))
       end
+
+      it 'hides a notification read more than a week ago and keeps an old unread one' do
+        create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' }, read_at: 8.days.ago)
+        create(:notification, user: user, kind: 'log_reminder', created_at: 1.month.ago)
+
+        get notifications_path
+
+        expect(response.body).not_to include('Tanque no vermelho')
+        expect(response.body).to include('Registre o seu dia')
+      end
     end
   end
 
@@ -188,12 +198,72 @@ RSpec.describe 'Notifications', type: :request do
       expect(second.reload.read_at).to be_present
     end
 
+    it 'keeps unread the notifications of a disabled kind' do
+      user.update!(notification_settings: user.notification_settings.with('log_reminder', false))
+      hidden = create(:notification, user: user, kind: 'log_reminder')
+      shown = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+      patch read_all_notifications_path
+
+      expect(hidden.reload.read_at).to be_nil
+      expect(shown.reload.read_at).to be_present
+    end
+
     it 'leaves notifications of other users untouched' do
       other = create(:notification, user: create(:user))
 
       patch read_all_notifications_path
 
       expect(other.reload.read_at).to be_nil
+    end
+  end
+
+  describe 'DELETE /notifications/clear' do
+    before { login_as(user) }
+
+    it 'dismisses only the read notifications and redirects to the center' do
+      read = create(:notification, user: user, read_at: Time.current)
+      unread = create(:notification, user: user)
+
+      delete clear_notifications_path
+
+      expect(read.reload.dismissed_at).to be_present
+      expect(unread.reload.dismissed_at).to be_nil
+      expect(response).to redirect_to(notifications_path)
+    end
+
+    it 'answers a turbo stream refresh' do
+      create(:notification, user: user, read_at: Time.current)
+
+      delete clear_notifications_path, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('action="refresh"')
+    end
+
+    it 'leaves notifications of other users untouched' do
+      other = create(:notification, user: create(:user), read_at: Time.current)
+
+      delete clear_notifications_path
+
+      expect(other.reload.dismissed_at).to be_nil
+    end
+
+    it 'does not recreate cleared notifications on the next visit' do
+      travel_to Date.new(2026, 7, 14) do
+        create(:earning, user: user, date: Date.new(2026, 7, 10))
+        get notifications_path
+        patch read_all_notifications_path
+        generated = user.notifications.read.count
+
+        delete clear_notifications_path
+        get notifications_path
+
+        expect(generated).to be_positive
+        expect(user.notifications.count).to eq(generated)
+        expect(user.notifications.visible.count).to eq(0)
+        expect(response.body).to include(I18n.t('notifications.index.empty.title'))
+      end
     end
   end
 end

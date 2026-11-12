@@ -37,6 +37,32 @@ RSpec.describe Notification, type: :model do
     end
   end
 
+  describe '.read' do
+    it 'returns only notifications with read_at' do
+      read = create(:notification, user: user, read_at: Time.current)
+      create(:notification, user: user)
+
+      expect(described_class.read).to contain_exactly(read)
+    end
+  end
+
+  describe '.retained' do
+    it 'keeps unread notifications regardless of age' do
+      unread = create(:notification, user: user, created_at: 1.year.ago)
+
+      expect(described_class.retained).to contain_exactly(unread)
+    end
+
+    it 'keeps notifications read within the retention and drops older reads' do
+      freeze_time do
+        recent = create(:notification, user: user, read_at: described_class::READ_RETENTION.ago)
+        create(:notification, user: user, read_at: described_class::READ_RETENTION.ago - 1.second)
+
+        expect(described_class.retained).to contain_exactly(recent)
+      end
+    end
+  end
+
   describe '.chronological' do
     it 'orders from newest to oldest' do
       older = create(:notification, user: user, created_at: 2.days.ago)
@@ -69,6 +95,18 @@ RSpec.describe Notification, type: :model do
       user.notifications.unread.mark_all_read!
 
       expect(notification.reload.read_at).to be_present
+    end
+  end
+
+  describe '.dismiss_all!' do
+    it 'stamps dismissed_at on every notification in the relation' do
+      read = create(:notification, user: user, read_at: Time.current)
+      unread = create(:notification, user: user)
+
+      user.notifications.read.dismiss_all!
+
+      expect(read.reload.dismissed_at).to be_present
+      expect(unread.reload.dismissed_at).to be_nil
     end
   end
 

@@ -349,5 +349,14 @@ RSpec.describe User, type: :model do
 
       expect(user.visible_notifications).to be_empty
     end
+
+    it 'hides read notifications past the retention but keeps old unread ones' do
+      user = create(:user)
+      fresh_read = create(:notification, user: user, read_at: 2.days.ago)
+      old_unread = create(:notification, user: user, created_at: 1.month.ago)
+      create(:notification, user: user, read_at: 8.days.ago)
+
+      expect(user.visible_notifications).to contain_exactly(fresh_read, old_unread)
+    end
   end
 end

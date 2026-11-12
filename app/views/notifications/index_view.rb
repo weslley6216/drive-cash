@@ -1,8 +1,8 @@
 module Notifications
   class IndexView < ApplicationView
-    READ_ALL_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
-    READ_ALL_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-2 ' \
-                               'text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
+    HEADER_ACTION_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
+    HEADER_ACTION_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 ' \
+                                     'py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
     PREFERENCES_MOBILE_CLASSES = 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex ' \
                                  'items-center justify-center text-slate-600'
     PREFERENCES_DESKTOP_CLASSES = 'w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center ' \
@@ -39,7 +39,7 @@ module Notifications
           end
           preferences_link(css: PREFERENCES_MOBILE_CLASSES)
         end
-        div(class: 'flex justify-end px-1 mb-2') { read_all_button(css: READ_ALL_MOBILE_CLASSES) } unless @groups.empty?
+        div(class: 'flex justify-end px-1 mb-2') { header_action(css: HEADER_ACTION_MOBILE_CLASSES) } unless @groups.empty?
       end
     end
 
@@ -51,9 +51,7 @@ module Notifications
         end
         div(class: 'flex items-center gap-2') do
           unless @groups.empty?
-            read_all_button(css: READ_ALL_DESKTOP_CLASSES) do
-              render PhlexIcons::Lucide::Check.new(class: 'w-[15px] h-[15px] text-slate-500')
-            end
+            header_action(css: HEADER_ACTION_DESKTOP_CLASSES, icon_class: 'w-[15px] h-[15px] text-slate-500')
           end
           preferences_link(css: PREFERENCES_DESKTOP_CLASSES)
         end
@@ -67,10 +65,22 @@ module Notifications
       end
     end
 
-    def read_all_button(css:, &block)
-      button_to(helpers.read_all_notifications_path, method: :patch, class: css, form_class: 'contents') do
-        block&.call
-        plain t('notifications.index.read_all')
+    def header_action(css:, icon_class: nil)
+      if @unread_count.positive?
+        header_button(helpers.read_all_notifications_path, :patch, 'read_all', css: css) do
+          render PhlexIcons::Lucide::Check.new(class: icon_class) if icon_class
+        end
+      else
+        header_button(helpers.clear_notifications_path, :delete, 'clear_all', css: css) do
+          render PhlexIcons::Lucide::Trash2.new(class: icon_class) if icon_class
+        end
+      end
+    end
+
+    def header_button(path, method, label_key, css:, &icon)
+      button_to(path, method: method, class: css, form_class: 'contents') do
+        icon.call
+        plain t("notifications.index.#{label_key}")
       end
     end
 
