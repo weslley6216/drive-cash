@@ -201,7 +201,7 @@ RSpec.describe 'Expenses', type: :request do
             as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title_month'))
       expect(response.body).not_to include(I18n.t('expenses.edit_view.title'))
       expect(response.body).to include('action="refresh"')
     end
@@ -314,7 +314,7 @@ RSpec.describe 'Expenses', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq Mime[:turbo_stream]
-      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title_month'))
       expect(response.body).to include('action="refresh"')
       expect(response.body).not_to include('target="stats_grid"')
     end

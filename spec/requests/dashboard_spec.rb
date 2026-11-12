@@ -330,7 +330,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title_month'))
       expect(response.body).to include('100,50')
       expect(response.body).to include('250,00')
       expect(response.body).to include('350,50')
@@ -354,12 +354,49 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.columns.month'))
-      expect(response.body).to include(I18n.t('date.month_names')[1])
-      expect(response.body).to include(I18n.t('date.month_names')[2])
+      expect(response.body).to include(I18n.t('date.month_names')[1].capitalize)
+      expect(response.body).to include(I18n.t('date.month_names')[2].capitalize)
       expect(response.body).to include('100,00')
       expect(response.body).to include('300,00')
       expect(response.body).to include('400,00')
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.total'))
+    end
+  end
+
+  describe 'detail modal chrome' do
+    it 'draws the annual earnings card like the prototype: accent top border, total title, chevrons and tight paddings' do
+      create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100)
+
+      get dashboard_earnings_detail_path(year: 2025)
+
+      expect(response.body).to include('bg-white rounded-2xl shadow-2xl w-full max-w-[380px]')
+      expect(response.body).to include('border-t-4 border-t-blue-600')
+      expect(response.body).to include(%(<h2 class="text-lg font-bold tracking-tight text-blue-600 truncate">#{I18n.t('dashboard.earnings_detail_view.title')}</h2>))
+      expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">2025</p>')
+      expect(response.body).to include('w-[15px] h-[15px] text-slate-300')
+      expect(response.body).to include('class="text-green-700">R$ 100,00</span>')
+      expect(response.body).to include('px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium')
+    end
+
+    it 'lists the month earnings as day/month with the actions before the amount' do
+      create(:earning, user: current_user, date: Date.new(2025, 1, 15), amount: 100)
+
+      get dashboard_earnings_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('>15/01</td>')
+      expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">Janeiro · 2025</p>')
+      expect(response.body).to include('overflow-y-auto px-5 py-3 max-h-[360px]')
+      expect(response.body).to match(/aria-label="#{I18n.t('dashboard.earnings_detail_view.edit')}".*R\$ 100,00/m)
+    end
+
+    it 'groups the month expenses under a short day label in the red theme' do
+      create(:expense, user: current_user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', vendor: 'Posto Shell')
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('>15 jan</p>')
+      expect(response.body).to include('border-t-4 border-t-red-600')
+      expect(response.body).to include('class="text-red-700">R$ 80,00</span>')
     end
   end
 
@@ -373,7 +410,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title'))
+      expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title_month'))
       expect(response.body).to include('Posto Shell')
       expect(response.body).to include('Lanchonete')
       expect(response.body).to include('Oficina')
@@ -428,8 +465,8 @@ RSpec.describe 'Dashboard', type: :request do
       get dashboard_expenses_detail_path(year: 2025)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(I18n.t('date.month_names')[1])
-      expect(response.body).to include(I18n.t('date.month_names')[2])
+      expect(response.body).to include(I18n.t('date.month_names')[1].capitalize)
+      expect(response.body).to include(I18n.t('date.month_names')[2].capitalize)
       expect(response.body).to include('100,00')
       expect(response.body).to include('200,00')
       expect(response.body).to include('300,00')

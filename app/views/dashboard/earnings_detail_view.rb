@@ -11,7 +11,7 @@ module Dashboard
 
     def view_template
       render_detail_modal(theme: @theme) do
-        render_header(subtitle: period_subtitle(@filters))
+        render_detail_header(title: detail_title, subtitle: period_subtitle(@filters))
         scrollable_content
         fixed_footer
       end
@@ -24,7 +24,7 @@ module Dashboard
     end
 
     def scrollable_content
-      div(class: 'flex-1 overflow-y-auto p-6 pt-4') do
+      div(class: 'flex-1 overflow-y-auto px-5 py-3 max-h-[360px]') do
         if has_rows?
           earnings_table
         else
@@ -37,10 +37,10 @@ module Dashboard
       table(class: 'w-full text-left border-collapse') do
         thead do
           tr(class: 'border-b border-slate-200') do
-            th(class: 'py-2 text-sm font-medium text-slate-600') do
+            th(class: 'pb-3 text-sm font-medium text-slate-600') do
               @annual ? t('.columns.month') : t('.columns.date')
             end
-            th(class: 'py-2 text-sm font-medium text-slate-600 text-right w-1 whitespace-nowrap') do
+            th(class: 'pb-3 text-sm font-medium text-slate-600 text-right w-1 whitespace-nowrap') do
               t('.columns.amount')
             end
           end
@@ -54,10 +54,13 @@ module Dashboard
                   link_to(
                     dashboard_earnings_detail_path(year: @filters[:year], month: row[:month]),
                     data:  { turbo_frame: 'modal' },
-                    class: 'flex justify-between items-center w-full py-2.5 px-0 text-left text-slate-800 capitalize hover:bg-slate-50 transition-colors'
+                    class: 'flex justify-between items-center w-full py-2.5 px-0 text-left text-slate-800 hover:bg-slate-50 transition-colors'
                   ) do
-                    span { row[:month_name].to_s }
-                    span(class: 'font-medium text-green-700') { format_currency(row[:total]) }
+                    span { row[:month_name].to_s.capitalize }
+                    span(class: 'flex items-center gap-2') do
+                      span(class: 'font-medium text-green-700') { format_currency(row[:total]) }
+                      chevron
+                    end
                   end
                 end
               end
@@ -67,14 +70,16 @@ module Dashboard
               tr(class: 'border-b border-slate-100 group') do
                 td(class: 'py-2.5 text-slate-800') { format_date(earning.date) }
                 td(class: 'py-2.5 text-right w-1 whitespace-nowrap') do
-                  div(class: 'flex items-center gap-2 flex-shrink-0 group justify-end') do
-                    span(class: 'font-medium text-green-700') { format_currency(earning.amount) }
-                    render_record_actions(
+                  div(class: 'flex items-center gap-3 flex-shrink-0 group justify-end') do
+                    div(class: 'flex items-center gap-2') do
+                      render_record_actions(
                       edit_path:   edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: earning_path(earning, context: @filters),
                       edit_hover:  'hover:text-blue-600',
                       labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description'), cancel: t('.confirm_delete_cancel') }
                     )
+                    end
+                    span(class: 'font-medium text-green-700') { format_currency(earning.amount) }
                   end
                 end
               end
@@ -86,17 +91,15 @@ module Dashboard
 
     def fixed_footer
       render_detail_footer(
-        annual:          @annual,
-        show_total:      has_rows?,
-        total:           @total,
-        total_class:     'text-green-800',
-        back_path:       dashboard_earnings_detail_path(year: @filters[:year]),
-        labels:          {
+        annual:     @annual,
+        show_total: has_rows?,
+        total:      @total,
+        back_path:  dashboard_earnings_detail_path(year: @filters[:year]),
+        labels:     {
           total: t('.total'),
           close: t('.close'),
           back:  t('.back')
-        },
-        padding_classes: 'px-6'
+        }
       )
     end
   end

@@ -7,6 +7,12 @@ module ModalStyles
     close_button: 'transition-colors p-2 flex-shrink-0 cursor-pointer'
   }.freeze
 
+  DETAIL_CARD = 'bg-white rounded-2xl shadow-2xl w-full max-w-[380px] max-h-[90vh] flex flex-col overflow-hidden ' \
+                'animate-slide-up border-t-4'.freeze
+  DETAIL_ACCENTS = {
+    blue: { border: 'border-t-blue-600', title: 'text-blue-600', total: 'text-green-700' },
+    red:  { border: 'border-t-red-600', title: 'text-red-600', total: 'text-red-700' }
+  }.freeze
 
   def modal_backdrop_classes
     MODAL_CLASSES[:backdrop]
