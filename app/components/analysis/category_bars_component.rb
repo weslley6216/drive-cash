@@ -1,5 +1,6 @@
 module Analysis
   class CategoryBarsComponent < ApplicationComponent
+    include CardStyles
     include CategoryPalette
 
     def initialize(categories:, month: nil)
@@ -9,7 +10,7 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full') do
+      section(class: "#{CARD} p-4 #{DESKTOP_FLAT} lg:p-6 lg:h-full") do
         h3(class: 'text-sm lg:text-base font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.categories.title') }
         p(class: 'text-xs text-slate-500 mb-3 lg:mb-5') { total_subtitle }
         @categories.empty? ? empty_state : list

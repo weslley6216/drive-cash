@@ -1,4 +1,5 @@
 class RecentActivityComponent < ApplicationComponent
+  include CardStyles
   STYLES = {
     earning: {
       icon:         PhlexIcons::Lucide::Truck,
@@ -46,7 +47,7 @@ class RecentActivityComponent < ApplicationComponent
   end
 
   def list
-    div(class: 'bg-white rounded-xl shadow-sm border border-slate-100 lg:border-slate-200 lg:shadow-none divide-y divide-slate-100') do
+    div(class: "#{CARD} #{DESKTOP_FLAT} divide-y divide-slate-100") do
       @rows.each { |row| activity_row(row) }
     end
   end

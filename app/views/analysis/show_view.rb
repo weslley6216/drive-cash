@@ -1,5 +1,6 @@
 module Analysis
   class ShowView < ApplicationView
+    include CardStyles
     include TopbarStyles
 
     METRIC_ICONS = {
@@ -66,7 +67,7 @@ module Analysis
     def empty_state
       div(class: 'space-y-4') do
         dimmed_chart_frame
-        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+        div(class: CARD) do
           render EmptyStateComponent.new(
             icon:        PhlexIcons::Lucide::ChartColumn,
             title:       t('empty_states.analysis.title', period: period_label),
@@ -81,7 +82,7 @@ module Analysis
     end
 
     def dimmed_chart_frame
-      div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5') do
+      div(class: "#{CARD} p-4") do
         p(class: 'text-sm font-semibold text-slate-700 mb-3') { t('.empty_chart_title') }
         div(class: 'flex items-end justify-between gap-1 h-[90px]') do
           14.times do

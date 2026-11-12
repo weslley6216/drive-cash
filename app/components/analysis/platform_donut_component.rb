@@ -1,5 +1,6 @@
 module Analysis
   class PlatformDonutComponent < ApplicationComponent
+    include CardStyles
     include PlatformPalette
 
     DEFAULT_SIZE = 140
@@ -13,7 +14,7 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6 lg:h-full') do
+      section(class: "#{CARD} p-4 #{DESKTOP_FLAT} lg:p-6 lg:h-full") do
         h3(class: 'text-sm lg:text-base font-semibold text-slate-800 mb-1') { I18n.t('analysis.show_view.platforms.title') }
         p(class: 'text-xs text-slate-500 mb-3 lg:mb-5') { total_subtitle }
         @platforms.empty? ? empty_state : body

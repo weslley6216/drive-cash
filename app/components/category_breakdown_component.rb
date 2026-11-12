@@ -1,4 +1,5 @@
 class CategoryBreakdownComponent < ApplicationComponent
+  include CardStyles
   include CategoryPalette
 
   def initialize(categories:)
@@ -33,7 +34,7 @@ class CategoryBreakdownComponent < ApplicationComponent
   end
 
   def list
-    div(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3 lg:border-slate-200 lg:shadow-none lg:p-5 lg:gap-3.5') do
+    div(class: "#{CARD} p-4 flex flex-col gap-3 #{DESKTOP_FLAT} lg:p-5 lg:gap-3.5") do
       @categories.first(DESKTOP_ROWS).each_with_index do |category, index|
         category_row(category, desktop_only: index >= MOBILE_ROWS)
       end

@@ -1,5 +1,6 @@
 module Analysis
   class BarChartComponent < ApplicationComponent
+    include CardStyles
     PLOT_HEIGHT = 'h-[118px] lg:h-[206px]'.freeze
     BAR_WIDTH = { month: 'w-[5px] lg:w-3', day: 'w-[3px] lg:w-1.5' }.freeze
     DAY_LABELS = 8
@@ -14,7 +15,7 @@ module Analysis
     end
 
     def view_template
-      section(class: 'bg-white rounded-xl shadow-sm border border-slate-100 p-4 lg:border-slate-200 lg:shadow-none lg:p-6') do
+      section(class: "#{CARD} p-4 #{DESKTOP_FLAT} lg:p-6") do
         header
         @bars.empty? ? empty_state : chart
       end

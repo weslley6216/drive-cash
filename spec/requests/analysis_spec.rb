@@ -124,6 +124,8 @@ RSpec.describe 'Analysis', type: :request do
 
       expect(response.body).to include(%(<p class="text-sm font-semibold text-slate-700 mb-3">#{I18n.t('analysis.show_view.empty_chart_title')}</p>))
       expect(I18n.t('analysis.show_view.empty_chart_title')).to eq('Receita × Despesa')
+      expect(response.body).to include('bg-white rounded-xl shadow-sm border border-slate-100 p-4')
+      expect(response.body).not_to include('rounded-2xl border border-slate-100 shadow-sm')
     end
 
     it 'renders the prototype topbar with the white desktop bar and the export shortcut' do

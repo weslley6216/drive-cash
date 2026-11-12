@@ -78,6 +78,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response.body).to include(I18n.t('empty_states.home.title'))
       expect(response.body).not_to include('data-controller="filter"')
+      expect(response.body).to include('<div class="bg-white rounded-xl shadow-sm border border-slate-100">')
     end
 
     it 'keeps the period filter on an empty year when the user has records in another year' do

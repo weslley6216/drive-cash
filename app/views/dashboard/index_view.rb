@@ -1,5 +1,6 @@
 module Dashboard
   class IndexView < ApplicationComponent
+    include CardStyles
     include TopbarStyles
 
     def initialize(totals:, first_name:, unread_count:, filters: {}, recent_activity: [], categories: [], today: nil,
@@ -112,7 +113,7 @@ module Dashboard
     def empty_region
       div(class: 'space-y-4') do
         render Dashboard::EmptyHeroComponent.new(year: @filters[:year])
-        div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm') do
+        div(class: CARD) do
           render EmptyStateComponent.new(
             icon:            PhlexIcons::Lucide::Receipt,
             icon_color:      'text-blue-600',

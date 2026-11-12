@@ -1,5 +1,6 @@
 module Analysis
   class MetricCardComponent < ApplicationComponent
+    include CardStyles
     def initialize(label:, icon:, value:, series:, variant: :compact, class_name: nil)
       @label = label
       @icon = icon
@@ -41,7 +42,7 @@ module Analysis
     end
 
     def compact_card
-      div(class: class_names('bg-white rounded-xl shadow-sm border border-slate-100 min-w-0 p-3.5 lg:p-5', @class_name)) do
+      div(class: class_names("#{CARD} min-w-0 p-3.5 lg:p-5", @class_name)) do
         div(class: 'flex items-center gap-1.5 text-slate-500 mb-1') do
           render @icon.new(class: 'lucide w-3 h-3')
           span(class: 'text-[11px] font-medium truncate') { @label }
