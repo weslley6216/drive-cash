@@ -336,6 +336,19 @@ RSpec.describe 'Dashboard', type: :request do
         expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
       end
     end
+
+    it 'loads the home of a selected month within ten queries' do
+      travel_to Time.zone.local(2026, 3, 15, 10, 0)
+      create(:earning, user: current_user, date: Date.new(2026, 3, 15), amount: 500)
+      create(:expense, user: current_user, date: Date.new(2026, 3, 10), amount: 120, category: 'fuel', paid: true)
+      create(:goal, user: current_user, kind: 'monthly', metric: 'profit', target_amount: 1000,
+             period_start: Date.new(2026, 3, 1), period_end: Date.new(2026, 3, 31))
+
+      queries = count_queries { get root_path, params: { year: 2026, month: 3 } }
+
+      expect(queries).to be <= 10
+      expect(response.body.squish).to include('380,00')
+    end
   end
 
   describe 'GET /dashboard/earnings_detail' do

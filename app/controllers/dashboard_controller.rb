@@ -2,22 +2,13 @@ class DashboardController < ApplicationController
   before_action :set_dashboard_filters, only: %i[index earnings_detail expenses_detail]
 
   def index
-    @totals = Dashboard::StatsService.new(year: @year, month: @month, user: current_user).call
-    @recent_activity = Dashboard::RecentActivityService.new(year: @year, month: @month, user: current_user).call
-    @categories = Dashboard::CategoryBreakdownService.new(year: @year, month: @month, user: current_user).call
-    @today = Dashboard::TodayService.new(user: current_user).call
-    reference = filter_reference_date
-    @monthly_goal = reference && Goals::ProgressService.new(user: current_user, date: reference).monthly
+    home = Dashboard::HomeService.new(user: current_user, year: @year, month: @month, reference_date: filter_reference_date).call
 
     render Dashboard::IndexView.new(
-      totals:          @totals,
-      first_name:      current_user.first_name,
-      unread_count:    current_user.visible_notifications.unread.count,
-      filters:         @filters,
-      recent_activity: @recent_activity,
-      categories:      @categories,
-      today:           @today,
-      monthly_goal:    @monthly_goal
+      **home,
+      first_name:   current_user.first_name,
+      unread_count: current_user.visible_notifications.unread.count,
+      filters:      @filters
     )
   end
 
