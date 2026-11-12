@@ -155,7 +155,7 @@ class FilterComponent < ApplicationComponent
   def month_options
     option(value: '', selected: @selected_month.nil?) { t('.all_months') }
 
-    (1..12).each do |month_index|
+    selectable_months.each do |month_index|
       option(value: month_index, selected: month_index.to_s == @selected_month.to_s) do
         I18n.t('date.month_names')[month_index].capitalize
       end

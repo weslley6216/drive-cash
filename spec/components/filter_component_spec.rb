@@ -23,6 +23,17 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to include(">#{I18n.t('filter_component.all_months')}</option>")
     end
 
+    it 'offers only the elapsed months of the current year in the month select' do
+      expect(html).to include('value="5">Maio</option>')
+      expect(html).not_to include('value="6">Junho</option>')
+    end
+
+    it 'offers every month of a past year in the month select' do
+      past = render_filter(selected_year: 2025)
+
+      expect(past).to include('value="12">Dezembro</option>')
+    end
+
     it 'selects the chosen year' do
       expect(html).to include('value="2026" selected')
       expect(html).not_to include('value="2025" selected')
