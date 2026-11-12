@@ -103,6 +103,16 @@ RSpec.describe 'Notifications', type: :request do
         expect(response.body).not_to include('Registre o seu dia')
         expect(response.body).to include(I18n.t('notifications.index.unread_count', count: 1))
       end
+
+      it 'hides a notification read more than a week ago and keeps an old unread one' do
+        create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' }, read_at: 8.days.ago)
+        create(:notification, user: user, kind: 'log_reminder', created_at: 1.month.ago)
+
+        get notifications_path
+
+        expect(response.body).not_to include('Tanque no vermelho')
+        expect(response.body).to include('Registre o seu dia')
+      end
     end
   end
 
