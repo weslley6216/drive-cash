@@ -40,5 +40,17 @@ RSpec.describe Dashboard::AvailableYears do
 
       expect(result).to eq(result.sort.reverse)
     end
+
+    it 'lists each year once when earnings and expenses share it, in a single query' do
+      create(:earning, user: user, date: '2023-06-01')
+      create(:expense, user: user, date: '2023-06-01', category: 'fuel')
+      create(:earning, user: user, date: '2024-01-01')
+
+      years = nil
+      queries = count_queries { years = described_class.fetch(user: user, date: Date.new(2026, 1, 1)) }
+
+      expect(years).to eq([2026, 2024, 2023])
+      expect(queries).to eq(1)
+    end
   end
 end

@@ -1,9 +1,7 @@
 module Dashboard
   class EarningsCalculator
-    include MonthlyTotals
-
-    def initialize(scope)
-      @scope = scope
+    def initialize(earning_days)
+      @earning_days = earning_days
     end
 
     def call
@@ -19,18 +17,18 @@ module Dashboard
 
     private
 
-    attr_reader :scope
+    attr_reader :earning_days
 
     def total_earnings
-      @total_earnings ||= scope.sum(:amount)
+      @total_earnings ||= earning_days.values.sum(0) { |earning_day| earning_day.amount }
     end
 
     def days_count
-      @days_count ||= scope.select(:date).distinct.count
+      @days_count ||= earning_days.size
     end
 
     def months_count
-      @months_count ||= ScopeMonthCounter.count_for(scope)
+      @months_count ||= [earning_days.keys.map(&:month).uniq.size, 1].max
     end
 
     def avg_per_month
@@ -44,7 +42,7 @@ module Dashboard
     end
 
     def total_trips
-      @total_trips ||= scope.sum(:trips_count)
+      @total_trips ||= earning_days.values.sum(0) { |earning_day| earning_day.trips }
     end
   end
 end

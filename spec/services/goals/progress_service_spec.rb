@@ -192,6 +192,28 @@ RSpec.describe Goals::ProgressService do
       expect(result[:current]).to eq(2000)
       expect(result[:target]).to eq(6000)
     end
+
+    it 'reads the goal metric from injected totals that cover the goal period' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+      injected = Goals::DailyTotals.new({ Date.new(2026, 6, 5) => 700 }, {}, range: Date.new(2026, 1, 1)..Date.new(2026, 12, 31))
+
+      result = described_class.new(user: user, date: reference_date, daily_totals: injected).monthly
+
+      expect(result[:current]).to eq(700)
+    end
+
+    it 'falls back to the database when the injected totals do not cover the goal period' do
+      create(:goal, user: user, kind: 'monthly', target_amount: 6000,
+             period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 2000)
+      injected = Goals::DailyTotals.new({ Date.new(2026, 6, 5) => 700 }, {}, range: Date.new(2025, 1, 1)..Date.new(2025, 12, 31))
+
+      result = described_class.new(user: user, date: reference_date, daily_totals: injected).monthly
+
+      expect(result[:current]).to eq(2000)
+    end
   end
 
   describe '#past_goals' do

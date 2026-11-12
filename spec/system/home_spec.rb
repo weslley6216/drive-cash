@@ -72,4 +72,19 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to have_no_link(I18n.t('filter_component.all_chip'))
     expect(page).to fit_the_phone_width
   end
+
+  it 'scrolls the strip so the December chip of a past year sits inside it on a phone' do
+    create(:earning, user: current_user, date: Date.new(2025, 12, 5), amount: 300)
+
+    visit root_path(year: 2025, month: 12)
+
+    chip = find('a', text: 'Dez', exact_text: true)
+    strip = chip.find(:xpath, 'ancestor::div[@data-controller="chip-strip"][1]')
+    chip_box = box(chip)
+    strip_box = box(strip)
+
+    expect(chip_box['left']).to be >= strip_box['left']
+    expect(chip_box['right']).to be <= strip_box['right']
+    expect(page).to fit_the_phone_width
+  end
 end

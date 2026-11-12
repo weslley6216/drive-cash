@@ -25,7 +25,7 @@ class FilterComponent < ApplicationComponent
   end
 
   def chips_view
-    div(class: 'flex items-center gap-2 -mx-1 px-1 -my-[5px] overflow-x-auto [scrollbar-width:none] lg:hidden') do
+    div(class: 'flex items-center gap-2 -mx-1 px-1 -my-[5px] overflow-x-auto [scrollbar-width:none] lg:hidden', data: { controller: 'chip-strip' }) do
       year_chip_form
       month_chips
     end
@@ -82,7 +82,8 @@ class FilterComponent < ApplicationComponent
 
   def chip_link(label, month)
     active = month.to_s == @selected_month.to_s
-    a(href: period_path(month), class: 'flex-shrink-0 flex items-center h-11') do
+    data = active ? { chip_strip_target: 'active' } : {}
+    a(href: period_path(month), class: 'flex-shrink-0 flex items-center h-11', data: data) do
       span(class: "#{CHIP} #{active ? CHIP_ACTIVE : CHIP_IDLE}") { label }
     end
   end

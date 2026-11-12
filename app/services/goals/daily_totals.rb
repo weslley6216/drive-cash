@@ -3,7 +3,7 @@ module Goals
     def self.for(user:, range:)
       earnings_by_day = user.earnings.where(date: range).group(:date).sum(:amount).transform_keys(&:to_date)
       expenses_by_day = user.expenses.paid_only.where(date: range).group(:date).sum(:amount).transform_keys(&:to_date)
-      new(earnings_by_day, expenses_by_day)
+      new(earnings_by_day, expenses_by_day, range: range)
     end
 
     def self.for_goals(user:, goals:)
@@ -13,9 +13,14 @@ module Goals
       self.for(user: user, range: range)
     end
 
-    def initialize(earnings_by_day, expenses_by_day)
+    def initialize(earnings_by_day, expenses_by_day, range: nil)
       @earnings_by_day = earnings_by_day
       @expenses_by_day = expenses_by_day
+      @range = range
+    end
+
+    def covers?(period)
+      @range.present? && @range.cover?(period)
     end
 
     def metric_for(goal)

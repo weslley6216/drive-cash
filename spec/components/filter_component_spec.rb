@@ -56,8 +56,10 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).not_to include('month=6')
     end
 
-    it 'highlights the selected month chip' do
-      expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
+    it 'marks only the active chip as the strip target' do
+      expect(html).to include('data-controller="chip-strip"')
+      expect(html.scan('data-chip-strip-target="active"').size).to eq(1)
+      expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11" data-chip-strip-target="active"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
     end
 
     it 'keeps the pills for desktop screens' do

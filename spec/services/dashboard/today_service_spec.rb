@@ -54,5 +54,16 @@ RSpec.describe Dashboard::TodayService do
 
       expect(result).to be_nil
     end
+
+    it 'reads the reference-date totals in a single query' do
+      reference = Date.new(2026, 3, 10)
+      create(:earning, user: user, date: reference, amount: 100, trips_count: 3)
+      create(:earning, user: user, date: reference, amount: 50, trips_count: 2)
+      create(:expense, user: user, date: reference, amount: 30, paid: true)
+
+      queries = count_queries { described_class.new(user: user, date: reference).call }
+
+      expect(queries).to eq(1)
+    end
   end
 end
