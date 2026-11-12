@@ -94,7 +94,7 @@ class LayoutComponent < ApplicationComponent
       base = 'h-full max-w-7xl mx-auto flex flex-col min-h-0'
       @sidebar_nav ? "#{base} lg:px-8" : base
     else
-      base = 'max-w-7xl mx-auto'
+      base = 'max-w-7xl mx-auto pt-2 sm:pt-0'
       base = "#{base} pb-24 lg:pb-6" if @bottom_nav
       base = "#{base} lg:p-8" if @sidebar_nav
       base

@@ -30,6 +30,10 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('px-5 safe-top pb-4 sm:p-6')
     end
 
+    it 'keeps the 8px header gutter inside the phone safe top' do
+      expect(html).to include('class="max-w-7xl mx-auto pt-2 sm:pt-0"')
+    end
+
     it 'renders an opaque bar the height of the top inset over the scrolled content' do
       expect(html).to include('id="safe-top-bar"')
       expect(html).to include('fixed top-0 inset-x-0 h-[env(safe-area-inset-top)] bg-slate-50 z-40')

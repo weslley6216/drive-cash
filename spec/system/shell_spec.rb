@@ -33,12 +33,12 @@ RSpec.describe 'App shell', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'starts the Home 16px below the top with an opaque slate bar behind the status bar on a phone' do
+  it 'starts the Home header 24px below the top like the prototype, with an opaque slate bar behind the status bar on a phone' do
     visit root_path
 
     eyebrow = find('p', text: I18n.t('dashboard.index_view.eyebrow').upcase)
 
-    expect(box_of(eyebrow)['top'].round).to eq(16)
+    expect(box_of(eyebrow)['top'].round).to eq(24)
     expect(computed('#safe-top-bar', 'position')).to eq('fixed')
     expect(computed('#safe-top-bar', 'backgroundColor')).to eq('rgb(248, 250, 252)')
     expect(computed('#safe-top-bar', 'zIndex')).to eq('40')
@@ -46,13 +46,13 @@ RSpec.describe 'App shell', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'starts the vehicle screen 16px below the top on a phone' do
+  it 'starts the vehicle title 24px below the top like the prototype on a phone' do
     create(:vehicle, user: current_user)
 
     visit vehicle_path
 
     expect(page).to have_css('h1', text: I18n.t('vehicle.title'))
-    expect(box('h1')['top'].round).to eq(16)
+    expect(box('h1')['top'].round).to eq(24)
     expect(page).to fit_the_phone_width
   end
 
