@@ -39,6 +39,7 @@ RSpec.describe StatsGridComponent, type: :component do
 
       expect(html).to include('Receitas')
       expect(html).to include('Dias trabalhados')
+      expect(html).to include('<span class="lg:hidden">Dias</span>')
       expect(html).to include('Rotas')
       expect(html).not_to include('Total de')
     end
@@ -60,9 +61,15 @@ RSpec.describe StatsGridComponent, type: :component do
       let(:component) { StatsGridComponent.new(totals: totals, month: nil) }
       let(:html) { view_context.render(component).squish }
 
+      it 'writes the subtitles with the prototype wording' do
+        expect(html).to include('Média R$ 500/mês')
+        expect(html).to include('10 dias/mês')
+        expect(html).to include('25 rotas/mês')
+      end
+
       it 'renders monthly average for earnings' do
         expect(html).to include(
-          I18n.t('dashboard.index_view.stats.earnings.subtitle_annual', value: 'R$ 500,00')
+          I18n.t('dashboard.index_view.stats.earnings.subtitle_annual', value: 'R$ 500')
         )
       end
 
@@ -102,7 +109,7 @@ RSpec.describe StatsGridComponent, type: :component do
 
       it 'renders daily average for earnings' do
         expect(html).to include(
-          I18n.t('dashboard.index_view.stats.earnings.subtitle_monthly', value: 'R$ 50,00')
+          I18n.t('dashboard.index_view.stats.earnings.subtitle_monthly', value: 'R$ 50')
         )
       end
 

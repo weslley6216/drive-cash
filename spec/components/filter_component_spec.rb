@@ -40,13 +40,13 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'renders a funnel year pill and one chip per elapsed month on phones' do
       expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-700')
-      expect(html).to include(">#{I18n.t('filter_component.all_chip')}</a>")
+      expect(html).to include(">#{I18n.t('filter_component.all_chip')}</span></a>")
       expect(html).to include('href="/?month=5&year=2026"')
       expect(html).not_to include('month=6')
     end
 
     it 'highlights the selected month chip' do
-      expect(html).to include('href="/?month=3&year=2026" class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium"')
+      expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
     end
 
     it 'keeps the pills for desktop screens' do

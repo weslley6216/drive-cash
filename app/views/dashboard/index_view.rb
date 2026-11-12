@@ -29,11 +29,15 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: 'mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between') do
+      div(class: 'mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 ' \
+                 'lg:-mx-8 lg:-mt-8 lg:mb-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200') do
         div(class: 'flex items-center justify-between') do
           div do
-            h1(class: 'text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight') { t('.greeting', name: @first_name) }
-            p(class: 'text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
+            p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }
+            h1(class: 'text-2xl font-bold text-slate-800 mt-0.5 lg:mt-0 lg:text-slate-900 lg:tracking-tight') do
+              t('.greeting', name: @first_name)
+            end
+            p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
           end
           div(class: 'flex items-center gap-2 lg:hidden') do
             bell_button
@@ -41,7 +45,7 @@ module Dashboard
           end
         end
 
-        div(class: 'flex items-center gap-2 flex-wrap') do
+        div(class: 'flex items-center gap-3') do
           render FilterComponent.new(
             selected_year:   @filters[:year],
             selected_month:  @filters[:month],
@@ -54,10 +58,7 @@ module Dashboard
             render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
             plain t('.new_record')
           end
-          div(class: 'hidden lg:flex items-center gap-2') do
-            bell_button
-            avatar_link
-          end
+          div(class: 'hidden lg:flex items-center') { bell_button }
         end
       end
     end
@@ -121,14 +122,14 @@ module Dashboard
     end
 
     def primary_grid
-      div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
+      div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mb-4 lg:mb-6') do
         div(id: 'hero_profit_card', class: 'lg:col-span-8') do
           render HeroProfitCardComponent.new(hero: hero_payload)
         end
 
-        div(class: 'lg:col-span-4 flex flex-col gap-4') do
+        div(class: 'lg:col-span-4 flex flex-col gap-4 lg:gap-5') do
           render CajuQuickAccessComponent.new
-          div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
+          div(id: 'today_card', class: 'hidden lg:block') { render TodayCardComponent.new(**@today) if @today }
         end
       end
     end
@@ -147,7 +148,7 @@ module Dashboard
     end
 
     def monthly_goal_mobile_section
-      div(id: 'monthly_goal_card', class: 'lg:hidden mb-6') do
+      div(id: 'monthly_goal_card', class: 'lg:hidden mb-4') do
         render Goals::MonthlyGoalCardComponent.new(progress: @monthly_goal) if @monthly_goal
       end
     end
@@ -161,7 +162,7 @@ module Dashboard
     end
 
     def secondary_grid
-      div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6') do
+      div(class: 'grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 mb-6') do
         div(id: 'recent_activity', class: 'lg:col-span-7') do
           render RecentActivityComponent.new(rows: @recent_activity)
         end

@@ -2,6 +2,7 @@ pt-BR:
   dashboard:
     index_view:
       title: "DriveCash"
+      eyebrow: "DriveCash"
       greeting: "Olá, %{name}"
       subtitle_period: "Veja seu desempenho de %{year}"
       new_record: "Novo lançamento"
@@ -11,9 +12,8 @@ pt-BR:
       stats:
         earnings:
           title: "Receitas"
-          subtitle: "Média: %{value}/mês"
-          subtitle_annual: "Média: %{value}/mês"
-          subtitle_monthly: "Média: %{value}/dia"
+          subtitle_annual: "Média %{value}/mês"
+          subtitle_monthly: "Média %{value}/dia"
         expenses:
           title: "Despesas"
           subtitle: "%{percent}% das receitas"
@@ -22,10 +22,10 @@ pt-BR:
           subtitle: "%{value}/dia trabalhado"
         days:
           title: "Dias trabalhados"
-          subtitle: "%{value} dias/mês em média"
-          subtitle_annual: "%{value} dias/mês em média"
-          subtitle_monthly: "Média: %{value} dias/semana"
+          short_title: "Dias"
+          subtitle_annual: "%{value} dias/mês"
+          subtitle_monthly: "%{value} dias/semana"
         trips:
           title: "Rotas"
-          subtitle_annual: "Média: %{value} rotas/mês"
-          subtitle_monthly: "Média: %{value} rotas/dia"
+          subtitle_annual: "%{value} rotas/mês"
+          subtitle_monthly: "%{value} rotas/dia"

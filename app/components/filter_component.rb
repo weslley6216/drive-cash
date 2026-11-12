@@ -25,7 +25,7 @@ class FilterComponent < ApplicationComponent
   end
 
   def chips_view
-    div(class: 'flex items-center gap-2 -mx-1 px-1 overflow-x-auto lg:hidden') do
+    div(class: 'flex items-center gap-2 -mx-1 px-1 -my-[5px] overflow-x-auto [scrollbar-width:none] lg:hidden') do
       year_chip_form
       month_chips
     end
@@ -66,7 +66,7 @@ class FilterComponent < ApplicationComponent
         render PhlexIcons::Lucide::Funnel.new(class: 'absolute left-3 w-3.5 h-3.5 text-slate-700 pointer-events-none')
         select(
           name:  'year',
-          class: 'appearance-none bg-white border border-slate-200 rounded-full pl-[30px] pr-[30px] py-1.5 text-sm ' \
+          class: 'appearance-none bg-white border border-slate-200 rounded-full pl-8 pr-8 py-1.5 text-sm ' \
                  'font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
           data:  { filter_target: 'year', action: 'change->filter#submit' }
         ) { year_options }
@@ -82,7 +82,9 @@ class FilterComponent < ApplicationComponent
 
   def chip_link(label, month)
     active = month.to_s == @selected_month.to_s
-    a(href: period_path(month), class: "#{CHIP} #{active ? CHIP_ACTIVE : CHIP_IDLE}") { label }
+    a(href: period_path(month), class: 'flex-shrink-0 flex items-center h-11') do
+      span(class: "#{CHIP} #{active ? CHIP_ACTIVE : CHIP_IDLE}") { label }
+    end
   end
 
   def popover

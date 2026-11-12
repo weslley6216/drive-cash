@@ -64,6 +64,23 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
     end
 
+    it 'renders the prototype header: brand eyebrow on phones, white topbar on desktops' do
+      get root_path, params: { year: 2025 }
+
+      expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
+      expect(response.body).to include('lg:-mx-8 lg:-mt-8 lg:mb-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
+      expect(response.body).to include(%(<p class="hidden lg:block text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
+      expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
+    end
+
+    it 'shows the today card on desktops only' do
+      create(:earning, user: current_user, date: Date.current, amount: 100, platform: 'uber')
+
+      get root_path
+
+      expect(response.body).to include('id="today_card" class="hidden lg:block"')
+    end
+
     it 'renders hero profit card section' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 1), amount: 500, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 2), amount: 100, category: 'fuel', paid: true)
@@ -193,9 +210,9 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path
 
-      expect(response.body).to include('class="lg:hidden mb-6"')
+      expect(response.body).to include('class="lg:hidden mb-4"')
       stats_position = response.body.index('grid-cols-2') || response.body.index(I18n.t('stats_grid_component.income'))
-      mobile_card_position = response.body.index('class="lg:hidden mb-6"')
+      mobile_card_position = response.body.index('class="lg:hidden mb-4"')
       expect(mobile_card_position).to be > stats_position
     end
 
@@ -204,7 +221,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path
 
-      expect(response.body).to include('class="lg:hidden mb-6"')
+      expect(response.body).to include('class="lg:hidden mb-4"')
       expect(response.body).not_to include(I18n.t('goals.index.monthly.label'))
     end
 

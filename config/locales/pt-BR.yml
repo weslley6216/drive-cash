@@ -63,6 +63,7 @@ pt-BR:
       long: "%d de %B de %Y"
       month_and_year: "%B de %Y"
       short: "%d de %B"
+      day_abbr: "%d/%b"
     month_names:
     -
     - janeiro

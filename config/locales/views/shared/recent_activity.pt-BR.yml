@@ -2,3 +2,5 @@ pt-BR:
   recent_activity_component:
     title: "Atividade recente"
     empty: "Nenhum lançamento no período."
+    see_all: "Ver tudo →"
+    see_all_desktop: "Ver todas →"
