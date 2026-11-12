@@ -198,6 +198,17 @@ RSpec.describe 'Notifications', type: :request do
       expect(second.reload.read_at).to be_present
     end
 
+    it 'keeps unread the notifications of a disabled kind' do
+      user.update!(notification_settings: user.notification_settings.with('log_reminder', false))
+      hidden = create(:notification, user: user, kind: 'log_reminder')
+      shown = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+      patch read_all_notifications_path
+
+      expect(hidden.reload.read_at).to be_nil
+      expect(shown.reload.read_at).to be_present
+    end
+
     it 'leaves notifications of other users untouched' do
       other = create(:notification, user: create(:user))
 

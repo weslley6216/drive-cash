@@ -20,7 +20,7 @@ class NotificationsController < ApplicationController
   end
 
   def read_all
-    current_user.notifications.unread.mark_all_read!
+    current_user.visible_notifications.unread.mark_all_read!
     respond_with_refresh(html_redirect: notifications_path)
   end
 
