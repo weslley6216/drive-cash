@@ -17,7 +17,7 @@ module Records
 
     def view_template
       render LayoutComponent.new(title: t('records.new_view.title'), app_shell: true) do
-        div(class: 'h-full flex flex-col bg-white max-w-[640px] mx-auto w-full lg:max-w-none lg:bg-black/30 lg:items-center lg:justify-center lg:p-8') do
+        div(class: 'h-full flex flex-col bg-white safe-top sm:pt-0 max-w-[640px] mx-auto w-full lg:max-w-none lg:bg-black/30 lg:items-center lg:justify-center lg:p-8') do
           div(class: 'group/record h-full flex flex-col w-full min-h-0 lg:h-auto lg:max-h-full lg:max-w-2xl lg:bg-white lg:rounded-2xl ' \
                      'lg:shadow-2xl lg:border lg:border-slate-200 lg:overflow-hidden',
               data:  stimulus_data) do
