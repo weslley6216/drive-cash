@@ -157,6 +157,18 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(html).to include(%(aria-label="#{jan_abbr}: Sem dados"))
   end
 
+  it 'renders future months as inert columns that keep their space and label' do
+    bars = annual_bars.map { |bar| bar.merge(future: bar[:key] > 6) }
+
+    html = view_context.render(Analysis::BarChartComponent.new(bars: bars, month: nil, year: 2026))
+    july = I18n.t('date.abbr_month_names')[7].capitalize
+
+    expect(html).to include(%(<div class="flex-1 min-w-0 flex flex-col gap-0.5" aria-hidden="true" data-future="true">))
+    expect(html).to include(%(text-slate-300 font-medium">#{july}</span>))
+    expect(html).not_to include(%(aria-label="#{july}: Sem dados"))
+    expect(html.scan('role="button"').size).to eq(6)
+  end
+
   it 'renders the no-data label inside the tooltip node' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 

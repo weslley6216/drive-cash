@@ -55,7 +55,22 @@ module Analysis
     end
 
     def bar_column(bar_row, index)
+      return future_bar_column(bar_row) if bar_row[:future]
+
       bar_row[:empty] ? empty_bar_column(bar_row, index) : data_bar_column(bar_row, index)
+    end
+
+    def future_bar_column(bar_row)
+      div(class: 'flex-1 min-w-0 flex flex-col gap-0.5', aria_hidden: 'true', data: { future: 'true' }) do
+        stub_bars
+        span(class: 'block overflow-hidden text-center text-[10px] text-slate-300 font-medium') { bar_row[:label] }
+      end
+    end
+
+    def stub_bars
+      div(class: 'flex items-end gap-px', style: "height: #{CHART_HEIGHT}px") do
+        2.times { div(class: 'flex-1 min-w-0 rounded-t bg-slate-200', style: "height: #{STUB_HEIGHT}px") }
+      end
     end
 
     def data_bar_column(bar_row, index)
