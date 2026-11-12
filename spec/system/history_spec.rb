@@ -11,10 +11,6 @@ RSpec.describe 'History', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'starts the history title below the iOS status bar on a phone' do
     visit history_path(year: 2026, month: 5)
 
@@ -22,6 +18,16 @@ RSpec.describe 'History', type: :system, js: true do
 
     expect(computed('turbo-frame#page', 'paddingTop')).to eq('16px')
     expect(box(title)['top'].round).to eq(24)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the History header still while the feed scrolls on a phone' do
+    (1..12).each { |day| create(:earning, user: current_user, date: Date.new(2026, 5, day), amount: 50) }
+    emulate_short_phone
+
+    visit history_path(year: 2026, month: 5)
+
+    expect(find('h1', text: I18n.t('history.index.title'))).to stay_pinned_while_the_content_scrolls
     expect(page).to fit_the_phone_width
   end
 

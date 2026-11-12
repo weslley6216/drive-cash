@@ -12,10 +12,6 @@ RSpec.describe 'Home', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'truncates large stat values inside the card and keeps the page within the phone width' do
     visit root_path
 

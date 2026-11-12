@@ -5,10 +5,6 @@ RSpec.describe 'App shell', type: :system, js: true do
 
   before { login_as(current_user) }
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'shows the bottom nav with the active tab in the prototype blue and a 20px gutter on a phone' do
     visit root_path
 

@@ -19,13 +19,15 @@ module History
         sidebar_nav: :history,
         app_shell:   true
       ) do
-        turbo_frame_tag 'page', class: 'flex-1 flex flex-col min-h-0 safe-top sm:pt-0' do
-          div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
-
-          static_header
-          filterable_region
-
-          render FabComponent.new(filters: filter_context, bottom_nav: true)
+        render ScreenComponent.new(frame: true, inline_header: true) do |screen|
+          screen.with_header do
+            static_header
+            filter_toolbar
+          end
+          screen.with_content do
+            feed_section
+            render FabComponent.new(filters: filter_context, bottom_nav: true)
+          end
         end
         turbo_frame_tag 'modal'
       end
@@ -34,7 +36,7 @@ module History
     private
 
     def static_header
-      div(class: "flex-none px-5 pt-2 pb-3 sm:px-6 #{DESKTOP_BAR}") do
+      div(class: "#{PHONE_BAR} #{DESKTOP_BAR}") do
         div(class: 'flex items-start justify-between gap-3 lg:items-center lg:gap-6') do
           div(class: 'min-w-0') do
             h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate lg:leading-8 lg:text-slate-900 lg:tracking-tight') do
@@ -65,21 +67,13 @@ module History
       end
     end
 
-    def filterable_region
-      div(class: 'feed-loading-region flex-1 flex flex-col min-h-0') do
-        div(class: 'feed-loading-overlay') do
-          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
+    def filter_toolbar
+      div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
+        div(class: 'space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
+          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, filter: @filter) }
+          render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
         end
-        div(class: 'flex-none px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
-          div(class: 'space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
-            div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, filter: @filter) }
-            render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
-          end
-          render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
-        end
-        div(class: 'flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-24 lg:px-0 lg:pb-8') do
-          feed_section
-        end
+        render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
       end
     end
 

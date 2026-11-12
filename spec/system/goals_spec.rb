@@ -8,10 +8,6 @@ RSpec.describe 'Goals', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   def card_of(title)
     find('p', text: title, exact_text: true, match: :first).find(:xpath, 'ancestor::div[contains(@class, "rounded-xl")][1]')
   end

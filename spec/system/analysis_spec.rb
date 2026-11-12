@@ -32,6 +32,15 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the Analysis header still while the metrics scroll on a phone' do
+    emulate_short_phone
+
+    visit analysis_path(year: 2026, month: 5)
+
+    expect(find('h1', text: I18n.t('analysis.show_view.title'))).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'puts the per km hero on top, two compact cards side by side and Sobra across the row on a phone' do
     visit analysis_path
 
