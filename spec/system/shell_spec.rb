@@ -9,6 +9,10 @@ RSpec.describe 'App shell', type: :system, js: true do
     find(selector).evaluate_script('this.getBoundingClientRect().toJSON()')
   end
 
+  def box_of(element)
+    element.evaluate_script('this.getBoundingClientRect().toJSON()')
+  end
+
   it 'shows the bottom nav with the active tab in the prototype blue and a 20px gutter on a phone' do
     visit root_path
 
@@ -26,6 +30,29 @@ RSpec.describe 'App shell', type: :system, js: true do
     visit root_path
 
     expect(page).to have_css('#bottom-nav', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'starts the Home 16px below the top with an opaque slate bar behind the status bar on a phone' do
+    visit root_path
+
+    eyebrow = find('p', text: I18n.t('dashboard.index_view.eyebrow').upcase)
+
+    expect(box_of(eyebrow)['top'].round).to eq(16)
+    expect(computed('#safe-top-bar', 'position')).to eq('fixed')
+    expect(computed('#safe-top-bar', 'backgroundColor')).to eq('rgb(248, 250, 252)')
+    expect(computed('#safe-top-bar', 'zIndex')).to eq('40')
+    expect(computed('#bottom-nav', 'paddingBottom')).to eq('24px')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'starts the vehicle screen 16px below the top on a phone' do
+    create(:vehicle, user: current_user)
+
+    visit vehicle_path
+
+    expect(page).to have_css('h1', text: I18n.t('vehicle.title'))
+    expect(box('h1')['top'].round).to eq(16)
     expect(page).to fit_the_phone_width
   end
 

@@ -4,7 +4,8 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  PHONE_GUTTER = 'px-5 pt-2 pb-4 sm:p-6'.freeze
+  PHONE_GUTTER = 'px-5 safe-top pb-4 sm:p-6'.freeze
+  SAFE_TOP_BAR = 'fixed top-0 inset-x-0 h-[env(safe-area-inset-top)] bg-slate-50 z-40'.freeze
 
   def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false, turbo_cache: true)
     @title = title
@@ -28,7 +29,7 @@ class LayoutComponent < ApplicationComponent
   def head_section
     head do
       title { @title }
-      meta(name: 'viewport', content: 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
+      meta(name: 'viewport', content: 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover')
       meta(name: 'mobile-web-app-capable', content: 'yes')
       meta(name: 'apple-mobile-web-app-capable', content: 'yes')
       meta(name: 'apple-mobile-web-app-status-bar-style', content: 'default')
@@ -52,6 +53,7 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
+      div(id: 'safe-top-bar', class: SAFE_TOP_BAR, aria: { hidden: 'true' }) if scrolling_body?
       render LoadingOverlayComponent.new unless @auth
       render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
       div(class: content_wrapper_classes) do
@@ -61,8 +63,12 @@ class LayoutComponent < ApplicationComponent
     end
   end
 
+  def scrolling_body?
+    !@auth && !@app_shell
+  end
+
   def body_classes
-    return 'min-h-screen' if @auth
+    return 'min-h-screen pt-[env(safe-area-inset-top)]' if @auth
 
     if @app_shell
       'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'

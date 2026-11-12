@@ -22,8 +22,17 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('name="apple-mobile-web-app-status-bar-style" content="default"')
     end
 
-    it 'keeps the viewport inside the safe area so the header clears the notch and clock' do
-      expect(html).to include('name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"')
+    it 'covers the whole screen so the safe-area insets reach the CSS' do
+      expect(html).to include('name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"')
+    end
+
+    it 'pads the phone top past the iOS status bar' do
+      expect(html).to include('px-5 safe-top pb-4 sm:p-6')
+    end
+
+    it 'renders an opaque bar the height of the top inset over the scrolled content' do
+      expect(html).to include('id="safe-top-bar"')
+      expect(html).to include('fixed top-0 inset-x-0 h-[env(safe-area-inset-top)] bg-slate-50 z-40')
     end
 
     it 'lets the status bar follow the device theme instead of forcing an accent color' do
@@ -70,6 +79,10 @@ RSpec.describe LayoutComponent, type: :component do
     it 'propagates h-full to the content wrapper' do
       expect(html).to include('h-full')
     end
+
+    it 'leaves the inset bar out because the locked body never scrolls under the clock' do
+      expect(html).not_to include('id="safe-top-bar"')
+    end
   end
 
   it 'keeps the normal min-h-screen body when app_shell: false (default)' do
@@ -101,6 +114,13 @@ RSpec.describe LayoutComponent, type: :component do
     html = view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' }
 
     expect(html).not_to include('id="loading-overlay"')
+  end
+
+  it 'pads the auth body by the top inset without the inset bar' do
+    html = view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' }
+
+    expect(html).to include('class="min-h-screen pt-[env(safe-area-inset-top)]"')
+    expect(html).not_to include('id="safe-top-bar"')
   end
 
   context 'with sidebar_nav: :home' do

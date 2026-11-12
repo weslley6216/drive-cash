@@ -135,6 +135,10 @@
   --color-fuchsia-950: #4a044e;
 }
 
+@utility safe-top {
+  padding-top: calc(env(safe-area-inset-top) + 16px);
+}
+
 @layer base {
   html {
     touch-action: manipulation;
