@@ -46,7 +46,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('fixed bottom-0 left-0 right-0')
       expect(response.body).to include('text-blue-600')
-      expect(response.body).to include('max-w-7xl mx-auto pb-24')
+      expect(response.body).to include('max-w-7xl mx-auto pt-2 sm:pt-0 pb-24')
       expect(response.body).to include('fixed bottom-24 right-5')
     end
 
