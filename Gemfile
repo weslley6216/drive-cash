@@ -53,6 +53,8 @@ group :test do
   gem 'database_cleaner-active_record'
   gem 'shoulda-matchers'
   gem 'simplecov'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 gem 'bcrypt', '~> 3.1'
