@@ -82,7 +82,7 @@ module Analysis
 
     def dimmed_chart_frame
       div(class: 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5') do
-        p(class: 'text-sm font-semibold text-slate-700 mb-3') { t('.bar_chart.title') }
+        p(class: 'text-sm font-semibold text-slate-700 mb-3') { t('.empty_chart_title') }
         div(class: 'flex items-end justify-between gap-1 h-[90px]') do
           14.times do
             div(class: 'flex-1 flex justify-center') do

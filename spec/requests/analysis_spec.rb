@@ -119,6 +119,13 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('text-amber-900')
     end
 
+    it 'titles the dimmed chart frame of the empty state like the prototype' do
+      get analysis_path(year: 2026, month: 7)
+
+      expect(response.body).to include(%(<p class="text-sm font-semibold text-slate-700 mb-3">#{I18n.t('analysis.show_view.empty_chart_title')}</p>))
+      expect(I18n.t('analysis.show_view.empty_chart_title')).to eq('Receita × Despesa')
+    end
+
     it 'renders the prototype topbar with the white desktop bar and the export shortcut' do
       get analysis_path
 

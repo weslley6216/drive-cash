@@ -73,6 +73,22 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
     end
 
+    it 'hides the period filter on the first use, before any record exists' do
+      get root_path
+
+      expect(response.body).to include(I18n.t('empty_states.home.title'))
+      expect(response.body).not_to include('data-controller="filter"')
+    end
+
+    it 'keeps the period filter on an empty year when the user has records in another year' do
+      create(:earning, user: current_user, date: Date.new(2024, 3, 1), amount: 100)
+
+      get root_path
+
+      expect(response.body).to include(I18n.t('empty_states.home.title'))
+      expect(response.body).to include('data-controller="filter"')
+    end
+
     it 'shows the today card on desktops only' do
       create(:earning, user: current_user, date: Date.current, amount: 100, platform: 'uber')
 

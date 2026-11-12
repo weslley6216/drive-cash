@@ -31,7 +31,7 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: "mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
+      div(class: "#{first_use? ? 'mb-3' : 'mb-4'} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
         div(class: 'flex items-center justify-between') do
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }
@@ -46,13 +46,8 @@ module Dashboard
           end
         end
 
-        div(class: 'flex items-center gap-3') do
-          render FilterComponent.new(
-            selected_year:   @filters[:year],
-            selected_month:  @filters[:month],
-            available_years: @filters[:available_years],
-            variant:         :chips
-          )
+        div(class: first_use? ? 'hidden lg:flex items-center gap-3' : 'flex items-center gap-3') do
+          period_filter unless first_use?
           link_to(new_earning_path,
                   data:  { turbo_frame: 'modal' },
                   class: new_record_button_classes) do
@@ -62,6 +57,19 @@ module Dashboard
           div(class: 'hidden lg:flex items-center') { bell_button }
         end
       end
+    end
+
+    def period_filter
+      render FilterComponent.new(
+        selected_year:   @filters[:year],
+        selected_month:  @filters[:month],
+        available_years: @filters[:available_years],
+        variant:         :chips
+      )
+    end
+
+    def first_use?
+      empty? && @filters[:available_years].to_a.size <= 1
     end
 
     def new_record_button_classes

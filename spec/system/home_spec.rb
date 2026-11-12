@@ -59,4 +59,17 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(topbar.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
     expect(page).to have_css('#today_card', visible: true)
   end
+
+  it 'shows the first-use empty state without the period filter on a phone' do
+    current_user.earnings.delete_all
+    current_user.expenses.delete_all
+
+    visit root_path
+
+    expect(page).to have_text(I18n.t('empty_states.home.title'))
+    expect(page).to have_link(I18n.t('empty_states.home.cta'))
+    expect(page).to have_link(I18n.t('empty_states.home.secondary'), href: chat_root_path)
+    expect(page).to have_no_link(I18n.t('filter_component.all_chip'))
+    expect(page).to fit_the_phone_width
+  end
 end
