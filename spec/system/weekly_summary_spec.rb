@@ -29,6 +29,25 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the weekly summary header still while the week scrolls on a phone' do
+    emulate_short_phone
+
+    visit weekly_summary_path(week_start: '2026-07-06')
+
+    expect(find('h1', text: I18n.t('weekly_summaries.show.title'))).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'lines the week cards up with the 20px prototype gutter on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    profit_card = find('#screen-content .rounded-xl', text: I18n.t('weekly_summaries.show.profit'))
+
+    expect(box(profit_card)['x'].round).to eq(20)
+    expect(box(profit_card)['right'].round).to eq(370)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'goes to the analysis of the month from the CTA on a phone' do
     visit weekly_summary_path('2026-07-06')
 

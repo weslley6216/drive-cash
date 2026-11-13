@@ -46,7 +46,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('fixed bottom-0 left-0 right-0')
       expect(response.body).to include('text-blue-600')
-      expect(response.body).to include('max-w-7xl mx-auto pt-2 sm:pt-0 pb-24')
+      expect(response.body).to include('h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8')
       expect(response.body).to include('fixed bottom-24 right-5')
     end
 
@@ -59,7 +59,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to match(%r{<a data-turbo-frame="_top" class="hidden lg:inline-flex[^>]*href="/records/new"})
       expect(response.body).to include('hidden lg:inline-flex')
       expect(response.body).to include('feed-loading-region')
-      expect(response.body).to include('feed-loading-overlay--page')
+      expect(response.body).to include('<div class="feed-loading-region flex-1 flex flex-col min-h-0"><div class="feed-loading-overlay">')
       expect(response.body).to include(I18n.t('sidebar_nav_component.account_hint'))
       expect(response.body).to include('w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm')
       expect(response.body).to include('w-9 h-9 rounded-full bg-blue-600 text-white')
@@ -69,7 +69,7 @@ RSpec.describe 'Dashboard', type: :request do
       get root_path, params: { year: 2025 }
 
       expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
-      expect(response.body).to include('lg:-mt-8 lg:mb-8 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
+      expect(response.body).to include('px-5 pt-2 pb-3 sm:px-6 sm:pt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
       expect(response.body).to include(%(<p class="hidden lg:block text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
       expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
     end

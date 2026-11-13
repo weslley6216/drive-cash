@@ -1,10 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Sign in screen', type: :system, js: true do
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'stacks the brand on top, pins the sign-up link to the bottom and keeps a 44px button on a phone' do
     visit new_session_path
 

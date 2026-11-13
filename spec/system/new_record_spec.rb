@@ -8,10 +8,6 @@ RSpec.describe 'New record', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'shows the expense form with a compact date and 44px category chips on a phone' do
     visit new_record_path(type: 'expense')
 

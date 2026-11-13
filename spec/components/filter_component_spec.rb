@@ -62,9 +62,8 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11" data-chip-strip-target="active"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
     end
 
-    it 'keeps the pills for desktop screens' do
-      expect(html).to include('hidden lg:block')
-      expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-500')
+    it 'leaves the desktop pills to the compact variant' do
+      expect(html).not_to include('hidden lg:block')
     end
 
     it 'lists every month for a past year' do

@@ -12,10 +12,6 @@ RSpec.describe 'Home', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   it 'truncates large stat values inside the card and keeps the page within the phone width' do
     visit root_path
 
@@ -26,6 +22,18 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(box(expenses_value)['right']).to be <= box(card)['right']
     expect(expenses_value.evaluate_script('getComputedStyle(this).textOverflow')).to eq('ellipsis')
     expect(page).to have_no_css('#today_card', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'shows the whole revenue at the original phone size on the stat card' do
+    create(:earning, user: current_user, date: Date.new(2026, 3, 3), amount: 60_619.20)
+
+    visit root_path
+
+    revenue = find('#stats_grid p', text: 'R$ 65.695,10')
+
+    expect(revenue.evaluate_script('getComputedStyle(this).fontSize')).to eq('20px')
+    expect(revenue.evaluate_script('this.scrollWidth <= this.clientWidth')).to be(true)
     expect(page).to fit_the_phone_width
   end
 
@@ -46,8 +54,18 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the Home header still while the month chips and the cards scroll on a phone' do
+    emulate_short_phone
+
+    visit root_path
+
+    expect(page).to have_css('#screen-content a', text: 'Jan', exact_text: true)
+    expect(find('h1', text: 'Olá, Weslley')).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'lays the four stat cards in one row under a white topbar on a desktop screen' do
-    emulate_desktop_screen
+    emulate_desktop_screen(height: 500)
 
     visit root_path
 
@@ -58,6 +76,8 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(cards.map { |card| card['y'].round }.uniq.size).to eq(1)
     expect(topbar.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
     expect(page).to have_css('#today_card', visible: true)
+    expect(box(topbar)['top'].round).to eq(0)
+    expect(topbar).to stay_pinned_while_the_content_scrolls
   end
 
   it 'shows the first-use empty state without the period filter on a phone' do
@@ -71,6 +91,29 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to have_link(I18n.t('empty_states.home.secondary'), href: chat_root_path)
     expect(page).to have_no_link(I18n.t('filter_component.all_chip'))
     expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the month chips 13px under the greeting like the prototype on a phone' do
+    visit root_path
+
+    greeting = find('h1', text: 'Olá, Weslley')
+    chip = find('a', text: I18n.t('filter_component.all_chip'), exact_text: true).find('span')
+
+    expect((box(chip)['top'] - box(greeting)['bottom']).round).to eq(13)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'lines the stat values up with their titles on a desktop screen' do
+    emulate_desktop_screen
+
+    visit root_path
+
+    revenue_card = find('#stats_grid > *', match: :first)
+    title = revenue_card.find('p', match: :first)
+    value = revenue_card.find('p', text: 'R$ 5.075,90')
+
+    expect(box(value)['x'].round).to eq(box(title)['x'].round)
+    expect(box(value)['width'].round).to be <= box(title)['width'].round
   end
 
   it 'scrolls the strip so the December chip of a past year sits inside it on a phone' do

@@ -17,6 +17,6 @@ RSpec.describe Dashboard::IndexView, type: :component do
                           recent_activity: [], categories: [])
     )
 
-    expect(html).to include('<turbo-frame id="page">')
+    expect(html).to include('<turbo-frame class="flex-1 flex flex-col min-h-0 safe-top sm:pt-0" id="page">')
   end
 end

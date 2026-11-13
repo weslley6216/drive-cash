@@ -1,4 +1,6 @@
 class Account::ShowView < ApplicationView
+  include TopbarStyles
+
   GROUPS = [
     {
       title_key: 'account.groups.account',
@@ -26,25 +28,31 @@ class Account::ShowView < ApplicationView
 
   def view_template
     render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-      mobile_layout
-      desktop_layout
+      render ScreenComponent.new do |screen|
+        screen.with_header { mobile_header }
+        screen.with_content do
+          mobile_layout
+          desktop_layout
+        end
+      end
     end
   end
 
   private
 
+  def mobile_header
+    header(class: "#{PHONE_BAR} lg:hidden") do
+      h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
+      p(class: 'text-sm text-slate-500 mt-0.5') { t('.mobile_subtitle') }
+    end
+  end
+
   def mobile_layout
-    div(class: 'lg:hidden') do
-      header(class: 'px-5 pt-2 pb-3') do
-        h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
-        p(class: 'text-sm text-slate-500 mt-0.5') { t('.mobile_subtitle') }
-      end
-      div(class: 'px-5 pb-10 space-y-5') do
-        profile_card_mobile
-        GROUPS.each { |group| group_block_mobile(group) }
-        sign_out_block_mobile
-        p(class: 'text-center text-[11px] text-slate-400') { t('.version_label', version: DriveCash::APP_VERSION) }
-      end
+    div(class: 'lg:hidden pb-10 space-y-5') do
+      profile_card_mobile
+      GROUPS.each { |group| group_block_mobile(group) }
+      sign_out_block_mobile
+      p(class: 'text-center text-[11px] text-slate-400') { t('.version_label', version: DriveCash::APP_VERSION) }
     end
   end
 

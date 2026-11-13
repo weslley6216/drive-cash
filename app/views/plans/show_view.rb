@@ -1,18 +1,23 @@
 module Plans
   class ShowView < ApplicationView
+    include TopbarStyles
+
     def initialize(comparison:)
       @comparison = comparison
     end
 
     def view_template
       render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-
-        div(data: { controller:                'plan-billing',
-                    plan_billing_active_class: PriceToggleComponent::ACTIVE_CLASSES,
-                    plan_billing_idle_class:   PriceToggleComponent::IDLE_CLASSES }) do
-          mobile_layout
-          desktop_layout
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            div(data: { controller:                'plan-billing',
+                        plan_billing_active_class: PriceToggleComponent::ACTIVE_CLASSES,
+                        plan_billing_idle_class:   PriceToggleComponent::IDLE_CLASSES }) do
+              mobile_layout
+              desktop_layout
+            end
+          end
         end
       end
     end
@@ -20,27 +25,22 @@ module Plans
     private
 
     def mobile_layout
-      div(class: 'lg:hidden') do
-        mobile_header
-        div(class: 'px-5 pb-10 pt-1 space-y-5') do
-          current_plan_card
-          div(class: 'text-center') { render PriceToggleComponent.new(discount_percent: @comparison.yearly_discount_percent) }
-          render ProCardComponent.new(comparison: @comparison)
-          render FreeCardComponent.new(comparison: @comparison)
-        end
+      div(class: 'lg:hidden pb-10 pt-1 space-y-5') do
+        current_plan_card
+        div(class: 'text-center') { render PriceToggleComponent.new(discount_percent: @comparison.yearly_discount_percent) }
+        render ProCardComponent.new(comparison: @comparison)
+        render FreeCardComponent.new(comparison: @comparison)
       end
     end
 
     def mobile_header
-      header(class: 'px-5 pt-2 pb-3') do
-        div(class: 'flex items-center gap-3') do
-          link_to(helpers.account_path, class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600') do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[18px] h-[18px]')
-          end
-          div do
-            h1(class: 'text-xl font-bold text-slate-900') { t('.heading') }
-            p(class: 'text-xs text-slate-500') { t('.mobile_subtitle') }
-          end
+      div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
+        link_to(helpers.account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500') do
+          render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
+        end
+        div do
+          h1(class: 'text-xl font-bold text-slate-900') { t('.heading') }
+          p(class: 'text-xs text-slate-500') { t('.mobile_subtitle') }
         end
       end
     end

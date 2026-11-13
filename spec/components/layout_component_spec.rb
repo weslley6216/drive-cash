@@ -8,10 +8,6 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).not_to include('fixed bottom-0 left-0 right-0')
     end
 
-    it 'does not apply pb-24 to the inner container' do
-      expect(html).not_to include('pb-24')
-    end
-
     it 'renders title and required PWA meta tags' do
       expect(html).to include('<title>X</title>')
       expect(html).to include('name="theme-color"')
@@ -26,17 +22,12 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"')
     end
 
-    it 'pads the phone top past the iOS status bar' do
-      expect(html).to include('px-5 safe-top pb-4 sm:p-6')
+    it 'locks the app body to the viewport so only the screen content scrolls' do
+      expect(html).to include('<body class="h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">')
     end
 
-    it 'keeps the 8px header gutter inside the phone safe top' do
-      expect(html).to include('class="max-w-7xl mx-auto pt-2 sm:pt-0"')
-    end
-
-    it 'renders an opaque bar the height of the top inset over the scrolled content' do
-      expect(html).to include('id="safe-top-bar"')
-      expect(html).to include('fixed top-0 inset-x-0 h-[env(safe-area-inset-top)] bg-slate-50 z-40')
+    it 'makes the container a full-height flex column' do
+      expect(html).to include('<div class="h-full"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0">')
     end
 
     it 'lets the status bar follow the device theme instead of forcing an accent color' do
@@ -57,43 +48,6 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('fixed bottom-0 left-0 right-0')
       expect(html).to include('text-blue-600')
     end
-
-    it 'adds pb-24 to the inner container' do
-      expect(html).to include('pb-24')
-    end
-  end
-
-  context 'with app_shell: true' do
-    let(:html) { view_context.render(LayoutComponent.new(title: 'X', bottom_nav: :home, app_shell: true)) { 'content' } }
-
-    it 'locks the body to full viewport height with no overflow' do
-      expect(html).to include('h-[100dvh]')
-      expect(html).to include('overflow-hidden')
-    end
-
-    it 'does not apply body padding (layout controls its own padding)' do
-      expect(html).not_to include('p-4')
-    end
-
-    it 'makes the container a full-height flex column' do
-      expect(html).to include('flex flex-col')
-      expect(html).to include('min-h-0')
-    end
-
-    it 'propagates h-full to the content wrapper' do
-      expect(html).to include('h-full')
-    end
-
-    it 'leaves the inset bar out because the locked body never scrolls under the clock' do
-      expect(html).not_to include('id="safe-top-bar"')
-    end
-  end
-
-  it 'keeps the normal min-h-screen body when app_shell: false (default)' do
-    html = view_context.render(LayoutComponent.new(title: 'X')) { 'content' }
-
-    expect(html).to include('min-h-screen')
-    expect(html).not_to include('h-[100dvh]')
   end
 
   it 'renders the loading overlay on an app page' do
@@ -120,11 +74,10 @@ RSpec.describe LayoutComponent, type: :component do
     expect(html).not_to include('id="loading-overlay"')
   end
 
-  it 'pads the auth body by the top inset without the inset bar' do
+  it 'pads the auth body by the top inset' do
     html = view_context.render(LayoutComponent.new(title: 'X', auth: true)) { 'content' }
 
     expect(html).to include('class="min-h-screen pt-[env(safe-area-inset-top)]"')
-    expect(html).not_to include('id="safe-top-bar"')
   end
 
   context 'with sidebar_nav: :home' do
@@ -143,8 +96,8 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('lg:flex')
     end
 
-    it 'wraps content in a desktop-aware container' do
-      expect(html).to include('lg:ml-60')
+    it 'wraps content in a desktop-aware container beside the sidebar' do
+      expect(html).to include('<div class="h-full lg:ml-60"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8">')
     end
 
     it 'hides BottomNavComponent on desktop' do

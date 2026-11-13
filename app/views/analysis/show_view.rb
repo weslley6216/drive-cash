@@ -19,14 +19,11 @@ module Analysis
       render LayoutComponent.new(
         title:       t('.title'),
         bottom_nav:  :analysis,
-        sidebar_nav: :analysis,
-        app_shell:   true
+        sidebar_nav: :analysis
       ) do
-        turbo_frame_tag 'page', class: 'flex-1 flex flex-col min-h-0 safe-top sm:pt-0' do
-          div(id: 'flash', class: 'flex-none') { render FlashComponent.new(flash: helpers.flash) }
-
-          pinned_topbar
-          loading_region
+        render ScreenComponent.new(frame: true) do |screen|
+          screen.with_header { pinned_topbar }
+          screen.with_content { content_sections }
         end
         turbo_frame_tag 'modal'
       end
@@ -35,20 +32,11 @@ module Analysis
     private
 
     def pinned_topbar
-      div(class: "flex-none px-5 pt-2 pb-3 sm:px-6 #{DESKTOP_BAR}") { topbar }
+      div(class: "#{PHONE_BAR} #{DESKTOP_BAR}") { topbar }
     end
 
-    def loading_region
-      div(class: 'feed-loading-region flex-1 flex flex-col min-h-0') do
-        div(class: 'feed-loading-overlay') do
-          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
-        end
-        content_scroll_region
-      end
-    end
-
-    def content_scroll_region
-      div(class: 'flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-24 lg:px-0 lg:pt-8 lg:pb-8 space-y-4 lg:space-y-6') do
+    def content_sections
+      div(class: 'space-y-4 lg:space-y-6') do
         if empty?
           empty_state
         else

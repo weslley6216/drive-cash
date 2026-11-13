@@ -4,14 +4,10 @@ class LayoutComponent < ApplicationComponent
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
-  PHONE_GUTTER = 'px-5 safe-top pb-4 sm:p-6'.freeze
-  SAFE_TOP_BAR = 'fixed top-0 inset-x-0 h-[env(safe-area-inset-top)] bg-slate-50 z-40'.freeze
-
-  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, app_shell: false, auth: false, turbo_cache: true)
+  def initialize(title: 'DriveCash', bottom_nav: nil, sidebar_nav: nil, auth: false, turbo_cache: true)
     @title = title
     @bottom_nav = bottom_nav
     @sidebar_nav = sidebar_nav
-    @app_shell = app_shell
     @auth = auth
     @turbo_cache = turbo_cache
   end
@@ -53,7 +49,6 @@ class LayoutComponent < ApplicationComponent
 
   def body_section(&block)
     body(class: body_classes) do
-      div(id: 'safe-top-bar', class: SAFE_TOP_BAR, aria: { hidden: 'true' }) if scrolling_body?
       render LoadingOverlayComponent.new unless @auth
       render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
       div(class: content_wrapper_classes) do
@@ -63,41 +58,21 @@ class LayoutComponent < ApplicationComponent
     end
   end
 
-  def scrolling_body?
-    !@auth && !@app_shell
-  end
-
   def body_classes
     return 'min-h-screen pt-[env(safe-area-inset-top)]' if @auth
 
-    if @app_shell
-      'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
-    else
-      base = 'min-h-screen bg-gradient-to-br from-slate-50 to-slate-100'
-      @sidebar_nav ? "#{base} #{PHONE_GUTTER} lg:p-0" : "#{base} #{PHONE_GUTTER}"
-    end
+    'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
   end
 
   def content_wrapper_classes
     return nil if @auth
 
-    classes = []
-    classes << 'lg:ml-60' if @sidebar_nav
-    classes << 'h-full' if @app_shell
-    classes.presence&.join(' ')
+    class_names('h-full', ('lg:ml-60' if @sidebar_nav))
   end
 
   def container_classes
     return nil if @auth
 
-    if @app_shell
-      base = 'h-full max-w-7xl mx-auto flex flex-col min-h-0'
-      @sidebar_nav ? "#{base} lg:px-8" : base
-    else
-      base = 'max-w-7xl mx-auto pt-2 sm:pt-0'
-      base = "#{base} pb-24 lg:pb-6" if @bottom_nav
-      base = "#{base} lg:p-8" if @sidebar_nav
-      base
-    end
+    class_names('h-full max-w-7xl mx-auto flex flex-col min-h-0', ('lg:px-8' if @sidebar_nav))
   end
 end

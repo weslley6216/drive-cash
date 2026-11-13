@@ -8,10 +8,6 @@ RSpec.describe 'Goals', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   def card_of(title)
     find('p', text: title, exact_text: true, match: :first).find(:xpath, 'ancestor::div[contains(@class, "rounded-xl")][1]')
   end
@@ -38,6 +34,16 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(box(monday_bar)['height'].round).to eq(47)
     expect(box(hit_area)['height']).to be >= 44
     expect(page).to have_text(I18n.t('goals.index.annual.months_left', count: 7))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the goals header still while the goal cards scroll on a phone' do
+    seed_goals
+    emulate_short_phone
+
+    visit goals_path
+
+    expect(find('h1', text: I18n.t('goals.index.title'))).to stay_pinned_while_the_content_scrolls
     expect(page).to fit_the_phone_width
   end
 

@@ -1,5 +1,7 @@
 module NotificationPreferences
   class EditView < ApplicationView
+    include TopbarStyles
+
     def initialize(rows:)
       @rows = rows
     end
@@ -7,14 +9,18 @@ module NotificationPreferences
     def view_template
       render LayoutComponent.new(title: t('notifications.preferences.title'), bottom_nav: :more, sidebar_nav: :more,
                                  turbo_cache: false) do
-        div(class: 'lg:max-w-2xl lg:mx-auto') do
-          mobile_header
-          desktop_header
-          div(class: 'space-y-3') do
-            list
-            mobile_note
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            div(class: 'lg:max-w-2xl lg:mx-auto') do
+              desktop_header
+              div(class: 'space-y-3') do
+                list
+                mobile_note
+              end
+              desktop_note
+            end
           end
-          desktop_note
         end
       end
     end
@@ -22,7 +28,7 @@ module NotificationPreferences
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-1 pt-2 pb-3 flex items-start gap-2') do
+      div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
         link_to(notifications_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500',
                                     aria:  { label: t('notifications.preferences.back') }) do
           render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')

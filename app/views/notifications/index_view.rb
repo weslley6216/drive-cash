@@ -1,5 +1,7 @@
 module Notifications
   class IndexView < ApplicationView
+    include TopbarStyles
+
     HEADER_ACTION_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
     HEADER_ACTION_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 ' \
                                      'py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
@@ -16,10 +18,13 @@ module Notifications
     def view_template
       render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more,
                                  turbo_cache: false) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        mobile_header
-        desktop_header
-        @groups.empty? ? empty_state : groups_list
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            desktop_header
+            @groups.empty? ? empty_state : groups_list
+          end
+        end
         turbo_frame_tag 'modal'
       end
     end
@@ -27,7 +32,7 @@ module Notifications
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-1 pt-2 pb-3') do
+      div(class: "#{PHONE_BAR} lg:hidden") do
         div(class: 'flex items-start justify-between gap-3') do
           div(class: 'flex items-start gap-2') do
             link_to(helpers.account_path,
@@ -39,7 +44,7 @@ module Notifications
           end
           preferences_link(css: PREFERENCES_MOBILE_CLASSES)
         end
-        div(class: 'flex justify-end px-1 mb-2') { header_action(css: HEADER_ACTION_MOBILE_CLASSES) } unless @groups.empty?
+        div(class: 'flex justify-end mb-2') { header_action(css: HEADER_ACTION_MOBILE_CLASSES) } unless @groups.empty?
       end
     end
 
@@ -85,7 +90,7 @@ module Notifications
     end
 
     def groups_list
-      div(class: 'px-1 lg:px-0 pb-10 max-w-2xl space-y-5') do
+      div(class: 'pb-10 max-w-2xl space-y-5') do
         @groups.each { |group| group_block(group) }
       end
     end

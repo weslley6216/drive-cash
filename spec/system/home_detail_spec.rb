@@ -11,10 +11,6 @@ RSpec.describe 'Home detail modal', type: :system, js: true do
     login_as(current_user)
   end
 
-  def box(element)
-    element.evaluate_script('this.getBoundingClientRect().toJSON()')
-  end
-
   def modal_card
     find('turbo-frame#modal [data-controller="modal"] > div')
   end

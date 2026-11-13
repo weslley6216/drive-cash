@@ -1,5 +1,7 @@
 module Exports
   class NewView < ApplicationView
+    include TopbarStyles
+
     PERIOD_KINDS = %w[this_month last_month year custom].freeze
     INCLUDE_ROWS = [
       { key: 'earnings', icon: PhlexIcons::Lucide::DollarSign },
@@ -16,12 +18,16 @@ module Exports
 
     def view_template
       render LayoutComponent.new(title: t('exports.title'), sidebar_nav: :more) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill export-field-sync' }) do
-          mobile_layout
-          desktop_layout
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill export-field-sync' }) do
+              mobile_layout
+              desktop_layout
+            end
+            recents_section
+          end
         end
-        recents_section
       end
     end
 
@@ -29,8 +35,7 @@ module Exports
 
     def mobile_layout
       div(class: 'lg:hidden') do
-        mobile_header
-        div(class: 'px-5 space-y-5') do
+        div(class: 'space-y-5') do
           why_block
           period_chips_mobile
           format_pills(mobile: true)
@@ -55,15 +60,13 @@ module Exports
     end
 
     def mobile_header
-      header(class: 'px-5 pt-2 pb-3') do
-        div(class: 'flex items-center gap-3') do
-          link_to(account_path, class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600') do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[18px] h-[18px]')
-          end
-          div do
-            h1(class: 'text-xl font-bold text-slate-900') { t('exports.title') }
-            p(class: 'text-xs text-slate-500') { t('exports.subtitle') }
-          end
+      div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
+        link_to(account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500') do
+          render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
+        end
+        div do
+          h1(class: 'text-xl font-bold text-slate-900') { t('exports.title') }
+          p(class: 'text-xs text-slate-500') { t('exports.subtitle') }
         end
       end
     end
@@ -221,7 +224,7 @@ module Exports
     end
 
     def recents_section
-      div(class: 'px-5 pt-5 pb-28 lg:px-0 lg:pt-6 lg:pb-0 lg:max-w-5xl') do
+      div(class: 'pt-5 lg:pt-6 lg:max-w-5xl') do
         p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5') { t('exports.recents') }
         div(id: 'export-wait')
         div(id: 'export-recents', class: 'bg-white rounded-2xl border border-slate-100 shadow-sm lg:border-slate-200 lg:shadow-none overflow-hidden') do

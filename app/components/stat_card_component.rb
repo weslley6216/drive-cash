@@ -1,6 +1,6 @@
 class StatCardComponent < ApplicationComponent
   SIZES = {
-    default: 'text-lg lg:text-2xl',
+    default: 'text-xl lg:text-2xl',
     sm:      'text-sm lg:text-xl'
   }.freeze
 
@@ -55,13 +55,11 @@ class StatCardComponent < ApplicationComponent
 
   def view_template
     container_tag(class: card_classes) do
-      div(class: 'flex items-start justify-between lg:gap-3') do
-        div(class: 'min-w-0 flex-1') do
-          p(class: title_classes) { title_content }
-          p(class: value_classes) { @value }
-          p(class: subtitle_classes) { @subtitle } if @subtitle
-        end
+      div(class: 'grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 lg:gap-x-3') do
+        p(class: title_classes) { title_content }
         icon_section
+        p(class: value_classes) { @value }
+        p(class: subtitle_classes) { @subtitle } if @subtitle
       end
     end
   end
@@ -78,7 +76,7 @@ class StatCardComponent < ApplicationComponent
   def icon_section
     return unless @icon
 
-    div(class: class_names('flex-shrink-0 lg:w-9 lg:h-9 lg:rounded-lg flex items-center justify-center', colors[:title])) do
+    div(class: class_names('row-start-1 col-start-2 lg:row-span-3 flex-shrink-0 lg:w-9 lg:h-9 lg:rounded-lg flex items-center justify-center', colors[:title])) do
       render @icon.new(class: 'w-5 h-5 opacity-50')
     end
   end
@@ -92,19 +90,19 @@ class StatCardComponent < ApplicationComponent
   end
 
   def card_classes
-    class_names('border-2 rounded-xl p-3 lg:p-4', colors[:bg], colors[:border])
+    class_names('border-2 rounded-xl p-3 shadow-sm lg:p-4 lg:shadow-none', colors[:bg], colors[:border])
   end
 
   def title_classes
-    class_names('text-xs font-medium opacity-75 lg:font-semibold lg:uppercase lg:tracking-wide lg:opacity-80', colors[:title])
+    class_names('text-sm font-medium opacity-75 lg:text-xs lg:font-semibold lg:uppercase lg:tracking-wide lg:opacity-80', colors[:title])
   end
 
   def value_classes
-    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-0.5 lg:mt-1.5 lg:tabular-nums lg:tracking-tight truncate", colors[:value])
+    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-1 lg:mt-1.5 lg:tabular-nums lg:tracking-tight -mx-1 lg:mx-0 truncate col-span-2 lg:col-span-1", colors[:value])
   end
 
   def subtitle_classes
-    class_names('text-[10px] lg:text-xs mt-0.5 lg:mt-1 opacity-60 lg:opacity-70 truncate', colors[:subtitle])
+    class_names('text-xs mt-1 opacity-60 lg:opacity-70 truncate col-span-2 lg:col-span-1', colors[:subtitle])
   end
 
   def colors

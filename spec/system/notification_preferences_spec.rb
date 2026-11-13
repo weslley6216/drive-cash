@@ -19,6 +19,15 @@ RSpec.describe 'Notification preferences', type: :system, js: true do
     expect(user.reload.notification_preferences).to eq('log_reminder' => false)
   end
 
+  it 'keeps the Avisos header still while the preferences scroll on a phone' do
+    emulate_short_phone
+
+    visit edit_notification_preferences_path
+
+    expect(find('h1', text: I18n.t('notifications.preferences.title'))).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'reaches the Avisos screen from Conta on a phone' do
     visit account_path
 
