@@ -133,7 +133,7 @@ module Dashboard
 
         div(class: 'lg:col-span-4 flex flex-col gap-4 lg:gap-5') do
           render CajuQuickAccessComponent.new
-          div(id: 'today_card', class: 'hidden lg:block') { render TodayCardComponent.new(**@today) if @today }
+          div(id: 'today_card') { render TodayCardComponent.new(**@today) if @today }
         end
       end
     end

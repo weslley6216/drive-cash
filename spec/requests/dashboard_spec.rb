@@ -91,12 +91,12 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('data-controller="filter"')
     end
 
-    it 'shows the today card on desktops only' do
+    it 'shows the today card on every screen size' do
       create(:earning, user: current_user, date: Date.current, amount: 100, platform: 'uber')
 
       get root_path
 
-      expect(response.body).to include('id="today_card" class="hidden lg:block"')
+      expect(response.body).to include('<div id="today_card"><div class="rounded-2xl bg-white')
     end
 
     it 'renders hero profit card section' do

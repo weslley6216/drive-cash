@@ -7,7 +7,7 @@ class TodayCardComponent < ApplicationComponent
   end
 
   def view_template
-    div(class: 'rounded-2xl bg-white border border-slate-200 p-5') do
+    div(class: 'rounded-2xl bg-white border border-slate-200 p-4 lg:p-5') do
       p(class: 'text-xs font-semibold uppercase tracking-wider text-slate-500') { t('.label') }
       p(class: 'text-2xl font-bold text-slate-900 mt-1 tabular-nums') do
         format_currency(@net)

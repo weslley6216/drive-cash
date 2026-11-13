@@ -21,7 +21,21 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to have_css('p', text: I18n.t('dashboard.index_view.eyebrow').upcase)
     expect(box(expenses_value)['right']).to be <= box(card)['right']
     expect(expenses_value.evaluate_script('getComputedStyle(this).textOverflow')).to eq('ellipsis')
-    expect(page).to have_no_css('#today_card', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it "shows today's net under the Caju card and above the stat cards on a phone" do
+    visit root_path
+
+    today = find('#today_card')
+    caju = find('a', text: I18n.t('caju_quick_access_component.title'))
+
+    expect(today).to have_text('R$ 165,00')
+    expect(today).to have_text('+R$ 245,00')
+    expect(today).to have_text('−R$ 80,00')
+    expect(today).to have_text('7 corridas')
+    expect(box(today)['top']).to be > box(caju)['bottom']
+    expect(box(today)['bottom']).to be < box(find('#stats_grid'))['top']
     expect(page).to fit_the_phone_width
   end
 
