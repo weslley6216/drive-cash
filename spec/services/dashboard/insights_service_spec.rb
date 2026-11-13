@@ -133,5 +133,38 @@ RSpec.describe Dashboard::InsightsService do
         expect(result[:insights]).to eq([])
       end
     end
+
+    context 'empty period' do
+      it 'flags the period as empty and points to the last month with data' do
+        create(:earning, user: user, date: Date.new(2024, 11, 3))
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:empty]).to be(true)
+        expect(result[:last_month_with_data]).to eq(Date.new(2024, 11, 1))
+      end
+
+      it 'searches before January when the whole year is selected' do
+        create(:earning, user: user, date: Date.new(2024, 12, 15))
+        create(:earning, user: user, date: Date.new(2026, 1, 5))
+
+        result = described_class.new(year: 2025, month: nil, user: user).call
+
+        expect(result[:empty]).to be(true)
+        expect(result[:last_month_with_data]).to eq(Date.new(2024, 12, 1))
+      end
+
+      it 'does not look for another month when the period has data' do
+        create(:earning, user: user, date: Date.new(2025, 1, 10))
+        create(:expense, user: user, date: Date.new(2025, 2, 1), amount: 50, category: 'fuel', paid: true)
+        allow(Dashboard::LastMonthWithData).to receive(:fetch)
+
+        result = described_class.new(year: 2025, month: 2, user: user).call
+
+        expect(result[:empty]).to be(false)
+        expect(result[:last_month_with_data]).to be_nil
+        expect(Dashboard::LastMonthWithData).not_to have_received(:fetch)
+      end
+    end
   end
 end
