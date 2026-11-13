@@ -10,31 +10,32 @@ module Goals
     end
 
     def view_template
-      render LayoutComponent.new(title: t('goals.index.title'), bottom_nav: :goals, sidebar_nav: :goals) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
+      render LayoutComponent.new(title: t('goals.index.title'), bottom_nav: :goals, sidebar_nav: :goals, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_header { header_section }
+          screen.with_content do
+            if any_goal?
+              hero_section
+              columns_section
+            else
+              div(class: CARD) do
+                render EmptyStateComponent.new(
+                  icon:        PhlexIcons::Lucide::Target,
+                  icon_color:  'text-blue-600',
+                  ring:        'bg-blue-50 border-blue-100',
+                  title:       t('empty_states.goals.title'),
+                  description: t('empty_states.goals.description'),
+                  cta_label:   t('empty_states.goals.cta'),
+                  cta_path:    helpers.new_goal_path,
+                  cta_icon:    PhlexIcons::Lucide::Target,
+                  cta_data:    { turbo_frame: 'modal' }
+                )
+              end
+            end
 
-        header_section
-        if any_goal?
-          hero_section
-          columns_section
-        else
-          div(class: CARD) do
-            render EmptyStateComponent.new(
-              icon:        PhlexIcons::Lucide::Target,
-              icon_color:  'text-blue-600',
-              ring:        'bg-blue-50 border-blue-100',
-              title:       t('empty_states.goals.title'),
-              description: t('empty_states.goals.description'),
-              cta_label:   t('empty_states.goals.cta'),
-              cta_path:    helpers.new_goal_path,
-              cta_icon:    PhlexIcons::Lucide::Target,
-              cta_data:    { turbo_frame: 'modal' }
-            )
+            past_goals_section if @past_monthly.any?
           end
         end
-
-        past_goals_section if @past_monthly.any?
-
         turbo_frame_tag 'modal'
       end
     end
@@ -46,7 +47,7 @@ module Goals
     end
 
     def header_section
-      div(class: "mb-3 flex items-start justify-between gap-3 lg:items-center lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
+      div(class: "#{PHONE_BAR} flex items-start justify-between gap-3 lg:items-center lg:gap-6 #{DESKTOP_BAR}") do
         div(class: 'min-w-0') do
           h1(class: 'text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight') { t('goals.index.title') }
           p(class: 'text-sm text-slate-500 mt-0.5') { subtitle_text }

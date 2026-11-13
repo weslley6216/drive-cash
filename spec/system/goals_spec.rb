@@ -37,6 +37,16 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the goals header still while the goal cards scroll on a phone' do
+    seed_goals
+    emulate_short_phone
+
+    visit goals_path
+
+    expect(find('h1', text: I18n.t('goals.index.title'))).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'fits the phone width in dark mode with a five digit monthly value' do
     seed_goals
     emulate_color_scheme('dark')
