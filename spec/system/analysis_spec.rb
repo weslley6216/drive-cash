@@ -122,4 +122,19 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to have_link('Ver maio, o último mês com dados →', href: analysis_path(year: 2026, month: 5))
     expect(page).to fit_the_phone_width
   end
+
+  it 'gives the last-month shortcut a 44px touch target without moving its text on a phone' do
+    visit analysis_path(year: 2026, month: 6)
+
+    cta = find(:link, I18n.t('empty_states.analysis.cta')).evaluate_script('this.getBoundingClientRect().toJSON()')
+    shortcut = find(:link, 'Ver maio, o último mês com dados →')
+    target = shortcut.evaluate_script('this.getBoundingClientRect().toJSON()')
+    text_top = shortcut.evaluate_script(<<~JS)
+      (() => { const range = document.createRange(); range.selectNodeContents(this); return range.getBoundingClientRect().top })()
+    JS
+
+    expect(target['height']).to be >= 44
+    expect(target['top']).to be >= cta['bottom']
+    expect(text_top - cta['bottom']).to be_within(1).of(12)
+  end
 end

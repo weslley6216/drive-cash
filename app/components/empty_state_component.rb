@@ -48,6 +48,8 @@ class EmptyStateComponent < ApplicationComponent
   def secondary_link
     return if @secondary_label.nil?
 
-    link_to(@secondary_path, class: 'mt-3 text-xs font-semibold text-blue-600') { @secondary_label }
+    link_to(@secondary_path, class: 'inline-flex items-start min-h-11 mt-1 pt-2 -mb-5 text-xs font-semibold text-blue-600') do
+      @secondary_label
+    end
   end
 end
