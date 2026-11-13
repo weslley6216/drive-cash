@@ -72,10 +72,12 @@ RSpec.describe 'Notifications', type: :request do
       end
 
       it 'does not duplicate generated notifications across loads' do
-        create(:earning, user: user, date: 4.days.ago.to_date)
-        get notifications_path
+        travel_to Date.new(2026, 7, 14) do
+          create(:earning, user: user, date: Date.new(2026, 7, 10))
+          get notifications_path
 
-        expect { get notifications_path }.not_to change { user.notifications.count }
+          expect { get notifications_path }.not_to change { user.notifications.count }
+        end
       end
 
       it 'never shows notifications belonging to another user' do
