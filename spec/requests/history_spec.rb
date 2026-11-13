@@ -192,4 +192,48 @@ RSpec.describe 'History', type: :request do
       expect(idx_2024).to be < idx_2023
     end
   end
+
+  describe 'GET /history with focus_day' do
+    it 'opens the period of focus_day with the empty day marker' do
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+
+      get history_path(focus_day: '2025-06-11')
+
+      expect(response.body).to include('id="day-2025-06-11"')
+      expect(response.body).to include(I18n.t('history.index.gap_day.title'))
+      expect(response.body).to include('day-2025-06-10')
+    end
+
+    it 'ignores the search and the chip filter while focusing a day' do
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+
+      get history_path(focus_day: '2025-06-11', q: 'nada', filter: 'earnings')
+
+      expect(response.body).to include('Posto Shell')
+      expect(response.body).to include(I18n.t('history.index.gap_day.title'))
+    end
+
+    it 'shows no empty days without focus_day' do
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+      create(:earning, user: current_user, date: Date.new(2025, 6, 12), amount: 100, platform: 'uber')
+
+      get history_path(year: 2025)
+
+      expect(response.body).not_to include('day-2025-06-11')
+      expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
+    end
+
+    it 'discards a malformed focus_day' do
+      get history_path(focus_day: 'ontem')
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
+    end
+
+    it 'discards a focus_day in the future' do
+      get history_path(focus_day: (Date.current + 1).iso8601)
+
+      expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
+    end
+  end
 end

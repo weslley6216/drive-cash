@@ -73,4 +73,31 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to have_css('tbody tr', count: 2)
     expect(page).to have_no_css('[data-controller="fab"]', visible: true)
   end
+
+  it 'marks the empty day with the dashed marker and rings it on a phone' do
+    visit history_path(focus_day: '2026-05-20', highlight: 'day-2026-05-20')
+
+    expect(page).to have_css('#day-2026-05-20.ring-amber-400')
+    expect(page).to have_text(I18n.t('history.index.gap_day.title'))
+    expect(page).to have_link(I18n.t('history.index.gap_day.log'), href: '/records/new?date=2026-05-20', exact_text: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens a logged day ringed and without the marker on a phone' do
+    visit history_path(focus_day: '2026-05-21', highlight: 'day-2026-05-21')
+
+    expect(page).to have_css('#day-2026-05-21.ring-amber-400')
+    expect(page).to have_no_text(I18n.t('history.index.gap_day.title'))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'marks the empty day as an outlined table row with a dated button on a desktop screen' do
+    emulate_desktop_screen
+
+    visit history_path(focus_day: '2026-05-20', highlight: 'day-2026-05-20')
+
+    expect(page).to have_css('tr#day-2026-05-20.outline-amber-400')
+    expect(page).to have_css('tbody tr', count: 3)
+    within('tr#day-2026-05-20') { expect(page).to have_link('Lançar 20/05', href: '/records/new?date=2026-05-20') }
+  end
 end
