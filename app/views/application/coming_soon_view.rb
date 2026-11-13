@@ -6,7 +6,7 @@ module Application
     end
 
     def view_template
-      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title'), bottom_nav: @bottom_nav, sidebar_nav: @sidebar_nav, app_shell: true) do
+      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title'), bottom_nav: @bottom_nav, sidebar_nav: @sidebar_nav) do
         render ScreenComponent.new do |screen|
           screen.with_content do
             div(class: 'flex flex-col items-center justify-center min-h-[60vh] text-center') do

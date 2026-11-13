@@ -8,7 +8,7 @@ module Refuelings
     end
 
     def view_template
-      render LayoutComponent.new(title: t('vehicle.moves.page_title'), bottom_nav: :more, sidebar_nav: :vehicle, app_shell: true) do
+      render LayoutComponent.new(title: t('vehicle.moves.page_title'), bottom_nav: :more, sidebar_nav: :vehicle) do
         render ScreenComponent.new(inline_header: true) do |screen|
           screen.with_header { header_section }
           screen.with_content do

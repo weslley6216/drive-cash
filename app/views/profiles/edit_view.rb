@@ -8,7 +8,7 @@ module Profiles
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), sidebar_nav: :more, app_shell: true) do
+      render LayoutComponent.new(title: t('.title'), sidebar_nav: :more) do
         render ScreenComponent.new do |screen|
           screen.with_header { mobile_header }
           screen.with_content do

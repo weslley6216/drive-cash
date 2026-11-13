@@ -11,7 +11,7 @@ module Vehicles
     end
 
     def view_template
-      render LayoutComponent.new(title: t('vehicle.title'), bottom_nav: :more, sidebar_nav: :vehicle, app_shell: true) do
+      render LayoutComponent.new(title: t('vehicle.title'), bottom_nav: :more, sidebar_nav: :vehicle) do
         render ScreenComponent.new do |screen|
           screen.with_header { header_mobile } unless @vehicle_form
           screen.with_content do

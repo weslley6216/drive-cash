@@ -16,7 +16,7 @@ module Dashboard
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home, turbo_cache: false, app_shell: true) do
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home, turbo_cache: false) do
         render ScreenComponent.new(frame: true) do |screen|
           screen.with_header { topbar_section }
           screen.with_content do

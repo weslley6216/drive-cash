@@ -7,7 +7,7 @@ module Plans
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more, app_shell: true) do
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
         render ScreenComponent.new(inline_header: true) do |screen|
           screen.with_header { page_header }
           screen.with_content do

@@ -19,8 +19,7 @@ module Analysis
       render LayoutComponent.new(
         title:       t('.title'),
         bottom_nav:  :analysis,
-        sidebar_nav: :analysis,
-        app_shell:   true
+        sidebar_nav: :analysis
       ) do
         render ScreenComponent.new(frame: true) do |screen|
           screen.with_header { pinned_topbar }

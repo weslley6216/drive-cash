@@ -16,8 +16,7 @@ module History
       render LayoutComponent.new(
         title:       t('history.index.title'),
         bottom_nav:  :history,
-        sidebar_nav: :history,
-        app_shell:   true
+        sidebar_nav: :history
       ) do
         render ScreenComponent.new(frame: true, inline_header: true) do |screen|
           screen.with_header do

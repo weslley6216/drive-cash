@@ -9,7 +9,7 @@ module Chat
     end
 
     def view_template
-      render LayoutComponent.new(title: "DriveCash — #{t('chat.index.header')}", app_shell: true) do
+      render LayoutComponent.new(title: "DriveCash — #{t('chat.index.header')}") do
         div(class: SCREEN, data: { controller: 'chat speech' }) do
           header_section
           messages_section

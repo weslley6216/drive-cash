@@ -17,7 +17,7 @@ module Notifications
 
     def view_template
       render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more,
-                                 turbo_cache: false, app_shell: true) do
+                                 turbo_cache: false) do
         render ScreenComponent.new do |screen|
           screen.with_header { mobile_header }
           screen.with_content do

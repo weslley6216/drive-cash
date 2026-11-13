@@ -10,7 +10,7 @@ module Goals
     end
 
     def view_template
-      render LayoutComponent.new(title: t('goals.index.title'), bottom_nav: :goals, sidebar_nav: :goals, app_shell: true) do
+      render LayoutComponent.new(title: t('goals.index.title'), bottom_nav: :goals, sidebar_nav: :goals) do
         render ScreenComponent.new do |screen|
           screen.with_header { header_section }
           screen.with_content do
