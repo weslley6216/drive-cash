@@ -42,8 +42,18 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the Home header still while the month chips and the cards scroll on a phone' do
+    emulate_short_phone
+
+    visit root_path
+
+    expect(page).to have_css('#screen-content a', text: 'Jan', exact_text: true)
+    expect(find('h1', text: 'Olá, Weslley')).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'lays the four stat cards in one row under a white topbar on a desktop screen' do
-    emulate_desktop_screen
+    emulate_desktop_screen(height: 500)
 
     visit root_path
 
@@ -54,6 +64,8 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(cards.map { |card| card['y'].round }.uniq.size).to eq(1)
     expect(topbar.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
     expect(page).to have_css('#today_card', visible: true)
+    expect(box(topbar)['top'].round).to eq(0)
+    expect(topbar).to stay_pinned_while_the_content_scrolls
   end
 
   it 'shows the first-use empty state without the period filter on a phone' do

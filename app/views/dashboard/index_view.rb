@@ -16,14 +16,14 @@ module Dashboard
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home, turbo_cache: false) do
-        turbo_frame_tag 'page' do
-          div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-
-          topbar_section
-          loading_region
-
-          render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :home, sidebar_nav: :home, turbo_cache: false, app_shell: true) do
+        render ScreenComponent.new(frame: true) do |screen|
+          screen.with_header { topbar_section }
+          screen.with_content do
+            div(class: 'lg:hidden pt-[5px] mb-4') { period_filter(:chips) } unless first_use?
+            content_section
+            render FabComponent.new(filters: { year: @filters[:year], month: @filters[:month] }, bottom_nav: true)
+          end
         end
         turbo_frame_tag 'modal'
       end
@@ -32,7 +32,7 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: "#{first_use? ? 'mb-3' : 'mb-4'} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mt-8 lg:mb-8 #{DESKTOP_BAR}") do
+      div(class: "#{PHONE_BAR} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 #{DESKTOP_BAR}") do
         div(class: 'flex items-center justify-between') do
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }
@@ -47,8 +47,8 @@ module Dashboard
           end
         end
 
-        div(class: first_use? ? 'hidden lg:flex items-center gap-3' : 'flex items-center gap-3') do
-          period_filter unless first_use?
+        div(class: 'hidden lg:flex items-center gap-3') do
+          period_filter(:compact) unless first_use?
           link_to(new_record_path,
                   data:  { turbo_frame: '_top' },
                   class: new_record_button_classes) do
@@ -60,12 +60,12 @@ module Dashboard
       end
     end
 
-    def period_filter
+    def period_filter(variant)
       render FilterComponent.new(
         selected_year:   @filters[:year],
         selected_month:  @filters[:month],
         available_years: @filters[:available_years],
-        variant:         :chips
+        variant:         variant
       )
     end
 
@@ -89,20 +89,14 @@ module Dashboard
       end
     end
 
-    def loading_region
-      div(class: 'feed-loading-region') do
-        div(class: 'feed-loading-overlay feed-loading-overlay--page') do
-          div(class: 'w-8 h-8 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin')
-        end
-
-        if empty?
-          empty_region
-        else
-          primary_grid
-          stats_grid_section
-          monthly_goal_mobile_section
-          secondary_grid
-        end
+    def content_section
+      if empty?
+        empty_region
+      else
+        primary_grid
+        stats_grid_section
+        monthly_goal_mobile_section
+        secondary_grid
       end
     end
 

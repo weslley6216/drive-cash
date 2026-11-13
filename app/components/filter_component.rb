@@ -29,7 +29,6 @@ class FilterComponent < ApplicationComponent
       year_chip_form
       month_chips
     end
-    div(class: 'hidden lg:block') { pills_form }
   end
 
   def popover_view
