@@ -251,6 +251,15 @@ RSpec.describe History::FeedService do
         expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
       end
 
+      it 'does not insert the gap when the day has an earning' do
+        create(:earning, user: user, date: Date.new(2025, 6, 11), amount: 200, platform: 'uber')
+
+        result = described_class.new(year: 2025, focus_day: Date.new(2025, 6, 11), user: user).call
+
+        expect(result[:groups].size).to eq(1)
+        expect(result[:groups].first[:items].size).to eq(1)
+      end
+
       it 'does not treat the day as logged because of another user earning on the same date' do
         create(:earning, user: create(:user), date: Date.new(2025, 6, 11), amount: 200, platform: 'uber')
 
