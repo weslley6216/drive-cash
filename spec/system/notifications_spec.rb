@@ -26,6 +26,18 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(notification.reload.read_at).to be_present
   end
 
+  it 'keeps the notifications header still while the list scrolls on a phone' do
+    (1..6).each do |day|
+      create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => Date.new(2026, 11, day).to_s })
+    end
+    emulate_short_phone
+
+    visit notifications_path
+
+    expect(find('h1', text: I18n.t('notifications.index.title'))).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'highlights the maintenance from a maintenance_due notification on a phone' do
     @oil.update!(last_done_km: 155_600)
 

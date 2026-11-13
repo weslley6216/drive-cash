@@ -1,5 +1,7 @@
 module Notifications
   class IndexView < ApplicationView
+    include TopbarStyles
+
     HEADER_ACTION_MOBILE_CLASSES = 'text-xs font-semibold text-blue-600 mt-2 text-right cursor-pointer'
     HEADER_ACTION_DESKTOP_CLASSES = 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 ' \
                                      'py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer'
@@ -15,11 +17,14 @@ module Notifications
 
     def view_template
       render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more,
-                                 turbo_cache: false) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        mobile_header
-        desktop_header
-        @groups.empty? ? empty_state : groups_list
+                                 turbo_cache: false, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            desktop_header
+            @groups.empty? ? empty_state : groups_list
+          end
+        end
         turbo_frame_tag 'modal'
       end
     end
@@ -27,7 +32,7 @@ module Notifications
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-1 pt-2 pb-3') do
+      div(class: "#{PHONE_BAR} lg:hidden") do
         div(class: 'flex items-start justify-between gap-3') do
           div(class: 'flex items-start gap-2') do
             link_to(helpers.account_path,

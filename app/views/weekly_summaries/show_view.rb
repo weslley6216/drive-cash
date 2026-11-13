@@ -1,17 +1,22 @@
 module WeeklySummaries
   class ShowView < ApplicationView
     include CategoryPalette
+    include TopbarStyles
 
     def initialize(summary:)
       @summary = summary
     end
 
     def view_template
-      render LayoutComponent.new(title: t('weekly_summaries.show.title'), bottom_nav: :more, sidebar_nav: :more) do
-        div(class: 'max-w-2xl lg:mx-auto') do
-          mobile_header
-          desktop_header
-          body_section
+      render LayoutComponent.new(title: t('weekly_summaries.show.title'), bottom_nav: :more, sidebar_nav: :more, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            div(class: 'max-w-2xl lg:mx-auto') do
+              desktop_header
+              body_section
+            end
+          end
         end
       end
     end
@@ -19,7 +24,7 @@ module WeeklySummaries
     private
 
     def mobile_header
-      div(class: 'lg:hidden px-1 pt-2 pb-3 flex items-start gap-2') do
+      div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
         link_to(helpers.notifications_path,
                 class: 'p-1 -ml-1 mt-0.5 text-slate-500',
                 aria:  { label: t('weekly_summaries.show.back') }) do
