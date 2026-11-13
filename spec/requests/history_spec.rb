@@ -230,6 +230,13 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
     end
 
+    it 'discards a focus_day longer than the date parser accepts' do
+      get history_path(focus_day: '2' * 200)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
+    end
+
     it 'discards a focus_day in the future' do
       get history_path(focus_day: (Date.current + 1).iso8601)
 

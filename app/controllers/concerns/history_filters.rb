@@ -22,7 +22,7 @@ module HistoryFilters
   def focused_day
     day = Date.iso8601(params[:focus_day].to_s)
     day unless day.future?
-  rescue Date::Error
+  rescue ArgumentError
     nil
   end
 end
