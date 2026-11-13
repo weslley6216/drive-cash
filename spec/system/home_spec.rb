@@ -93,6 +93,29 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the month chips 13px under the greeting like the prototype on a phone' do
+    visit root_path
+
+    greeting = find('h1', text: 'Olá, Weslley')
+    chip = find('a', text: I18n.t('filter_component.all_chip'), exact_text: true).find('span')
+
+    expect((box(chip)['top'] - box(greeting)['bottom']).round).to eq(13)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'lines the stat values up with their titles on a desktop screen' do
+    emulate_desktop_screen
+
+    visit root_path
+
+    revenue_card = find('#stats_grid > *', match: :first)
+    title = revenue_card.find('p', match: :first)
+    value = revenue_card.find('p', text: 'R$ 5.075,90')
+
+    expect(box(value)['x'].round).to eq(box(title)['x'].round)
+    expect(box(value)['width'].round).to be <= box(title)['width'].round
+  end
+
   it 'scrolls the strip so the December chip of a past year sits inside it on a phone' do
     create(:earning, user: current_user, date: Date.new(2025, 12, 5), amount: 300)
 

@@ -32,7 +32,7 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: "#{PHONE_BAR} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 #{DESKTOP_BAR}") do
+      div(class: "#{first_use? ? PHONE_BAR : PHONE_BAR_ABOVE_CHIPS} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 #{DESKTOP_BAR}") do
         div(class: 'flex items-center justify-between') do
           div do
             p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }
