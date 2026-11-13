@@ -7,9 +7,7 @@ module Notifications
 
       private
 
-      def path = new_refueling_path
-
-      def frame = 'modal'
+      def path = vehicle_path(highlight: 'vehicle_tank')
 
       def inline_action
         InlineAction.new(label: I18n.t('notifications.actions.refuel'), path: new_refueling_path, frame: 'modal')
