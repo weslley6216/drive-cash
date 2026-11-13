@@ -143,20 +143,6 @@
   bottom: calc(4.5rem + var(--bottom-nav-inset));
 }
 
-@utility anchor-screen-content {
-  anchor-name: --screen-content;
-}
-
-@utility inset-y-screen-content {
-  top: anchor(--screen-content top, 0px);
-  bottom: anchor(--screen-content bottom, 0px);
-
-  body:has(#modal > *, [data-confirm-action-target="overlay"]:not(.hidden)) & {
-    top: 0;
-    bottom: 0;
-  }
-}
-
 @utility safe-top {
   padding-top: calc(env(safe-area-inset-top) + 16px);
 }
