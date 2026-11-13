@@ -11,27 +11,29 @@ module History
 
     def self.filter_names = FILTERS.keys
 
-    def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', limit: 100, user: Current.user)
+    def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', focus_day: nil, limit: 100, user: Current.user)
       @year = year
       @month = month
       @query = query
       @filter = filter
+      @focus_day = focus_day
       @limit = limit
       @user = user
     end
 
     def call
       grouped = limited_items.group_by(&:date).sort_by { |date, _| date }.reverse
+      groups = grouped.map { |date, day_items| build_group(date, day_items) }
 
       {
-        groups:  grouped.map { |date, day_items| build_group(date, day_items) },
+        groups:  with_focus_gap(groups),
         summary: build_summary
       }
     end
 
     private
 
-    attr_reader :year, :month, :query, :filter, :limit
+    attr_reader :year, :month, :query, :filter, :focus_day, :limit
 
     def limited_items
       earnings = include_earnings? ? filtered_earnings.chronological.limit(limit).to_a : []
@@ -97,6 +99,16 @@ module History
         earnings_total: day_earnings,
         expenses_total: day_expenses
       }
+    end
+
+    def with_focus_gap(groups)
+      return groups if focus_day.nil? || day_logged?
+
+      (groups + [{ date: focus_day, items: [], gap: true }]).sort_by { |group| group[:date] }.reverse
+    end
+
+    def day_logged?
+      @user.earnings.exists?(date: focus_day) || @user.expenses.paid_only.exists?(date: focus_day)
     end
   end
 end

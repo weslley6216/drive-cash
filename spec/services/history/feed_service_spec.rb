@@ -222,5 +222,34 @@ RSpec.describe History::FeedService do
         expect(result[:summary]).to eq(earnings: 100, expenses: 80, net: 20)
       end
     end
+
+    context 'with focus_day' do
+      it 'inserts an empty gap group for the focused day in date order' do
+        create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 150, platform: 'ifood')
+
+        result = described_class.new(year: 2025, focus_day: Date.new(2025, 6, 11), user: user).call
+
+        expect(result[:groups].map { |group| group[:date] }).to eq([Date.new(2025, 6, 12), Date.new(2025, 6, 11), Date.new(2025, 6, 10)])
+        expect(result[:groups].second).to eq(date: Date.new(2025, 6, 11), items: [], gap: true)
+      end
+
+      it 'does not insert the gap when the day has a visible record' do
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, focus_day: Date.new(2025, 6, 11), user: user).call
+
+        expect(result[:groups].size).to eq(1)
+        expect(result[:groups].first).not_to have_key(:gap)
+      end
+
+      it 'inserts the gap when the day only has an unpaid expense' do
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', paid: false)
+
+        result = described_class.new(year: 2025, focus_day: Date.new(2025, 6, 11), user: user).call
+
+        expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
+      end
+    end
   end
 end
