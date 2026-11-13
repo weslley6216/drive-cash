@@ -18,6 +18,12 @@ pt-BR:
       day_group:
         unpaid_badge: "Pendente"
         weekdays: ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"]
+      gap_day:
+        no_records: "sem lançamentos"
+        title: "Nada lançado neste dia"
+        hint: "Se rodou, registre agora. Se foi folga, pode ignorar."
+        table_hint: "· se foi folga, pode ignorar"
+        log: "Lançar"
       table:
         date: "Data"
         type: "Tipo"

@@ -80,12 +80,14 @@ module History
       if @feed[:groups].empty?
         empty_state
       else
-        div(class: 'space-y-4 lg:hidden') do
+        div(class: 'space-y-4 lg:hidden', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
           @feed[:groups].each do |group|
             render History::DayGroupComponent.new(group: group, context: filter_context)
           end
         end
-        div(class: 'hidden lg:block') { render History::TableComponent.new(groups: @feed[:groups], context: filter_context) }
+        div(class: 'hidden lg:block', data: { controller: 'highlight', highlight_active_class: History::TableComponent::HIGHLIGHT_OUTLINE }) do
+          render History::TableComponent.new(groups: @feed[:groups], context: filter_context)
+        end
       end
     end
 

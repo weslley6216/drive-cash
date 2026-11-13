@@ -263,6 +263,9 @@ pt-BR:
   common:
     today: "Hoje"
     yesterday: "Ontem"
+    log_day:
+      yesterday: "Lançar ontem"
+      on: "Lançar %{date}"
     trips:
       one: "%{count} corrida"
       other: "%{count} corridas"

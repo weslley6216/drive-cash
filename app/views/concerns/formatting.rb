@@ -16,4 +16,10 @@ module Formatting
   def month_abbr(number)
     I18n.t('date.abbr_month_names')[number].capitalize
   end
+
+  def log_day_label(date)
+    return I18n.t('common.log_day.yesterday') if date == Date.current - 1
+
+    I18n.t('common.log_day.on', date: I18n.l(date, format: '%d/%m'))
+  end
 end

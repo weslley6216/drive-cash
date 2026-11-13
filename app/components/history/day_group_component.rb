@@ -8,13 +8,38 @@ module History
     end
 
     def view_template
+      @group[:gap] ? gap_day : logged_day
+    end
+
+    private
+
+    def logged_day
       section(id: section_id) do
         header
         list
       end
     end
 
-    private
+    def gap_day
+      section do
+        div(class: 'flex items-center justify-between mb-2 px-1') do
+          p(class: 'text-xs font-bold text-slate-500 uppercase tracking-wider') { date_label }
+          p(class: 'text-xs font-medium text-slate-400') { t('history.index.gap_day.no_records') }
+        end
+        div(id: section_id, class: 'rounded-xl border border-dashed border-slate-300 bg-white/70 px-4 py-3.5 flex items-center gap-3') do
+          div(class: 'w-10 h-10 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0') do
+            render PhlexIcons::Lucide::Calendar.new(class: 'w-[18px] h-[18px]')
+          end
+          div(class: 'flex-1 min-w-0') do
+            p(class: 'text-sm font-semibold text-slate-700') { t('history.index.gap_day.title') }
+            p(class: 'text-xs text-slate-500 leading-snug') { t('history.index.gap_day.hint') }
+          end
+          link_to(t('history.index.gap_day.log'), new_record_path(date: @group[:date]),
+                  data:  { turbo_frame: '_top' },
+                  class: 'inline-flex items-center px-3 h-9 rounded-lg bg-blue-600 text-white text-xs font-semibold flex-shrink-0')
+        end
+      end
+    end
 
     def section_id
       "day-#{@group[:date].strftime('%Y-%m-%d')}"
