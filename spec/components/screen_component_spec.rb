@@ -25,7 +25,7 @@ RSpec.describe ScreenComponent, type: :component do
     html = render_screen
 
     expect(html).to include('<div id="screen-header" class="flex-none"><h1>Topo</h1></div>')
-    expect(html).to include('<div id="screen-content" class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-3.5 lg:px-0 lg:pb-8 lg:pt-8"><p>Corpo</p></div>')
+    expect(html).to include('<div id="screen-content" class="anchor-screen-content flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-3.5 lg:px-0 lg:pb-8 lg:pt-8"><p>Corpo</p></div>')
   end
 
   it 'pads the phone top past the status bar in a full-height column' do
@@ -50,7 +50,7 @@ RSpec.describe ScreenComponent, type: :component do
   end
 
   it 'leaves the desktop top gutter to the header when the header sits inline on desktop' do
-    expect(render_screen(inline_header: true)).to include('class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-3.5 lg:px-0 lg:pb-8"')
+    expect(render_screen(inline_header: true)).to include('class="anchor-screen-content flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-3.5 lg:px-0 lg:pb-8"')
   end
 
   it 'wraps the screen in the page frame with the loading overlay over the content' do

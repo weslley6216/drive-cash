@@ -77,6 +77,30 @@ RSpec.describe 'App shell', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the header and the bottom nav out of the loading overlay and centers its card on the content on a phone' do
+    visit goals_path
+    hold_the_loading_overlay
+
+    content = box(find('#screen-content'))
+    card = box(find('#loading-overlay > div'))
+
+    expect(topmost_shell_part_at_the_center_of('#screen-header')).to eq('screen-header')
+    expect(topmost_shell_part_at_the_center_of('#bottom-nav')).to eq('bottom-nav')
+    expect(topmost_shell_part_at_the_center_of('#screen-content')).to eq('loading-overlay')
+    expect((card['top'] + (card['height'] / 2)).round).to eq((content['top'] + (content['height'] / 2)).round)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the loading overlay over the whole screen while a modal is open on a phone' do
+    visit goals_path
+    page.execute_script("document.getElementById('modal').innerHTML = '<div></div>'")
+    hold_the_loading_overlay
+
+    expect(topmost_shell_part_at_the_center_of('#screen-header')).to eq('loading-overlay')
+    expect(topmost_shell_part_at_the_center_of('#bottom-nav')).to eq('loading-overlay')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'shows a 240px sidebar with the profile footer and hides the bottom nav on a desktop screen' do
     emulate_desktop_screen
 
@@ -89,5 +113,20 @@ RSpec.describe 'App shell', type: :system, js: true do
     expect(footer).to have_text('Weslley')
     expect(footer).to have_text(I18n.t('sidebar_nav_component.account_hint'))
     expect(page).to have_no_button(I18n.t('sessions.sign_out'))
+  end
+
+  def hold_the_loading_overlay
+    page.execute_script("document.dispatchEvent(new CustomEvent('loading:hold'))")
+    expect(page).to have_css('#loading-overlay', visible: true)
+  end
+
+  def topmost_shell_part_at_the_center_of(selector)
+    page.evaluate_script(<<~JS)
+      (() => {
+        const rect = document.querySelector('#{selector}').getBoundingClientRect()
+        const topmost = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+        return ['loading-overlay', 'screen-header', 'bottom-nav', 'screen-content'].find((id) => topmost.closest(`#${id}`))
+      })()
+    JS
   end
 end
