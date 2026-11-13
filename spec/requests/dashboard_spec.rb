@@ -47,7 +47,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('id="bottom-nav"')
       expect(response.body).to include('text-blue-600')
       expect(response.body).to include('h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8')
-      expect(response.body).to include('fixed bottom-24 right-5')
+      expect(response.body).to include('fixed bottom-above-nav right-5')
     end
 
     it 'renders static chrome: topbar greeting, new record button, loading region, and sidebar links' do

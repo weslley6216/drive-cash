@@ -21,7 +21,7 @@ RSpec.describe BottomNavComponent, type: :component do
     end
 
     it 'keeps the tabs above the iOS home indicator' do
-      expect(html).to include('pb-[max(1.5rem,env(safe-area-inset-bottom))]')
+      expect(html).to include('pb-bottom-nav-inset')
     end
 
     it 'hides on desktop via lg:hidden' do

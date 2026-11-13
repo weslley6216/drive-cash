@@ -6,7 +6,7 @@ class FabComponent < ApplicationComponent
 
   def view_template
     div(
-      class: "fixed #{@bottom_nav ? 'bottom-24' : 'bottom-6'} right-5 z-40 flex flex-col items-end gap-3 lg:hidden",
+      class: "fixed #{@bottom_nav ? 'bottom-above-nav' : 'bottom-6'} right-5 z-40 flex flex-col items-end gap-3 lg:hidden",
       data:  { controller: 'fab', action: 'click@window->fab#close' }
     ) do
       menu_options

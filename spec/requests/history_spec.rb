@@ -125,7 +125,7 @@ RSpec.describe 'History', type: :request do
     it 'renders the FAB positioned above the bottom nav' do
       get history_path
 
-      expect(response.body).to include('fixed bottom-24 right-5')
+      expect(response.body).to include('fixed bottom-above-nav right-5')
     end
 
     it 'renders the no-results empty state when a filter matches nothing' do

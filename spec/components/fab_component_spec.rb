@@ -65,8 +65,8 @@ RSpec.describe FabComponent, type: :component do
     let(:component) { FabComponent.new(filters: filters, bottom_nav: true) }
     let(:html) { view_context.render(component) }
 
-    it 'positions container at bottom-24 instead of bottom-6' do
-      expect(html).to include('fixed bottom-24 right-5')
+    it 'positions container above the bottom nav instead of bottom-6' do
+      expect(html).to include('fixed bottom-above-nav right-5')
       expect(html).not_to include('fixed bottom-6 right-5')
     end
   end

@@ -44,6 +44,16 @@ RSpec.describe 'App shell', type: :system, js: true do
     end
   end
 
+  it 'keeps the add button 14px above a bottom nav made taller by the system inset on a phone' do
+    visit root_path
+    page.execute_script("document.documentElement.style.setProperty('--bottom-nav-inset', '80px')")
+
+    gap = box(find('#bottom-nav'))['top'] - box(find('[data-controller="fab"]'))['bottom']
+
+    expect(computed('#bottom-nav', 'paddingBottom')).to eq('80px')
+    expect(gap.round).to eq(14)
+  end
+
   it 'starts every screen header 16px below the top with the 8px header gutter on a phone' do
     create(:vehicle, user: current_user)
 

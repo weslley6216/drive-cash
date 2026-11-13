@@ -135,11 +135,23 @@
   --color-fuchsia-950: #4a044e;
 }
 
+@utility pb-bottom-nav-inset {
+  padding-bottom: var(--bottom-nav-inset);
+}
+
+@utility bottom-above-nav {
+  bottom: calc(4.5rem + var(--bottom-nav-inset));
+}
+
 @utility safe-top {
   padding-top: calc(env(safe-area-inset-top) + 16px);
 }
 
 @layer base {
+  :root {
+    --bottom-nav-inset: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
   html {
     touch-action: manipulation;
   }
