@@ -64,9 +64,11 @@ RSpec.describe 'Notifications', type: :request do
       end
 
       it 'generates notifications from the domain on load' do
-        create(:earning, user: user, date: 4.days.ago.to_date)
+        travel_to Date.new(2026, 7, 14) do
+          create(:earning, user: user, date: Date.new(2026, 7, 10))
 
-        expect { get notifications_path }.to change { user.notifications.count }.from(0)
+          expect { get notifications_path }.to change { user.notifications.count }.from(0)
+        end
       end
 
       it 'does not duplicate generated notifications across loads' do
