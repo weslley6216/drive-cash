@@ -39,6 +39,14 @@ RSpec.describe 'Vehicle', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'rings the tank card for two seconds when arriving highlighted on a phone' do
+    visit vehicle_path(highlight: 'vehicle_tank')
+
+    expect(page).to have_css('#vehicle_tank.ring-amber-400')
+    expect(page).to have_no_css('#vehicle_tank.ring-amber-400', wait: 3)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'keeps the content scroll after marking a maintenance done on a phone' do
     emulate_short_phone
     visit vehicle_path

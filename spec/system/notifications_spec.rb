@@ -12,18 +12,30 @@ RSpec.describe 'Notifications', type: :system, js: true do
     login_as(current_user)
   end
 
-  it "opens yesterday's record from a log reminder on a phone" do
+  it 'opens the empty day in the history from a log reminder on a phone' do
     notification = create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-11' })
+
+    visit notifications_path
+    click_on I18n.t('notifications.kinds.log_reminder.title')
+
+    expect(page).to have_css('#day-2026-11-10.ring-amber-400')
+    expect(page).to have_current_path('/history?focus_day=2026-11-10')
+    expect(page).to have_text(I18n.t('history.index.gap_day.title'))
+    expect(page).to fit_the_phone_width
+    expect(notification.reload.read_at).to be_present
+  end
+
+  it 'logs the empty day inline from a log reminder on a phone' do
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-11' })
 
     visit notifications_path
     expect(page).to fit_the_phone_width
 
-    click_on I18n.t('notifications.kinds.log_reminder.title')
+    click_on I18n.t('common.log_day.yesterday')
 
     expect(page).to have_current_path('/records/new?date=2026-11-10')
     expect(page).to have_field('record[date]', with: '2026-11-10', visible: :all)
     expect(page).to have_text('10 nov 2026')
-    expect(notification.reload.read_at).to be_present
   end
 
   it 'keeps the notifications header still while the list scrolls on a phone' do
@@ -60,6 +72,17 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to have_current_path(vehicle_path)
     expect(page).to have_css("#maintenance_#{@oil.id}.ring-amber-400")
     expect(page).to have_no_css("#maintenance_#{@oil.id}.ring-amber-400", wait: 3)
+  end
+
+  it 'opens the vehicle with the tank card highlighted from a tank_low notification on a phone' do
+    create(:notification, user: current_user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+    visit notifications_path
+    click_on I18n.t('notifications.kinds.tank_low.title')
+
+    expect(page).to have_current_path(vehicle_path)
+    expect(page).to have_css('#vehicle_tank.ring-amber-400')
+    expect(page).to fit_the_phone_width
   end
 
   it 'marks a maintenance done inline without leaving the center on a phone' do

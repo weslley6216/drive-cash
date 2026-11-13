@@ -79,11 +79,11 @@ RSpec.describe Notifications::Presenters do
       expect(row.icon).to eq(PhlexIcons::Lucide::Fuel)
     end
 
-    it 'opens the refueling form in the modal frame, with an inline refuel action' do
+    it 'links to the vehicle with the tank card highlighted, keeping the inline refuel action in the modal frame' do
       row = present('tank_low', { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
 
-      expect(row.path).to eq('/refuelings/new')
-      expect(row.frame).to eq('modal')
+      expect(row.path).to eq('/vehicle?highlight=vehicle_tank')
+      expect(row.frame).to eq('_top')
       expect(row.inline_action.label).to eq('Abastecer')
       expect(row.inline_action.path).to eq('/refuelings/new')
       expect(row.inline_action.frame).to eq('modal')
@@ -115,10 +115,49 @@ RSpec.describe Notifications::Presenters do
       expect(row.icon).to eq(PhlexIcons::Lucide::Calendar)
     end
 
-    it 'links to a new record dated the day before the reminder' do
+    it 'links to the history focused on the empty day before the reminder' do
       row = present('log_reminder', { 'date' => '2026-07-14' })
 
-      expect(row.path).to eq('/records/new?date=2026-07-13')
+      expect(row.path).to eq('/history?focus_day=2026-07-13&highlight=day-2026-07-13')
+      expect(row.frame).to eq('_top')
+    end
+
+    it 'offers an inline Lançar ontem to a new record on the empty day when the reminder is from today' do
+      travel_to Date.new(2026, 7, 14)
+
+      row = present('log_reminder', { 'date' => '2026-07-14' })
+
+      expect(row.inline_action.label).to eq('Lançar ontem')
+      expect(row.inline_action.path).to eq('/records/new?date=2026-07-13')
+      expect(row.inline_action.frame).to eq('_top')
+    end
+
+    it 'offers an inline action with the empty day when the reminder is older' do
+      travel_to Date.new(2026, 7, 20)
+
+      row = present('log_reminder', { 'date' => '2026-07-14' })
+
+      expect(row.inline_action.label).to eq('Lançar 13/07')
+    end
+  end
+
+  describe 'row destinations' do
+    sample_data = {
+      'maintenance_due' => { 'maintenance_id' => 1, 'status' => 'overdue', 'category' => 'oil_change',
+                             'km_until' => -412, 'interval_km' => 5_000 },
+      'tank_low'        => { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 },
+      'goal_reached'    => { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 },
+      'weekly_summary'  => { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 },
+      'log_reminder'    => { 'date' => '2026-07-14' }
+    }
+
+    Notifications::Registry::KINDS.each do |kind|
+      it "opens a show screen in the top frame when tapping a #{kind} row" do
+        row = present(kind, sample_data.fetch(kind))
+
+        expect(row.frame).to eq('_top')
+        expect(row.path).not_to match(%r{/(new|edit)(\?|/|\z)})
+      end
     end
   end
 

@@ -128,7 +128,7 @@ RSpec.describe 'Notifications', type: :request do
 
       patch open_notification_path(notification)
 
-      expect(response).to redirect_to('/records/new?date=2026-07-13')
+      expect(response).to redirect_to('/history?focus_day=2026-07-13&highlight=day-2026-07-13')
       expect(response).to have_http_status(:see_other)
       expect(notification.reload.read_at).to be_present
     end

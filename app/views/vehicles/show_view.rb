@@ -1,9 +1,9 @@
 module Vehicles
   class ShowView < ApplicationView
     include TopbarStyles
+    include CardStyles
 
     MOBILE_MAINTENANCE_LIMIT = 5
-    HIGHLIGHT_ACTIVE_CLASS = 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-50'
 
     def initialize(payload:, vehicle_form: nil)
       @payload = payload
@@ -64,7 +64,7 @@ module Vehicles
     def mobile_layout
       div(class: 'space-y-4') do
         render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago])
-        div(id: 'vehicle_tank_section') { render_tank_card }
+        div(id: 'vehicle_tank_section') { highlightable_tank }
         div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
         moves_section
         insight_section
@@ -89,6 +89,12 @@ module Vehicles
       render Vehicles::TankBalanceCardComponent.new(balance: tank[:balance], full: tank[:full], last_fill: tank[:last_fill], variant: variant)
     end
 
+    def highlightable_tank
+      div(data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
+        div(id: 'vehicle_tank', class: 'rounded-2xl') { render_tank_card }
+      end
+    end
+
     def maintenances_section(limit: nil)
       div do
         div(class: 'flex items-center justify-between mb-2 px-1') do
@@ -101,7 +107,7 @@ module Vehicles
 
     def maintenances_list(limit:)
       shown = limit ? maintenances.first(limit) : maintenances
-      div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_ACTIVE_CLASS }) do
+      div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
         if maintenances.empty?
           empty_row(t('vehicle.maintenances.empty'))
         else
@@ -185,7 +191,7 @@ module Vehicles
         div(class: 'col-span-12 lg:col-span-5') do
           render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], variant: :desktop)
         end
-        div(class: 'col-span-12 lg:col-span-7') { render_tank_card }
+        div(class: 'col-span-12 lg:col-span-7') { highlightable_tank }
       end
     end
 

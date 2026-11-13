@@ -69,4 +69,26 @@ RSpec.describe History::DayGroupComponent, type: :component do
     expect(expenses_only_html).to include('−R$')
     expect(expenses_only_html).not_to include('+R$')
   end
+
+  context 'with an empty focused day' do
+    let(:gap_html) do
+      view_context.render(described_class.new(group: { date: Date.new(2025, 6, 11), items: [], gap: true }, context: context))
+    end
+
+    it 'renders the dashed marker with the no-records copy' do
+      expect(gap_html).to include(I18n.t('history.index.gap_day.title'))
+      expect(gap_html).to include(I18n.t('history.index.gap_day.hint'))
+      expect(gap_html).to include(I18n.t('history.index.gap_day.no_records'))
+      expect(gap_html).to include('border-dashed border-slate-300')
+    end
+
+    it 'links the Lançar button to a new record on that day' do
+      expect(gap_html).to include(%(href="/records/new?date=2025-06-11"))
+      expect(gap_html).to include(">#{I18n.t('history.index.gap_day.log')}<")
+    end
+
+    it 'anchors the day id on the marker box so the highlight rings it' do
+      expect(gap_html).to match(/<div id="day-2025-06-11" class="[^"]*border-dashed/)
+    end
+  end
 end

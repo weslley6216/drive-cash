@@ -41,4 +41,32 @@ RSpec.describe History::TableComponent, type: :component do
     expect(html).to include(%(href="/earnings/#{earning.id}/edit))
     expect(html).to include(%(aria-label="#{I18n.t('history.index.edit.expense')}"))
   end
+
+  context 'with an empty focused day' do
+    def gap_html(date)
+      view_context.render(described_class.new(groups: [{ date: date, items: [], gap: true }], context: context))
+    end
+
+    it 'renders an anchored amber row with the marker copy' do
+      html = gap_html(Date.current - 1)
+
+      expect(html).to include(%(id="day-#{(Date.current - 1).iso8601}"))
+      expect(html).to include('bg-amber-50/40')
+      expect(html).to include(I18n.t('history.index.gap_day.title'))
+      expect(html).to include(I18n.t('history.index.gap_day.table_hint'))
+    end
+
+    it 'offers Lançar ontem for yesterday, linked to a new record on that day' do
+      html = gap_html(Date.current - 1)
+
+      expect(html).to include(">#{I18n.t('common.log_day.yesterday')}<")
+      expect(html).to include(%(href="/records/new?date=#{(Date.current - 1).iso8601}"))
+    end
+
+    it 'offers Lançar DD/MM for an older day' do
+      date = Date.current - 3
+
+      expect(gap_html(date)).to include(">#{I18n.t('common.log_day.on', date: I18n.l(date, format: '%d/%m'))}<")
+    end
+  end
 end
