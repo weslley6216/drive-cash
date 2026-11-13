@@ -39,7 +39,8 @@ RSpec.describe 'App shell', type: :system, js: true do
     create(:vehicle, user: current_user)
 
     [root_path, history_path, analysis_path, goals_path, vehicle_path, refuelings_path, account_path, edit_profile_path,
-     notifications_path, edit_notification_preferences_path, help_path, plan_path, exports_path].each do |path|
+     notifications_path, edit_notification_preferences_path, help_path, plan_path, exports_path,
+     weekly_summary_path('2026-07-06')].each do |path|
       visit path
 
       expect(box(find('#screen-header'))['top'].round).to eq(16), path
