@@ -1,18 +1,23 @@
 module Profiles
   class EditView < ApplicationView
+    include TopbarStyles
+
     def initialize(user:, reauthenticated:)
       @user = user
       @reauthenticated = reauthenticated
     end
 
     def view_template
-      render LayoutComponent.new(title: t('.title'), sidebar_nav: :more) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        form_with(model: @user, url: helpers.profile_path, method: :patch, class: 'contents') do |form|
-          mobile_header
-          desktop_header
-          fields_card(form)
-          mobile_cta
+      render LayoutComponent.new(title: t('.title'), sidebar_nav: :more, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            form_with(model: @user, url: helpers.profile_path, method: :patch, class: 'contents') do |form|
+              desktop_header
+              fields_card(form)
+              mobile_cta
+            end
+          end
         end
       end
     end
@@ -30,23 +35,19 @@ module Profiles
     end
 
     def fields_card(form)
-      div(class: 'px-5 pb-28 lg:px-0 lg:pb-0') do
-        div(class: 'space-y-6 lg:max-w-xl lg:bg-white lg:rounded-2xl lg:border lg:border-slate-200 lg:p-8') do
-          avatar
-          identity_fields(form)
-          security_section(form)
-        end
+      div(class: 'space-y-6 lg:max-w-xl lg:bg-white lg:rounded-2xl lg:border lg:border-slate-200 lg:p-8') do
+        avatar
+        identity_fields(form)
+        security_section(form)
       end
     end
 
     def mobile_header
-      header(class: 'px-5 pt-2 pb-3 lg:hidden') do
-        div(class: 'flex items-center gap-3') do
-          link_to(helpers.account_path, class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600') do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[18px] h-[18px]')
-          end
-          h1(class: 'text-xl font-bold text-slate-900') { t('.heading') }
+      div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
+        link_to(helpers.account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500') do
+          render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
         end
+        h1(class: 'text-xl font-bold text-slate-900') { t('.heading') }
       end
     end
 

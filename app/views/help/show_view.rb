@@ -1,14 +1,20 @@
 module Help
   class ShowView < ApplicationView
+    include TopbarStyles
+
     def view_template
-      render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-        mobile_header
-        div(class: 'px-5 lg:px-0 pb-10') do
-          div(class: 'lg:max-w-4xl lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-6 lg:items-start') do
-            div(class: 'mb-6 lg:mb-0') { faq_section }
-            div(class: 'space-y-6') do
-              contact_section
-              about_section
+      render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more, app_shell: true) do
+        render ScreenComponent.new(inline_header: true) do |screen|
+          screen.with_header { mobile_header }
+          screen.with_content do
+            div(class: 'pb-10') do
+              div(class: 'lg:max-w-4xl lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-6 lg:items-start') do
+                div(class: 'mb-6 lg:mb-0') { faq_section }
+                div(class: 'space-y-6') do
+                  contact_section
+                  about_section
+                end
+              end
             end
           end
         end
@@ -20,10 +26,10 @@ module Help
     def faqs = t('.faqs')
 
     def mobile_header
-      header(class: 'px-5 lg:px-1 pt-2 pb-3') do
-        div(class: 'flex items-center gap-3') do
-          link_to(helpers.account_path, class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600 lg:hidden') do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[18px] h-[18px]')
+      header(class: "#{PHONE_BAR} lg:px-1 lg:pt-10 lg:pb-3") do
+        div(class: 'flex items-start gap-2 lg:items-center') do
+          link_to(helpers.account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500 lg:hidden') do
+            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
           end
           div do
             h1(class: 'text-xl lg:text-2xl font-bold text-slate-900') { t('.heading') }
