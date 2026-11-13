@@ -5,7 +5,7 @@ RSpec.describe LayoutComponent, type: :component do
     let(:html) { view_context.render(LayoutComponent.new(title: 'X')) { 'content' } }
 
     it 'does not render the BottomNavComponent' do
-      expect(html).not_to include('fixed bottom-0 left-0 right-0')
+      expect(html).not_to include('id="bottom-nav"')
     end
 
     it 'renders title and required PWA meta tags' do
@@ -22,12 +22,12 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"')
     end
 
-    it 'locks the app body to the viewport so only the screen content scrolls' do
-      expect(html).to include('<body class="h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">')
+    it 'locks the app body to the viewport as a column so only the screen content scrolls' do
+      expect(html).to include('<body class="h-[100dvh] flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">')
     end
 
-    it 'makes the container a full-height flex column' do
-      expect(html).to include('<div class="h-full"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0">')
+    it 'gives the container the height left above the bottom nav' do
+      expect(html).to include('<div class="flex-1 min-h-0"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0">')
     end
 
     it 'lets the status bar follow the device theme instead of forcing an accent color' do
@@ -45,7 +45,7 @@ RSpec.describe LayoutComponent, type: :component do
     let(:html) { view_context.render(LayoutComponent.new(title: 'X', bottom_nav: :home)) { 'content' } }
 
     it 'renders the BottomNavComponent' do
-      expect(html).to include('fixed bottom-0 left-0 right-0')
+      expect(html).to include('id="bottom-nav"')
       expect(html).to include('text-blue-600')
     end
   end
@@ -97,7 +97,7 @@ RSpec.describe LayoutComponent, type: :component do
     end
 
     it 'wraps content in a desktop-aware container beside the sidebar' do
-      expect(html).to include('<div class="h-full lg:ml-60"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8">')
+      expect(html).to include('<div class="flex-1 min-h-0 lg:ml-60"><div class="h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8">')
     end
 
     it 'hides BottomNavComponent on desktop' do
@@ -105,7 +105,7 @@ RSpec.describe LayoutComponent, type: :component do
     end
 
     it 'still renders bottom nav for mobile' do
-      expect(html).to include('fixed bottom-0')
+      expect(html).to include('id="bottom-nav"')
     end
   end
 end

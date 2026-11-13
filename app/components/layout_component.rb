@@ -61,13 +61,13 @@ class LayoutComponent < ApplicationComponent
   def body_classes
     return 'min-h-screen pt-[env(safe-area-inset-top)]' if @auth
 
-    'h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
+    'h-[100dvh] flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100'
   end
 
   def content_wrapper_classes
     return nil if @auth
 
-    class_names('h-full', ('lg:ml-60' if @sidebar_nav))
+    class_names('flex-1 min-h-0', ('lg:ml-60' if @sidebar_nav))
   end
 
   def container_classes

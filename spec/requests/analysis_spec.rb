@@ -144,7 +144,7 @@ RSpec.describe 'Analysis', type: :request do
       get analysis_path
 
       expect(response.body).to include('id="platform_breakdown" class="hidden lg:block lg:col-span-5"')
-      expect(response.body).to include('overflow-y-auto px-5 sm:px-6 pb-24 lg:px-0 lg:pb-8 lg:pt-8')
+      expect(response.body).to include('overflow-y-auto px-5 sm:px-6 pb-3.5 lg:px-0 lg:pb-8 lg:pt-8')
       expect(response.body).to include('<div class="space-y-4 lg:space-y-6">')
     end
 

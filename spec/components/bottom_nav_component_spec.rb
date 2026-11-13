@@ -15,8 +15,8 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include(I18n.t('bottom_nav_component.tabs.more'))
     end
 
-    it 'positions nav fixed at the bottom with z-30' do
-      expect(html).to include('fixed bottom-0 left-0 right-0')
+    it 'sits as the last row of the shell so the content scroll ends above it' do
+      expect(html).to include('flex-none bg-white')
       expect(html).to include('z-30')
     end
 

@@ -18,7 +18,7 @@ RSpec.describe 'Coming soon placeholder', type: :request do
     it 'renders bottom nav so users can navigate away' do
       get '/coming_soon'
 
-      expect(response.body).to include('fixed bottom-0 left-0 right-0')
+      expect(response.body).to include('id="bottom-nav"')
       expect(response.body).to include(I18n.t('bottom_nav_component.tabs.home'))
     end
   end

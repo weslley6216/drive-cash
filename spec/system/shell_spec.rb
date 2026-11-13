@@ -35,6 +35,15 @@ RSpec.describe 'App shell', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'ends the scroll of every tab above a bottom nav made taller by the system inset on a phone' do
+    [root_path, analysis_path, goals_path, history_path, account_path].each do |path|
+      visit path
+      page.execute_script("document.getElementById('bottom-nav').style.paddingBottom = '80px'")
+
+      expect(box(find('#screen-content'))['bottom']).to be <= box(find('#bottom-nav'))['top'], path
+    end
+  end
+
   it 'starts every screen header 16px below the top with the 8px header gutter on a phone' do
     create(:vehicle, user: current_user)
 

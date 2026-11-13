@@ -44,7 +44,7 @@ RSpec.describe 'Dashboard', type: :request do
       get root_path
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include('fixed bottom-0 left-0 right-0')
+      expect(response.body).to include('id="bottom-nav"')
       expect(response.body).to include('text-blue-600')
       expect(response.body).to include('h-full max-w-7xl mx-auto flex flex-col min-h-0 lg:px-8')
       expect(response.body).to include('fixed bottom-24 right-5')
