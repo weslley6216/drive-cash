@@ -1,16 +1,21 @@
 module Refuelings
   class IndexView < ApplicationView
+    include TopbarStyles
+
     def initialize(moves:, cadence:)
       @moves = moves
       @cadence = cadence
     end
 
     def view_template
-      render LayoutComponent.new(title: t('vehicle.moves.page_title'), bottom_nav: :more, sidebar_nav: :vehicle) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-        header_section
-        cadence_section
-        moves_section
+      render LayoutComponent.new(title: t('vehicle.moves.page_title'), bottom_nav: :more, sidebar_nav: :vehicle, app_shell: true) do
+        render ScreenComponent.new(inline_header: true) do |screen|
+          screen.with_header { header_section }
+          screen.with_content do
+            cadence_section
+            moves_section
+          end
+        end
         turbo_frame_tag 'modal'
       end
     end
@@ -18,7 +23,7 @@ module Refuelings
     private
 
     def header_section
-      div(class: 'mb-4 flex items-center justify-between') do
+      div(class: "#{PHONE_BAR} flex items-center justify-between lg:px-0 lg:pt-8 lg:pb-4") do
         div do
           h1(class: 'text-xl lg:text-2xl font-bold text-slate-900') { t('vehicle.moves.page_title') }
           p(class: 'text-sm text-slate-500') { t('vehicle.moves.page_subtitle') }

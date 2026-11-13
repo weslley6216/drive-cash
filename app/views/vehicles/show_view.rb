@@ -1,5 +1,7 @@
 module Vehicles
   class ShowView < ApplicationView
+    include TopbarStyles
+
     MOBILE_MAINTENANCE_LIMIT = 5
     HIGHLIGHT_ACTIVE_CLASS = 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-50'
 
@@ -9,15 +11,17 @@ module Vehicles
     end
 
     def view_template
-      render LayoutComponent.new(title: t('vehicle.title'), bottom_nav: :more, sidebar_nav: :vehicle) do
-        div(id: 'flash') { render FlashComponent.new(flash: helpers.flash) }
-
-        if @vehicle_form
-          empty_state
-        else
-          dashboard_layout
+      render LayoutComponent.new(title: t('vehicle.title'), bottom_nav: :more, sidebar_nav: :vehicle, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_header { header_mobile } unless @vehicle_form
+          screen.with_content do
+            if @vehicle_form
+              empty_state
+            else
+              dashboard_layout
+            end
+          end
         end
-
         turbo_frame_tag 'modal'
       end
     end
@@ -59,7 +63,6 @@ module Vehicles
 
     def mobile_layout
       div(class: 'space-y-4') do
-        header_mobile
         render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago])
         div(id: 'vehicle_tank_section') { render_tank_card }
         div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
@@ -69,7 +72,7 @@ module Vehicles
     end
 
     def header_mobile
-      div(class: 'flex items-center justify-between mb-2') do
+      div(class: "#{PHONE_BAR} flex items-center justify-between lg:hidden") do
         div do
           h1(class: 'text-xl font-bold text-slate-900') { t('vehicle.title') }
           p(class: 'text-xs text-slate-500') { vehicle_subtitle }
