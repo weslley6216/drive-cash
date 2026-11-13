@@ -98,7 +98,7 @@ class StatCardComponent < ApplicationComponent
   end
 
   def value_classes
-    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-1 lg:mt-1.5 lg:tabular-nums lg:tracking-tight -mx-1 truncate col-span-2 lg:col-span-1", colors[:value])
+    class_names("#{SIZES.fetch(@size, SIZES[:default])} font-bold mt-1 lg:mt-1.5 lg:tabular-nums lg:tracking-tight -mx-1 lg:mx-0 truncate col-span-2 lg:col-span-1", colors[:value])
   end
 
   def subtitle_classes
