@@ -114,11 +114,12 @@ RSpec.describe 'Analysis', type: :system, js: true do
   end
 
   it 'shows the dimmed chart frame and the empty block for a month without records on a phone' do
-    visit analysis_path(year: 2026, month: 1)
+    visit analysis_path(year: 2026, month: 6)
 
     expect(page).to have_text(I18n.t('analysis.show_view.empty_chart_title'))
-    expect(page).to have_text(I18n.t('empty_states.analysis.title', period: 'janeiro'))
+    expect(page).to have_text(I18n.t('empty_states.analysis.title', period: 'junho'))
     expect(page).to have_link(I18n.t('empty_states.analysis.cta'))
+    expect(page).to have_link('Ver maio, o último mês com dados →', href: analysis_path(year: 2026, month: 5))
     expect(page).to fit_the_phone_width
   end
 end

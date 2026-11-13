@@ -26,3 +26,5 @@ pt-BR:
       title: "Sem dados em %{period}"
       description: "Registre ganhos e gastos do mês pra ver seus gráficos e métricas aqui."
       cta: "Registrar lançamento"
+      secondary: "Ver %{period}, o último mês com dados →"
+      secondary_period_with_year: "%{month} de %{year}"
