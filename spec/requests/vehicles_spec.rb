@@ -75,6 +75,12 @@ RSpec.describe 'Vehicles', type: :request do
         expect(response.body).to include('data-controller="highlight"')
         expect(response.body).to include('ring-amber-400')
       end
+
+      it 'wraps the tank card in a highlight target on the phone and desktop layouts' do
+        get vehicle_path
+
+        expect(response.body.scan('<div id="vehicle_tank" class="rounded-2xl">').size).to eq(2)
+      end
     end
 
     context 'with more maintenances than the mobile limit' do
