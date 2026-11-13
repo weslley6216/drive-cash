@@ -38,6 +38,19 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'lines the notification cards and the mark-all action up with the 20px prototype gutter on a phone' do
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-10' })
+
+    visit notifications_path
+
+    card = find('#screen-content .rounded-xl', match: :first)
+    mark_all = find('#screen-header').find_button(I18n.t('notifications.index.read_all'))
+
+    expect(box(card)['x'].round).to eq(20)
+    expect(box(mark_all)['right'].round).to eq(370)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'highlights the maintenance from a maintenance_due notification on a phone' do
     @oil.update!(last_done_km: 155_600)
 

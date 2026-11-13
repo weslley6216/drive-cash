@@ -44,7 +44,7 @@ module Notifications
           end
           preferences_link(css: PREFERENCES_MOBILE_CLASSES)
         end
-        div(class: 'flex justify-end px-1 mb-2') { header_action(css: HEADER_ACTION_MOBILE_CLASSES) } unless @groups.empty?
+        div(class: 'flex justify-end mb-2') { header_action(css: HEADER_ACTION_MOBILE_CLASSES) } unless @groups.empty?
       end
     end
 
@@ -90,7 +90,7 @@ module Notifications
     end
 
     def groups_list
-      div(class: 'px-1 lg:px-0 pb-10 max-w-2xl space-y-5') do
+      div(class: 'pb-10 max-w-2xl space-y-5') do
         @groups.each { |group| group_block(group) }
       end
     end

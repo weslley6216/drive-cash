@@ -45,7 +45,7 @@ module WeeklySummaries
     end
 
     def body_section
-      div(class: 'px-1 lg:px-0 pb-10 space-y-4') do
+      div(class: 'pb-10 space-y-4') do
         profit_card
         render DailyBarsComponent.new(week: @summary.week, daily_profits: @summary.daily_profits,
                                       best_day_index: @summary.best_day_index)
