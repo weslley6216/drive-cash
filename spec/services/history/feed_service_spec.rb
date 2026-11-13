@@ -250,6 +250,14 @@ RSpec.describe History::FeedService do
 
         expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
       end
+
+      it 'does not treat the day as logged because of another user earning on the same date' do
+        create(:earning, user: create(:user), date: Date.new(2025, 6, 11), amount: 200, platform: 'uber')
+
+        result = described_class.new(year: 2025, focus_day: Date.new(2025, 6, 11), user: user).call
+
+        expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
+      end
     end
   end
 end
