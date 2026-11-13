@@ -25,6 +25,18 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'shows the whole revenue at the original phone size on the stat card' do
+    create(:earning, user: current_user, date: Date.new(2026, 3, 3), amount: 60_619.20)
+
+    visit root_path
+
+    revenue = find('#stats_grid p', text: 'R$ 65.695,10')
+
+    expect(revenue.evaluate_script('getComputedStyle(this).fontSize')).to eq('20px')
+    expect(revenue.evaluate_script('this.scrollWidth <= this.clientWidth')).to be(true)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'gives the month chips a 44px tap area while keeping the prototype size in dark mode' do
     emulate_color_scheme('dark')
 
