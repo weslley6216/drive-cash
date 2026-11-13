@@ -6,14 +6,18 @@ module Application
     end
 
     def view_template
-      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title'), bottom_nav: @bottom_nav, sidebar_nav: @sidebar_nav) do
-        div(class: 'flex flex-col items-center justify-center min-h-[60vh] text-center') do
-          h1(class: 'text-3xl font-bold text-slate-800 mb-2') do
-            I18n.t('application.coming_soon_view.title')
-          end
-          p(class: 'text-slate-600 mb-8') { I18n.t('application.coming_soon_view.message') }
-          link_to(root_path, class: 'inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium') do
-            I18n.t('application.coming_soon_view.back')
+      render LayoutComponent.new(title: I18n.t('application.coming_soon_view.title'), bottom_nav: @bottom_nav, sidebar_nav: @sidebar_nav, app_shell: true) do
+        render ScreenComponent.new do |screen|
+          screen.with_content do
+            div(class: 'flex flex-col items-center justify-center min-h-[60vh] text-center') do
+              h1(class: 'text-3xl font-bold text-slate-800 mb-2') do
+                I18n.t('application.coming_soon_view.title')
+              end
+              p(class: 'text-slate-600 mb-8') { I18n.t('application.coming_soon_view.message') }
+              link_to(root_path, class: 'inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium') do
+                I18n.t('application.coming_soon_view.back')
+              end
+            end
           end
         end
       end
