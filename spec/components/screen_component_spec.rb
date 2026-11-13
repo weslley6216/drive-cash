@@ -36,6 +36,15 @@ RSpec.describe ScreenComponent, type: :component do
     expect(render_screen).to include('<div id="flash" class="flex-none">')
   end
 
+  it 'gives the page a single flash id for the turbo streams to update while a toast shows' do
+    view_context.flash[:notice] = 'Salvo!'
+
+    html = render_screen
+
+    expect(html.scan('id="flash"').size).to eq(1)
+    expect(html).to include('Salvo!')
+  end
+
   it 'leaves the header wrapper out when the screen has no header' do
     expect(render_screen(with_header: false)).not_to include('screen-header')
   end
