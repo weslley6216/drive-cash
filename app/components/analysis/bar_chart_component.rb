@@ -94,7 +94,7 @@ module Analysis
     end
 
     def future_bar_column(bar_row, index)
-      div(class: 'flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5', aria_hidden: 'true', data: { future: 'true' }) do
+      div(class: 'flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5 cursor-default', aria_hidden: 'true', data: { future: 'true' }) do
         stub_bar
         bar_label(bar_row, index, 'text-slate-300')
       end
@@ -130,6 +130,7 @@ module Analysis
           exp:                brl(bar_row[:expenses]),
           muted:              bar_row[:empty].to_s,
           action:             'mouseenter->bar-tooltip#show mouseleave->bar-tooltip#hide ' \
+                  'focus->bar-tooltip#show blur->bar-tooltip#hide ' \
                   'click->bar-tooltip#toggle keydown.enter->bar-tooltip#toggle'
         }
       }
