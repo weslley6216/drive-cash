@@ -28,7 +28,8 @@ module DashboardContext
 
   def read_period_params(month_default: nil)
     @year = params[:year].presence&.to_i || Date.current.year
-    @month = params[:month].presence&.to_i || month_default
+    month = params[:month].presence&.to_i
+    @month = (1..12).cover?(month) ? month : month_default
   end
 
   def filter_reference_date

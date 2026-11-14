@@ -186,6 +186,13 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
     end
 
+    it 'falls back to the whole year when the month is out of the calendar range' do
+      get history_path(year: 2026, month: 99)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('filter_component.year_all_months', year: 2026))
+    end
+
     it 'offers the current month in the period popover even when the user has no records' do
       get history_path
 
