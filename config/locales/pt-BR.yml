@@ -16,6 +16,8 @@ pt-BR:
           attributes:
             email_address:
               domain_not_allowed: "E-mail deve ser de um provedor válido (Gmail, Hotmail, iCloud etc.)"
+            password_confirmation:
+              confirmation: "As senhas não são iguais."
         goal:
           attributes:
             period_end:

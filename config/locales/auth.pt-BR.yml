@@ -1,4 +1,19 @@
 pt-BR:
+  auth:
+    brand_panel_component:
+      headline_line1: "Saiba exatamente"
+      headline_line2: "quanto você lucra."
+      subheadline: "Receitas, despesas, metas e veículo num só lugar — feito para quem roda no aplicativo."
+      hero_profit_label: "Lucro líquido · 2026"
+      copyright: "© 2026 DriveCash · Gestão financeira para motoristas"
+    back_to_login_component:
+      label: "Voltar para Entrar"
+    password_field_component:
+      show: "Mostrar senha"
+    or_divider_component:
+      label: "ou"
+    google_button_component:
+      label: "Continuar com Google"
   sessions:
     new_view:
       title: "Entrar — DriveCash"
@@ -10,30 +25,34 @@ pt-BR:
       forgot_password: "Esqueci a senha"
       remember_me: "Manter conectado"
       sign_in: "Entrar"
-      divider: "ou"
-      google: "Continuar com Google"
       no_account: "Não tem conta?"
       create_account: "Criar conta"
-      brand_headline_line1: "Saiba exatamente"
-      brand_headline_line2: "quanto você lucra."
-      brand_subheadline: "Receitas, despesas, metas e veículo num só lugar — feito para quem roda no aplicativo."
-      hero_profit_label: "Lucro líquido · 2026"
-      copyright: "© 2026 DriveCash · Gestão financeira para motoristas"
     sign_out: "Sair"
     invalid_credentials: "E-mail ou senha inválidos."
     rate_limit: "Muitas tentativas. Aguarde alguns minutos."
     oauth_failure: "Não foi possível entrar com o Google. Tente novamente."
   passwords:
     new_view:
-      title: "Recuperar senha"
-      subtitle: "Enviaremos um link de redefinição."
+      title: "Esqueci a senha — DriveCash"
+      heading: "Esqueci a senha"
+      subtitle: "Informe o e-mail da sua conta. Enviamos um link para você criar uma nova senha."
       email: "E-mail"
       submit: "Enviar link"
+    sent_view:
+      title: "Confira seu e-mail — DriveCash"
+      heading: "Confira seu e-mail"
+      body_prefix: "Se existir uma conta com "
+      body_suffix: ", o link para criar uma nova senha chega em alguns minutos."
+      back: "Voltar para Entrar"
+      resend: "Não chegou? Reenviar link"
     edit_view:
-      title: "Definir nova senha"
+      title: "Criar nova senha — DriveCash"
+      heading: "Criar nova senha"
+      subtitle: "Escolha uma senha que você não usa em outros apps."
       password: "Nova senha"
-      password_confirmation: "Confirmar senha"
-      submit: "Salvar"
+      password_confirmation: "Confirmar nova senha"
+      hint: "Mínimo de 8 caracteres."
+      submit: "Salvar nova senha"
     mailer:
       reset:
         subject: "DriveCash — redefina sua senha"
@@ -47,13 +66,14 @@ pt-BR:
 
           Se não foi você, ignore este e-mail — sua senha continua a mesma.
     not_found: "Link inválido ou expirado."
-    instructions_sent: "Se este e-mail existir, você receberá instruções."
+    rate_limit: "Muitas tentativas. Aguarde alguns minutos."
     updated: "Senha atualizada."
   registrations:
     new_view:
       title: "Criar conta — DriveCash"
-      headline: "Crie sua conta"
-      subtitle: "Controle seus ganhos e despesas como motorista."
+      heading: "Criar conta"
+      subtitle: "Comece a registrar seus ganhos em menos de um minuto."
+      password_hint: "Mínimo de 8 caracteres."
       name_label: "Nome"
       email_label: "E-mail"
       password_label: "Senha"

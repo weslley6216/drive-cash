@@ -23,6 +23,12 @@ RSpec.describe 'Sessions', type: :request do
       expect(response.body).to include('required')
     end
 
+    it 'renders the e-mail field with the mail icon' do
+      get new_session_path
+
+      expect(response.body).to include(PhlexIcons::Lucide::Mail.new(class: 'w-[18px] h-[18px]').call)
+    end
+
     it 'wires the password toggle stimulus controller' do
       get new_session_path
 
@@ -53,14 +59,14 @@ RSpec.describe 'Sessions', type: :request do
       get new_session_path
 
       expect(response.body).to include('lg:flex')
-      expect(response.body).to include(I18n.t('sessions.new_view.brand_headline_line1'))
-      expect(response.body).to include(I18n.t('sessions.new_view.copyright'))
+      expect(response.body).to include(I18n.t('auth.brand_panel_component.headline_line1'))
+      expect(response.body).to include(I18n.t('auth.brand_panel_component.copyright'))
     end
 
     it 'renders the Google sign-in button posting to /auth/google_oauth2' do
       get new_session_path
 
-      expect(response.body).to include(I18n.t('sessions.new_view.google'))
+      expect(response.body).to include(I18n.t('auth.google_button_component.label'))
       expect(response.body).to include('action="/auth/google_oauth2"')
     end
 
@@ -99,13 +105,6 @@ RSpec.describe 'Sessions', type: :request do
       follow_redirect!
 
       expect(response.body).to include(I18n.t('sessions.invalid_credentials'))
-    end
-
-    it 'renders the notice banner after a password reset request redirect' do
-      post passwords_path, params: { email_address: user.email_address }
-      follow_redirect!
-
-      expect(response.body).to include(I18n.t('passwords.instructions_sent'))
     end
 
     context 'with remember_me' do

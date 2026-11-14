@@ -1,6 +1,8 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
   before_action :set_user_by_token, only: %i[edit update]
+  rate_limit to: 10, within: 3.minutes, only: :create,
+             with: -> { redirect_to new_password_path, alert: I18n.t('passwords.rate_limit') }
 
   def new
     render Passwords::NewView.new
@@ -10,11 +12,11 @@ class PasswordsController < ApplicationController
     user = User.find_by(email_address: params[:email_address].to_s.strip.downcase)
     PasswordsMailer.reset(user).deliver_later if user
 
-    redirect_to new_session_path, notice: I18n.t('passwords.instructions_sent')
+    render Passwords::SentView.new(email_address: params[:email_address].to_s.strip)
   end
 
   def edit
-    render Passwords::EditView.new(token: params[:token])
+    render Passwords::EditView.new(token: params[:token], user: @user)
   end
 
   def update
@@ -22,7 +24,7 @@ class PasswordsController < ApplicationController
       @user.revoke_sessions_except(Current.session)
       redirect_to new_session_path, notice: I18n.t('passwords.updated')
     else
-      redirect_to edit_password_path(params[:token]), alert: @user.errors.full_messages.to_sentence
+      render Passwords::EditView.new(token: params[:token], user: @user), status: :unprocessable_content
     end
   end
 

@@ -2,10 +2,13 @@ pt-BR:
   reauthentications:
     rate_limit: "Muitas tentativas. Tente novamente em alguns minutos."
     new_view:
-      title: "Confirmar identidade — DriveCash"
-      heading: "Confirme sua identidade"
-      subtitle: "Por segurança, confirme sua senha para continuar."
+      title: "Confirmar senha — DriveCash"
+      header: "Segurança"
+      topbar_subtitle: "Conta · Confirmar senha"
+      back: "Voltar"
+      heading: "Confirme sua senha"
+      subtitle: "Por segurança, digite sua senha para continuar alterando seus dados de acesso."
       password_label: "Senha"
+      forgot_password: "Esqueci a senha"
       submit: "Confirmar"
-      cancel: "Cancelar"
       error: "Senha incorreta"
