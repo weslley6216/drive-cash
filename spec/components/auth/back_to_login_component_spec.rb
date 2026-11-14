@@ -8,4 +8,8 @@ RSpec.describe Auth::BackToLoginComponent, type: :component do
     expect(html).to include('h-11 -ml-1')
     expect(html).to include(I18n.t('auth.back_to_login_component.label'))
   end
+
+  it 'hugs its content instead of stretching across the form column' do
+    expect(html).to include('flex w-fit items-center')
+  end
 end
