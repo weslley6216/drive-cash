@@ -57,10 +57,10 @@ RSpec.describe 'Home', type: :system, js: true do
     visit root_path
 
     chip = find('a', text: 'Jan', exact_text: true)
-    rect = box(chip.find('span'))
+    rect = box(chip)
     tap_center = rect['x'] + (rect['width'] / 2)
-    top_hit = page.evaluate_script("document.elementFromPoint(#{tap_center}, #{rect['top'] + rect['height'] / 2 - 22 + 1})?.textContent")
-    bottom_hit = page.evaluate_script("document.elementFromPoint(#{tap_center}, #{rect['top'] + rect['height'] / 2 + 22 - 1})?.textContent")
+    top_hit = page.evaluate_script("document.elementFromPoint(#{tap_center}, #{rect['top'] + rect['height'] / 2 - 22 + 1})?.closest('a')?.textContent")
+    bottom_hit = page.evaluate_script("document.elementFromPoint(#{tap_center}, #{rect['top'] + rect['height'] / 2 + 22 - 2})?.closest('a')?.textContent")
 
     expect(chip[:href]).to end_with('month=1&year=2026')
     expect(rect['height']).to be < 44
@@ -111,7 +111,7 @@ RSpec.describe 'Home', type: :system, js: true do
     visit root_path
 
     greeting = find('h1', text: 'Olá, Weslley')
-    chip = find('a', text: I18n.t('filter_component.all_chip'), exact_text: true).find('span')
+    chip = find('a', text: I18n.t('filter_component.all_chip'), exact_text: true)
 
     expect((box(chip)['top'] - box(greeting)['bottom']).round).to eq(13)
     expect(page).to fit_the_phone_width

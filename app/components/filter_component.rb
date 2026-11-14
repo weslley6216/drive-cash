@@ -1,7 +1,7 @@
 class FilterComponent < ApplicationComponent
   PILL = 'appearance-none bg-white border border-slate-200 rounded-lg py-2 text-sm font-medium text-slate-700 ' \
          'hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer'.freeze
-  CHIP = 'px-3 py-1.5 rounded-full text-sm whitespace-nowrap'.freeze
+  CHIP = 'relative px-3 py-1.5 rounded-full text-sm whitespace-nowrap'.freeze
   CHIP_ACTIVE = 'bg-slate-800 text-white font-medium'.freeze
   CHIP_IDLE = 'bg-white border border-slate-200 text-slate-600'.freeze
   MONTH_LINK = 'px-1 py-1.5 rounded-lg text-xs text-center'.freeze
@@ -27,7 +27,7 @@ class FilterComponent < ApplicationComponent
   end
 
   def chips_view
-    div(class: 'flex items-center gap-2 -mx-1 px-1 -my-[5px] overflow-x-auto [scrollbar-width:none] lg:hidden', data: { controller: 'chip-strip' }) do
+    div(class: 'flex items-center gap-2 -mx-1 px-1 py-[5px] -my-[5px] overflow-x-auto [scrollbar-width:none] lg:hidden', data: { controller: 'chip-strip' }) do
       year_chip_form
       month_chips
     end
@@ -130,8 +130,9 @@ class FilterComponent < ApplicationComponent
   def chip_link(label, month)
     active = month.to_s == @selected_month.to_s
     data = active ? { chip_strip_target: 'active' } : {}
-    a(href: period_path(month), class: 'flex-shrink-0 flex items-center h-11', data: data) do
-      span(class: "#{CHIP} #{active ? CHIP_ACTIVE : CHIP_IDLE}") { label }
+    a(href: period_path(month), class: "#{CHIP} #{active ? CHIP_ACTIVE : CHIP_IDLE}", data: data) do
+      span(class: 'absolute inset-x-0 -inset-y-[5px]', aria_hidden: 'true')
+      plain label
     end
   end
 
