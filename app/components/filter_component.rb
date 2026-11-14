@@ -84,15 +84,15 @@ class FilterComponent < ApplicationComponent
     ) { popover_panel }
   end
 
-  def pills_form(month_icon: nil)
+  def pills_form
     form(action: target_path, method: 'get', class: 'flex items-center gap-3', data: { controller: 'filter' }) do
       pill(icon: PhlexIcons::Lucide::Calendar) do
         select(name: 'year', class: "#{PILL} pl-8 pr-8", data: { filter_target: 'year', action: 'change->filter#handleYearChange' }) do
           year_options
         end
       end
-      pill(icon: month_icon) do
-        select(name: 'month', class: "#{PILL} #{month_icon ? 'pl-8' : 'pl-3'} pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
+      pill do
+        select(name: 'month', class: "#{PILL} pl-3 pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
           month_options
         end
       end
