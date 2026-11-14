@@ -62,6 +62,15 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'shows only the active category with its chip after the type chips on a phone' do
+    visit history_path(year: 2026, month: 5, filter: 'maintenance')
+
+    expect(page).to have_css('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.maintenance'), exact_text: true)
+    expect(page).to have_text('−R$ 10.450,00')
+    expect(page).to have_no_text('+R$ 32,50')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'shows the records as a table with the design column order and no FAB on a desktop screen' do
     emulate_desktop_screen
 

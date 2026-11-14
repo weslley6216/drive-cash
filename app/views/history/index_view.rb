@@ -120,7 +120,7 @@ module History
       return t('empty_states.history.description') if @query.blank?
       return t('empty_states.history.description_query', query: @query) if @filter == 'all'
 
-      t('empty_states.history.description_query_filter', query: @query, filter: t("history.index.filters.#{@filter}"))
+      t('empty_states.history.description_query_filter', query: @query, filter: t(History::FeedService::FILTERS.fetch(@filter).label_key))
     end
 
     def no_result?

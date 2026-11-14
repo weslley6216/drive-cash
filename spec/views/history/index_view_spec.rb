@@ -76,6 +76,12 @@ RSpec.describe History::IndexView, type: :component do
       expect(render_with(query: 'posto', filter: 'all')).not_to include(I18n.t('history.index.summary.net'))
     end
 
+    it 'echoes the search term and the active category' do
+      expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: I18n.t('activerecord.attributes.expense.categories.fuel'))
+
+      expect(render_with(query: 'posto', filter: 'fuel')).to include(CGI.escapeHTML(expected))
+    end
+
     it 'keeps the generic message when only a filter is active' do
       expect(render_with(query: nil, filter: 'unpaid')).to include(I18n.t('empty_states.history.description'))
     end

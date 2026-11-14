@@ -200,6 +200,31 @@ RSpec.describe History::FeedService do
       end
     end
 
+    context 'with a category filter' do
+      it 'returns only the paid expenses of that category in the period' do
+        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+        fuel = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 30, category: 'fuel', paid: false)
+        create(:expense, user: user, date: Date.new(2025, 6, 13), amount: 40, category: 'meals', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 7, 11), amount: 90, category: 'fuel', paid: true)
+
+        result = described_class.new(year: 2025, month: 6, filter: 'fuel', user: user).call
+
+        items = result[:groups].flat_map { |group| group[:items] }
+        expect(items.map(&:id)).to eq([fuel.id])
+      end
+
+      it 'keeps the summary of the whole period regardless of the category' do
+        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 13), amount: 40, category: 'meals', paid: true)
+
+        result = described_class.new(year: 2025, month: 6, filter: 'fuel', user: user).call
+
+        expect(result[:summary]).to eq(earnings: 200, expenses: 120, net: 80)
+      end
+    end
+
     context 'with query parameter' do
       it 'delegates matching to RecordSearch for both earnings and expenses' do
         match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
@@ -267,6 +292,12 @@ RSpec.describe History::FeedService do
 
         expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
       end
+    end
+  end
+
+  describe '.filter_names' do
+    it 'accepts the four type filters and one filter per expense category' do
+      expect(described_class.filter_names).to eq(%w[all earnings expenses unpaid] + Expense.categories.keys)
     end
   end
 end

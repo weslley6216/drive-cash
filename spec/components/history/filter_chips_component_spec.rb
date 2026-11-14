@@ -40,6 +40,19 @@ RSpec.describe History::FilterChipsComponent, type: :component do
     expect(new_html).to include('text-white')
   end
 
+  it 'adds the active category chip after the type chips, labeled with the category name' do
+    new_html = view_context.render(described_class.new(current_filter: 'fuel', query: nil, year: 2026, month: 5))
+
+    chips = Capybara.string(new_html).all('a')
+    expect(chips.map(&:text)).to eq(['Todos', 'Receitas', 'Despesas', 'Não pagas', 'Combustível'])
+    expect(chips.last[:class]).to include('bg-slate-800 text-white')
+    expect(chips.last[:href]).to eq(Rails.application.routes.url_helpers.history_path(filter: 'fuel', year: 2026, month: 5))
+  end
+
+  it 'leaves the category chips out while a type filter is active' do
+    expect(Capybara.string(html).all('a').map(&:text)).to eq(['Todos', 'Receitas', 'Despesas', 'Não pagas'])
+  end
+
   it 'styles inactive chips with white background' do
     expect(html).to include('bg-white')
     expect(html).to include('border-slate-200')
