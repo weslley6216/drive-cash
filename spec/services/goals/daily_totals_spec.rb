@@ -94,4 +94,35 @@ RSpec.describe Goals::DailyTotals do
       expect(totals.metric_on(goal, Date.new(2026, 6, 7))).to eq(0)
     end
   end
+
+  describe '#profit_in' do
+    it 'subtracts paid expenses from earnings inside the range only' do
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 500)
+      create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 120, paid: true)
+      create(:expense, user: user, date: Date.new(2026, 6, 7), amount: 80, paid: false)
+      create(:earning, user: user, date: Date.new(2026, 7, 1), amount: 999)
+
+      totals = described_class.for(user: user, range: Date.new(2026, 6, 1)..Date.new(2026, 7, 31))
+
+      expect(totals.profit_in(Date.new(2026, 6, 1)..Date.new(2026, 6, 30))).to eq(380)
+    end
+  end
+
+  describe '#active_in?' do
+    it 'is active when the range has an earning or a paid expense' do
+      create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 120, paid: true)
+
+      totals = described_class.for(user: user, range: Date.new(2026, 6, 1)..Date.new(2026, 7, 31))
+
+      expect(totals.active_in?(Date.new(2026, 6, 1)..Date.new(2026, 6, 30))).to be(true)
+    end
+
+    it 'is inactive when the range only has unpaid expenses' do
+      create(:expense, user: user, date: Date.new(2026, 7, 6), amount: 120, paid: false)
+
+      totals = described_class.for(user: user, range: Date.new(2026, 6, 1)..Date.new(2026, 7, 31))
+
+      expect(totals.active_in?(Date.new(2026, 7, 1)..Date.new(2026, 7, 31))).to be(false)
+    end
+  end
 end
