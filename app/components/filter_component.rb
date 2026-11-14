@@ -5,11 +5,13 @@ class FilterComponent < ApplicationComponent
   CHIP_ACTIVE = 'bg-slate-800 text-white font-medium'.freeze
   CHIP_IDLE = 'bg-white border border-slate-200 text-slate-600'.freeze
   MONTH_LINK = 'px-1 py-1.5 rounded-lg text-xs text-center'.freeze
+  YEAR_ARROW = 'w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100'.freeze
 
-  def initialize(selected_year:, selected_month:, available_years: [], variant: :compact, action_path: nil)
+  def initialize(selected_year:, selected_month:, available_years: [], periods: {}, variant: :compact, action_path: nil)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
+    @periods = periods
     @variant = variant
     @action_path = action_path
   end
@@ -32,19 +34,65 @@ class FilterComponent < ApplicationComponent
   end
 
   def popover_view
-    div(class: 'lg:hidden') { popover }
-    div(class: 'hidden lg:block') { pills_form(month_icon: PhlexIcons::Lucide::Calendar) }
+    div(
+      class: 'relative',
+      data:  {
+        controller:                      'filter-popover',
+        filter_popover_persistent_value: 'true',
+        action:                          'click@window->filter-popover#closeOnOutsideClick'
+      }
+    ) do
+      popover_trigger
+      popover_pill
+      popover_panel_wrapper
+    end
   end
 
-  def pills_form(month_icon: nil)
+  def popover_trigger
+    button(
+      type:  'button',
+      class: 'lg:hidden w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center ' \
+             'text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
+      title: t('.title'),
+      data:  { action: 'click->filter-popover#toggle' }
+    ) { render PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]') }
+  end
+
+  def popover_pill
+    button(
+      type:  'button',
+      class: 'hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 bg-white ' \
+             'text-sm font-medium text-slate-700 hover:bg-slate-50',
+      data:  { action: 'click->filter-popover#toggle' }
+    ) do
+      render PhlexIcons::Lucide::Calendar.new(class: 'w-[15px] h-[15px] text-slate-400')
+      span { pill_label }
+      render PhlexIcons::Lucide::ChevronDown.new(class: 'w-3.5 h-3.5 text-slate-400')
+    end
+  end
+
+  def pill_label
+    return t('.year_all_months', year: @selected_year) if @selected_month.blank?
+
+    t('.month_year', month: I18n.t('date.month_names')[@selected_month.to_i].capitalize, year: @selected_year)
+  end
+
+  def popover_panel_wrapper
+    div(
+      class: 'hidden absolute right-0 top-full mt-2 z-30 w-48 bg-white rounded-xl shadow-xl border border-slate-200 p-1.5',
+      data:  { filter_popover_target: 'panel' }
+    ) { popover_panel }
+  end
+
+  def pills_form
     form(action: target_path, method: 'get', class: 'flex items-center gap-3', data: { controller: 'filter' }) do
       pill(icon: PhlexIcons::Lucide::Calendar) do
         select(name: 'year', class: "#{PILL} pl-8 pr-8", data: { filter_target: 'year', action: 'change->filter#handleYearChange' }) do
           year_options
         end
       end
-      pill(icon: month_icon) do
-        select(name: 'month', class: "#{PILL} #{month_icon ? 'pl-8' : 'pl-3'} pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
+      pill do
+        select(name: 'month', class: "#{PILL} pl-3 pr-8", data: { filter_target: 'month', action: 'change->filter#submit' }) do
           month_options
         end
       end
@@ -87,50 +135,65 @@ class FilterComponent < ApplicationComponent
     end
   end
 
-  def popover
-    div(class: 'relative', data: { controller: 'filter-popover', action: 'click@window->filter-popover#closeOnOutsideClick' }) do
-      button(
-        type:  'button',
-        class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center ' \
-               'text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
-        title: t('.title'),
-        data:  { action: 'click->filter-popover#toggle' }
-      ) { render PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]') }
-
-      div(
-        class: 'hidden absolute right-0 top-full mt-2 z-30 w-48 bg-white rounded-xl shadow-xl border border-slate-200 p-1.5',
-        data:  { filter_popover_target: 'panel' }
-      ) { popover_panel }
-    end
-  end
-
   def popover_panel
-    form(action: target_path, method: 'get', class: 'px-2.5 pt-1 pb-1.5', data: { controller: 'filter' }) do
-      select(
-        name:         'year',
-        'aria-label': t('.year'),
-        class:        'appearance-none bg-transparent text-[11px] font-semibold text-slate-400 uppercase tracking-wide ' \
-                      'focus:outline-none cursor-pointer',
-        data:         { filter_target: 'year', action: 'change->filter#submit' }
-      ) { year_options }
+    div(class: 'flex items-center justify-between px-0.5 pb-1') do
+      year_arrow(:previous)
+      p(class: 'text-[11px] font-semibold text-slate-500 uppercase tracking-wide tabular-nums') { @selected_year.to_s }
+      year_arrow(:next)
     end
-    a(href: period_path(nil), class: "block w-full text-left px-2.5 py-2 rounded-lg text-sm #{month_link_state(nil, :all)}") do
-      t('.all_months')
-    end
+    a(
+      href:  period_path(nil),
+      data:  { turbo_action: 'advance' },
+      class: "block w-full text-left px-2.5 py-2 rounded-lg text-sm #{month_link_state(nil, :all)}"
+    ) { t('.all_months') }
     div(class: 'grid grid-cols-3 gap-1 mt-1') do
-      selectable_months.each do |month|
-        a(href: period_path(month), class: "#{MONTH_LINK} #{month_link_state(month, :month)}") do
-          I18n.t('date.abbr_month_names')[month].capitalize
-        end
+      calendar_months.each do |month|
+        a(
+          href:  period_path(month),
+          data:  { turbo_action: 'advance' },
+          class: "#{MONTH_LINK} #{month_link_state(month, :month)}"
+        ) { I18n.t('date.abbr_month_names')[month].capitalize }
       end
     end
   end
 
+  def year_arrow(direction)
+    year = direction == :previous ? previous_calendar_year : next_calendar_year
+
+    return span(class: "#{YEAR_ARROW} invisible", 'aria-hidden': 'true') unless year
+
+    label = direction == :previous ? t('.previous_year') : t('.next_year')
+    icon = direction == :previous ? PhlexIcons::Lucide::ChevronLeft : PhlexIcons::Lucide::ChevronRight
+
+    a(
+      href:         "#{target_path}?year=#{year}",
+      'aria-label': label,
+      class:        YEAR_ARROW,
+      data:         { action: 'filter-popover#keepOpen', turbo_action: 'advance' }
+    ) { render icon.new(class: 'w-[15px] h-[15px]') }
+  end
+
+  def previous_calendar_year
+    @periods.keys.select { |year| year < @selected_year.to_i }.max
+  end
+
+  def next_calendar_year
+    @periods.keys.select { |year| year > @selected_year.to_i }.min
+  end
+
+  def calendar_months
+    @periods.fetch(@selected_year.to_i, [])
+  end
+
   def month_link_state(month, kind)
-    return 'text-slate-700 hover:bg-slate-50' unless month.to_s == @selected_month.to_s
+    return idle_month_state(kind) unless month.to_s == @selected_month.to_s
     return 'bg-blue-50 text-blue-700 font-semibold' if kind == :all
 
     'bg-blue-600 text-white font-semibold'
+  end
+
+  def idle_month_state(kind)
+    kind == :all ? 'text-slate-700 hover:bg-slate-50' : 'text-slate-700 hover:bg-slate-100'
   end
 
   def selectable_months

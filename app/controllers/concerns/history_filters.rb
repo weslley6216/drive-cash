@@ -4,7 +4,7 @@ module HistoryFilters
   private
 
   def set_history_filters
-    set_dashboard_filters
+    set_calendar_filters
     @focus_day = focused_day
     return focus_period if @focus_day
 

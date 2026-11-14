@@ -7,6 +7,6 @@ class HistoryController < ApplicationController
                                      focus_day: @focus_day, user: current_user).call
 
     render History::IndexView.new(feed: @feed, year: @year, month: @month, query: @query,
-                                  filter: @filter, available_years: @available_years)
+                                  filter: @filter, periods: @periods)
   end
 end

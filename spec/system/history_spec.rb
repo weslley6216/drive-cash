@@ -94,6 +94,37 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to have_no_css('[data-controller="fab"]', visible: true)
   end
 
+  it 'filters the period from the single month and year pill on a desktop screen' do
+    create(:earning, user: current_user, date: Date.new(2026, 4, 8), amount: 50, platform: 'ifood', trips_count: 1)
+    emulate_desktop_screen
+
+    visit history_path(year: 2026, month: 5)
+    click_button 'Maio 2026'
+    find('[data-filter-popover-target="panel"]').click_link 'Abr'
+
+    expect(page).to have_current_path(history_path(year: 2026, month: 4))
+    expect(page).to have_button('Abril 2026')
+    expect(page).to have_css('tbody tr', count: 1)
+  end
+
+  it 'switches the year inside the period popover, keeps it open and picks a month on a phone' do
+    create(:earning, user: current_user, date: Date.new(2025, 11, 10), amount: 75, platform: 'ifood', trips_count: 1)
+
+    visit history_path
+    click_button I18n.t('filter_component.title')
+    find('[data-filter-popover-target="panel"]').click_link I18n.t('filter_component.previous_year')
+    reopened = find('[data-filter-popover-target="panel"]')
+
+    expect(page).to have_current_path(history_path(year: 2025))
+    expect(reopened).to have_css('a.bg-blue-50', text: I18n.t('filter_component.all_months'))
+
+    reopened.click_link 'Nov'
+
+    expect(page).to have_current_path(history_path(year: 2025, month: 11))
+    expect(page).to have_text('R$ 75,00')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'marks the empty day with the dashed marker and rings it on a phone' do
     visit history_path(focus_day: '2026-05-20', highlight: 'day-2026-05-20')
 

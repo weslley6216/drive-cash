@@ -6,12 +6,12 @@ RSpec.describe History::IndexView, type: :component do
   let(:html) do
     view_context.render(
       described_class.new(
-        feed:            feed,
-        year:            2025,
-        month:           nil,
-        query:           nil,
-        filter:          'all',
-        available_years: [2025]
+        feed:    feed,
+        year:    2025,
+        month:   nil,
+        query:   nil,
+        filter:  'all',
+        periods: { 2025 => [3] }
       )
     )
   end
@@ -42,7 +42,7 @@ RSpec.describe History::IndexView, type: :component do
   end
 
   it 'renders the month/year filter in the pinned header' do
-    expect(html).to include('data-controller="filter"')
+    expect(html).to include('data-controller="filter-popover"')
   end
 
   it 'offers a new record from the desktop topbar' do
@@ -59,7 +59,7 @@ RSpec.describe History::IndexView, type: :component do
 
   context 'when a search finds nothing' do
     def render_with(query:, filter:)
-      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, filter: filter, available_years: [2025]))
+      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, filter: filter, periods: { 2025 => [3] }))
     end
 
     it 'echoes the search term' do

@@ -124,6 +124,52 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to have_css('tbody tr', count: 1)
   end
 
+  it 'switches the year inside the period popover, keeps it open and picks a month on a phone' do
+    create(:earning, user: current_user, amount: 500, date: Date.new(2025, 11, 10))
+    travel_to Time.zone.local(2026, 6, 3, 10, 0)
+
+    visit analysis_path
+    click_button I18n.t('filter_component.title')
+    panel = find('[data-filter-popover-target="panel"]')
+
+    expect(panel).to have_link('Jun')
+    expect(panel).to have_no_link('Jul')
+    expect(panel).to have_no_link('Jan')
+
+    panel.click_link I18n.t('filter_component.previous_year')
+    reopened = find('[data-filter-popover-target="panel"]')
+
+    expect(page).to have_current_path(analysis_path(year: 2025))
+    expect(reopened).to have_css('p', text: '2025', exact_text: true)
+    expect(reopened).to have_css('a.bg-blue-50', text: I18n.t('filter_component.all_months'))
+    expect(reopened).to have_link(I18n.t('filter_component.next_year'))
+
+    reopened.click_link 'Nov'
+
+    expect(page).to have_current_path(analysis_path(year: 2025, month: 11))
+    expect(page).to have_text(I18n.t('analysis.show_view.subtitle_monthly', month_name: 'Novembro', year: 2025))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'replaces the year pill with one period pill that switches the year inside its popover on a desktop screen' do
+    create(:earning, user: current_user, amount: 500, date: Date.new(2025, 11, 10))
+    emulate_desktop_screen
+
+    visit analysis_path(year: 2026, month: 5)
+
+    expect(page).to have_no_select('year')
+
+    click_button 'Maio 2026'
+    find('[data-filter-popover-target="panel"]').click_link I18n.t('filter_component.previous_year')
+
+    expect(page).to have_button(I18n.t('filter_component.year_all_months', year: 2025))
+
+    find('[data-filter-popover-target="panel"]').click_link 'Nov'
+
+    expect(page).to have_current_path(analysis_path(year: 2025, month: 11))
+    expect(page).to have_button('Novembro 2025')
+  end
+
   it 'keeps the category insight without the history link on a phone' do
     visit analysis_path(year: 2026, month: 5)
 

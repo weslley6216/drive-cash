@@ -186,24 +186,28 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
     end
 
-    it 'always includes the current year in the year selector even when the user has no records' do
-      get history_path
+    it 'falls back to the whole year when the month is out of the calendar range' do
+      get history_path(year: 2026, month: 99)
 
-      expect(response.body).to include(%(value="#{Date.current.year}"))
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('filter_component.year_all_months', year: 2026))
     end
 
-    it 'lists historical years from earnings and expenses in descending order' do
+    it 'offers the current month in the period popover even when the user has no records' do
+      get history_path
+
+      expect(response.body).to include(%(href="/history?month=#{Date.current.month}&year=#{Date.current.year}"))
+    end
+
+    it 'points the previous-year arrow at the last earlier year with records' do
+      travel_to Time.zone.local(2026, 5, 22, 10, 0)
       create(:earning, user: current_user, date: Date.new(2023, 5, 1), amount: 100, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2024, 7, 1), amount: 50, category: 'fuel', paid: true)
 
       get history_path
 
-      idx_2024 = response.body.index(%(value="2024"))
-      idx_2023 = response.body.index(%(value="2023"))
-
-      expect(idx_2024).not_to be_nil
-      expect(idx_2023).not_to be_nil
-      expect(idx_2024).to be < idx_2023
+      expect(response.body).to include('href="/history?year=2024"')
+      expect(response.body).to include(%(aria-label="#{I18n.t('filter_component.previous_year')}"))
     end
   end
 

@@ -1,6 +1,9 @@
 pt-BR:
   filter_component:
     title: "Filtros"
-    year: "Ano"
     all_months: "Todos os meses"
     all_chip: "Todos"
+    previous_year: "Ano anterior"
+    next_year: "Próximo ano"
+    month_year: "%{month} %{year}"
+    year_all_months: "%{year} · todos os meses"

@@ -15,10 +15,21 @@ module DashboardContext
   end
 
   def set_dashboard_filters(month_default: nil)
-    @year = params[:year].presence&.to_i || Date.current.year
-    @month = params[:month].presence&.to_i || month_default
+    read_period_params(month_default: month_default)
     @available_years = Dashboard::AvailableYears.fetch(user: current_user)
     @filters = { year: @year, month: @month, available_years: @available_years }
+  end
+
+  def set_calendar_filters
+    read_period_params
+    @periods = Dashboard::ActivePeriods.fetch(user: current_user)
+    @filters = { year: @year, month: @month, periods: @periods }
+  end
+
+  def read_period_params(month_default: nil)
+    @year = params[:year].presence&.to_i || Date.current.year
+    month = params[:month].presence&.to_i
+    @month = (1..12).cover?(month) ? month : month_default
   end
 
   def filter_reference_date

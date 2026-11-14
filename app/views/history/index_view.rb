@@ -3,13 +3,13 @@ module History
     include CardStyles
     include TopbarStyles
 
-    def initialize(feed:, year:, month:, query:, filter:, available_years:)
+    def initialize(feed:, year:, month:, query:, filter:, periods:)
       @feed = feed
       @year = year
       @month = month
       @query = query
       @filter = filter
-      @available_years = available_years
+      @periods = periods
     end
 
     def view_template
@@ -45,11 +45,11 @@ module History
           end
           div(class: 'flex items-center gap-3 flex-shrink-0') do
             render FilterComponent.new(
-              selected_year:   @year,
-              selected_month:  @month,
-              available_years: @available_years,
-              variant:         :popover,
-              action_path:     history_path
+              selected_year:  @year,
+              selected_month: @month,
+              periods:        @periods,
+              variant:        :popover,
+              action_path:    history_path
             )
             new_record_link
           end
