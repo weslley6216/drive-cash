@@ -6,7 +6,7 @@ RSpec.describe 'Sign in screen', type: :system, js: true do
 
     footer = find('p', text: I18n.t('sessions.new_view.no_account'))
     submit = find('button', text: I18n.t('sessions.new_view.sign_in'))
-    divider = find('span', text: I18n.t('sessions.new_view.divider'), exact_text: true)
+    divider = find('span', text: I18n.t('auth.or_divider_component.label'), exact_text: true)
 
     expect(page).to have_text(I18n.t('brand_mark_component.subtitle'))
     expect(I18n.t('brand_mark_component.subtitle')).to eq('Gestão financeira')
@@ -21,7 +21,7 @@ RSpec.describe 'Sign in screen', type: :system, js: true do
 
     visit new_session_path
 
-    panel = find('h2', text: I18n.t('sessions.new_view.brand_headline_line1')).find(:xpath, '../..')
+    panel = find('h2', text: I18n.t('auth.brand_panel_component.headline_line1')).find(:xpath, '../..')
 
     brand_title = within(panel) { find('p', text: I18n.t('brand_mark_component.title'), exact_text: true) }
 
