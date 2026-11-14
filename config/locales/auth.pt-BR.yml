@@ -60,8 +60,9 @@ pt-BR:
   registrations:
     new_view:
       title: "Criar conta — DriveCash"
-      headline: "Crie sua conta"
-      subtitle: "Controle seus ganhos e despesas como motorista."
+      heading: "Criar conta"
+      subtitle: "Comece a registrar seus ganhos em menos de um minuto."
+      password_hint: "Mínimo de 8 caracteres."
       name_label: "Nome"
       email_label: "E-mail"
       password_label: "Senha"
