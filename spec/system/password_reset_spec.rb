@@ -1,0 +1,40 @@
+require 'rails_helper'
+
+RSpec.describe 'Password reset screens', type: :system, js: true do
+  let(:user) { create(:user) }
+
+  it 'sends the link, shows the sent screen and resends it on a phone' do
+    Rails.cache.clear
+    visit new_password_path
+
+    back = find('a', text: I18n.t('auth.back_to_login_component.label'))
+
+    expect(box(back)['height'].round).to eq(44)
+    expect(page).to fit_the_phone_width
+
+    fill_in I18n.t('passwords.new_view.email'), with: user.email_address
+    click_on I18n.t('passwords.new_view.submit')
+
+    expect(page).to have_text(I18n.t('passwords.sent_view.heading'))
+    expect(page).to have_text(user.email_address)
+    expect(box(find('button', text: I18n.t('passwords.sent_view.resend')))['height'].round).to eq(44)
+    expect(page).to fit_the_phone_width
+
+    click_on I18n.t('passwords.sent_view.resend')
+
+    expect(page).to have_text(I18n.t('passwords.sent_view.heading'))
+  end
+
+  it 'splits the brand panel and a 384px column on a desktop screen' do
+    emulate_desktop_screen
+
+    visit new_password_path
+
+    panel = find('h2', text: I18n.t('auth.brand_panel_component.headline_line1')).find(:xpath, '../..')
+    form = find('form[action="/passwords"]')
+
+    expect(box(panel)['width'].round).to eq((1280 * 0.46).round)
+    expect(box(form)['width'].round).to eq(384)
+    expect(page).to have_link(I18n.t('auth.back_to_login_component.label'))
+  end
+end

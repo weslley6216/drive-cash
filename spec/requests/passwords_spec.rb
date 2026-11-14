@@ -4,13 +4,14 @@ RSpec.describe 'Passwords', type: :request do
   let(:user) { create(:user) }
 
   describe 'GET /passwords/new' do
-    it 'renders the password reset request form with BrandMark' do
+    it 'renders the request form with the back link and without the brand mark' do
       get new_password_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(I18n.t('passwords.new_view.title'))
-      expect(response.body).to include('viewBox="0 0 100 100"')
-      expect(response.body).to include(I18n.t('brand_mark_component.title'))
+      expect(response.body).to include(I18n.t('passwords.new_view.heading'))
+      expect(response.body).to include(I18n.t('passwords.new_view.subtitle'))
+      expect(response.body).to include(I18n.t('auth.back_to_login_component.label'))
+      expect(response.body).to include(I18n.t('passwords.new_view.submit'))
     end
   end
 
@@ -27,16 +28,36 @@ RSpec.describe 'Passwords', type: :request do
       }.not_to have_enqueued_mail(PasswordsMailer, :reset)
     end
 
-    it 'redirects to the login page with the same neutral notice in both cases' do
+    it 'renders the sent screen with the typed address whether or not the account exists' do
       post passwords_path, params: { email_address: 'unknown@gmail.com' }
-
-      expect(response).to redirect_to(new_session_path)
-      expect(flash[:notice]).to eq(I18n.t('passwords.instructions_sent'))
+      unknown_response = response.body
 
       post passwords_path, params: { email_address: user.email_address }
 
-      expect(response).to redirect_to(new_session_path)
-      expect(flash[:notice]).to eq(I18n.t('passwords.instructions_sent'))
+      expect(response).to have_http_status(:ok)
+      expect(unknown_response).to include(I18n.t('passwords.sent_view.heading'))
+      expect(unknown_response).to include('unknown@gmail.com')
+      expect(response.body).to include(I18n.t('passwords.sent_view.heading'))
+      expect(response.body).to include(user.email_address)
+    end
+
+    it 'offers a resend form posting the same address back and a link to the sign in screen' do
+      post passwords_path, params: { email_address: user.email_address }
+
+      expect(response.body).to match(%r{<form[^>]*action="/passwords"})
+      expect(response.body).to match(/<input[^>]*type="hidden"[^>]*name="email_address"[^>]*value="#{Regexp.escape(user.email_address)}"/)
+      expect(response.body).to include(I18n.t('passwords.sent_view.resend'))
+      expect(response.body).to include("href=\"#{new_session_path}\"")
+    end
+
+    it 'redirects back to the request form with an alert after too many requests and shows it there' do
+      11.times { post passwords_path, params: { email_address: 'unknown@gmail.com' } }
+
+      expect(response).to redirect_to(new_password_path)
+      expect(flash[:alert]).to eq(I18n.t('passwords.rate_limit'))
+
+      follow_redirect!
+      expect(response.body).to include(I18n.t('passwords.rate_limit'))
     end
   end
 

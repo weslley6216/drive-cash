@@ -33,10 +33,18 @@ pt-BR:
     oauth_failure: "Não foi possível entrar com o Google. Tente novamente."
   passwords:
     new_view:
-      title: "Recuperar senha"
-      subtitle: "Enviaremos um link de redefinição."
+      title: "Esqueci a senha — DriveCash"
+      heading: "Esqueci a senha"
+      subtitle: "Informe o e-mail da sua conta. Enviamos um link para você criar uma nova senha."
       email: "E-mail"
       submit: "Enviar link"
+    sent_view:
+      title: "Confira seu e-mail — DriveCash"
+      heading: "Confira seu e-mail"
+      body_prefix: "Se existir uma conta com "
+      body_suffix: ", o link para criar uma nova senha chega em alguns minutos."
+      back: "Voltar para Entrar"
+      resend: "Não chegou? Reenviar link"
     edit_view:
       title: "Definir nova senha"
       password: "Nova senha"
@@ -55,7 +63,7 @@ pt-BR:
 
           Se não foi você, ignore este e-mail — sua senha continua a mesma.
     not_found: "Link inválido ou expirado."
-    instructions_sent: "Se este e-mail existir, você receberá instruções."
+    rate_limit: "Muitas tentativas. Aguarde alguns minutos."
     updated: "Senha atualizada."
   registrations:
     new_view:
