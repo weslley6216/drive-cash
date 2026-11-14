@@ -42,7 +42,7 @@ RSpec.describe History::IndexView, type: :component do
   end
 
   it 'renders the month/year filter in the pinned header' do
-    expect(html).to include('data-controller="filter"')
+    expect(html).to include('data-controller="filter-popover"')
   end
 
   it 'offers a new record from the desktop topbar' do
