@@ -3,10 +3,11 @@ module Goals
     include CardStyles
     include TopbarStyles
 
-    def initialize(progress:, filters: {}, past_monthly: [])
+    def initialize(progress:, filters: {}, past_monthly: [], suggestion: nil)
       @progress = progress
       @filters = filters
       @past_monthly = past_monthly
+      @suggestion = suggestion
     end
 
     def view_template
@@ -18,18 +19,21 @@ module Goals
               hero_section
               columns_section
             else
-              div(class: CARD) do
-                render EmptyStateComponent.new(
-                  icon:        PhlexIcons::Lucide::Target,
-                  icon_color:  'text-blue-600',
-                  ring:        'bg-blue-50 border-blue-100',
-                  title:       t('empty_states.goals.title'),
-                  description: t('empty_states.goals.description'),
-                  cta_label:   t('empty_states.goals.cta'),
-                  cta_path:    helpers.new_goal_path,
-                  cta_icon:    PhlexIcons::Lucide::Target,
-                  cta_data:    { turbo_frame: 'modal' }
-                )
+              div(class: 'space-y-4') do
+                div(class: CARD) do
+                  render EmptyStateComponent.new(
+                    icon:        PhlexIcons::Lucide::Target,
+                    icon_color:  'text-blue-600',
+                    ring:        'bg-blue-50 border-blue-100',
+                    title:       t('empty_states.goals.title'),
+                    description: t('empty_states.goals.description'),
+                    cta_label:   t('empty_states.goals.cta'),
+                    cta_path:    helpers.new_goal_path,
+                    cta_icon:    PhlexIcons::Lucide::Target,
+                    cta_data:    { turbo_frame: 'modal' }
+                  )
+                end
+                render Goals::SuggestionCardComponent.new(amount: @suggestion) if @suggestion
               end
             end
 

@@ -65,6 +65,18 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'suggests a realistic target below the empty block on a phone' do
+    create(:earning, user: current_user, amount: 6000, date: Date.new(2026, 2, 10))
+    create(:earning, user: current_user, amount: 6300, date: Date.new(2026, 3, 10))
+    create(:earning, user: current_user, amount: 6441, date: Date.new(2026, 4, 10))
+
+    visit goals_path
+
+    expect(page).to have_text(I18n.t('goals.index.suggestion.label').upcase)
+    expect(page).to have_text('R$ 6.200,00')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'spreads the hero across the row and lines up the weekly, annual and achievements cards on a desktop screen' do
     seed_goals
     emulate_desktop_screen

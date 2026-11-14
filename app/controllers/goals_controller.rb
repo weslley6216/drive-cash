@@ -5,7 +5,12 @@ class GoalsController < ApplicationController
 
   def index
     service = Goals::ProgressService.new(user: current_user, date: filter_reference_date)
-    render Goals::IndexView.new(progress: service.call, filters: @filters, past_monthly: service.past_goals('monthly'))
+    render Goals::IndexView.new(
+      progress:     service.call,
+      filters:      @filters,
+      past_monthly: service.past_goals('monthly'),
+      suggestion:   Goals::RealisticTarget.call(user: current_user, date: filter_reference_date)
+    )
   end
 
   def new

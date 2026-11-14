@@ -30,6 +30,18 @@ RSpec.describe Goals::IndexView, type: :component do
       expect(html).to include('href="/goals"')
       expect(html).to include('text-blue-600')
     end
+
+    it 'omits the suggestion card without a suggestion' do
+      expect(html).not_to include(I18n.t('goals.index.suggestion.label'))
+    end
+
+    it 'renders the suggestion card below the empty block' do
+      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200')))
+
+      expect(output).to include(I18n.t('goals.index.suggestion.label'))
+      expect(output).to include('R$ 6.200,00')
+      expect(output.index(I18n.t('empty_states.goals.title'))).to be < output.index(I18n.t('goals.index.suggestion.label'))
+    end
   end
 
   context 'desktop layout when monthly goal exists' do
@@ -60,6 +72,12 @@ RSpec.describe Goals::IndexView, type: :component do
 
     it 'renders the wide 200px ring in the hero area' do
       expect(html).to include('width="200" height="200"')
+    end
+
+    it 'omits the suggestion card when a goal exists' do
+      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200')))
+
+      expect(output).not_to include(I18n.t('goals.index.suggestion.label'))
     end
   end
 
