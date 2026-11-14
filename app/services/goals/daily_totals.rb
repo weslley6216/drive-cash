@@ -35,5 +35,15 @@ module Goals
       spent = @expenses_by_day.fetch(day, 0)
       MetricValue.of(goal, earned: earned, spent: spent)
     end
+
+    def profit_in(range)
+      earned = range.sum { |day| @earnings_by_day.fetch(day, 0) }
+      spent = range.sum { |day| @expenses_by_day.fetch(day, 0) }
+      earned - spent
+    end
+
+    def active_in?(range)
+      range.any? { |day| @earnings_by_day.key?(day) || @expenses_by_day.key?(day) }
+    end
   end
 end

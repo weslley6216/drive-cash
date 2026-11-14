@@ -12,6 +12,10 @@ pt-BR:
         achieved_label: "Atingido"
         achieved_yes: "✅ batida"
         achieved_no: "❌ %{percent}%%"
+      suggestion:
+        label: "Sugestão"
+        text_before: "Com base nos seus últimos 3 meses, uma meta realista seria "
+        text_after: "."
       monthly:
         label: "Meta do mês"
         sublabel_profit: "Lucro líquido"

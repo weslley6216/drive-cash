@@ -72,6 +72,19 @@ RSpec.describe 'Goals', type: :request do
         expect(response.body).to include(I18n.t('goals.index.subtitle', month_name: 'Abril', year: 2026))
       end
     end
+
+    it 'suggests a realistic target from the last three closed months when the user has no goals' do
+      travel_to Date.new(2026, 11, 14) do
+        create(:earning, user: current_user, date: Date.new(2026, 8, 10), amount: 6000)
+        create(:earning, user: current_user, date: Date.new(2026, 9, 10), amount: 6300)
+        create(:earning, user: current_user, date: Date.new(2026, 10, 10), amount: 6441)
+
+        get goals_path
+
+        expect(response.body).to include(I18n.t('goals.index.suggestion.label'))
+        expect(response.body).to include('R$ 6.200,00')
+      end
+    end
   end
 
   describe 'GET /goals/new' do
