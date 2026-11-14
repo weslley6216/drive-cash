@@ -8,6 +8,12 @@ pt-BR:
       copyright: "© 2026 DriveCash · Gestão financeira para motoristas"
     back_to_login_component:
       label: "Voltar para Entrar"
+    password_field_component:
+      show: "Mostrar senha"
+    or_divider_component:
+      label: "ou"
+    google_button_component:
+      label: "Continuar com Google"
   sessions:
     new_view:
       title: "Entrar — DriveCash"
