@@ -49,6 +49,13 @@ RSpec.describe History::FilterChipsComponent, type: :component do
     expect(chips.last[:href]).to eq(Rails.application.routes.url_helpers.history_path(filter: 'fuel', year: 2026, month: 5))
   end
 
+  it 'marks only the active chip as the target the chip strip scrolls into view' do
+    new_html = view_context.render(described_class.new(current_filter: 'fuel', query: nil, year: 2026, month: 5))
+
+    strip = Capybara.string(new_html).find('div[data-controller="chip-strip"]')
+    expect(strip.all('a[data-chip-strip-target="active"]').map(&:text)).to eq(['Combustível'])
+  end
+
   it 'leaves the category chips out while a type filter is active' do
     expect(Capybara.string(html).all('a').map(&:text)).to eq(['Todos', 'Receitas', 'Despesas', 'Não pagas'])
   end

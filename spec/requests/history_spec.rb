@@ -74,7 +74,8 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('Posto Shell')
       expect(response.body).not_to include('Lanchonete')
       expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
-      expect(response.body).to include(%(bg-slate-800 text-white" href="#{CGI.escapeHTML(history_path(filter: 'fuel', year: 2025, month: 6))}">#{I18n.t('activerecord.attributes.expense.categories.fuel')}</a>))
+      active_chip = Capybara.string(response.body).find('a.bg-slate-800.text-white', text: I18n.t('activerecord.attributes.expense.categories.fuel'), exact_text: true)
+      expect(active_chip[:href]).to eq(history_path(filter: 'fuel', year: 2025, month: 6))
     end
 
     it 'excludes unpaid expenses from the default feed and net summary' do

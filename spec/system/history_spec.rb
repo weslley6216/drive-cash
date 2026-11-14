@@ -71,6 +71,17 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'scrolls the chip row so the active category chip sits inside it on a phone' do
+    visit history_path(year: 2026, month: 5, filter: 'maintenance')
+
+    chip = find('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.maintenance'), exact_text: true)
+    strip = chip.find(:xpath, 'ancestor::div[@data-controller="chip-strip"][1]')
+
+    expect(box(chip)['left']).to be >= box(strip)['left']
+    expect(box(chip)['right']).to be <= box(strip)['right']
+    expect(page).to fit_the_phone_width
+  end
+
   it 'shows the records as a table with the design column order and no FAB on a desktop screen' do
     emulate_desktop_screen
 
