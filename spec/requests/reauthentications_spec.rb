@@ -21,6 +21,16 @@ RSpec.describe 'Reauthentications', type: :request do
         expect(response.body).to include('name="password"')
         expect(response.body).to include('action="/reauthentication"')
       end
+
+      it 'renders inside the app with the security header, the profile back link and the forgot password link' do
+        get new_reauthentication_path
+
+        expect(response.body).to include(I18n.t('reauthentications.new_view.header'))
+        expect(response.body).to include(I18n.t('reauthentications.new_view.topbar_subtitle'))
+        expect(response.body).to include("href=\"#{edit_profile_path}\"")
+        expect(response.body).to include("href=\"#{new_password_path}\"")
+        expect(response.body).to include('w-11 h-11')
+      end
     end
   end
 
