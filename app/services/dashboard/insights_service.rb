@@ -15,12 +15,14 @@ module Dashboard
 
     def call
       {
-        metrics:         metrics,
-        monthly_bars:    monthly_bars,
-        categories:      categories,
-        platforms:       platforms,
-        platforms_total: platforms_total,
-        insights:        insights
+        metrics:              metrics,
+        monthly_bars:         monthly_bars,
+        categories:           categories,
+        platforms:            platforms,
+        platforms_total:      platforms_total,
+        insights:             insights,
+        empty:                empty?,
+        last_month_with_data: last_month_with_data
       }
     end
 
@@ -86,6 +88,16 @@ module Dashboard
     def insights
       INSIGHT_RULES.filter_map { |rule| rule.new(insight_context).call }
         .map { |raw| Insights::Presenters.present(raw) }
+    end
+
+    def empty?
+      current_stats[:earnings].to_f.zero? && current_stats[:expenses].to_f.zero?
+    end
+
+    def last_month_with_data
+      return nil unless empty?
+
+      LastMonthWithData.fetch(user: @user, before: Date.new(year, month || 1, 1))
     end
   end
 end

@@ -49,7 +49,7 @@ module Analysis
     end
 
     def empty?
-      metrics[:earnings].to_f.zero? && metrics[:expenses].to_f.zero?
+      @insights[:empty]
     end
 
     def empty_state
@@ -57,16 +57,41 @@ module Analysis
         dimmed_chart_frame
         div(class: CARD) do
           render EmptyStateComponent.new(
-            icon:        PhlexIcons::Lucide::ChartColumn,
-            title:       t('empty_states.analysis.title', period: period_label),
-            description: t('empty_states.analysis.description'),
-            cta_label:   t('empty_states.analysis.cta'),
-            cta_path:    helpers.new_record_path,
-            cta_icon:    PhlexIcons::Lucide::Plus,
-            cta_data:    { turbo_frame: '_top' }
+            icon:            PhlexIcons::Lucide::ChartColumn,
+            title:           t('empty_states.analysis.title', period: period_label),
+            description:     t('empty_states.analysis.description'),
+            cta_label:       t('empty_states.analysis.cta'),
+            cta_path:        helpers.new_record_path,
+            cta_icon:        PhlexIcons::Lucide::Plus,
+            cta_data:        { turbo_frame: '_top' },
+            secondary_label: last_month_with_data_label,
+            secondary_path:  last_month_with_data_path
           )
         end
       end
+    end
+
+    def last_month_with_data_date
+      @insights[:last_month_with_data]
+    end
+
+    def last_month_with_data_label
+      return nil if last_month_with_data_date.nil?
+
+      t('empty_states.analysis.secondary', period: last_month_label(last_month_with_data_date))
+    end
+
+    def last_month_with_data_path
+      return nil if last_month_with_data_date.nil?
+
+      helpers.analysis_path(year: last_month_with_data_date.year, month: last_month_with_data_date.month)
+    end
+
+    def last_month_label(date)
+      month_name = I18n.t('date.month_names')[date.month]
+      return month_name if date.year == @filters[:year]
+
+      t('empty_states.analysis.secondary_period_with_year', month: month_name, year: date.year)
     end
 
     def dimmed_chart_frame
