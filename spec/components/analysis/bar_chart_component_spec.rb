@@ -150,11 +150,13 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(html).to include("data-exp=\"R$ 50,00\"")
   end
 
-  it 'wires stimulus actions for hover, click, touch and keyboard on each column' do
+  it 'wires stimulus actions for hover, focus, click and keyboard on each column' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 
     expect(html).to include('mouseenter->bar-tooltip#show')
     expect(html).to include('mouseleave->bar-tooltip#hide')
+    expect(html).to include('focus->bar-tooltip#show')
+    expect(html).to include('blur->bar-tooltip#hide')
     expect(html).to include('click->bar-tooltip#toggle')
     expect(html).to include('keydown.enter->bar-tooltip#toggle')
   end
@@ -194,7 +196,7 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     html = view_context.render(Analysis::BarChartComponent.new(bars: bars, month: nil, year: 2026))
     july = I18n.t('date.abbr_month_names')[7].capitalize
 
-    expect(html).to include(%(<div class="flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5" aria-hidden="true" data-future="true">))
+    expect(html).to include(%(<div class="flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5 cursor-default" aria-hidden="true" data-future="true">))
     expect(html).to include(%(text-slate-300 font-medium">#{july}</span>))
     expect(html).not_to include(%(aria-label="#{july}: Sem dados"))
     expect(html.scan('role="button"').size).to eq(6)

@@ -99,6 +99,21 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(past['tabindex']).to eq('0')
   end
 
+  it 'shows the column tooltip on keyboard focus and hides it on blur on a phone' do
+    visit analysis_path
+
+    may = find('[data-bar-tooltip-target="column"]', text: 'Mai')
+    may.execute_script('this.focus()')
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /mai/i)
+    expect(page).to have_css('[data-bar-tooltip-target="earnValue"]', text: 'R$ 1.000,00')
+
+    may.execute_script('this.blur()')
+
+    expect(page).to have_no_css('[data-bar-tooltip-target="tooltip"]', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'shows the white topbar with the export shortcut and the platform donut beside the categories on a desktop screen' do
     emulate_desktop_screen
 

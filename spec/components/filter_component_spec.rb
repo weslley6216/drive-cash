@@ -51,7 +51,7 @@ RSpec.describe FilterComponent, type: :component do
 
     it 'renders a funnel year pill and one chip per elapsed month on phones' do
       expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-700')
-      expect(html).to include(">#{I18n.t('filter_component.all_chip')}</span></a>")
+      expect(html).to include(%(aria-hidden="true"></span>#{I18n.t('filter_component.all_chip')}</a>))
       expect(html).to include('href="/?month=5&year=2026"')
       expect(html).not_to include('month=6')
     end
@@ -59,7 +59,11 @@ RSpec.describe FilterComponent, type: :component do
     it 'marks only the active chip as the strip target' do
       expect(html).to include('data-controller="chip-strip"')
       expect(html.scan('data-chip-strip-target="active"').size).to eq(1)
-      expect(html).to include('href="/?month=3&year=2026" class="flex-shrink-0 flex items-center h-11" data-chip-strip-target="active"><span class="px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium">Mar</span>')
+      expect(html).to include('<a href="/?month=3&year=2026" class="relative px-3 py-1.5 rounded-full text-sm whitespace-nowrap bg-slate-800 text-white font-medium" data-chip-strip-target="active"><span class="absolute inset-x-0 -inset-y-[5px]" aria-hidden="true"></span>Mar</a>')
+    end
+
+    it 'pads the strip so the chip tap area is not clipped by the horizontal scroll' do
+      expect(html).to include('flex items-center gap-2 -mx-1 px-1 py-[5px] -my-[5px] overflow-x-auto')
     end
 
     it 'leaves the desktop pills to the compact variant' do

@@ -75,33 +75,35 @@ module Dashboard
     end
 
     def render_record_actions(edit_path:, delete_path:, edit_hover:, labels:)
-      link_to(
-        edit_path,
-        data:  { turbo_frame: 'modal' },
-        class: "inline-flex items-center h-11 -my-[14.5px] text-slate-300 #{edit_hover} transition-colors",
-        aria:  { label: labels[:edit] },
-        title: labels[:edit]
-      ) do
-        render PhlexIcons::Lucide::Pencil.new(class: 'w-[15px] h-[15px]')
-      end
-
-      render ConfirmActionComponent.new(
-        title:          labels[:confirm],
-        icon:           PhlexIcons::Lucide::Trash2,
-        confirm_path:   delete_path,
-        confirm_method: :delete,
-        confirm_label:  labels[:delete],
-        cancel_label:   labels[:cancel],
-        description:    labels[:description]
-      ) do
-        button(
-          type:       'button',
-          class:      'inline-flex items-center h-11 -my-[14.5px] text-slate-300 hover:text-red-500 transition-colors cursor-pointer',
-          data:       { action: 'click->confirm-action#open' },
-          aria_label: labels[:delete],
-          title:      labels[:delete]
+      div(class: 'flex items-center gap-0.5 flex-shrink-0') do
+        link_to(
+          edit_path,
+          data:  { turbo_frame: 'modal' },
+          class: "h-11 w-8 -my-[14.5px] flex items-center justify-center text-slate-300 #{edit_hover} transition-colors",
+          aria:  { label: labels[:edit] },
+          title: labels[:edit]
         ) do
-          render PhlexIcons::Lucide::Trash2.new(class: 'w-[15px] h-[15px]')
+          render PhlexIcons::Lucide::Pencil.new(class: 'w-[15px] h-[15px]')
+        end
+
+        render ConfirmActionComponent.new(
+          title:          labels[:confirm],
+          icon:           PhlexIcons::Lucide::Trash2,
+          confirm_path:   delete_path,
+          confirm_method: :delete,
+          confirm_label:  labels[:delete],
+          cancel_label:   labels[:cancel],
+          description:    labels[:description]
+        ) do
+          button(
+            type:       'button',
+            class:      'h-11 w-8 -my-[14.5px] flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors cursor-pointer',
+            data:       { action: 'click->confirm-action#open' },
+            aria_label: labels[:delete],
+            title:      labels[:delete]
+          ) do
+            render PhlexIcons::Lucide::Trash2.new(class: 'w-[15px] h-[15px]')
+          end
         end
       end
     end
