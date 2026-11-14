@@ -9,8 +9,11 @@ module Reauthentications
     def view_template
       render LayoutComponent.new(title: t('.title'), sidebar_nav: :more) do
         render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
-          screen.with_content { content_block }
+          screen.with_header do
+            mobile_header
+            desktop_header
+          end
+          screen.with_content { card }
         end
       end
     end
@@ -24,11 +27,6 @@ module Reauthentications
         end
         h1(class: 'text-2xl font-bold text-slate-800 leading-tight') { t('.header') }
       end
-    end
-
-    def content_block
-      desktop_header
-      card
     end
 
     def desktop_header

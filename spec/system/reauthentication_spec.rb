@@ -23,8 +23,11 @@ RSpec.describe 'Confirm password screen', type: :system, js: true do
     visit new_reauthentication_path
 
     card = find('h2', text: I18n.t('reauthentications.new_view.heading')).find(:xpath, '..')
+    title = find('h1', text: I18n.t('reauthentications.new_view.header'))
 
     expect(page).to have_text(I18n.t('reauthentications.new_view.topbar_subtitle'))
+    expect(box(title)['top'].round).to eq(16)
+    expect(box(card)['top'].round).to eq(151)
     expect(box(card)['width'].round).to eq(384)
   end
 end
