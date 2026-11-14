@@ -25,7 +25,7 @@ RSpec.describe Dashboard::Insights::CategoryShare do
       result = described_class.new(context).call
 
       expect(result[:type]).to eq('category_share')
-      expect(result[:payload]).to eq(category: 'Combustível', percent: 52.7, amount: 220.0, month: 6)
+      expect(result[:payload]).to eq(category_id: 'fuel', category: 'Combustível', percent: 52.7, amount: 220.0, year: 2025, month: 6)
     end
 
     it 'returns nil when the period has no expenses' do

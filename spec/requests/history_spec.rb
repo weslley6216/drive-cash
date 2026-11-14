@@ -64,6 +64,20 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
+    it 'filters by an expense category and marks its chip active' do
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
+
+      get history_path(year: 2025, month: 6, filter: 'fuel')
+
+      expect(response.body).to include('Posto Shell')
+      expect(response.body).not_to include('Lanchonete')
+      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      active_chip = Capybara.string(response.body).find('a.bg-slate-800.text-white', text: I18n.t('activerecord.attributes.expense.categories.fuel'), exact_text: true)
+      expect(active_chip[:href]).to eq(history_path(filter: 'fuel', year: 2025, month: 6))
+    end
+
     it 'excludes unpaid expenses from the default feed and net summary' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Paid', paid: true)

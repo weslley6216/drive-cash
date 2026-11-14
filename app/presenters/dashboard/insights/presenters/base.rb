@@ -14,7 +14,8 @@ module Dashboard
           {
             type:        @raw[:type],
             title:       title,
-            description: description
+            description: description,
+            link:        link
           }
         end
 
@@ -26,6 +27,10 @@ module Dashboard
 
         def translate(key, **options)
           I18n.t("#{I18N_SCOPE}.#{@raw[:type]}.#{key}", **options)
+        end
+
+        def link
+          nil
         end
       end
     end

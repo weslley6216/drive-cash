@@ -11,7 +11,7 @@ module Dashboard
 
         {
           type:    'category_share',
-          payload: { category: top[:label], percent: top[:percent], amount: top[:amount].to_f, month: @context.month }
+          payload: { category_id: top[:id], category: top[:label], percent: top[:percent], amount: top[:amount].to_f, year: @context.year, month: @context.month }
         }
       end
     end

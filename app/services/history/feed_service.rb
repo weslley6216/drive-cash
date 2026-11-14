@@ -1,13 +1,24 @@
 module History
   class FeedService
-    Filter = Data.define(:earnings, :expense_scope)
+    Filter = Data.define(:earnings, :expense_scope, :label_key, :chip)
 
-    FILTERS = {
-      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
-      'earnings' => Filter.new(earnings: true, expense_scope: nil),
-      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
-      'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) })
+    TYPE_FILTERS = {
+      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }, label_key: 'history.index.filters.all', chip: :always),
+      'earnings' => Filter.new(earnings: true, expense_scope: nil, label_key: 'history.index.filters.earnings', chip: :always),
+      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }, label_key: 'history.index.filters.expenses', chip: :always),
+      'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) }, label_key: 'history.index.filters.unpaid', chip: :always)
     }.freeze
+
+    CATEGORY_FILTERS = Expense.categories.keys.index_with do |category|
+      Filter.new(
+        earnings:      false,
+        expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month).where(category:) },
+        label_key:     "activerecord.attributes.expense.categories.#{category}",
+        chip:          :when_active
+      )
+    end.freeze
+
+    FILTERS = TYPE_FILTERS.merge(CATEGORY_FILTERS).freeze
 
     def self.filter_names = FILTERS.keys
 
