@@ -1,4 +1,13 @@
 pt-BR:
+  auth:
+    brand_panel_component:
+      headline_line1: "Saiba exatamente"
+      headline_line2: "quanto você lucra."
+      subheadline: "Receitas, despesas, metas e veículo num só lugar — feito para quem roda no aplicativo."
+      hero_profit_label: "Lucro líquido · 2026"
+      copyright: "© 2026 DriveCash · Gestão financeira para motoristas"
+    back_to_login_component:
+      label: "Voltar para Entrar"
   sessions:
     new_view:
       title: "Entrar — DriveCash"
