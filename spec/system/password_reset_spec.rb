@@ -25,6 +25,19 @@ RSpec.describe 'Password reset screens', type: :system, js: true do
     expect(page).to have_text(I18n.t('passwords.sent_view.heading'))
   end
 
+  it 'shows the mismatch inline under the confirmation on a phone' do
+    visit edit_password_path(user.password_reset_token)
+
+    fill_in I18n.t('passwords.edit_view.password'), with: 'newpassword'
+    fill_in I18n.t('passwords.edit_view.password_confirmation'), with: 'mismatch1'
+    click_on I18n.t('passwords.edit_view.submit')
+
+    expect(page).to have_text(I18n.t('activerecord.errors.models.user.attributes.password_confirmation.confirmation'))
+    expect(page).to have_css('input#password_confirmation.border-red-300')
+    expect(page).to have_text(I18n.t('brand_mark_component.subtitle'))
+    expect(page).to fit_the_phone_width
+  end
+
   it 'splits the brand panel and a 384px column on a desktop screen' do
     emulate_desktop_screen
 

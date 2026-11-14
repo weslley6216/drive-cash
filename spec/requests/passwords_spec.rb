@@ -62,13 +62,15 @@ RSpec.describe 'Passwords', type: :request do
   end
 
   describe 'GET /passwords/:token/edit' do
-    it 'renders the reset form with BrandMark for a valid token' do
+    it 'renders the new password form with BrandMark, subtitle and hint for a valid token' do
       token = user.password_reset_token
 
       get edit_password_path(token)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(I18n.t('passwords.edit_view.title'))
+      expect(response.body).to include(I18n.t('passwords.edit_view.heading'))
+      expect(response.body).to include(I18n.t('passwords.edit_view.subtitle'))
+      expect(response.body).to include(I18n.t('passwords.edit_view.hint'))
       expect(response.body).to include('viewBox="0 0 100 100"')
     end
 
@@ -107,13 +109,25 @@ RSpec.describe 'Passwords', type: :request do
       expect(flash[:alert]).to eq(I18n.t('passwords.not_found'))
     end
 
-    it 're-renders the edit form when confirmation mismatches' do
+    it 're-renders the form with the inline mismatch error and 422 when confirmation differs' do
       token = user.password_reset_token
 
       patch password_path(token), params: { password: 'newpassword', password_confirmation: 'mismatch' }
 
-      expect(response).to redirect_to(edit_password_path(token))
-      expect(flash[:alert]).to be_present
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t('activerecord.errors.models.user.attributes.password_confirmation.confirmation'))
+      expect(response.body).to include('border-red-300 ring-2 ring-red-100')
+      expect(response.body).to include("action=\"#{password_path(token)}\"")
+    end
+
+    it 'shows the length error inline in place of the hint when the new password is too short' do
+      token = user.password_reset_token
+
+      patch password_path(token), params: { password: 'short', password_confirmation: 'short' }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('mínimo: 8 caracteres')
+      expect(response.body).not_to include(I18n.t('passwords.edit_view.hint'))
     end
 
     it 'signs out every existing session after the reset' do

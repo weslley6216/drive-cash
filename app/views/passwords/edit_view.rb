@@ -1,39 +1,34 @@
 class Passwords::EditView < ApplicationView
-  def initialize(token:)
+  def initialize(token:, user:)
     @token = token
+    @user = user
   end
 
   def view_template
     render LayoutComponent.new(title: t('.title'), auth: true) do
-      div(class: 'min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100') do
-        div(class: 'w-full max-w-sm') do
-          div(class: 'pb-8') { render BrandMarkComponent.new(size: :lg) }
-          h1(class: 'text-3xl font-bold text-slate-900 tracking-tight') { t('.title') }
-          form_block
-        end
+      render Auth::ShellComponent.new(title: t('.heading'), subtitle: t('.subtitle')) do |shell|
+        shell.with_content { content_block }
       end
     end
   end
 
   private
 
-  def form_block
-    form_with(url: helpers.password_path(@token), method: :patch, data: { turbo: false }, class: 'space-y-4 mt-8') do |form|
-      password_input(form, :password, label_key: 'password', autocomplete: 'new-password')
-      password_input(form, :password_confirmation, label_key: 'password_confirmation', autocomplete: 'new-password')
-      raw form.submit(t('.submit'),
-                      class: 'w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 text-sm font-semibold shadow-lg shadow-blue-600/25').to_s
+  def content_block
+    form_with(url: helpers.password_path(@token), method: :patch, data: { turbo: false }, class: 'space-y-4') do |form|
+      render Auth::PasswordFieldComponent.new(
+        form: form, attribute: :password, label: t('.password'), autocomplete: 'new-password',
+        hint: t('.hint'), error: field_error(:password), autofocus: true
+      )
+      render Auth::PasswordFieldComponent.new(
+        form: form, attribute: :password_confirmation, label: t('.password_confirmation'), autocomplete: 'new-password',
+        error: field_error(:password_confirmation)
+      )
+      div(class: 'pt-1') { render Auth::CtaComponent.new(label: t('.submit'), icon: PhlexIcons::Lucide::Check) }
     end
   end
 
-  def password_input(form, name, label_key:, autocomplete:)
-    div do
-      label(class: 'text-xs font-semibold text-slate-600 mb-1.5 block', for: name.to_s) { t(".#{label_key}") }
-      raw form.password_field(name,
-                              id:           name.to_s,
-                              required:     true,
-                              autocomplete: autocomplete,
-                              class:        'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500').to_s
-    end
+  def field_error(attribute)
+    @user.errors[attribute].first
   end
 end

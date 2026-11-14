@@ -16,7 +16,7 @@ class PasswordsController < ApplicationController
   end
 
   def edit
-    render Passwords::EditView.new(token: params[:token])
+    render Passwords::EditView.new(token: params[:token], user: @user)
   end
 
   def update
@@ -24,7 +24,7 @@ class PasswordsController < ApplicationController
       @user.revoke_sessions_except(Current.session)
       redirect_to new_session_path, notice: I18n.t('passwords.updated')
     else
-      redirect_to edit_password_path(params[:token]), alert: @user.errors.full_messages.to_sentence
+      render Passwords::EditView.new(token: params[:token], user: @user), status: :unprocessable_content
     end
   end
 

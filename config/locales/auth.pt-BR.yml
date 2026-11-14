@@ -46,10 +46,13 @@ pt-BR:
       back: "Voltar para Entrar"
       resend: "Não chegou? Reenviar link"
     edit_view:
-      title: "Definir nova senha"
+      title: "Criar nova senha — DriveCash"
+      heading: "Criar nova senha"
+      subtitle: "Escolha uma senha que você não usa em outros apps."
       password: "Nova senha"
-      password_confirmation: "Confirmar senha"
-      submit: "Salvar"
+      password_confirmation: "Confirmar nova senha"
+      hint: "Mínimo de 8 caracteres."
+      submit: "Salvar nova senha"
     mailer:
       reset:
         subject: "DriveCash — redefina sua senha"
