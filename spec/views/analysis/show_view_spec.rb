@@ -11,12 +11,18 @@ RSpec.describe Analysis::ShowView, type: :component do
       monthly_bars: [], categories: [], platforms: [], platforms_total: 0, insights: [], empty: false, last_month_with_data: nil
     }
   end
-  let(:filters) { { year: 2026, month: nil, available_years: [2026] } }
+  let(:filters) { { year: 2026, month: nil, periods: { 2026 => [5] } } }
 
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
     html = view_context.render(described_class.new(insights: base_insights, filters: filters))
 
     expect(html).to include('id="page"')
+  end
+
+  it 'feeds the period popover with the months of the calendar' do
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+
+    expect(html).to include('href="/analysis?month=5&year=2026"')
   end
 
   it 'renders em dash for per_km when value is nil' do
@@ -63,7 +69,7 @@ RSpec.describe Analysis::ShowView, type: :component do
 
   describe 'empty period' do
     let(:empty_insights) { base_insights.deep_merge(metrics: { earnings: 0 }).merge(empty: true) }
-    let(:july) { { year: 2026, month: 7, available_years: [2026] } }
+    let(:july) { { year: 2026, month: 7, periods: { 2026 => [5] } } }
 
     it 'links the empty state to the last month with data' do
       insights = empty_insights.merge(last_month_with_data: Date.new(2026, 6, 1))

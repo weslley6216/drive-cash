@@ -174,5 +174,18 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('111,00')
       expect(response.body).not_to include('999,00')
     end
+
+    it 'offers the months with records of the selected year in the period popover' do
+      travel_to Time.zone.local(2026, 5, 20, 10, 0)
+      create(:earning, user: current_user, date: Date.new(2025, 3, 10))
+      create(:expense, user: current_user, category: :fuel, date: Date.new(2025, 11, 10))
+
+      get analysis_path(year: 2025)
+
+      expect(response.body).to include('href="/analysis?month=3&year=2025"')
+      expect(response.body).to include('href="/analysis?month=11&year=2025"')
+      expect(response.body).not_to include('href="/analysis?month=4&year=2025"')
+      expect(response.body).to include('href="/analysis?year=2026"')
+    end
   end
 end

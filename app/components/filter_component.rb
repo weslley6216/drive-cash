@@ -141,14 +141,18 @@ class FilterComponent < ApplicationComponent
       p(class: 'text-[11px] font-semibold text-slate-500 uppercase tracking-wide tabular-nums') { @selected_year.to_s }
       year_arrow(:next)
     end
-    a(href: period_path(nil), class: "block w-full text-left px-2.5 py-2 rounded-lg text-sm #{month_link_state(nil, :all)}") do
-      t('.all_months')
-    end
+    a(
+      href:  period_path(nil),
+      data:  { turbo_action: 'advance' },
+      class: "block w-full text-left px-2.5 py-2 rounded-lg text-sm #{month_link_state(nil, :all)}"
+    ) { t('.all_months') }
     div(class: 'grid grid-cols-3 gap-1 mt-1') do
       calendar_months.each do |month|
-        a(href: period_path(month), class: "#{MONTH_LINK} #{month_link_state(month, :month)}") do
-          I18n.t('date.abbr_month_names')[month].capitalize
-        end
+        a(
+          href:  period_path(month),
+          data:  { turbo_action: 'advance' },
+          class: "#{MONTH_LINK} #{month_link_state(month, :month)}"
+        ) { I18n.t('date.abbr_month_names')[month].capitalize }
       end
     end
   end
@@ -161,9 +165,12 @@ class FilterComponent < ApplicationComponent
     label = direction == :previous ? t('.previous_year') : t('.next_year')
     icon = direction == :previous ? PhlexIcons::Lucide::ChevronLeft : PhlexIcons::Lucide::ChevronRight
 
-    a(href: "#{target_path}?year=#{year}", 'aria-label': label, class: YEAR_ARROW, data: { action: 'filter-popover#keepOpen' }) do
-      render icon.new(class: 'w-[15px] h-[15px]')
-    end
+    a(
+      href:         "#{target_path}?year=#{year}",
+      'aria-label': label,
+      class:        YEAR_ARROW,
+      data:         { action: 'filter-popover#keepOpen', turbo_action: 'advance' }
+    ) { render icon.new(class: 'w-[15px] h-[15px]') }
   end
 
   def previous_calendar_year

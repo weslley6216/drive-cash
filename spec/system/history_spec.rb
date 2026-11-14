@@ -94,6 +94,19 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to have_no_css('[data-controller="fab"]', visible: true)
   end
 
+  it 'filters the period from the single month and year pill on a desktop screen' do
+    create(:earning, user: current_user, date: Date.new(2026, 4, 8), amount: 50, platform: 'ifood', trips_count: 1)
+    emulate_desktop_screen
+
+    visit history_path(year: 2026, month: 5)
+    click_button 'Maio 2026'
+    find('[data-filter-popover-target="panel"]').click_link 'Abr'
+
+    expect(page).to have_current_path(history_path(year: 2026, month: 4))
+    expect(page).to have_button('Abril 2026')
+    expect(page).to have_css('tbody tr', count: 1)
+  end
+
   it 'marks the empty day with the dashed marker and rings it on a phone' do
     visit history_path(focus_day: '2026-05-20', highlight: 'day-2026-05-20')
 

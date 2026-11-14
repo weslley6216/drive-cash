@@ -122,11 +122,11 @@ module Analysis
 
         div(class: 'flex items-center gap-3 flex-shrink-0') do
           render FilterComponent.new(
-            selected_year:   @filters[:year],
-            selected_month:  @filters[:month],
-            available_years: @filters[:available_years],
-            variant:         :popover,
-            action_path:     helpers.analysis_path
+            selected_year:  @filters[:year],
+            selected_month: @filters[:month],
+            periods:        @filters[:periods],
+            variant:        :popover,
+            action_path:    helpers.analysis_path
           )
           export_link
         end
