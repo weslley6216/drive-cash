@@ -77,14 +77,12 @@ module Dashboard
                     p(class: 'text-sm text-slate-500') { expense.vendor.presence || '—' }
                   end
                   div(class: 'flex items-center gap-3 flex-shrink-0 group') do
-                    div(class: 'flex items-center gap-2') do
-                      render_record_actions(
+                    render_record_actions(
                       edit_path:   edit_expense_path(expense, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: expense_path(expense, context: @filters),
                       edit_hover:  'hover:text-red-600',
                       labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description'), cancel: t('.confirm_delete_cancel') }
                     )
-                    end
                     span(class: 'font-medium text-red-700') { format_currency(expense.amount) }
                   end
                 end

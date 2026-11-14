@@ -429,6 +429,15 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('border-t-4 border-t-red-600')
       expect(response.body).to include('class="text-red-700">R$ 80,00</span>')
     end
+
+    it 'renders the row actions as 32px-wide buttons in a gap-0.5 wrapper' do
+      create(:expense, user: current_user, date: Date.new(2025, 1, 15), amount: 80, category: 'fuel', vendor: 'Posto Shell')
+
+      get dashboard_expenses_detail_path(year: 2025, month: 1)
+
+      expect(response.body).to include('<div class="flex items-center gap-0.5 flex-shrink-0">')
+      expect(response.body.scan('h-11 w-8 -my-[14.5px] flex items-center justify-center').size).to eq(2)
+    end
   end
 
   describe 'GET /dashboard/expenses_detail' do

@@ -49,6 +49,20 @@ RSpec.describe 'Home detail modal', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'lays the row actions as 32px-wide buttons 2px apart on a phone' do
+    visit root_path
+    find('#stats_grid a', text: /\A#{I18n.t('dashboard.index_view.stats.earnings.title')}/i).click
+    find('turbo-frame#modal a', text: 'Maio').click
+
+    edit = box(find("a[aria-label='#{I18n.t('dashboard.earnings_detail_view.edit')}']"))
+    trash = box(find("button[aria-label='#{I18n.t('dashboard.earnings_detail_view.delete')}']"))
+
+    expect(edit['width']).to eq(32)
+    expect(trash['width']).to eq(32)
+    expect(trash['x'] - edit['right']).to eq(2)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'centers the modal card on a desktop screen' do
     emulate_desktop_screen
 

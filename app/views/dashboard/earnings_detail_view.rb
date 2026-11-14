@@ -71,14 +71,12 @@ module Dashboard
                 td(class: 'py-2.5 text-slate-800') { format_date(earning.date) }
                 td(class: 'py-2.5 text-right w-1 whitespace-nowrap') do
                   div(class: 'flex items-center gap-3 flex-shrink-0 group justify-end') do
-                    div(class: 'flex items-center gap-2') do
-                      render_record_actions(
+                    render_record_actions(
                       edit_path:   edit_earning_path(earning, context: { year: @filters[:year], month: @filters[:month] }),
                       delete_path: earning_path(earning, context: @filters),
                       edit_hover:  'hover:text-blue-600',
                       labels:      { edit: t('.edit'), delete: t('.delete'), confirm: t('.confirm_delete'), description: t('.confirm_delete_description'), cancel: t('.confirm_delete_cancel') }
                     )
-                    end
                     span(class: 'font-medium text-green-700') { format_currency(earning.amount) }
                   end
                 end
