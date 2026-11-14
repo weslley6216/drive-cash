@@ -40,3 +40,4 @@ pt-BR:
           description: "Foram %{value} %{period}. É a categoria que mais pesa no seu lucro por km."
           period_monthly: "no mês"
           period_annual: "no ano"
+          link: "Ver lançamentos →"

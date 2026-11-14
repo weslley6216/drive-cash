@@ -119,6 +119,23 @@ RSpec.describe 'Analysis', type: :request do
       expect(response.body).to include('text-amber-900')
     end
 
+    it 'links the category insight to the history filtered by the category and the month' do
+      create(:expense, user: current_user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
+
+      get analysis_path, params: { year: 2025, month: 2 }
+
+      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(filter: 'fuel', year: 2025, month: 2))}"))
+      expect(response.body).to include(I18n.t('analysis.show_view.insights.category_share.link'))
+    end
+
+    it 'links the annual category insight to the history of the whole year' do
+      create(:expense, user: current_user, date: Date.new(2025, 2, 1), amount: 220, category: 'fuel', paid: true)
+
+      get analysis_path, params: { year: 2025 }
+
+      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(filter: 'fuel', year: 2025))}"))
+    end
+
     it 'titles the dimmed chart frame of the empty state like the prototype' do
       get analysis_path(year: 2026, month: 7)
 

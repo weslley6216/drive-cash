@@ -113,6 +113,25 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(platforms.evaluate_script('this.getBoundingClientRect().height')).to eq(categories.evaluate_script('this.getBoundingClientRect().height'))
   end
 
+  it 'opens the history filtered by the insight category and month from the insight link on a desktop screen' do
+    emulate_desktop_screen
+    visit analysis_path(year: 2026, month: 5)
+
+    click_link I18n.t('analysis.show_view.insights.category_share.link')
+
+    expect(page).to have_current_path(history_path(filter: 'fuel', year: 2026, month: 5))
+    expect(page).to have_css('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.fuel'), exact_text: true)
+    expect(page).to have_css('tbody tr', count: 1)
+  end
+
+  it 'keeps the category insight without the history link on a phone' do
+    visit analysis_path(year: 2026, month: 5)
+
+    expect(page).to have_text('Combustível leva')
+    expect(page).to have_no_link(I18n.t('analysis.show_view.insights.category_share.link'))
+    expect(page).to fit_the_phone_width
+  end
+
   it 'shows the dimmed chart frame and the empty block for a month without records on a phone' do
     visit analysis_path(year: 2026, month: 6)
 
