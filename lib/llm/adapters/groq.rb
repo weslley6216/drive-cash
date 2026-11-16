@@ -9,7 +9,7 @@ module Llm
         Rails.logger.info "[Groq] Requesting #{model}"
 
         payload = build_payload(messages, tools, system)
-        response = connection(api_key).post('chat/completions', payload)
+        response = send_request(connection(api_key), 'chat/completions', payload)
 
         handle_error!(response) if response.status != 200
 

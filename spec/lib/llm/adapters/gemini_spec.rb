@@ -186,5 +186,13 @@ RSpec.describe Llm::Adapters::Gemini do
         expect { adapter.chat(messages: messages) }.to raise_error(Llm::ConfigurationError, /GEMINI_API_KEY is not set/)
       end
     end
+
+    context 'when the network fails before Gemini answers' do
+      it 'wraps a connection failure in Llm::Error' do
+        allow(connection_mock).to receive(:post).and_raise(Faraday::ConnectionFailed, 'Network is unreachable')
+
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::Error, /Network is unreachable/)
+      end
+    end
   end
 end

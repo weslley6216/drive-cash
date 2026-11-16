@@ -10,7 +10,7 @@ module Llm
         endpoint = "/v1beta/models/#{model}:generateContent?key=#{api_key}"
 
         Rails.logger.info "[Gemini] Requesting #{model}"
-        response = connection.post(endpoint, build_payload(messages, tools, system))
+        response = send_request(connection, endpoint, build_payload(messages, tools, system))
 
         handle_error!(response) if response.status != 200 || response.body['error']
 

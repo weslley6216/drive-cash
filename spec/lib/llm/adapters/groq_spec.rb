@@ -179,6 +179,20 @@ RSpec.describe Llm::Adapters::Groq do
       end
     end
 
+    context 'when the network fails before Groq answers' do
+      it 'wraps a connection failure in Llm::Error' do
+        allow(connection_mock).to receive(:post).and_raise(Faraday::ConnectionFailed, 'Network is unreachable')
+
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::Error, /Network is unreachable/)
+      end
+
+      it 'wraps a timeout in Llm::Error' do
+        allow(connection_mock).to receive(:post).and_raise(Faraday::TimeoutError, 'execution expired')
+
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::Error, /execution expired/)
+      end
+    end
+
     context 'when LLM returns text alongside a tool call' do
       it 'includes text_before in the result' do
         allow(response_mock).to receive(:status).and_return(200)
