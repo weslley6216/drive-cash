@@ -17,7 +17,7 @@ module Goals
     def streak_badge
       return nil unless streak?
 
-      { type: :streak, label: I18n.t('goals.index.achievements.streak_7d', days: STREAK_DAYS) }
+      { type: :streak, days: STREAK_DAYS }
     end
 
     def streak?
@@ -34,11 +34,19 @@ module Goals
       return nil if goals.empty?
 
       totals = DailyTotals.for_goals(user: @user, goals: goals)
-      goal = goals.find { |candidate| totals.metric_for(candidate) >= candidate.target_amount }
+      goal = nil
+      metric = nil
+      goals.each do |candidate|
+        candidate_metric = totals.metric_for(candidate)
+        next unless candidate_metric >= candidate.target_amount
+
+        goal = candidate
+        metric = candidate_metric
+        break
+      end
       return nil unless goal
 
-      period_label = I18n.l(goal.period_start, format: '%B').capitalize
-      { type: :goal_completed, label: I18n.t('goals.index.achievements.goal_completed', period: period_label) }
+      { type: :goal_completed, period_start: goal.period_start, percent: metric * 100 / goal.target_amount }
     end
 
     def best_day_badge
@@ -46,8 +54,7 @@ module Goals
       best = @user.earnings.where(date: range).group(:date).sum(:amount).max_by { |_date, total| total }
       return nil unless best
 
-      formatted = format('%.2f', best.last.to_f).tr('.', ',')
-      { type: :best_day, label: I18n.t('goals.index.achievements.best_day', value: formatted), value: best.last }
+      { type: :best_day, value: best.last, date: best.first }
     end
   end
 end
