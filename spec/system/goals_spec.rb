@@ -77,6 +77,39 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  def seed_achievements
+    seed_goals
+    (16..17).each { |day| create(:earning, user: current_user, amount: 250, date: Date.new(2026, 5, day)) }
+    create(:goal, user: current_user, kind: 'monthly', target_amount: 5000,
+                  period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
+    create(:earning, user: current_user, amount: 5400, date: Date.new(2026, 4, 10))
+  end
+
+  it 'shows the short achievement labels with a rounded thousands value on a phone' do
+    seed_achievements
+
+    visit goals_path
+
+    expect(page).to have_text('Sequência 7 dias')
+    expect(page).to have_text('Meta de Abril')
+    expect(page).to have_text('Melhor dia: R$ 12.346')
+    expect(page).to have_no_text('Sequência de 7 dias trabalhando')
+    expect(page).to have_no_text('Meta de Abril batida (108%)')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'shows the long achievement sentences on a desktop screen' do
+    seed_achievements
+    emulate_desktop_screen
+
+    visit goals_path
+
+    expect(page).to have_text('Sequência de 7 dias trabalhando')
+    expect(page).to have_text('Meta de Abril batida (108%)')
+    expect(page).to have_text('Melhor dia: R$ 12.346 em 02/mai')
+    expect(page).to have_no_text('Sequência 7 dias')
+  end
+
   it 'spreads the hero across the row and lines up the weekly, annual and achievements cards on a desktop screen' do
     seed_goals
     emulate_desktop_screen

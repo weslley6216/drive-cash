@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Goals::AchievementsRowComponent, type: :component do
   let(:achievements) do
     [
-      { type: :streak, label: 'Sequência 7 dias' },
-      { type: :goal_completed, label: 'Meta mensal batida' },
-      { type: :best_day, label: 'Melhor dia: R$ 800,00', value: 800 }
+      { type: :streak, days: 7 },
+      { type: :goal_completed, period_start: Date.new(2026, 4, 1), percent: 108 },
+      { type: :best_day, value: 3000.70, date: Date.new(2026, 5, 2) }
     ]
   end
   let(:html) { view_context.render(described_class.new(achievements: achievements)) }
@@ -14,10 +14,16 @@ RSpec.describe Goals::AchievementsRowComponent, type: :component do
     expect(html).to include(I18n.t('goals.index.achievements.title'))
   end
 
-  it 'renders one item per achievement with its label' do
-    expect(html).to include('Sequência 7 dias')
-    expect(html).to include('Meta mensal batida')
-    expect(html).to include('Melhor dia: R$ 800,00')
+  it 'renders the short label for the phone and hides it from the desktop breakpoint' do
+    expect(html).to include('<span class="lg:hidden">Sequência 7 dias</span>')
+    expect(html).to include('<span class="lg:hidden">Meta de Abril</span>')
+    expect(html).to include('<span class="lg:hidden">Melhor dia: R$ 3.001</span>')
+  end
+
+  it 'renders the long label only from the desktop breakpoint' do
+    expect(html).to include('<span class="hidden lg:inline">Sequência de 7 dias trabalhando</span>')
+    expect(html).to include('<span class="hidden lg:inline">Meta de Abril batida (108%)</span>')
+    expect(html).to include('<span class="hidden lg:inline">Melhor dia: R$ 3.001 em 02/mai</span>')
   end
 
   it 'maps each badge type to its palette color via inline style' do
@@ -28,14 +34,6 @@ RSpec.describe Goals::AchievementsRowComponent, type: :component do
 
   it 'renders icon circles with rounded-full' do
     expect(html.scan('rounded-full').size).to eq(achievements.size)
-  end
-
-  it 'falls back to the default palette when the badge type is unknown' do
-    unknown = [{ type: :something_new, label: 'Teste' }]
-    output = view_context.render(described_class.new(achievements: unknown))
-
-    expect(output).to include('Teste')
-    expect(output).to include('background-color: #64748b')
   end
 
   it 'renders an empty message when no achievements are provided' do

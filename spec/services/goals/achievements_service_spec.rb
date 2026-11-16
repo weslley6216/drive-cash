@@ -11,24 +11,24 @@ RSpec.describe Goals::AchievementsService do
       expect(result).to eq([])
     end
 
-    it 'returns streak_7d badge when user has 7 consecutive earning days' do
+    it 'returns the streak length when user has 7 consecutive earning days' do
       (Date.new(2026, 6, 9)..Date.new(2026, 6, 15)).each do |earning_date|
         create(:earning, user: user, date: earning_date, amount: 100)
       end
 
       result = described_class.new(user: user, date: reference_date).call
 
-      expect(result.map { |badge| badge[:type] }).to include(:streak)
+      expect(result).to include(type: :streak, days: 7)
     end
 
-    it 'returns best_day badge with highest earning day in current month' do
+    it 'returns the value and the date of the highest earning day in current month' do
       create(:earning, user: user, date: Date.new(2026, 6, 3), amount: 800)
       create(:earning, user: user, date: Date.new(2026, 6, 4), amount: 200)
 
       result = described_class.new(user: user, date: reference_date).call
 
       best = result.find { |badge| badge[:type] == :best_day }
-      expect(best[:value]).to eq(800)
+      expect(best).to eq(type: :best_day, value: 800, date: Date.new(2026, 6, 3))
     end
 
     it 'returns goal_completed badge when most recent past monthly goal was beaten' do
@@ -44,7 +44,7 @@ RSpec.describe Goals::AchievementsService do
       result = described_class.new(user: user, date: reference_date).call
 
       completed = result.find { |badge| badge[:type] == :goal_completed }
-      expect(completed[:label]).to include('Maio')
+      expect(completed).to eq(type: :goal_completed, period_start: Date.new(2026, 5, 1), percent: 120)
     end
 
     it 'returns goal_completed badge for older beaten goal when most recent was not beaten' do
@@ -59,8 +59,7 @@ RSpec.describe Goals::AchievementsService do
       result = described_class.new(user: user, date: reference_date).call
 
       completed = result.find { |badge| badge[:type] == :goal_completed }
-      expect(completed).not_to be_nil
-      expect(completed[:label]).to include('Abril')
+      expect(completed).to eq(type: :goal_completed, period_start: Date.new(2026, 4, 1), percent: 120)
     end
 
     it 'ignores unpaid expenses when deciding if a past monthly goal was beaten' do
@@ -72,7 +71,7 @@ RSpec.describe Goals::AchievementsService do
       result = described_class.new(user: user, date: reference_date).call
 
       completed = result.find { |badge| badge[:type] == :goal_completed }
-      expect(completed[:label]).to include('Maio')
+      expect(completed).to eq(type: :goal_completed, period_start: Date.new(2026, 5, 1), percent: 120)
     end
 
     it 'does not return goal_completed badge when no past monthly goal was beaten' do
@@ -89,6 +88,20 @@ RSpec.describe Goals::AchievementsService do
 
       types = result.map { |badge| badge[:type] }
       expect(types).not_to include(:goal_completed)
+    end
+
+    it 'ignores activity and goals of other users' do
+      other_user = create(:user)
+      (Date.new(2026, 6, 9)..Date.new(2026, 6, 15)).each do |earning_date|
+        create(:earning, user: other_user, date: earning_date, amount: 100)
+      end
+      create(:goal, user: other_user, kind: 'monthly', target_amount: 500,
+             period_start: Date.new(2026, 5, 1), period_end: Date.new(2026, 5, 31), metric: 'profit')
+      create(:earning, user: other_user, date: Date.new(2026, 5, 10), amount: 600)
+
+      result = described_class.new(user: user, date: reference_date).call
+
+      expect(result).to eq([])
     end
   end
 end
