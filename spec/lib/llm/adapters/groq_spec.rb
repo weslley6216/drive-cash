@@ -4,20 +4,20 @@ RSpec.describe Llm::Adapters::Groq do
   subject(:adapter) { described_class.new }
 
   let(:messages) { [{ role: 'user', content: 'Hello' }] }
-  let(:response_mock) { instance_double(Faraday::Response) }
-  let(:connection_mock) { instance_double(Faraday::Connection) }
-
-  let(:builder_mock) { double('FaradayBuilder', request: true, response: true, adapter: true) }
-
-  before do
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with('GROQ_API_KEY').and_return('fake-key')
-    allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('groq-test-model')
-    allow(Faraday).to receive(:new).and_yield(builder_mock).and_return(connection_mock)
-    allow(connection_mock).to receive(:post).and_return(response_mock)
-  end
 
   describe '#chat' do
+    let(:response_mock) { instance_double(Faraday::Response) }
+    let(:connection_mock) { instance_double(Faraday::Connection) }
+    let(:builder_mock) { double('FaradayBuilder', request: true, response: true, adapter: true) }
+
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('GROQ_API_KEY').and_return('fake-key')
+      allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('groq-test-model')
+      allow(Faraday).to receive(:new).and_yield(builder_mock).and_return(connection_mock)
+      allow(connection_mock).to receive(:post).and_return(response_mock)
+    end
+
     context 'when the API returns a text response' do
       before do
         allow(response_mock).to receive(:status).and_return(200)
@@ -243,6 +243,30 @@ RSpec.describe Llm::Adapters::Groq do
         ).and_return(response_mock)
 
         adapter.chat(messages: messages, tools: tools)
+      end
+    end
+  end
+
+  describe '#chat against the recorded Groq API' do
+    context 'when Groq answers in plain text', vcr: { cassette_name: 'llm/groq/text_answer' } do
+      it 'returns a normalized text response' do
+        result = adapter.chat(messages: [{ role: 'user', content: 'Responda apenas com a palavra: ok' }])
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to be_present
+      end
+    end
+
+    context 'when Groq calls a registered tool', vcr: { cassette_name: 'llm/groq/tool_call' } do
+      it 'returns the tool call with the JSON-parsed input' do
+        result = adapter.chat(
+          messages: [{ role: 'user', content: 'gastei R$ 50 de gasolina no posto Ipiranga hoje' }],
+          tools:    Ai::Tools::Registry.declarations,
+          system:   'Você registra gastos e ganhos usando as ferramentas. Hoje é 2026-11-16.'
+        )
+
+        expect(result).to include(type: :tool_use, tool_name: 'create_expense')
+        expect(result[:tool_input]).to include('amount' => 50, 'category' => 'fuel')
       end
     end
   end

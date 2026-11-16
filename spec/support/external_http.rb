@@ -16,6 +16,7 @@ VCR.configure do |config|
   config.ignore_localhost = true
   config.allow_http_connections_when_no_cassette = false
   config.default_cassette_options = { record: ENV['VCR_RECORD'] ? :once : :none, match_requests_on: %i[method uri] }
+  config.filter_sensitive_data('<GROQ_API_KEY>') { ENV.fetch('GROQ_API_KEY', nil) }
   config.before_http_request(:unhandled?) { |request| ExternalHttp.unhandled_requests << request.uri }
 end
 

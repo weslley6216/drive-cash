@@ -1,0 +1,79 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.groq.com/openai/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"openai/gpt-oss-120b","messages":[{"role":"user","content":"Responda
+        apenas com a palavra: ok"}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer <GROQ_API_KEY>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 16 Nov 2026 13:31:53 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - private, max-age=0, no-store, no-cache, must-revalidate
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      X-Groq-Region:
+      - bra
+      X-Ratelimit-Limit-Requests:
+      - '1000'
+      X-Ratelimit-Limit-Tokens:
+      - '8000'
+      X-Ratelimit-Remaining-Requests:
+      - '998'
+      X-Ratelimit-Remaining-Tokens:
+      - '7687'
+      X-Ratelimit-Reset-Requests:
+      - 2m52.8s
+      X-Ratelimit-Reset-Tokens:
+      - 2.347s
+      X-Request-Id:
+      - req_01m7j8x6ffeysbzksapp5pax22
+      Via:
+      - 1.1 google
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - __cf_bm=aiPUzEVDtSNU7S1a9q1nJX12BexEpskdgKMhlPftUJc-1794835913.196157-1.0.1.1-XHqklgnT3l3JwC33xUFicWRcY6AI7f..lq.CVhYLOcPqgIg5.KNwgwndijK28fNtgYLrnx14G2NGoUK4YQ6C7iT9HW0RIVEafk5aALzPkJidnyrO9ERT7lo6hDar2WFi;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=groq.com; Expires=Mon,
+        16 Nov 2026 14:01:53 GMT
+      Strict-Transport-Security:
+      - max-age=15552000
+      Cf-Ray:
+      - a5b6dbc97fbdb23d-GRU
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":"chatcmpl-232f4086-f9f9-4cfa-acfa-0efdb2945aa2","object":"chat.completion","created":1794835913,"model":"openai/gpt-oss-120b","choices":[{"index":0,"message":{"role":"assistant","content":"ok","reasoning":"The
+        user wants a response only with the word \"ok\". This is a simple request.
+        According to policy, short answer is allowed. No disallowed content. So respond
+        with \"ok\"."},"logprobs":null,"finish_reason":"stop"}],"usage":{"queue_time":0.315411609,"prompt_tokens":80,"prompt_time":0.003539258,"completion_tokens":49,"completion_time":0.105418893,"total_tokens":129,"total_time":0.108958151,"completion_tokens_details":{"reasoning_tokens":39}},"usage_breakdown":null,"system_fingerprint":"fp_a655021f7d","x_groq":{"id":"req_01m7j8x6ffeysbzksapp5pax22","seed":1688343562},"service_tier":"on_demand"}
+
+        '
+  recorded_at: Mon, 16 Nov 2026 13:31:53 GMT
+recorded_with: VCR 6.4.1
