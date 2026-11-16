@@ -55,8 +55,15 @@ pt-BR:
         title: "Últimas conquistas"
         empty: "Continue registrando ganhos para destravar conquistas."
         streak_7d: "Sequência %{days} dias"
-        goal_completed: "Meta de %{period}"
-        best_day: "Melhor dia: R$ %{value}"
+        streak:
+          short: "Sequência %{days} dias"
+          long: "Sequência de %{days} dias trabalhando"
+        goal_completed:
+          short: "Meta de %{period}"
+          long: "Meta de %{period} batida (%{percent}%)"
+        best_day:
+          short: "Melhor dia: %{value}"
+          long: "Melhor dia: %{value} em %{date}"
       form:
         title_new: "Nova meta"
         title_edit: "Editar meta"
