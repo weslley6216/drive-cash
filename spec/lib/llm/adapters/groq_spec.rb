@@ -106,6 +106,60 @@ RSpec.describe Llm::Adapters::Groq do
       end
     end
 
+    context 'when the daily token quota is exhausted' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on tokens per day (TPD): Limit 200000, Used 199532, Requested 4120. Please try again in 26m11.52s.',
+            'type'    => 'tokens',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises Llm::QuotaExhaustedError' do
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::QuotaExhaustedError, /tokens per day \(TPD\)/)
+      end
+    end
+
+    context 'when the daily request quota is exhausted' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on requests per day (RPD): Limit 1000, Used 1000, Requested 1. Please try again in 1m26.4s.',
+            'type'    => 'requests',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises Llm::QuotaExhaustedError' do
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::QuotaExhaustedError, /requests per day \(RPD\)/)
+      end
+    end
+
+    context 'when the per-minute token limit is hit' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on tokens per minute (TPM): Limit 8000, Used 6512, Requested 3480. Please try again in 14.94s.',
+            'type'    => 'tokens',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises a plain Llm::RateLimitError' do
+        expect { adapter.chat(messages: messages) }.to raise_error { |error| expect(error.class).to eq(Llm::RateLimitError) }
+      end
+    end
+
     context 'when the API returns a generic error' do
       before do
         allow(response_mock).to receive(:status).and_return(400)

@@ -153,6 +153,9 @@ RSpec.describe Ai::ParserService do
     end
 
     it 'maps each LLM error to its message' do
+      allow(client).to receive(:chat).and_raise(Llm::QuotaExhaustedError.new('daily quota'))
+      expect(service.call).to eq(type: :text, content: I18n.t('chat.errors.quota_exhausted'))
+
       allow(client).to receive(:chat).and_raise(Llm::RateLimitError.new('busy'))
       expect(service.call).to eq(type: :text, content: I18n.t('chat.errors.rate_limit'))
 

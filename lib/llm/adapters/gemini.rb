@@ -2,10 +2,11 @@ module Llm
   module Adapters
     class Gemini < BaseAdapter
       BASE_URL = 'https://generativelanguage.googleapis.com'.freeze
+      DEFAULT_MODEL = 'gemini-3-flash-preview'.freeze
 
       def chat(messages:, tools: [], system: nil)
         api_key = ENV.fetch('GEMINI_API_KEY') { raise Llm::ConfigurationError, 'GEMINI_API_KEY is not set.' }
-        model = ENV.fetch('GEMINI_MODEL', 'gemini-2.0-flash')
+        model = ENV.fetch('GEMINI_MODEL', DEFAULT_MODEL)
         endpoint = "/v1beta/models/#{model}:generateContent?key=#{api_key}"
 
         Rails.logger.info "[Gemini] Requesting #{model}"
@@ -38,10 +39,19 @@ module Llm
         body = response.body || {}
         error_msg = body.dig('error', 'message') || "HTTP #{response.status}"
 
+        raise Llm::QuotaExhaustedError, error_msg if daily_quota_exhausted?(body)
+
         if RATE_LIMIT_STATUSES.include?(response.status) || error_msg.match?(/high demand/i)
           raise Llm::RateLimitError, error_msg
         else
           raise Llm::Error, error_msg
+        end
+      end
+
+      def daily_quota_exhausted?(body)
+        Array(body.dig('error', 'details')).any? do |detail|
+          detail['@type'].to_s.end_with?('google.rpc.QuotaFailure') &&
+            Array(detail['violations']).any? { |violation| violation['quotaId'].to_s.include?('PerDay') }
         end
       end
 

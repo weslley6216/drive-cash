@@ -58,6 +58,33 @@ RSpec.describe Llm::Client do
       end
     end
 
+    context 'when a provider fails and the next one answers' do
+      before do
+        stub_const('ENV', ENV.to_h.merge('LLM_PROVIDER' => 'groq', 'LLM_FALLBACK' => 'gemini'))
+        allow(gemini_adapter).to receive(:chat).and_return({ type: :text, content: 'Gemini response' })
+        allow(Rails.logger).to receive(:warn)
+        allow(Rails.logger).to receive(:error)
+      end
+
+      it 'logs a rate limit as warn' do
+        allow(groq_adapter).to receive(:chat).and_raise(Llm::QuotaExhaustedError, 'tokens per day (TPD)')
+
+        described_class.chat(messages: messages)
+
+        expect(Rails.logger).to have_received(:warn).with(/Llm::Adapters::Groq.*tokens per day \(TPD\)/)
+        expect(Rails.logger).not_to have_received(:error)
+      end
+
+      it 'logs a permanent failure as error with the provider and the message' do
+        allow(groq_adapter).to receive(:chat).and_raise(Llm::Error, 'The model `llama-3.3-70b-versatile` has been decommissioned')
+
+        described_class.chat(messages: messages)
+
+        expect(Rails.logger).to have_received(:error).with(/Llm::Adapters::Groq.*decommissioned/)
+        expect(Rails.logger).not_to have_received(:warn)
+      end
+    end
+
     context 'when an unknown provider is configured' do
       before { stub_const('ENV', ENV.to_h.merge('LLM_PROVIDER' => 'unknown_ai')) }
 

@@ -105,6 +105,69 @@ RSpec.describe Llm::Adapters::Gemini do
       end
     end
 
+    context 'when the free tier daily quota is exhausted' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'code'    => 429,
+            'message' => 'You exceeded your current quota, please check your plan and billing details.',
+            'status'  => 'RESOURCE_EXHAUSTED',
+            'details' => [
+              {
+                '@type'      => 'type.googleapis.com/google.rpc.QuotaFailure',
+                'violations' => [{
+                  'quotaMetric' => 'generativelanguage.googleapis.com/generate_content_free_tier_requests',
+                  'quotaId'     => 'GenerateRequestsPerDayPerProjectPerModel-FreeTier',
+                  'quotaValue'  => '20'
+                }]
+              },
+              { '@type' => 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay' => '33606s' }
+            ]
+          }
+        })
+      end
+
+      it 'raises Llm::QuotaExhaustedError' do
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::QuotaExhaustedError, /exceeded your current quota/)
+      end
+    end
+
+    context 'when the per-minute quota is exceeded' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'code'    => 429,
+            'message' => 'You exceeded your current quota, please check your plan and billing details.',
+            'status'  => 'RESOURCE_EXHAUSTED',
+            'details' => [{
+              '@type'      => 'type.googleapis.com/google.rpc.QuotaFailure',
+              'violations' => [{ 'quotaId' => 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier' }]
+            }]
+          }
+        })
+      end
+
+      it 'raises a plain Llm::RateLimitError' do
+        expect { adapter.chat(messages: messages) }.to raise_error { |error| expect(error.class).to eq(Llm::RateLimitError) }
+      end
+    end
+
+    context 'when GEMINI_MODEL is not set' do
+      before do
+        allow(ENV).to receive(:fetch).with('GEMINI_MODEL', anything) { |_key, default| default }
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({ 'candidates' => [] })
+      end
+
+      it 'requests the gemini-3-flash-preview model' do
+        adapter.chat(messages: messages)
+
+        expect(connection_mock).to have_received(:post).with(%r{/models/gemini-3-flash-preview:generateContent}, anything)
+      end
+    end
+
     context 'when the API returns a generic error' do
       before do
         allow(response_mock).to receive(:status).and_return(400)
