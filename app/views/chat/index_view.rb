@@ -107,7 +107,7 @@ module Chat
                 placeholder:  t('chat.index.placeholder'),
                 rows:         1,
                 autocomplete: 'off',
-                class:        'w-full px-4 py-3 pr-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
+                class:        'block w-full px-4 py-3 pr-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
                 data:         { chat_target: 'input', speech_target: 'input', action: 'keydown.enter->chat#handleEnter' }
               )
               button(

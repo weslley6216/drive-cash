@@ -25,6 +25,18 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'lines up the bottom of the message box with the send button and the mic inside the box on a phone' do
+    visit chat_root_path
+
+    message_box = box(find('textarea[name="message"]'))
+    send_button = box(find('button[type="submit"]'))
+    mic = box(find('[data-speech-target="mic"]'))
+
+    expect(send_button['bottom']).to eq(message_box['bottom'])
+    expect(mic['top'] + (mic['height'] / 2)).to be_within(1).of(message_box['top'] + (message_box['height'] / 2))
+    expect(page).to fit_the_phone_width
+  end
+
   it 'clears the message box and shows the whole user bubble before Caju answers on a phone' do
     message = 'Oi Caju, ganhei R$ 120 pela Shopee e abasteci R$ 60 no Ipiranga hoje'
     parser = instance_double(Ai::ParserService)
