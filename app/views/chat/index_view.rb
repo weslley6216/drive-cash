@@ -55,7 +55,7 @@ module Chat
     end
 
     def empty_state
-      div(class: 'flex flex-col items-center justify-center h-full text-center px-8 gap-3') do
+      div(class: 'flex flex-col items-center justify-center h-full text-center px-8 gap-3', data: { chat_target: 'emptyState' }) do
         div(class: 'w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center') do
           render PhlexIcons::Lucide::Sparkles.new(class: 'w-8 h-8 text-violet-600')
         end
@@ -98,7 +98,7 @@ module Chat
       div(class: 'flex-shrink-0 pt-4 border-t border-slate-200') do
         form_with(
           url:  chat_message_path,
-          data: { loading_skip: true, action: 'submit->chat#send turbo:submit-end->chat#clearInput' }
+          data: { loading_skip: true, action: 'submit->chat#send turbo:submit-start->chat#clearSentMessage turbo:submit-end->chat#clearInput' }
         ) do
           div(class: 'flex gap-2 items-end') do
             div(class: 'flex-1 relative') do
