@@ -6,7 +6,7 @@ pt-BR:
       preview_sent_detail: "Registro apresentado ao usuário para confirmação: %{summary}"
       record_confirmed: "✅ Registrado: %{summary}"
       record_cancelled: "Cancelei o registro: %{summary}"
-      all_registered: "Prontinho! Registrei tudo que você mandou. 🎉"
+      nothing_pending: "Beleza! Por aqui não ficou nada pendente. Quer registrar mais alguma coisa?"
       preview_cancelled: "Cancelei o registro. Pode continuar com o que precisar."
     confirm:
       success_earning: "✅ Receita registrada com sucesso!"

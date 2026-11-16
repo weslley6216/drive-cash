@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 const SUPPRESSED_PROGRESS_BAR_DELAY = 2_000_000_000
 
 export default class extends Controller {
-  static targets = ["input", "submit", "messages", "userTemplate", "typingTemplate"]
+  static targets = ["input", "submit", "messages", "userTemplate", "typingTemplate", "emptyState"]
 
   connect() {
     this.originalProgressBarDelay = Turbo.config.drive.progressBarDelay
@@ -39,6 +39,11 @@ export default class extends Controller {
     this.enableInput()
   }
 
+  clearSentMessage() {
+    this.inputTarget.value = ""
+    this.inputTarget.style.height = "auto"
+  }
+
   cancelPreview(e) {
     const actionName = e.target.dataset.actionName
     const card = e.target.closest(".flex.items-start")
@@ -71,6 +76,8 @@ export default class extends Controller {
   }
 
   appendOptimisticUI(message) {
+    if (this.hasEmptyStateTarget) this.emptyStateTarget.remove()
+
     const userNode = this.userTemplateTarget.content.cloneNode(true)
     userNode.querySelector("[data-message-content]").textContent = message
     this.messagesTarget.appendChild(userNode)

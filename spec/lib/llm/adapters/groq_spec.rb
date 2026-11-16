@@ -289,28 +289,57 @@ RSpec.describe Llm::Adapters::Groq do
       let(:tools) do
         [{
           name:       'test_tool',
-          parameters: { type: 'OBJECT', properties: { amount: { type: 'STRING' } } }
+          parameters: {
+            type:       'OBJECT',
+            properties: { amount: { type: 'NUMBER' }, notes: { type: 'STRING' } },
+            required:   ['amount']
+          }
         }]
       end
 
-      it 'normalizes the schema types to lowercase and sends them in the payload' do
+      it 'lowercases the schema types and makes only the optional properties nullable' do
         allow(response_mock).to receive(:status).and_return(200)
         allow(response_mock).to receive(:body).and_return({})
 
-        expect(connection_mock).to receive(:post).with(
+        adapter.chat(messages: messages, tools: tools)
+
+        expect(connection_mock).to have_received(:post).with(
           'chat/completions',
           hash_including(
             tools: [{
               type:     'function',
               function: {
                 name:       'test_tool',
-                parameters: { type: 'object', properties: { amount: { type: 'string' } } }
+                parameters: {
+                  type:       'object',
+                  properties: { amount: { type: 'number' }, notes: { type: ['string', 'null'] } },
+                  required:   ['amount']
+                }
               }
             }]
           )
-        ).and_return(response_mock)
+        )
+      end
+    end
 
-        adapter.chat(messages: messages, tools: tools)
+    context 'when a tool call sends null for an optional field' do
+      before do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({
+          'choices' => [{ 'message' => {
+            'tool_calls' => [
+              { 'function' => { 'name' => 'create_earning', 'arguments' => '{"amount":120,"platform":"shopee","notes":null}' } },
+              { 'function' => { 'name' => 'create_expense', 'arguments' => '{"amount":60,"vendor":"Ipiranga","description":null}' } }
+            ]
+          } }]
+        })
+      end
+
+      it 'drops the null keys from every tool input' do
+        result = adapter.chat(messages: messages)
+
+        expect(result[:tool_input]).to eq({ 'amount' => 120, 'platform' => 'shopee' })
+        expect(result[:extra_calls]).to eq([{ name: 'create_expense', input: { 'amount' => 60, 'vendor' => 'Ipiranga' } }])
       end
     end
   end

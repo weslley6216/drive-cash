@@ -39,7 +39,13 @@ module Llm
       def normalize_schema(tool)
         adapted = tool.deep_dup
         adapted.dig(:parameters, :type)&.then { |type| adapted[:parameters][:type] = type.downcase }
-        adapted.dig(:parameters, :properties)&.each_value { |property| property[:type] = property[:type].to_s.downcase if property[:type] }
+        required = adapted.dig(:parameters, :required) || []
+        adapted.dig(:parameters, :properties)&.each do |name, property|
+          next unless property[:type]
+
+          downcased = property[:type].to_s.downcase
+          property[:type] = required.include?(name.to_s) ? downcased : [downcased, 'null']
+        end
         adapted
       end
 
@@ -61,7 +67,7 @@ module Llm
 
         if message['tool_calls']
           calls = message['tool_calls'].map do |tc|
-            { name: tc.dig('function', 'name'), input: JSON.parse(tc.dig('function', 'arguments')) }
+            { name: tc.dig('function', 'name'), input: JSON.parse(tc.dig('function', 'arguments')).compact }
           end
 
           first = calls.first
