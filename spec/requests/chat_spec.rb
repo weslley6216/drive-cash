@@ -402,6 +402,27 @@ RSpec.describe 'Chats', type: :request do
       )
     end
 
+    it 'hands the cancellation to the assistant as the user turn' do
+      sent_messages = []
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
+          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
+        { type: :text, content: 'Beleza, mais alguma coisa?' }
+      )
+      allow(Ai::ParserService).to receive(:new) do |messages:, **|
+        sent_messages << messages
+        parser_mock
+      end
+
+      post chat_message_path, params: { message: 'ganhei 80 no Uber hoje' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(sent_messages.last.last.slice(:role, :content)).to eq(
+        role: 'user', content: I18n.t('chat.history.record_cancelled', summary: 'Receita de R$ 80,00 via Uber')
+      )
+      expect(sent_messages.last[-2][:role]).to eq('assistant')
+    end
+
     it 'adds cancelled history entry and re-invokes ParserService for continuation' do
       allow(parser_mock).to receive(:call).and_return(
         { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
@@ -501,6 +522,29 @@ RSpec.describe 'Chats', type: :request do
 
       expect(response.body).to include('iFood')
       expect(response.body).to include('45')
+    end
+
+    it 'hands the confirmation to the assistant as the user turn' do
+      earning_input = { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' }
+      sent_messages = []
+      allow(parser_mock).to receive(:call).and_return(
+        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber', params: earning_input },
+        { type: :text, content: 'Mais alguma coisa?' }
+      )
+      allow(Ai::ParserService).to receive(:new) do |messages:, **|
+        sent_messages << messages
+        parser_mock
+      end
+
+      post chat_message_path, params: { message: 'Uber 80 hoje' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
+           as:     :turbo_stream
+
+      expect(sent_messages.last.last[:role]).to eq('user')
+      expect(sent_messages.last.last[:content]).to start_with(I18n.t('chat.history.record_confirmed', summary: ''))
+      expect(sent_messages.last[-2][:role]).to eq('assistant')
     end
 
     it 'renders text continuation when auto-continue returns plain text' do

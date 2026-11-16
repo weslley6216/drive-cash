@@ -11,6 +11,10 @@ module ChatSession
     (session[:chat_history] || []).map(&:symbolize_keys)
   end
 
+  def llm_history
+    chat_history.map { |message| message[:type].to_s == 'user_action' ? message.merge(role: 'user') : message }
+  end
+
   def add_to_history(message)
     history = chat_history
     history << message.to_session_hash
@@ -100,7 +104,7 @@ module ChatSession
     record_handled_signature(action: action, params: record_params)
 
     add_to_history(Chat::Message.from_result(
-      { type: :text, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
+      { type: :user_action, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
       fallback_content: t(i18n_key)
     ))
 
@@ -163,7 +167,7 @@ module ChatSession
     end
 
     increment_continuation_depth
-    continuation = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
+    continuation = Ai::ParserService.new(messages: llm_history, today: Date.current, user: current_user).call
     continuation = dedup_continuation(continuation)
     continuation = attach_nonce_if_preview(continuation)
 
@@ -189,7 +193,7 @@ module ChatSession
     end
 
     increment_continuation_depth
-    continuation = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
+    continuation = Ai::ParserService.new(messages: llm_history, today: Date.current, user: current_user).call
     continuation = dedup_continuation(continuation)
     continuation = attach_nonce_if_preview(continuation)
 
