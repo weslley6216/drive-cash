@@ -9,12 +9,13 @@ module Llm
       last_error = nil
 
       adapter_chain.each do |adapter_class|
-        begin
-          return adapter_class.new.chat(messages: messages, tools: tools, system: system)
-        rescue Llm::RateLimitError, Llm::ConfigurationError, Llm::Error => e
-          Rails.logger.warn "[LLM] #{adapter_class.name} failed: #{e.message}. Trying next provider."
-          last_error = e
-        end
+        return adapter_class.new.chat(messages: messages, tools: tools, system: system)
+      rescue Llm::RateLimitError => e
+        Rails.logger.warn "[LLM] #{adapter_class.name} rate limited: #{e.message}. Trying next provider."
+        last_error = e
+      rescue Llm::Error => e
+        Rails.logger.error "[LLM] #{adapter_class.name} failed: #{e.message}. Trying next provider."
+        last_error = e
       end
 
       raise last_error || Llm::Error.new('No LLM provider available.')

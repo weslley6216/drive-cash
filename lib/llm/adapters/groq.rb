@@ -2,13 +2,14 @@ module Llm
   module Adapters
     class Groq < BaseAdapter
       BASE_URL = 'https://api.groq.com/openai/v1'.freeze
+      DAILY_QUOTA_PATTERN = /per day \((?:TPD|RPD)\)/
 
       def chat(messages:, tools: [], system: nil)
         api_key = ENV.fetch('GROQ_API_KEY') { raise Llm::ConfigurationError, 'GROQ_API_KEY is not set.' }
         Rails.logger.info "[Groq] Requesting #{model}"
 
         payload = build_payload(messages, tools, system)
-        response = connection(api_key).post('chat/completions', payload)
+        response = send_request(connection(api_key), 'chat/completions', payload)
 
         handle_error!(response) if response.status != 200
 
@@ -44,6 +45,8 @@ module Llm
 
       def handle_error!(response)
         error_msg = response.body.dig('error', 'message') || "HTTP #{response.status}"
+
+        raise Llm::QuotaExhaustedError, error_msg if response.status == 429 && error_msg.match?(DAILY_QUOTA_PATTERN)
 
         if RATE_LIMIT_STATUSES.include?(response.status)
           raise Llm::RateLimitError, error_msg

@@ -1,0 +1,121 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.groq.com/openai/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"openai/gpt-oss-120b","messages":[{"role":"system","content":"Você
+        registra gastos e ganhos usando as ferramentas. Hoje é 2026-11-16."},{"role":"user","content":"gastei
+        R$ 50 de gasolina no posto Ipiranga hoje"}],"tools":[{"type":"function","function":{"name":"create_earning","description":"Registra
+        uma receita do motorista. Use OBRIGATORIAMENTE quando mencionar valor ganho
+        em corrida, entrega ou serviço.","parameters":{"type":"object","properties":{"amount":{"type":"number","description":"Valor
+        numérico em reais. OBRIGATORIAMENTE um número, nunca uma string. Ex: 50.0,
+        245.0"},"platform":{"type":"string","description":"Plataforma utilizada: amazon,
+        ifood, mercado_livre, nine_nine, rappi, shopee, uber, other"},"date":{"type":"string","description":"Data
+        no formato YYYY-MM-DD. Use hoje se não especificado."},"notes":{"type":"string","description":"Observações
+        opcionais"},"trips_count":{"type":"number","description":"Quantidade de rotas
+        feitas. Padrão 1 se não informado."}},"required":["amount","date","platform"]}}},{"type":"function","function":{"name":"create_expense","description":"Registra
+        uma despesa do motorista. Use OBRIGATORIAMENTE quando mencionar um gasto.","parameters":{"type":"object","properties":{"amount":{"type":"number","description":"Valor
+        numérico em reais (total da compra). OBRIGATORIAMENTE um número. Ex: 50.0,
+        1200.0"},"category":{"type":"string","description":"Categoria: fuel, maintenance,
+        car_wash, toll, parking, documentation, insurance, fine, meals, phone, other"},"date":{"type":"string","description":"Data
+        no formato YYYY-MM-DD da primeira parcela ou da despesa única."},"vendor":{"type":"string","description":"Estabelecimento
+        ou fornecedor"},"description":{"type":"string","description":"Observação adicional
+        opcional. Não usar para repetir a categoria."},"installments":{"type":"integer","description":"Opcional.
+        Número de parcelas/compromissos (mínimo 2). Cada parcela nasce como \"a pagar\"
+        até confirmar quitada no cadastro."},"installments_period":{"type":"string","description":"Obrigatório
+        se installments >= 2: weekly, biweekly, monthly ou annual"}},"required":["amount","category","date"]}}},{"type":"function","function":{"name":"create_goal","description":"Cria
+        uma meta financeira para o motorista.","parameters":{"type":"object","properties":{"kind":{"type":"string","description":"Período:
+        weekly, monthly, annual"},"target_amount":{"type":"number","description":"Valor
+        alvo em reais"},"metric":{"type":"string","description":"Métrica: profit (padrão)
+        ou earnings"}},"required":["kind","target_amount"]}}},{"type":"function","function":{"name":"update_maintenance","description":"Registra
+        que o motorista realizou uma manutenção no veículo.","parameters":{"type":"object","properties":{"category":{"type":"string","description":"Tipo:
+        oil_change, oil_filter, air_filter, fuel_filter, tire_rotation, brake_pads,
+        spark_plugs, timing_belt"},"done_km":{"type":"integer","description":"Km em
+        que foi feita (padrão: odômetro atual do veículo)"}},"required":["category"]}}},{"type":"function","function":{"name":"query","description":"Consulta
+        os dados financeiros e operacionais do motorista. Use o campo type para escolher
+        qual consulta executar.","parameters":{"type":"object","properties":{"type":{"type":"string","enum":["summary","vendor_efficiency","best_day","worst_platform","category_spike","margin_drop","per_km","per_trip","tank_balance","last_full_tank","goal_progress","platform_breakdown","best_month","unpaid_expenses","maintenance_status","last_maintenance","history_search"],"description":"summary=resumo
+        (lucro/ganhos/despesas) · vendor_efficiency=posto mais econômico (km/L) ·
+        best_day=melhor dia da semana · worst_platform=plataforma menos lucrativa
+        · category_spike=categoria de despesa que mais pesou · margin_drop=queda de
+        margem vs período anterior · per_km=lucro por km · per_trip=lucro por corrida
+        · tank_balance=saldo estimado do tanque · last_full_tank=último abastecimento
+        completo · goal_progress=progresso das metas · platform_breakdown=ganhos por
+        plataforma · best_month=melhor mês de lucro · unpaid_expenses=despesas em
+        aberto · maintenance_status=status das manutenções · last_maintenance=última
+        manutenção (opcional category) · history_search=busca no histórico (exige
+        term)"},"year":{"type":"integer","description":"Ano (padrão: atual)"},"month":{"type":"integer","description":"Mês
+        1–12 (omitir para o ano todo)"},"term":{"type":"string","description":"Termo
+        de busca (usado por history_search)"},"category":{"type":"string","description":"Categoria
+        de manutenção (usado por last_maintenance): oil_change, oil_filter, air_filter,
+        fuel_filter, tire_rotation, brake_pads, spark_plugs, timing_belt"}},"required":["type"]}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.3
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer <GROQ_API_KEY>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 16 Nov 2026 13:31:28 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - private, max-age=0, no-store, no-cache, must-revalidate
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      X-Groq-Region:
+      - bra
+      X-Ratelimit-Limit-Requests:
+      - '1000'
+      X-Ratelimit-Limit-Tokens:
+      - '8000'
+      X-Ratelimit-Remaining-Requests:
+      - '999'
+      X-Ratelimit-Remaining-Tokens:
+      - '6680'
+      X-Ratelimit-Reset-Requests:
+      - 1m26.4s
+      X-Ratelimit-Reset-Tokens:
+      - 9.9s
+      X-Request-Id:
+      - req_01m7j8wdqvefav59ft06mz49kw
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - __cf_bm=.C9MBc1K6OBcFZdouUVUXSR8CXLVOv9WJjXVJ1P6npY-1794835887.8623931-1.0.1.1-U3Y10MWaL4sozeXgX2w3I_lhhL8c8cFhIUqpmTJIHYCWRs5ofCQVxbz5knm7Q.t7wmh7j_oWND0zRKCBDMHo8pDM3R3sXdRBkPYL7I5VuDU_2Mx1pB9KNH89ZsQGCSki;
+        HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=groq.com; Expires=Mon,
+        16 Nov 2026 14:01:28 GMT
+      Strict-Transport-Security:
+      - max-age=15552000
+      Cf-Ray:
+      - a5b6db2b2e6ef2e4-GRU
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":"chatcmpl-ca5d578d-d7d7-4449-8dff-d1378a9861dc","object":"chat.completion","created":1794835888,"model":"openai/gpt-oss-120b","choices":[{"index":0,"message":{"role":"assistant","reasoning":"The
+        user says they spent R$50 on gasoline at Ipiranga today. Need to register
+        an expense. Category: fuel. Date: today (2026-11-16). Vendor: Ipiranga. Amount:
+        50 (number). Use create_expense.","tool_calls":[{"id":"fc_5fa22e0c-1640-4ef6-a83e-fc6d03475e26","type":"function","function":{"name":"create_expense","arguments":"{\"amount\":50,\"category\":\"fuel\",\"date\":\"2026-11-16\",\"description\":\"Gasolina
+        no posto Ipiranga\",\"vendor\":\"Ipiranga\"}"}}]},"logprobs":null,"finish_reason":"tool_calls"}],"usage":{"queue_time":0.208991357,"prompt_tokens":1015,"prompt_time":0.061094731,"completion_tokens":125,"completion_time":0.268008008,"total_tokens":1140,"total_time":0.329102739,"completion_tokens_details":{"reasoning_tokens":56}},"usage_breakdown":null,"system_fingerprint":"fp_e1a78f200e","x_groq":{"id":"req_01m7j8wdqvefav59ft06mz49kw","seed":241845454},"service_tier":"on_demand"}
+
+        '
+  recorded_at: Mon, 16 Nov 2026 13:31:28 GMT
+recorded_with: VCR 6.4.1

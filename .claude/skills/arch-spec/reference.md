@@ -109,6 +109,7 @@ O `build` evita ir ao banco à toa (validações e métodos de instância não p
 - **FactoryBot::Syntax::Methods**, **shoulda-matchers** (rspec+rails), **DatabaseCleaner** (transação por
   exemplo), **TimeHelpers** (`travel_to`/`freeze_time`).
 - **`login_as(user)`** em `type: :request`; **`view_context`** em `type: :component`.
+- **`spec/support/external_http.rb`**: WebMock bloqueia rede externa e o VCR reprova HTTP fora de cassete com `External HTTP attempted:`; o contrato real do adapter Groq vive em `vcr: { cassette_name: 'llm/groq/…' }` (regravação com `VCR_RECORD=1`), casos sintéticos usam doubles do Faraday.
 
 ---
 

@@ -45,6 +45,7 @@ todo spec, de qualquer camada.
 | **`login_as(user)`** | `type: :request` — autentica via `POST session_path` (senha `password123`); `type: :system` — mesmo nome, preenche o formulário (`new_session_path`) |
 | **`view_context`** | `type: :component` — renderiza Phlex via `view_context.render(...)` |
 | **`emulate_phone`/`emulate_desktop_screen`/`fit_the_phone_width`** | `type: :system` — padrão do driver já é celular (390×844); `emulate_desktop_screen` muda para 1280×800 sem toque; matcher `fit_the_phone_width` cobre `scrollWidth <= screen.width` |
+| **`spec/support/external_http.rb`** | WebMock + VCR: HTTP externo fora de cassete reprova com `External HTTP attempted:`; contrato real do LLM em `vcr: { cassette_name: 'llm/groq/…' }` (regravar com `VCR_RECORD=1`); casos sintéticos com doubles do Faraday |
 | **`emulate_color_scheme`/`computed`** | `type: :system` — `emulate_color_scheme('dark'\|'light')` e `computed(selector, property)` para `getComputedStyle` |
 | **`wait_until(&condition)`** | `type: :system` — espera condição custom até `Capybara.default_max_wait_time` |
 | **`verify_partial_doubles`** | ligado — mock precisa bater com a assinatura real do método |

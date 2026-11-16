@@ -29,6 +29,7 @@ pt-BR:
       fallback: "Não entendi a ação solicitada. Pode tentar de novo?"
     errors:
       rate_limit: "O assistente está com alta demanda no momento. Aguarde uns instantes e tente novamente. ⏳"
+      quota_exhausted: "O assistente atingiu o limite de uso de hoje. Tente de novo mais tarde ou registre pelos formulários. 📅"
       misconfig: "O assistente está mal configurado. Por favor, contate o suporte."
       api_error: "Tivemos um problema de comunicação com os servidores. Tente novamente mais tarde."
       unexpected: "Ocorreu um erro inesperado no sistema. Tente novamente."

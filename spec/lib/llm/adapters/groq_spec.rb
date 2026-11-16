@@ -4,20 +4,20 @@ RSpec.describe Llm::Adapters::Groq do
   subject(:adapter) { described_class.new }
 
   let(:messages) { [{ role: 'user', content: 'Hello' }] }
-  let(:response_mock) { instance_double(Faraday::Response) }
-  let(:connection_mock) { instance_double(Faraday::Connection) }
-
-  let(:builder_mock) { double('FaradayBuilder', request: true, response: true, adapter: true) }
-
-  before do
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with('GROQ_API_KEY').and_return('fake-key')
-    allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('groq-test-model')
-    allow(Faraday).to receive(:new).and_yield(builder_mock).and_return(connection_mock)
-    allow(connection_mock).to receive(:post).and_return(response_mock)
-  end
 
   describe '#chat' do
+    let(:response_mock) { instance_double(Faraday::Response) }
+    let(:connection_mock) { instance_double(Faraday::Connection) }
+    let(:builder_mock) { double('FaradayBuilder', request: true, response: true, adapter: true) }
+
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('GROQ_API_KEY').and_return('fake-key')
+      allow(ENV).to receive(:fetch).with('GROQ_MODEL', anything).and_return('groq-test-model')
+      allow(Faraday).to receive(:new).and_yield(builder_mock).and_return(connection_mock)
+      allow(connection_mock).to receive(:post).and_return(response_mock)
+    end
+
     context 'when the API returns a text response' do
       before do
         allow(response_mock).to receive(:status).and_return(200)
@@ -106,6 +106,60 @@ RSpec.describe Llm::Adapters::Groq do
       end
     end
 
+    context 'when the daily token quota is exhausted' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on tokens per day (TPD): Limit 200000, Used 199532, Requested 4120. Please try again in 26m11.52s.',
+            'type'    => 'tokens',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises Llm::QuotaExhaustedError' do
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::QuotaExhaustedError, /tokens per day \(TPD\)/)
+      end
+    end
+
+    context 'when the daily request quota is exhausted' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on requests per day (RPD): Limit 1000, Used 1000, Requested 1. Please try again in 1m26.4s.',
+            'type'    => 'requests',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises Llm::QuotaExhaustedError' do
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::QuotaExhaustedError, /requests per day \(RPD\)/)
+      end
+    end
+
+    context 'when the per-minute token limit is hit' do
+      before do
+        allow(response_mock).to receive(:status).and_return(429)
+        allow(response_mock).to receive(:body).and_return({
+          'error' => {
+            'message' => 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_test` service tier `on_demand` ' \
+                         'on tokens per minute (TPM): Limit 8000, Used 6512, Requested 3480. Please try again in 14.94s.',
+            'type'    => 'tokens',
+            'code'    => 'rate_limit_exceeded'
+          }
+        })
+      end
+
+      it 'raises a plain Llm::RateLimitError' do
+        expect { adapter.chat(messages: messages) }.to raise_error { |error| expect(error.class).to eq(Llm::RateLimitError) }
+      end
+    end
+
     context 'when the API returns a generic error' do
       before do
         allow(response_mock).to receive(:status).and_return(400)
@@ -122,6 +176,20 @@ RSpec.describe Llm::Adapters::Groq do
 
       it 'raises Llm::ConfigurationError' do
         expect { adapter.chat(messages: messages) }.to raise_error(Llm::ConfigurationError, /GROQ_API_KEY is not set/)
+      end
+    end
+
+    context 'when the network fails before Groq answers' do
+      it 'wraps a connection failure in Llm::Error' do
+        allow(connection_mock).to receive(:post).and_raise(Faraday::ConnectionFailed, 'Network is unreachable')
+
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::Error, /Network is unreachable/)
+      end
+
+      it 'wraps a timeout in Llm::Error' do
+        allow(connection_mock).to receive(:post).and_raise(Faraday::TimeoutError, 'execution expired')
+
+        expect { adapter.chat(messages: messages) }.to raise_error(Llm::Error, /execution expired/)
       end
     end
 
@@ -243,6 +311,30 @@ RSpec.describe Llm::Adapters::Groq do
         ).and_return(response_mock)
 
         adapter.chat(messages: messages, tools: tools)
+      end
+    end
+  end
+
+  describe '#chat against the recorded Groq API' do
+    context 'when Groq answers in plain text', vcr: { cassette_name: 'llm/groq/text_answer' } do
+      it 'returns a normalized text response' do
+        result = adapter.chat(messages: [{ role: 'user', content: 'Responda apenas com a palavra: ok' }])
+
+        expect(result[:type]).to eq(:text)
+        expect(result[:content]).to be_present
+      end
+    end
+
+    context 'when Groq calls a registered tool', vcr: { cassette_name: 'llm/groq/tool_call' } do
+      it 'returns the tool call with the JSON-parsed input' do
+        result = adapter.chat(
+          messages: [{ role: 'user', content: 'gastei R$ 50 de gasolina no posto Ipiranga hoje' }],
+          tools:    Ai::Tools::Registry.declarations,
+          system:   'Você registra gastos e ganhos usando as ferramentas. Hoje é 2026-11-16.'
+        )
+
+        expect(result).to include(type: :tool_use, tool_name: 'create_expense')
+        expect(result[:tool_input]).to include('amount' => 50, 'category' => 'fuel')
       end
     end
   end

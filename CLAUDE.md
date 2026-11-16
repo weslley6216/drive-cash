@@ -9,7 +9,7 @@ Aplicação Rails 8.1 para motoristas de delivery/gig workers rastrearem gastos 
 - **Backend**: Ruby 3.3.5, Rails 8.1.2, PostgreSQL 16
 - **Frontend**: Phlex 2.2 (componentes Ruby, sem ERB), Stimulus, Turbo, Tailwind CSS
 - **LLM**: Groq (primário, openai/gpt-oss-120b) + Gemini (fallback), via Faraday
-- **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório), Capybara + Cuprite (system specs de celular/desktop em spec/system)
+- **Testes**: RSpec, Factory Bot, SimpleCov (100% coverage obrigatório), Capybara + Cuprite (system specs de celular/desktop em spec/system), WebMock + VCR (rede externa bloqueada na suíte; cassetes só do adapter Groq, regravação com `VCR_RECORD=1`)
 - **Deploy**: Northflank (free tier — 0,1 vCPU/256MB, Puma single mode, Solid Queue dentro do Puma), push na `main` dispara build+rollout
 - **Locale**: pt-BR, fuso Brasília
 
@@ -53,7 +53,7 @@ Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
 - **Turbo Streams via concern, nunca inline no controller**: toda resposta Turbo padronizada vive num concern, não repetida em cada action. Dois padrões: (1) render parcial de view Phlex com totais — `RecordSaveResponse` (`turbo_success`/`turbo_error`/`turbo_render_list`); (2) fecha modal + refresh de página inteira (Turbo morphing) — `ModalRefreshResponse#respond_with_modal_refresh(html_redirect:)`, usado pela família de veículo/goals. Guard `before_action` compartilhado entre controllers da mesma família também vira concern (ex: `RequiresVehicle`). Nunca montar `render turbo_stream: [...]` à mão dentro de uma action.
 - **Monetário**: sempre `decimal(10,2)`, concern `MonetaryAmount` converte string de input.
 - **Cache**: sem invalidação automática. `Dashboard::AvailableYears.fetch` consulta o banco direto (overhead trivial). Se for cachear agregações pesadas no futuro, usar chave por-usuário (`"...#{user.id}"`).
-- **LLM fallback**: se Groq falha (rate limit/config), cai automaticamente no Gemini.
+- **LLM fallback**: se o Groq falha (rate limit, cota, config ou rede), cai automaticamente no Gemini. Rate limit/cota loga `warn`; qualquer outro `Llm::Error` loga `error`. Cota diária esgotada vira `Llm::QuotaExhaustedError` (classificada no `handle_error!` de cada adapter) com mensagem própria.
 - **i18n**: todas as strings visíveis em `config/locales/pt-BR.yml`.
 - **Namespaces sempre no plural**: diretórios e módulos usam a forma plural (`module Vehicles`, `module Expenses`, `module Maintenances`). Nunca usar `class ModelName` para criar namespace — se o nome do namespace coincidir com um model AR (singular), renomear para plural. Isso evita o `TypeError: X is not a module`.
 - **Variação de domínio estende, não edita (OCP)**: conjunto que cresce (período de parcelamento, tipo de insight, ferramenta de chat, filtro de histórico) despacha via registry de dados ou uma classe por variante resolvida por convenção — nunca `case/when`/`if-elsif` espalhado por vários arquivos. Adicionar uma variante = uma entrada declarativa + suas classes colaboradoras, sem tocar na lógica de despacho. Registries: `Expenses::InstallmentPlan::PERIOD_ADVANCE`, `Dashboard::Insights::Presenters` (um presenter por tipo), `Ai::Tools::Registry`, `History::FeedService::FILTERS`. Mapa de lookup com fallback default (paletas) também conta como registry. **OCP não revoga SRP**: o registry referencia colaboradores, não os contém — cálculo de domínio e apresentação seguem em classes separadas.

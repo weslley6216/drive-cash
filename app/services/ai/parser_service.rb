@@ -21,6 +21,9 @@ module Ai
       )
 
       process_response(response)
+    rescue Llm::QuotaExhaustedError => e
+      Rails.logger.warn "[ParserService] Daily quota exhausted: #{e.message}"
+      { type: :text, content: I18n.t('chat.errors.quota_exhausted') }
     rescue Llm::RateLimitError => e
       Rails.logger.warn "[ParserService] Rate Limit Hit: #{e.message}"
       { type: :text, content: I18n.t('chat.errors.rate_limit') }

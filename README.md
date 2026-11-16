@@ -51,7 +51,7 @@ Acesse `http://localhost:3000`.
 | `GROQ_API_KEY` | Chave da API Groq (LLM primário) | Para o chat |
 | `GEMINI_API_KEY` | Chave da API Gemini (fallback) | Para o chat |
 | `GROQ_MODEL` | Modelo Groq (padrão: `openai/gpt-oss-120b`) | Não |
-| `GEMINI_MODEL` | Modelo Gemini (padrão: `gemini-2.0-flash`) | Não |
+| `GEMINI_MODEL` | Modelo Gemini (padrão: `gemini-3-flash-preview`) | Não |
 
 ## Comandos úteis
 

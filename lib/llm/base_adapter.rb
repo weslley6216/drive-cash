@@ -1,8 +1,15 @@
 module Llm
   class BaseAdapter
     RATE_LIMIT_STATUSES = [429, 503].freeze
+    NETWORK_ERRORS = [Faraday::ConnectionFailed, Faraday::TimeoutError].freeze
 
     private
+
+    def send_request(connection, path, payload)
+      connection.post(path, payload)
+    rescue *NETWORK_ERRORS => e
+      raise Llm::Error, "#{e.class.name}: #{e.message}"
+    end
 
     def sanitize_function_leaks(text)
       text = text.gsub(/<function[^>]*>.*?<\/function>/m, '')
@@ -14,12 +21,6 @@ module Llm
     def build_connection(url, &block)
       Faraday.new(url: url) do |f|
         f.request :json
-        f.request :retry,
-                  max:            3,
-                  interval:       0.5,
-                  backoff_factor: 2,
-                  retry_statuses: [429, 500, 502, 503, 504],
-                  exceptions:     Faraday::Retry::Middleware::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed]
         f.response :json, parser_options: { symbolize_names: false }
         f.adapter Faraday.default_adapter
         instance_exec(f, &block) if block
