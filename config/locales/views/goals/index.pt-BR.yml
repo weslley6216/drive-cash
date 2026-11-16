@@ -54,7 +54,6 @@ pt-BR:
       achievements:
         title: "Últimas conquistas"
         empty: "Continue registrando ganhos para destravar conquistas."
-        streak_7d: "Sequência %{days} dias"
         streak:
           short: "Sequência %{days} dias"
           long: "Sequência de %{days} dias trabalhando"
