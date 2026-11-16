@@ -38,6 +38,7 @@ class LayoutComponent < ApplicationComponent
 
       link(rel: 'icon', type: 'image/png', href: '/icon-192.png')
       link(rel: 'apple-touch-icon', href: '/icon.png')
+      render SplashScreenLinksComponent.new
 
       meta(name: 'turbo-cache-control', content: 'no-cache') if @auth || !@turbo_cache
       csrf_meta_tags

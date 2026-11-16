@@ -14,6 +14,10 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('rel="manifest"')
     end
 
+    it 'shows the brand launch image while the installed app opens on iOS' do
+      expect(html).to include('rel="apple-touch-startup-image"')
+    end
+
     it 'keeps the iOS status bar opaque so content does not run under the clock and carrier' do
       expect(html).to include('name="apple-mobile-web-app-status-bar-style" content="default"')
     end
