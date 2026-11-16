@@ -418,6 +418,41 @@ RSpec.describe 'Chats', type: :request do
       expect(response.body).to include('iFood')
     end
 
+    it 'does not re-propose the cancelled record as the continuation' do
+      shopee_preview = { type: :preview, action: 'create_earning', summary: 'Receita de R$ 120,00 via Shopee',
+                         params: { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' } }
+      allow(parser_mock).to receive(:call).and_return(shopee_preview, shopee_preview)
+
+      post chat_message_path, params: { message: 'rota de R$ 120 pelo Shopee e abasteci R$ 60 no Ipiranga hoje' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response.body).not_to include(I18n.t('chat.message.understood'))
+      expect(response.body).to include(I18n.t('chat.history.nothing_pending'))
+    end
+
+    it 'forgets the handled records when the user sends a new message' do
+      shopee_input = { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' }
+      shopee_preview = { type: :preview, action: 'create_earning', summary: 'Receita de R$ 120,00 via Shopee', params: shopee_input }
+      ipiranga_input = { 'amount' => 60, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' }
+      allow(parser_mock).to receive(:call).and_return(
+        shopee_preview,
+        { type: :text, content: 'Beleza, cancelei.' },
+        { type: :preview, action: 'create_expense', summary: 'Despesa de R$ 60,00 no Ipiranga', params: ipiranga_input },
+        shopee_preview
+      )
+
+      post chat_message_path, params: { message: 'rota de R$ 120 pelo Shopee e abasteci R$ 60 no Ipiranga hoje' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      post chat_message_path, params: { message: 'na verdade a Shopee valeu, registra o Ipiranga primeiro' }, as: :turbo_stream
+      nonce = response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+      post chat_confirm_path,
+           params: { record_action: 'create_expense', record: ipiranga_input, confirm_nonce: nonce },
+           as:     :turbo_stream
+
+      expect(response.body).to include('Shopee')
+      expect(response.body).to include(I18n.t('chat.message.understood'))
+    end
+
     it 'renders cancelled message when depth exceeded' do
       allow(parser_mock).to receive(:call).and_return(
         { type: :preview, action: 'create_earning', summary: 'Receita',
@@ -521,7 +556,7 @@ RSpec.describe 'Chats', type: :request do
            params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
            as:     :turbo_stream
 
-      expect(response.body).to include(I18n.t('chat.history.all_registered'))
+      expect(response.body).to include(I18n.t('chat.history.nothing_pending'))
       expect(response.body).not_to include(I18n.t('chat.message.understood'))
     end
 

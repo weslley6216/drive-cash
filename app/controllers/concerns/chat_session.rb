@@ -21,7 +21,7 @@ module ChatSession
     session.delete(:chat_history)
     session.delete(:continuation_depth)
     session.delete(:confirm_nonce)
-    session.delete(:confirmed_signatures)
+    session.delete(:handled_signatures)
   end
 
   def continuation_depth
@@ -97,7 +97,7 @@ module ChatSession
 
   def finalize_chat_confirm_success(action:, record:, record_params:)
     i18n_key = Ai::Tools::Registry.find(action).confirm_key
-    record_confirmed_signature(action: action, params: record_params)
+    record_handled_signature(action: action, params: record_params)
 
     add_to_history(Chat::Message.from_result(
       { type: :text, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
@@ -111,33 +111,44 @@ module ChatSession
     Ai::Tools::Registry.find(action).summary_presenter.new(record_params).call
   end
 
+  def last_preview
+    chat_history.reverse_each.find { |message| message[:action].present? }
+  end
+
   def last_preview_summary
-    chat_history.reverse_each.find { |message| message[:summary].present? }&.dig(:summary)
+    last_preview&.dig(:summary)
   end
 
-  def record_confirmed_signature(action:, params:)
-    signatures = session[:confirmed_signatures] || []
+  def record_handled_signature(action:, params:)
+    signatures = session[:handled_signatures] || []
     signatures << Chat::PreviewSignature.from(action: action, params: params).to_session_hash
-    session[:confirmed_signatures] = signatures
+    session[:handled_signatures] = signatures
   end
 
-  def confirmed_signatures
-    (session[:confirmed_signatures] || []).map do |entry|
+  def record_cancelled_signature
+    preview = last_preview
+    return if preview.blank?
+
+    record_handled_signature(action: preview[:action], params: preview[:params])
+  end
+
+  def handled_signatures
+    (session[:handled_signatures] || []).map do |entry|
       Chat::PreviewSignature.from(action: entry['action'], params: entry['params'])
     end
   end
 
-  def reset_confirmed_signatures
-    session.delete(:confirmed_signatures)
+  def reset_handled_signatures
+    session.delete(:handled_signatures)
   end
 
   def dedup_continuation(continuation)
     return continuation unless continuation[:type] == :preview
 
     candidate = Chat::PreviewSignature.from(action: continuation[:action], params: continuation[:params])
-    return continuation unless confirmed_signatures.any? { |signature| signature.matches?(candidate) }
+    return continuation unless handled_signatures.any? { |signature| signature.matches?(candidate) }
 
-    { type: :text, content: t('chat.history.all_registered') }
+    { type: :text, content: t('chat.history.nothing_pending') }
   end
 
   def auto_continue_and_render_confirm(action:, record:, i18n_key:)

@@ -10,7 +10,7 @@ class ChatController < ApplicationController
     return head :bad_request if user_text.blank?
 
     reset_continuation_depth
-    reset_confirmed_signatures
+    reset_handled_signatures
     add_to_history(Chat::Message.from_user(user_text))
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
@@ -30,6 +30,7 @@ class ChatController < ApplicationController
   end
 
   def cancel_preview
+    record_cancelled_signature
     summary = last_preview_summary
     content = summary.present? ? t('chat.history.record_cancelled', summary: summary) : t('chat.history.preview_cancelled')
 
