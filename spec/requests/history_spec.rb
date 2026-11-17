@@ -208,6 +208,47 @@ RSpec.describe 'History', type: :request do
     end
   end
 
+  describe 'GET /history with page' do
+    before do
+      stub_const('History::FeedService::PER_PAGE', 1)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+      create(:earning, user: current_user, date: Date.new(2025, 6, 12), amount: 100, platform: 'ifood')
+    end
+
+    it 'loads the newest day and links to the next page inside the feed frame' do
+      get history_path(year: 2025, month: 6)
+
+      load_more = Capybara.string(response.body).find_link(I18n.t('history.index.load_more'))
+      expect(response.body).to include('day-2025-06-12')
+      expect(response.body).not_to include('day-2025-06-10')
+      expect(load_more[:href]).to eq(history_path(year: 2025, month: 6, page: 2))
+      expect(load_more['data-turbo-frame']).to eq('history-feed')
+    end
+
+    it 'accumulates the requested page and drops the link on the last one' do
+      get history_path(year: 2025, month: 6, page: 2)
+
+      expect(response.body).to include('day-2025-06-12')
+      expect(response.body).to include('day-2025-06-10')
+      expect(response.body).not_to include(I18n.t('history.index.load_more'))
+    end
+
+    it 'falls back to the first page when the page is not a small positive number' do
+      ['abc', '0', '-3', '9' * 200].each do |page|
+        get history_path(year: 2025, month: 6, page: page)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(I18n.t('history.index.load_more'))
+      end
+    end
+
+    it 'restarts from the first page while focusing a day' do
+      get history_path(focus_day: '2025-06-12', page: 2)
+
+      expect(response.body).to include(I18n.t('history.index.load_more'))
+    end
+  end
+
   describe 'GET /history with focus_day' do
     it 'opens the period of focus_day with the empty day marker' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
