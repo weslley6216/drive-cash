@@ -32,6 +32,18 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'labels every day of a 31-day month without the numbers touching on a phone' do
+    (1..31).each { |day| create(:earning, user: current_user, amount: 100 + day, date: Date.new(2026, 5, day)) }
+
+    visit analysis_path(year: 2026, month: 5)
+
+    boxes = all('span.tracking-tighter').map { |label| label.evaluate_script('this.getBoundingClientRect().toJSON()') }
+
+    expect(boxes.size).to eq(31)
+    expect(boxes.each_cons(2).all? { |left, right| left['right'] <= right['left'] }).to be(true)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'keeps the Analysis header still while the metrics scroll on a phone' do
     emulate_short_phone
 

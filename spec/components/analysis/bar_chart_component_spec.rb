@@ -90,17 +90,16 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(annual).to include('rounded-full bg-slate-200 h-[3px] w-[5px] lg:w-3')
   end
 
-  it 'uses 9px labels and labels about eight days in the daily view' do
-    many_bars = (1..20).map do |day|
+  it 'labels every day of the month in a single row of tabular 8px numbers that grow on desktop' do
+    many_bars = (1..31).map do |day|
       { unit: :day, key: day, label: day.to_s, earnings: 100.0, expenses: 20.0, empty: false }
     end
 
     html = view_context.render(Analysis::BarChartComponent.new(bars: many_bars, month: 3, year: 2025))
+    labels = Nokogiri::HTML(html).css('span.tracking-tighter').map(&:text)
 
-    expect(html).to include('text-[9px] leading-none min-h-[10px]')
-    expect(html).to include('font-medium">4</span>')
-    expect(html).not_to include('font-medium">2</span>')
-    expect(html).to include('font-medium">20</span>')
+    expect(labels).to eq((1..31).map(&:to_s))
+    expect(html).to include('text-[8px] lg:text-[11px] leading-none min-h-[10px] tabular-nums tracking-tighter')
   end
 
   it 'uses the prototype legend colors and the wider desktop card' do

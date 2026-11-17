@@ -3,7 +3,6 @@ module Analysis
     include CardStyles
     PLOT_HEIGHT = 'h-[118px] lg:h-[206px]'.freeze
     BAR_WIDTH = { month: 'w-[5px] lg:w-3', day: 'w-[3px] lg:w-1.5' }.freeze
-    DAY_LABELS = 8
 
     def initialize(bars:, month:, year:)
       @bars = bars
@@ -49,7 +48,7 @@ module Analysis
     end
 
     def chart
-      gap = daily? ? 'gap-0.5' : 'gap-[3px]'
+      gap = daily? ? 'gap-0' : 'gap-[3px]'
       div(class: 'relative lg:mt-6', data: { controller: 'bar-tooltip' }) do
         tooltip_node
         div(class: "flex items-end justify-between #{gap}") do
@@ -67,7 +66,7 @@ module Analysis
     end
 
     def bar_column(bar_row, index)
-      return future_bar_column(bar_row, index) if bar_row[:future]
+      return future_bar_column(bar_row) if bar_row[:future]
 
       bar_row[:empty] ? empty_bar_column(bar_row, index) : data_bar_column(bar_row, index)
     end
@@ -82,22 +81,26 @@ module Analysis
           div(class: "rounded-t bg-emerald-500 #{bar_width}", data: { bar_tooltip_target: 'fill' }, style: "height: #{bar_share(bar_row[:earnings])}%")
           div(class: "rounded-t bg-red-500 #{bar_width}", data: { bar_tooltip_target: 'fill' }, style: "height: #{bar_share(bar_row[:expenses])}%")
         end
-        bar_label(bar_row, index, 'text-slate-500')
+        bar_label(bar_row, 'text-slate-500')
       end
     end
 
     def empty_bar_column(bar_row, index)
       div(class: "#{column_classes} cursor-pointer", **column_data(bar_row, index)) do
         stub_bar
-        bar_label(bar_row, index, 'text-slate-300')
+        bar_label(bar_row, 'text-slate-300')
       end
     end
 
-    def future_bar_column(bar_row, index)
+    def future_bar_column(bar_row)
       div(class: 'flex-1 min-w-0 flex flex-col items-center gap-1 pt-0.5 cursor-default', aria_hidden: 'true', data: { future: 'true' }) do
         stub_bar
-        bar_label(bar_row, index, 'text-slate-300')
+        bar_label(bar_row, 'text-slate-300')
       end
+    end
+
+    def label_size
+      daily? ? 'text-[8px] lg:text-[11px]' : 'text-[9px]'
     end
 
     def stub_bar
@@ -106,15 +109,8 @@ module Analysis
       end
     end
 
-    def bar_label(bar_row, index, color)
-      span(class: "text-[9px] leading-none min-h-[10px] #{color} font-medium") { label_shown?(index) ? bar_row[:label] : '' }
-    end
-
-    def label_shown?(index)
-      return true unless daily?
-
-      every = (@bars.size / DAY_LABELS.to_f).ceil
-      (index % every).zero? || index == @bars.size - 1
+    def bar_label(bar_row, color)
+      span(class: "#{label_size} leading-none min-h-[10px] tabular-nums tracking-tighter #{color} font-medium") { bar_row[:label] }
     end
 
     def column_data(bar_row, index)
