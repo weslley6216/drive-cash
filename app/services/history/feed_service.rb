@@ -3,16 +3,16 @@ module History
     Filter = Data.define(:earnings, :expense_scope, :label_key, :chip)
 
     TYPE_FILTERS = {
-      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }, label_key: 'history.index.filters.all', chip: :always),
+      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month) }, label_key: 'history.index.filters.all', chip: :always),
       'earnings' => Filter.new(earnings: true, expense_scope: nil, label_key: 'history.index.filters.earnings', chip: :always),
-      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }, label_key: 'history.index.filters.expenses', chip: :always),
+      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month) }, label_key: 'history.index.filters.expenses', chip: :always),
       'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) }, label_key: 'history.index.filters.unpaid', chip: :always)
     }.freeze
 
     CATEGORY_FILTERS = Expense.categories.keys.index_with do |category|
       Filter.new(
         earnings:      false,
-        expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month).where(category:) },
+        expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(category:) },
         label_key:     "activerecord.attributes.expense.categories.#{category}",
         chip:          :when_active
       )
@@ -78,17 +78,18 @@ module History
     end
 
     def summary_expenses_scope
-      @user.expenses.paid_in_period(year, month)
+      @user.expenses.in_period(year, month)
     end
 
     def build_summary
       earnings_total = summary_earnings_scope.sum(:amount)
       expenses_total = summary_expenses_scope.sum(:amount)
+      paid_expenses_total = @user.expenses.paid_in_period(year, month).sum(:amount)
 
       {
         earnings: earnings_total,
         expenses: expenses_total,
-        net:      earnings_total - expenses_total
+        net:      earnings_total - paid_expenses_total
       }
     end
 
@@ -119,7 +120,7 @@ module History
     end
 
     def day_logged?
-      @user.earnings.exists?(date: focus_day) || @user.expenses.paid_only.exists?(date: focus_day)
+      @user.earnings.exists?(date: focus_day) || @user.expenses.exists?(date: focus_day)
     end
   end
 end

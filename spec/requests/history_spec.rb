@@ -78,15 +78,16 @@ RSpec.describe 'History', type: :request do
       expect(active_chip[:href]).to eq(history_path(filter: 'fuel', year: 2025, month: 6))
     end
 
-    it 'excludes unpaid expenses from the default feed and net summary' do
+    it 'lists unpaid expenses in the default feed and sums them into the expenses tile only' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Paid', paid: true)
-      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete Unpaid', paid: false)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 30, category: 'meals', vendor: 'Lanchonete Unpaid', paid: false)
 
       get history_path(year: 2025)
 
       expect(response.body).to include('Posto Paid')
-      expect(response.body).not_to include('Lanchonete Unpaid')
+      expect(response.body).to include('Lanchonete Unpaid')
+      expect(response.body).to include('110,00')
       expect(response.body).to include('120,00')
     end
 
@@ -100,14 +101,10 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include('Lanchonete')
     end
 
-    it 'renders the pending badge only inside the unpaid filter' do
+    it 'marks unpaid expenses with the pending badge in the default feed' do
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
       get history_path(year: 2025)
-
-      expect(response.body).not_to include(I18n.t('history.index.day_group.unpaid_badge'))
-
-      get history_path(year: 2025, filter: 'unpaid')
 
       expect(response.body).to include(I18n.t('history.index.day_group.unpaid_badge'))
       expect(response.body).to include('bg-amber-100')

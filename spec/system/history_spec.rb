@@ -51,6 +51,16 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'shows the unpaid expense with the pending badge among all records on a phone' do
+    create(:expense, user: current_user, date: Date.new(2026, 5, 20), amount: 35, category: 'car_wash', paid: false)
+
+    visit history_path(year: 2026, month: 5)
+
+    within('#day-2026-05-20') { expect(page).to have_text(I18n.t('history.index.day_group.unpaid_badge').upcase) }
+    expect(page).to have_text('R$ 10.485,00')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'echoes the search term and keeps a 44px clear button when nothing matches on a phone' do
     visit history_path(year: 2026, month: 5, q: 'posto ipiranga')
 
