@@ -3,6 +3,10 @@ pt-BR:
     index:
       title: "Histórico"
       subtitle: "Todos os lançamentos"
+      count_subtitle:
+        one: "%{count} lançamento · %{period}"
+        other: "%{count} lançamentos · %{period}"
+      load_more: "Carregar mais"
       new_record: "Novo"
       search_placeholder: "Buscar por descrição, posto, plataforma..."
       search_clear: "Limpar busca"

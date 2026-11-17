@@ -41,7 +41,10 @@ module History
             h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate lg:leading-8 lg:text-slate-900 lg:tracking-tight') do
               t('history.index.title')
             end
-            p(class: 'text-sm text-slate-500 mt-0.5') { t('history.index.subtitle') }
+            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { t('history.index.subtitle') }
+            p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') do
+              t('history.index.count_subtitle', count: @feed[:total_count], period: period_label)
+            end
           end
           div(class: 'flex items-center gap-3 flex-shrink-0') do
             render FilterComponent.new(
@@ -80,15 +83,36 @@ module History
       if @feed[:groups].empty?
         empty_state
       else
-        div(class: 'space-y-4 lg:hidden', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
-          @feed[:groups].each do |group|
-            render History::DayGroupComponent.new(group: group, context: filter_context)
+        turbo_frame_tag('history-feed', class: 'block') do
+          div(class: 'space-y-4 lg:hidden', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
+            @feed[:groups].each do |group|
+              render History::DayGroupComponent.new(group: group, context: filter_context)
+            end
           end
-        end
-        div(class: 'hidden lg:block', data: { controller: 'highlight', highlight_active_class: History::TableComponent::HIGHLIGHT_OUTLINE }) do
-          render History::TableComponent.new(groups: @feed[:groups], context: filter_context)
+          div(class: 'hidden lg:block', data: { controller: 'highlight', highlight_active_class: History::TableComponent::HIGHLIGHT_OUTLINE }) do
+            render History::TableComponent.new(groups: @feed[:groups], context: filter_context)
+          end
+          load_more_button
         end
       end
+    end
+
+    def load_more_button
+      return unless @feed[:next_page]
+
+      div(class: 'mt-4') { render History::LoadMoreComponent.new(path: load_more_path) }
+    end
+
+    def load_more_path
+      context = filter_context.except(:filter)
+      context[:filter] = @filter unless @filter == 'all'
+      history_path(**context, page: @feed[:next_page])
+    end
+
+    def period_label
+      return @year.to_s if @month.blank?
+
+      "#{I18n.t('date.month_names')[@month]} #{@year}"
     end
 
     def empty_state
