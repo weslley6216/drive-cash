@@ -181,5 +181,16 @@ RSpec.describe Goals::IndexView, type: :component do
       expect(html).to include(I18n.t('goals.index.past_goals.title'))
       expect(html).to include(I18n.t('goals.index.past_goals.achieved_no', percent: 60))
     end
+
+    it 'links every past goal row to the outcome of its period' do
+      hit_goal = create(:goal, user: user, kind: 'monthly', target_amount: 4000,
+                               period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
+      rows = past_monthly + [{ goal: hit_goal, current: 4200, target: 4000, percent: 105, achieved: true }]
+
+      rendered = view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: rows))
+
+      expect(rendered).to include(%(href="/goals/#{missed_goal.id}/outcomes/2026-05-01"))
+      expect(rendered).to include(%(href="/goals/#{hit_goal.id}/outcomes/2026-04-01"))
+    end
   end
 end

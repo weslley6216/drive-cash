@@ -184,7 +184,8 @@ module Goals
 
     def past_goal_row(row)
       goal = row[:goal]
-      div(class: 'flex items-center justify-between gap-4 px-4 py-3') do
+      link_to(helpers.goal_outcome_path(goal, goal.period_start),
+              class: 'flex items-center justify-between gap-4 px-4 py-3 hover:bg-slate-50') do
         div(class: 'min-w-0') do
           p(class: 'text-sm font-semibold text-slate-800') { I18n.l(goal.period_start, format: '%B %Y').capitalize }
           p(class: 'text-xs text-slate-500') do

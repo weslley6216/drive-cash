@@ -125,4 +125,27 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect([weekly, annual, achievements].map { |card| box(card)['y'].round }.uniq.size).to eq(1)
     expect(page).to have_link(I18n.t('goals.index.new_goal'), href: new_goal_path)
   end
+
+  it 'opens the outcome of a missed and of a hit past goal from Metas anteriores on a phone' do
+    missed = create(:goal, user: current_user, kind: 'monthly', target_amount: 1_000,
+                           period_start: Date.new(2026, 3, 1), period_end: Date.new(2026, 3, 31))
+    hit = create(:goal, user: current_user, kind: 'monthly', target_amount: 1_000,
+                        period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
+    create(:earning, user: current_user, amount: 500, date: Date.new(2026, 3, 10))
+    create(:earning, user: current_user, amount: 1_200, date: Date.new(2026, 4, 10))
+
+    visit goals_path
+    find('a', text: 'Março 2026').click
+
+    expect(page).to have_current_path("/goals/#{missed.id}/outcomes/2026-03-01")
+    expect(page).to have_text('Não foi dessa vez')
+    expect(page).to fit_the_phone_width
+
+    visit goals_path
+    find('a', text: 'Abril 2026').click
+
+    expect(page).to have_current_path("/goals/#{hit.id}/outcomes/2026-04-01")
+    expect(page).to have_text('Meta de abril batida!')
+    expect(page).to fit_the_phone_width
+  end
 end
