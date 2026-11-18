@@ -3,12 +3,12 @@ module History
     include CardStyles
     include TopbarStyles
 
-    def initialize(feed:, year:, month:, query:, filter:, periods:)
+    def initialize(feed:, year:, month:, query:, slice:, periods:)
       @feed = feed
       @year = year
       @month = month
       @query = query
-      @filter = filter
+      @slice = slice
       @periods = periods
     end
 
@@ -72,8 +72,8 @@ module History
     def filter_toolbar
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
         div(class: 'space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
-          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, filter: @filter) }
-          render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
+          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
+          render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
         end
         render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
       end
@@ -104,9 +104,7 @@ module History
     end
 
     def load_more_path
-      context = filter_context.except(:filter)
-      context[:filter] = @filter unless @filter == 'all'
-      history_path(**context, page: @feed[:next_page])
+      history_path(**filter_context, page: @feed[:next_page])
     end
 
     def period_label
@@ -142,9 +140,12 @@ module History
 
     def no_result_description
       return t('empty_states.history.description') if @query.blank?
-      return t('empty_states.history.description_query', query: @query) if @filter == 'all'
 
-      t('empty_states.history.description_query_filter', query: @query, filter: t(History::FeedService::FILTERS.fetch(@filter).label_key))
+      preset = @slice.active_preset
+      return t('empty_states.history.description_query', query: @query) if preset == 'all'
+
+      filter_label = @slice.filtering? ? History::SliceTrail.new(@slice).sentence : t("history.index.filters.#{preset}")
+      t('empty_states.history.description_query_filter', query: @query, filter: filter_label)
     end
 
     def no_result?
@@ -152,11 +153,11 @@ module History
     end
 
     def filtering?
-      @query.present? || (@filter.present? && @filter != 'all')
+      @query.present? || @slice.active_preset != 'all'
     end
 
     def filter_context
-      { year: @year, month: @month, q: @query, filter: @filter }.compact
+      { year: @year, month: @month, q: @query }.compact.merge(@slice.to_params)
     end
   end
 end

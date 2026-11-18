@@ -155,7 +155,7 @@ RSpec.describe History::FeedService do
         create_five_days
         create(:expense, user: user, date: Date.new(2025, 6, 3), amount: 80, category: 'fuel', paid: true)
 
-        result = described_class.new(year: 2025, filter: 'earnings', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('earnings'), user: user).call
 
         expect(result[:total_count]).to eq(5)
       end
@@ -209,12 +209,12 @@ RSpec.describe History::FeedService do
       end
     end
 
-    context 'with filter earnings' do
+    context 'with the earnings preset' do
       it 'returns only earnings' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
-        result = described_class.new(year: 2025, filter: 'earnings', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('earnings'), user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:class).uniq).to eq([Earning])
@@ -224,19 +224,19 @@ RSpec.describe History::FeedService do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
-        result = described_class.new(year: 2025, filter: 'earnings', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('earnings'), user: user).call
 
         expect(result[:summary]).to eq(earnings: 200, expenses: 80, net: 120)
       end
     end
 
-    context 'with filter expenses' do
+    context 'with the expenses preset' do
       it 'returns the paid and the unpaid expenses' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         paid = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         unpaid = create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
-        result = described_class.new(year: 2025, filter: 'expenses', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('expenses'), user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:id)).to eq([unpaid.id, paid.id])
@@ -246,19 +246,19 @@ RSpec.describe History::FeedService do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
-        result = described_class.new(year: 2025, filter: 'expenses', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('expenses'), user: user).call
 
         expect(result[:summary]).to eq(earnings: 200, expenses: 80, net: 120)
       end
     end
 
-    context 'with filter unpaid' do
+    context 'with the unpaid preset' do
       it 'returns only expenses with paid: false' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         unpaid = create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
-        result = described_class.new(year: 2025, filter: 'unpaid', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('unpaid'), user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:id)).to eq([unpaid.id])
@@ -268,7 +268,7 @@ RSpec.describe History::FeedService do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 40, category: 'meals', paid: false)
 
-        result = described_class.new(year: 2025, filter: 'unpaid', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('unpaid'), user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:class).uniq).to eq([Expense])
@@ -278,13 +278,13 @@ RSpec.describe History::FeedService do
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', paid: false)
 
-        result = described_class.new(year: 2025, filter: 'unpaid', user: user).call
+        result = described_class.new(year: 2025, slice: History::Slice.preset('unpaid'), user: user).call
 
         expect(result[:summary]).to eq(earnings: 0, expenses: 120, net: -80)
       end
     end
 
-    context 'with a category filter' do
+    context 'with a category slice' do
       it 'returns the paid and unpaid expenses of that category in the period' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         fuel = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
@@ -292,20 +292,42 @@ RSpec.describe History::FeedService do
         create(:expense, user: user, date: Date.new(2025, 6, 13), amount: 40, category: 'meals', paid: true)
         create(:expense, user: user, date: Date.new(2025, 7, 11), amount: 90, category: 'fuel', paid: true)
 
-        result = described_class.new(year: 2025, month: 6, filter: 'fuel', user: user).call
+        result = described_class.new(year: 2025, month: 6, slice: History::Slice.new(categories: %w[fuel]), user: user).call
 
         items = result[:groups].flat_map { |group| group[:items] }
         expect(items.map(&:id)).to eq([unpaid_fuel.id, fuel.id])
       end
 
-      it 'keeps the summary of the whole period regardless of the category' do
+      it 'keeps the summary of the whole period regardless of the slice' do
         create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
         create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
         create(:expense, user: user, date: Date.new(2025, 6, 13), amount: 40, category: 'meals', paid: true)
 
-        result = described_class.new(year: 2025, month: 6, filter: 'fuel', user: user).call
+        result = described_class.new(year: 2025, month: 6, slice: History::Slice.new(categories: %w[fuel]), user: user).call
 
         expect(result[:summary]).to eq(earnings: 200, expenses: 120, net: 80)
+      end
+
+      it 'returns only the expenses of the marked vendor and counts them' do
+        create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+        orense = create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Orense', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 70, category: 'fuel', vendor: 'Shell', paid: true)
+        slice = History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] })
+
+        result = described_class.new(year: 2025, month: 6, slice: slice, user: user).call
+
+        expect(result[:groups].flat_map { |group| group[:items].map(&:id) }).to eq([orense.id])
+        expect(result[:total_count]).to eq(1)
+      end
+
+      it 'keeps the slice inside the user records' do
+        create(:expense, user: create(:user), date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Orense', paid: true)
+        mine = create(:expense, user: user, date: Date.new(2025, 6, 12), amount: 60, category: 'fuel', vendor: 'Posto Orense', paid: true)
+        slice = History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] })
+
+        result = described_class.new(year: 2025, month: 6, slice: slice, user: user).call
+
+        expect(result[:groups].flat_map { |group| group[:items].map(&:id) }).to eq([mine.id])
       end
     end
 
@@ -377,12 +399,6 @@ RSpec.describe History::FeedService do
 
         expect(result[:groups]).to eq([{ date: Date.new(2025, 6, 11), items: [], gap: true }])
       end
-    end
-  end
-
-  describe '.filter_names' do
-    it 'accepts the four type filters and one filter per expense category' do
-      expect(described_class.filter_names).to eq(%w[all earnings expenses unpaid] + Expense.categories.keys)
     end
   end
 end

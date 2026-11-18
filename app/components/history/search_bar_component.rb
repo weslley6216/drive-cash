@@ -1,8 +1,8 @@
 module History
   class SearchBarComponent < ApplicationComponent
-    def initialize(query:, filter:)
+    def initialize(query:, slice:)
       @query = query
-      @filter = filter
+      @slice = slice
     end
 
     def view_template
@@ -12,7 +12,7 @@ module History
         class:  'relative',
         data:   { controller: 'history-search' }
       ) do
-        input(type: 'hidden', name: 'filter', value: @filter)
+        slice_hidden_fields(@slice.to_params)
 
         div(class: 'relative') do
           render PhlexIcons::Lucide::Search.new(
@@ -34,9 +34,20 @@ module History
 
     private
 
+    def slice_hidden_fields(params, prefix: nil)
+      params.each do |key, value|
+        name = prefix ? "#{prefix}[#{key}]" : key.to_s
+        case value
+        when Hash then slice_hidden_fields(value, prefix: name)
+        when Array then value.each { |item| input(type: 'hidden', name: "#{name}[]", value: item) }
+        else input(type: 'hidden', name: name, value: value)
+        end
+      end
+    end
+
     def clear_button
       link_to(
-        history_path(filter: @filter),
+        history_path(**@slice.to_params),
         class: 'cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600',
         aria:  { label: t('history.index.search_clear') },
         title: t('history.index.search_clear')

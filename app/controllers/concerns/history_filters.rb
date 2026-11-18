@@ -1,23 +1,25 @@
 module HistoryFilters
   extend ActiveSupport::Concern
 
+  SLICE_PARAMS = [:unpaid, { types: [], categories: [], platforms: [], vendors: Expense.categories.keys.index_with { [] } }].freeze
+
   private
 
   def set_history_filters
     set_calendar_filters
     @focus_day = focused_day
     @page = requested_page
+    @slice = History::Slice.from_params(params.slice(:types, :unpaid, :categories, :platforms, :vendors).permit(*SLICE_PARAMS).to_h)
     return focus_period if @focus_day
 
     @query = params[:q].to_s.strip.presence
-    @filter = History::FeedService.filter_names.include?(params[:filter]) ? params[:filter] : 'all'
   end
 
   def focus_period
     @year = @focus_day.year
     @month = @focus_day.month
     @query = nil
-    @filter = 'all'
+    @slice = History::Slice.new
     @page = 1
   end
 

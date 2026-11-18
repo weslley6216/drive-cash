@@ -10,7 +10,7 @@ RSpec.describe History::IndexView, type: :component do
         year:    2025,
         month:   nil,
         query:   nil,
-        filter:  'all',
+        slice:   History::Slice.new,
         periods: { 2025 => [3] }
       )
     )
@@ -50,13 +50,13 @@ RSpec.describe History::IndexView, type: :component do
   end
 
   it 'counts the records of the period in the desktop subtitle' do
-    html = view_context.render(described_class.new(feed: feed.merge(total_count: 10), year: 2026, month: 5, query: nil, filter: 'all', periods: { 2026 => [5] }))
+    html = view_context.render(described_class.new(feed: feed.merge(total_count: 10), year: 2026, month: 5, query: nil, slice: History::Slice.new, periods: { 2026 => [5] }))
 
     expect(html).to include('10 lançamentos · maio 2026')
   end
 
   it 'counts against the whole year when no month is picked' do
-    html = view_context.render(described_class.new(feed: feed.merge(total_count: 1), year: 2025, month: nil, query: nil, filter: 'all', periods: { 2025 => [3] }))
+    html = view_context.render(described_class.new(feed: feed.merge(total_count: 1), year: 2025, month: nil, query: nil, slice: History::Slice.new, periods: { 2025 => [3] }))
 
     expect(html).to include('1 lançamento · 2025')
   end
@@ -75,7 +75,7 @@ RSpec.describe History::IndexView, type: :component do
 
     def render_page(next_page:)
       view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 2, next_page: next_page),
-                                              year: 2026, month: 5, query: nil, filter: 'all', periods: { 2026 => [5] }))
+                                              year: 2026, month: 5, query: nil, slice: History::Slice.new, periods: { 2026 => [5] }))
     end
 
     it 'puts the load more link inside the feed frame pointing at the next page' do
@@ -87,35 +87,46 @@ RSpec.describe History::IndexView, type: :component do
     it 'leaves the load more link out on the last page' do
       expect(render_page(next_page: nil)).not_to include(I18n.t('history.index.load_more'))
     end
+
+    it 'carries the slice in the load more link' do
+      html = view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 2, next_page: 2),
+                                                     year: 2026, month: 5, query: nil, slice: History::Slice.new(categories: %w[fuel]),
+                                                     periods: { 2026 => [5] }))
+      link = Capybara.string(html).find('turbo-frame#history-feed a', text: I18n.t('history.index.load_more'))
+
+      expect(link[:href]).to eq(Rails.application.routes.url_helpers.history_path(types: %w[expenses], categories: %w[fuel], year: 2026, month: 5, page: 2))
+    end
   end
 
   context 'when a search finds nothing' do
-    def render_with(query:, filter:)
-      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, filter: filter, periods: { 2025 => [3] }))
+    def render_with(query:, slice:)
+      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, slice: slice, periods: { 2025 => [3] }))
     end
 
     it 'echoes the search term' do
-      expect(render_with(query: 'posto ipiranga', filter: 'all')).to include(CGI.escapeHTML(I18n.t('empty_states.history.description_query', query: 'posto ipiranga')))
+      expect(render_with(query: 'posto ipiranga', slice: History::Slice.new))
+        .to include(CGI.escapeHTML(I18n.t('empty_states.history.description_query', query: 'posto ipiranga')))
     end
 
-    it 'echoes the search term and the active filter' do
+    it 'echoes the search term and the active preset' do
       expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: I18n.t('history.index.filters.expenses'))
 
-      expect(render_with(query: 'posto', filter: 'expenses')).to include(CGI.escapeHTML(expected))
+      expect(render_with(query: 'posto', slice: History::Slice.preset('expenses'))).to include(CGI.escapeHTML(expected))
     end
 
     it 'hides the period summary' do
-      expect(render_with(query: 'posto', filter: 'all')).not_to include(I18n.t('history.index.summary.net'))
+      expect(render_with(query: 'posto', slice: History::Slice.new)).not_to include(I18n.t('history.index.summary.net'))
     end
 
-    it 'echoes the search term and the active category' do
-      expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: I18n.t('activerecord.attributes.expense.categories.fuel'))
+    it 'echoes the search term and the slice sentence' do
+      slice = History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] })
+      expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: 'Combustível (Posto Orense)')
 
-      expect(render_with(query: 'posto', filter: 'fuel')).to include(CGI.escapeHTML(expected))
+      expect(render_with(query: 'posto', slice: slice)).to include(CGI.escapeHTML(expected))
     end
 
-    it 'keeps the generic message when only a filter is active' do
-      expect(render_with(query: nil, filter: 'unpaid')).to include(I18n.t('empty_states.history.description'))
+    it 'keeps the generic message when only a preset is active' do
+      expect(render_with(query: nil, slice: History::Slice.preset('unpaid'))).to include(I18n.t('empty_states.history.description'))
     end
   end
 end
