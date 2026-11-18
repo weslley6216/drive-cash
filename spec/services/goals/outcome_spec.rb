@@ -77,11 +77,24 @@ RSpec.describe Goals::Outcome do
     end
   end
 
-  context 'when the result is short of the target' do
+  it 'resolves the hit outcome with the celebration' do
+    expect(outcome).to have_attributes(state: 'hit', celebration?: true)
+  end
+
+  context 'when the result is short of the target in an open period' do
     let(:target) { 5_000 }
+    let(:date) { Date.new(2026, 6, 28) }
 
     it 'returns no outcome' do
       expect(outcome).to be_nil
+    end
+  end
+
+  context 'when the period ended short of the target' do
+    let(:target) { 5_000 }
+
+    it 'resolves the missed outcome' do
+      expect(outcome).to have_attributes(state: 'missed', achieved: 1_320, celebration?: false)
     end
   end
 end

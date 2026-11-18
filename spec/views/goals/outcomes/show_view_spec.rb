@@ -6,7 +6,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
                          period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
   end
   let(:outcome) do
-    Goals::Outcome::Result.new(
+    Goals::Outcomes::Hit::Result.new(
       goal:            goal,
       target:          goal.target_amount,
       achieved:        BigDecimal('6120'),
@@ -16,7 +16,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
       days_before_end: 3,
       worked_days:     21,
       per_day:         BigDecimal('291.43'),
-      best_day:        Goals::Outcome::BestDay.new(date: Date.new(2026, 6, 13), value: BigDecimal('412')),
+      best_day:        Goals::Outcomes::Base::BestDay.new(date: Date.new(2026, 6, 13), value: BigDecimal('412')),
       streak:          2,
       next_period:     Date.new(2026, 7, 1)..Date.new(2026, 7, 31),
       next_goal:       nil,
