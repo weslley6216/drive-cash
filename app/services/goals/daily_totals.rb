@@ -45,5 +45,9 @@ module Goals
     def active_in?(range)
       range.any? { |day| @earnings_by_day.key?(day) || @expenses_by_day.key?(day) }
     end
+
+    def worked_days_in(range)
+      range.count { |day| @earnings_by_day.key?(day) }
+    end
   end
 end

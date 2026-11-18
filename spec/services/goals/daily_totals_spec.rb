@@ -125,4 +125,18 @@ RSpec.describe Goals::DailyTotals do
       expect(totals.active_in?(Date.new(2026, 7, 1)..Date.new(2026, 7, 31))).to be(false)
     end
   end
+
+  describe '#worked_days_in' do
+    it 'counts the days with an earning and skips the days with only an expense' do
+      create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 100)
+      create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 50)
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 80)
+      create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 30, paid: true)
+      june = Date.new(2026, 6, 1)..Date.new(2026, 6, 30)
+
+      worked_days = described_class.for(user: user, range: june).worked_days_in(june)
+
+      expect(worked_days).to eq(2)
+    end
+  end
 end
