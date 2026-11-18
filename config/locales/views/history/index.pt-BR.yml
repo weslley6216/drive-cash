@@ -15,6 +15,13 @@ pt-BR:
         earnings: "Receitas"
         expenses: "Despesas"
         unpaid: "Não pagas"
+      trail:
+        remove: "Remover %{label}"
+        fuel_vendors: "%{count} postos"
+        vendors: "%{count} estabelecimentos"
+        sentence_vendor: "%{category} (%{vendors})"
+      panel:
+        no_vendor: "Sem estabelecimento"
       summary:
         earnings: "Receitas"
         expenses: "Despesas"
