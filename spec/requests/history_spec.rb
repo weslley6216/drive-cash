@@ -147,6 +147,14 @@ RSpec.describe 'History', type: :request do
       expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
+    it 'describes a search without results under a type combination that matches no chip' do
+      create(:earning, user: current_user, date: Date.current)
+
+      get history_path(types: %w[earnings], unpaid: '1', q: 'nao-existe')
+
+      expect(Nokogiri::HTML(response.body).text).to include(I18n.t('empty_states.history.description_query', query: 'nao-existe'))
+    end
+
     it 'renders the FAB positioned above the bottom nav' do
       get history_path
 

@@ -198,7 +198,7 @@ module History
       return t('empty_states.history.description') if @query.blank?
 
       preset = @slice.active_preset
-      return t('empty_states.history.description_query', query: @query) if preset == 'all'
+      return t('empty_states.history.description_query', query: @query) if preset == 'all' || (preset.nil? && !@slice.filtering?)
 
       filter_label = @slice.filtering? ? History::SliceTrail.new(@slice).sentence : t("history.index.filters.#{preset}")
       t('empty_states.history.description_query_filter', query: @query, filter: filter_label)
