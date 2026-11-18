@@ -22,4 +22,10 @@ RSpec.describe Formatting do
       expect(helper.month_abbr(5)).to eq('Mai')
     end
   end
+
+  describe '#short_month' do
+    it 'returns the lowercase month abbreviation' do
+      expect(helper.short_month(5)).to eq('mai')
+    end
+  end
 end

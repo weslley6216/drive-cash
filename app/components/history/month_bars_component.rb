@@ -25,7 +25,7 @@ module History
         div(class: "w-full rounded-t #{SIZES[@size][:bar]} #{bar_classes(index)}", data: { trend_bar: true },
             style: "--bar: #{ratio(month[:total])}")
         span(class: "text-[9px] #{index == @months.size - 1 ? 'font-bold text-slate-700' : 'text-slate-400'}",
-             data:  { trend_label: true }) { month_abbr(month[:month]) }
+             data:  { trend_label: true }) { short_month(month[:month]) }
       end
     end
 
@@ -40,7 +40,5 @@ module History
 
       (total / max).round(2)
     end
-
-    def month_abbr(month) = I18n.t('date.abbr_month_names')[month]
   end
 end

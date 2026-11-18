@@ -14,7 +14,11 @@ module Formatting
   end
 
   def month_abbr(number)
-    I18n.t('date.abbr_month_names')[number].capitalize
+    short_month(number).capitalize
+  end
+
+  def short_month(number)
+    I18n.t('date.abbr_month_names')[number]
   end
 
   def log_day_label(date)

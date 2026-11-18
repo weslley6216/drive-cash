@@ -110,18 +110,16 @@ module History
 
     def month_title(row) = "#{I18n.t('date.month_names')[row[:month]].capitalize} #{row[:year]}"
 
-    def month_short(row) = "#{abbr_month(row[:month]).capitalize}/#{'%02d' % (row[:year] % 100)}"
+    def month_short(row) = "#{month_abbr(row[:month])}/#{'%02d' % (row[:year] % 100)}"
 
     def variation_text(row)
-      return t('history.index.twelve_months.equal', month: abbr_month(row[:previous_month])) if row[:equal]
+      return t('history.index.twelve_months.equal', month: short_month(row[:previous_month])) if row[:equal]
 
-      t('history.index.twelve_months.versus', change: signed_percent(row[:change]), month: abbr_month(row[:previous_month]))
+      t('history.index.twelve_months.versus', change: signed_percent(row[:change]), month: short_month(row[:previous_month]))
     end
 
     def path_for(row)
       history_path(year: row[:year], month: row[:month], **@slice.without_range.to_params, q: @query.presence)
     end
-
-    def abbr_month(number) = I18n.t('date.abbr_month_names')[number]
   end
 end

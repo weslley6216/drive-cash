@@ -44,7 +44,7 @@ module History
 
     def adjustment_badge
       span(class: badge_classes, data: { twelve_months: 'adjustment' }) do
-        plain t('history.index.twelve_months.adjustment', change: signed_percent(shift[:change]), month: abbr_month(shift[:month]))
+        plain t('history.index.twelve_months.adjustment', change: signed_percent(shift[:change]), month: short_month(shift[:month]))
         plain ' '
         span(class: 'hidden lg:inline') do
           t('history.index.twelve_months.adjustment_levels', from: format_currency(shift[:from]), to: format_currency(shift[:to]))
@@ -86,7 +86,5 @@ module History
     def shift
       @year[:shift]
     end
-
-    def abbr_month(number) = I18n.t('date.abbr_month_names')[number]
   end
 end
