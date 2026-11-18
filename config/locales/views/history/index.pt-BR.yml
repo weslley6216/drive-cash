@@ -103,3 +103,12 @@ pt-BR:
         summary: "em 12 meses · média %{average}/mês"
         adjustment: "Reajuste %{change} em %{month}"
         adjustment_levels: "· %{from} → %{to}"
+        equal: "= %{month}"
+        versus: "%{change} vs %{month}"
+        entries:
+          one: "%{count} lançamento"
+          other: "%{count} lançamentos"
+        tap_hint: "Toque num mês para abrir os lançamentos dele (volta para o modo Mês)."
+      month_table:
+        month: "Mês"
+        variation: "Variação"
