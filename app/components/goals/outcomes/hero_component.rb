@@ -1,6 +1,8 @@
 module Goals
   module Outcomes
     class HeroComponent < ApplicationComponent
+      include OutcomeLabels
+
       def initialize(outcome:)
         @outcome = outcome
       end
@@ -71,18 +73,6 @@ module Goals
                                    value: I18n.l(@outcome.hit_on, format: :day_abbr),
                                    sub:   t('goals.outcomes.show.hero.days_before_end', count: @outcome.days_before_end))
         end
-      end
-
-      def kind_label
-        t("goals.outcomes.show.kinds.#{@outcome.goal.kind}")
-      end
-
-      def metric_label
-        t("goals.outcomes.show.metrics.#{@outcome.goal.metric}")
-      end
-
-      def period_label
-        Goals::PeriodLabel.new(kind: @outcome.goal.kind, period: @outcome.goal.period_start..@outcome.goal.period_end)
       end
     end
   end

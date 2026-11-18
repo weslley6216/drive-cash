@@ -63,6 +63,7 @@ RSpec.describe 'Goal outcome', type: :system, js: true do
 
     expect(page).to have_link('Ver meta de julho')
     expect(Goal.find_by(user: current_user, kind: 'monthly', period_start: Date.new(2026, 7, 1)).target_amount).to eq(6_000)
+    expect(page).to fit_the_phone_width
   end
 
   it 'lays the hero on seven columns beside the next step and journey on five on a desktop screen' do

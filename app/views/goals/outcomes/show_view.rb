@@ -2,6 +2,7 @@ module Goals
   module Outcomes
     class ShowView < ApplicationView
       include TopbarStyles
+      include OutcomeLabels
 
       def initialize(outcome:, confetti:)
         @outcome = outcome
@@ -77,18 +78,6 @@ module Goals
           plain t('goals.outcomes.show.view_all_goals')
           render PhlexIcons::Lucide::ArrowRight.new(class: 'w-[14px] h-[14px]')
         end
-      end
-
-      def kind_label
-        t("goals.outcomes.show.kinds.#{@outcome.goal.kind}")
-      end
-
-      def metric_label
-        t("goals.outcomes.show.metrics.#{@outcome.goal.metric}")
-      end
-
-      def period_label
-        Goals::PeriodLabel.new(kind: @outcome.goal.kind, period: @outcome.goal.period_start..@outcome.goal.period_end)
       end
     end
   end

@@ -2,6 +2,7 @@ module Goals
   module Outcomes
     class NextStepComponent < ApplicationComponent
       include Phlex::Rails::Helpers::ButtonTo
+      include OutcomeLabels
 
       def initialize(outcome:)
         @outcome = outcome
@@ -83,10 +84,6 @@ module Goals
 
       def next_period_label
         Goals::PeriodLabel.new(kind: @outcome.goal.kind, period: @outcome.next_period)
-      end
-
-      def period_label
-        Goals::PeriodLabel.new(kind: @outcome.goal.kind, period: @outcome.goal.period_start..@outcome.goal.period_end)
       end
     end
   end
