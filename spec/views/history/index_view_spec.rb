@@ -53,6 +53,12 @@ RSpec.describe History::IndexView, type: :component do
     expect(html).to include('data-controller="filter-popover"')
   end
 
+  it 'shows the calendar on the phone period trigger' do
+    trigger = Capybara.string(html).find('[data-controller="filter-popover"] button.lg\:hidden')
+
+    expect(trigger.native.inner_html).to include(PhlexIcons::Lucide::Calendar.new(class: 'w-[18px] h-[18px]').call)
+  end
+
   it 'offers a new record from the desktop topbar' do
     expect(html).to include(I18n.t('history.index.new_record'))
   end

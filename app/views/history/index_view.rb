@@ -52,7 +52,8 @@ module History
               selected_month: @month,
               periods:        @periods,
               variant:        :popover,
-              action_path:    history_path
+              action_path:    history_path,
+              trigger_icon:   PhlexIcons::Lucide::Calendar
             )
             new_record_link
           end
