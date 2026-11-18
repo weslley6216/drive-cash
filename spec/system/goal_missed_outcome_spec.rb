@@ -36,6 +36,16 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'scrolls the missed outcome under a pinned header with the content inset from the edges on a short phone' do
+    emulate_short_phone
+
+    visit goal_outcome_path(goal, '2026-07-06')
+
+    expect(box(find('a', text: 'Ver lançamentos da semana'))['x']).to eq(20)
+    expect(find('h1', text: 'Resultado da meta')).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'adjusts the next week goal to the recent average on a phone' do
     visit goal_outcome_path(goal, '2026-07-06')
 

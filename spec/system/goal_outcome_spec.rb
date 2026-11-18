@@ -34,6 +34,16 @@ RSpec.describe 'Goal outcome', type: :system, js: true do
     expect(page).to have_no_css('.dc-confetti', visible: :all)
   end
 
+  it 'scrolls the hit outcome under a pinned header with the content inset from the edges on a short phone' do
+    emulate_short_phone
+
+    visit goal_outcome_path(goal, '2026-06-01')
+
+    expect(box(find('a', text: 'Ver todas as metas'))['x']).to eq(20)
+    expect(find('h1', text: 'Meta batida')).to stay_pinned_while_the_content_scrolls
+    expect(page).to fit_the_phone_width
+  end
+
   it 'hides the confetti under reduced motion on a phone' do
     emulate_reduced_motion('reduce')
 

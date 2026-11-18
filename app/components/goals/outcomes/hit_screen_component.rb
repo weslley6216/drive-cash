@@ -9,9 +9,14 @@ module Goals
 
       def view_template
         div(class: 'flex-1 flex flex-col min-h-0 bg-gradient-to-b from-emerald-50 to-slate-50 lg:from-emerald-50/60') do
-          render HeaderComponent.new(title: title, outcome: @outcome, action_label: t('goals.outcomes.show.view_goals'),
-                                     action_icon: PhlexIcons::Lucide::Target, action_path: helpers.goals_path)
-          body_section
+          render ScreenComponent.new do |screen|
+            screen.with_header do
+              render HeaderComponent.new(title: title, outcome: @outcome,
+                                         action_label: t('goals.outcomes.show.view_goals'),
+                                         action_icon: PhlexIcons::Lucide::Target, action_path: helpers.goals_path)
+            end
+            screen.with_content { body_section }
+          end
         end
       end
 

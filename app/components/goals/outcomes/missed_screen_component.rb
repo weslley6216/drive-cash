@@ -15,9 +15,13 @@ module Goals
 
       def view_template
         div(class: 'flex-1 flex flex-col min-h-0 bg-gradient-to-br from-slate-50 to-slate-100 lg:bg-none lg:bg-slate-50') do
-          render HeaderComponent.new(title: title, outcome: @outcome, action_label: view_entries_label,
-                                     action_icon: PhlexIcons::Lucide::List, action_path: history_link)
-          body_section
+          render ScreenComponent.new do |screen|
+            screen.with_header do
+              render HeaderComponent.new(title: title, outcome: @outcome, action_label: view_entries_label,
+                                         action_icon: PhlexIcons::Lucide::List, action_path: history_link)
+            end
+            screen.with_content { body_section }
+          end
         end
       end
 
