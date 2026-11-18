@@ -8,6 +8,9 @@ pt-BR:
         other: "%{count} lançamentos · %{period}"
       load_more: "Carregar mais"
       new_record: "Novo"
+      week_chip: "Semana de %{range}"
+      week_chip_remove: "Remover filtro da semana"
+      week_period: "semana de %{range}"
       search_placeholder: "Buscar por descrição, posto, plataforma..."
       search_clear: "Limpar busca"
       mode:

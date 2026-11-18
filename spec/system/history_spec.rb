@@ -174,4 +174,30 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to have_css('tbody tr', count: 3)
     within('tr#day-2026-05-20') { expect(page).to have_link('Lançar 20/05', href: '/records/new?date=2026-05-20') }
   end
+
+  it 'shows only the week behind a removable chip and returns to its month on a phone' do
+    create(:earning, user: current_user, date: Date.new(2026, 5, 17), amount: 77, platform: 'uber', trips_count: 1)
+
+    visit history_path(week: '2026-05-20')
+
+    expect(page).to have_text('Semana de 18 a 24 de maio')
+    expect(page).to have_css('[id^="day-"]', count: 2)
+    expect(page).to have_no_field('q')
+    expect(page).to fit_the_phone_width
+
+    find("a[aria-label='Remover filtro da semana']").click
+
+    expect(page).to have_current_path('/history?month=5&year=2026')
+    expect(page).to have_field('q')
+  end
+
+  it 'counts the records of the week in the subtitle beside the chip on a desktop screen' do
+    emulate_desktop_screen
+
+    visit history_path(week: '2026-05-20')
+
+    expect(page).to have_text('2 lançamentos · semana de 18 a 24 de maio')
+    expect(page).to have_text('Semana de 18 a 24 de maio')
+    expect(page).to have_css('tbody tr', count: 2)
+  end
 end

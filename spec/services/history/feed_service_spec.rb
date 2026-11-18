@@ -15,6 +15,33 @@ RSpec.describe History::FeedService do
       end
     end
 
+    context 'with a week' do
+      let(:week) { Calendars::Week.containing(Date.new(2025, 7, 2)) }
+
+      before do
+        create(:earning, user: user, date: Date.new(2025, 6, 29), amount: 999, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 6, 30), amount: 200, platform: 'uber')
+        create(:earning, user: user, date: Date.new(2025, 7, 6), amount: 300, platform: 'ifood')
+        create(:expense, user: user, date: Date.new(2025, 7, 3), amount: 50, category: 'fuel', paid: true)
+        create(:expense, user: user, date: Date.new(2025, 7, 4), amount: 80, category: 'meals', paid: false)
+        create(:expense, user: user, date: Date.new(2025, 7, 7), amount: 999, category: 'fuel', paid: true)
+      end
+
+      it 'lists only the monday to sunday records even across two months' do
+        result = described_class.new(year: 2025, month: 6, week: week, user: user).call
+
+        dates = result[:groups].map { |group| group[:date] }
+        expect(dates).to eq([Date.new(2025, 7, 6), Date.new(2025, 7, 4), Date.new(2025, 7, 3), Date.new(2025, 6, 30)])
+        expect(result[:total_count]).to eq(4)
+      end
+
+      it 'sums the week with the net over paid expenses only' do
+        result = described_class.new(year: 2025, month: 6, week: week, user: user).call
+
+        expect(result[:summary]).to eq(earnings: 500, expenses: 130, net: 450)
+      end
+    end
+
     context 'with filter all (default) and mixed records' do
       it 'groups items by date in descending order' do
         create(:earning, user: user, date: Date.new(2025, 6, 12), amount: 200, platform: 'uber', trips_count: 3)

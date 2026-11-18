@@ -8,16 +8,26 @@ module HistoryFilters
   def set_history_filters
     set_calendar_filters
     @focus_day = focused_day
+    @week = (requested_week unless @focus_day)
     @page = requested_page
     @slice = History::Slice.from_params(params.slice(:types, :unpaid, :categories, :platforms, :vendors, :range).permit(*SLICE_PARAMS).to_h)
     return focus_period if @focus_day
+    return week_period if @week
 
     @query = params[:q].to_s.strip.presence
   end
 
   def focus_period
-    @year = @focus_day.year
-    @month = @focus_day.month
+    reset_history_period(@focus_day.year, @focus_day.month)
+  end
+
+  def week_period
+    reset_history_period(@week.monday.year, @week.monday.month)
+  end
+
+  def reset_history_period(year, month)
+    @year = year
+    @month = month
     @query = nil
     @slice = History::Slice.new
     @page = 1
@@ -28,6 +38,11 @@ module HistoryFilters
     day unless day.future?
   rescue ArgumentError
     nil
+  end
+
+  def requested_week
+    week = Calendars::Week.parse(params[:week])
+    week unless week.nil? || week.future?
   end
 
   def requested_page
