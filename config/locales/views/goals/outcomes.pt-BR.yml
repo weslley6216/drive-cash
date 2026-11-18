@@ -1,0 +1,11 @@
+pt-BR:
+  goals:
+    periods:
+      short:
+        weekly: "%{start} a %{end}"
+        monthly: "%{month}"
+        annual: "%{year}"
+      full:
+        weekly: "%{start} a %{end} · %{year}"
+        monthly: "%{month_year}"
+        annual: "%{year}"

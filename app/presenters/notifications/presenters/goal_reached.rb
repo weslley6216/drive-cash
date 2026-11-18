@@ -7,14 +7,18 @@ module Notifications
 
       private
 
-      def body
-        translate('body', month: month_label, value: format_currency(data['current']))
+      def title
+        translate("title.#{data['kind']}")
       end
 
-      def path = goals_path
+      def body
+        translate('body', period: period_label.short, value: format_currency(data['current']))
+      end
 
-      def month_label
-        I18n.l(Date.parse(data['month']), format: '%B').capitalize
+      def path = goal_outcome_path(data['goal_id'], data['period_start'])
+
+      def period_label
+        Goals::PeriodLabel.new(kind: data['kind'], period: Goal.period_for(data['kind'], Date.parse(data['period_start'])))
       end
     end
   end
