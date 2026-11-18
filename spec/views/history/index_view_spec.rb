@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe History::IndexView, type: :component do
   let(:summary) { { earnings: 200.0, expenses: 80.0, net: 120.0 } }
-  let(:feed) { { groups: [], summary: summary, total_count: 0, next_page: nil } }
+  let(:facets) { { earnings_count: 0, expenses_count: 0, platforms: {}, categories: {}, vendors: {}, rows: [] } }
+  let(:feed) { { groups: [], summary: summary, total_count: 0, next_page: nil, facets: facets } }
   let(:html) do
     view_context.render(
       described_class.new(
@@ -39,6 +40,13 @@ RSpec.describe History::IndexView, type: :component do
 
   it 'renders filter chips in the pinned header' do
     expect(html).to include(I18n.t('history.index.filters.all'))
+  end
+
+  it 'scopes the filters button and the panel to one filter panel controller' do
+    toolbar = Capybara.string(html).find('[data-controller~="history-filter-panel"]')
+
+    expect(toolbar).to have_button(I18n.t('history.index.filters.button'))
+    expect(toolbar).to have_css('[data-history-filter-panel-target="panel"]')
   end
 
   it 'renders the month/year filter in the pinned header' do

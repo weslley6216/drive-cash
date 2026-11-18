@@ -1,0 +1,124 @@
+require 'rails_helper'
+
+RSpec.describe 'History filters', type: :system, js: true do
+  let(:current_user) { create(:user) }
+
+  before do
+    travel_to Time.zone.local(2026, 5, 22, 10, 0)
+    create(:earning, user: current_user, date: Date.new(2026, 5, 22), amount: 32.5, platform: 'uber', trips_count: 1)
+    create(:earning, user: current_user, date: Date.new(2026, 5, 21), amount: 41.5, platform: 'nine_nine', trips_count: 1)
+    create(:expense, user: current_user, date: Date.new(2026, 5, 22), amount: 60, category: 'fuel', vendor: 'Posto Orense', paid: true)
+    create(:expense, user: current_user, date: Date.new(2026, 5, 19), amount: 65, category: 'fuel', vendor: 'Posto Orense', paid: true)
+    create(:expense, user: current_user, date: Date.new(2026, 5, 18), amount: 70, category: 'fuel', vendor: 'Shell Av. Brasil', paid: true)
+    create(:expense, user: current_user, date: Date.new(2026, 5, 20), amount: 35, category: 'car_wash', vendor: 'Lava-rápido Central', paid: false)
+    create(:expense, user: current_user, date: Date.new(2026, 4, 16), amount: 100, category: 'fuel', vendor: 'Posto Orense', paid: true)
+    login_as(current_user)
+  end
+
+  def panel = find('[data-history-filter-panel-target="panel"]')
+
+  def mark(label) = panel.check(label, allow_label_click: true)
+
+  it 'narrows the history down to one station from the side panel, counting live, on a phone' do
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+
+    mark I18n.t('history.index.panel.expenses')
+    expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 4))
+    mark 'Combustível'
+    expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 3))
+    mark 'Posto Orense'
+    expect(page).to fit_the_phone_width
+
+    panel.click_button I18n.t('history.index.panel.submit', count: 2)
+
+    expect(page).to have_button(I18n.t('history.index.filters.button_count', count: 2))
+    expect(page.all('[data-slice-pill]').map(&:text)).to eq(['Combustível', 'Posto Orense'])
+    expect(page).to have_css('#day-2026-05-22')
+    expect(page).to have_css('#day-2026-05-19')
+    expect(page).to have_no_text('Shell Av. Brasil')
+    expect(page).to have_no_text('+R$ 32,50')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'locks the submit when the marked combination has no records on a phone' do
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+    mark I18n.t('history.index.panel.expenses')
+    mark I18n.t('history.index.panel.unpaid_only')
+    mark 'Combustível'
+
+    expect(panel).to have_button(I18n.t('history.index.panel.submit_none'), disabled: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'discards the marks when the panel closes and clears them without closing on a phone' do
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+    mark I18n.t('history.index.panel.earnings')
+    panel.find("button[aria-label='#{I18n.t('history.index.panel.close')}']").click
+    click_button I18n.t('history.index.filters.button')
+
+    expect(panel).to have_unchecked_field(I18n.t('history.index.panel.earnings'), visible: :all)
+
+    mark I18n.t('history.index.panel.earnings')
+    panel.click_button I18n.t('history.index.panel.clear')
+
+    expect(panel).to have_unchecked_field(I18n.t('history.index.panel.earnings'), visible: :all)
+    expect(panel).to have_button(I18n.t('history.index.panel.submit_all', count: 6))
+  end
+
+  it 'drops the category with its station from the pill cross on a phone' do
+    visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
+    find("a[aria-label='#{I18n.t('history.index.trail.remove', label: 'Combustível')}']").click
+
+    expect(page).to have_css('a.bg-slate-800', text: I18n.t('history.index.filters.expenses'), exact_text: true)
+    expect(page).to have_text('Lava-rápido Central')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'reopens the panel with the marks of the slice from the pill body on a phone' do
+    visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
+    find('[data-slice-pill="vendors"] button').click
+
+    expect(panel).to have_checked_field('Posto Orense', visible: :all)
+    expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 2))
+  end
+
+  it 'searches the stations once there are more than six on a phone' do
+    %w[Ale BR Ipiranga Petrobras Raízen Texaco].each do |name|
+      create(:expense, user: current_user, date: Date.new(2026, 5, 10), amount: 50, category: 'fuel', vendor: name)
+    end
+
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+    mark I18n.t('history.index.panel.expenses')
+    mark 'Combustível'
+    panel.fill_in placeholder: I18n.t('history.index.panel.vendor_search'), with: 'ipi'
+
+    expect(panel).to have_css('label', text: 'Ipiranga')
+    expect(panel).to have_no_css('label', text: 'Texaco')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens the three column popover under the filters button and applies a mixed slice on a desktop screen' do
+    emulate_desktop_screen
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+
+    expect(box(panel.find('[data-history-filter-panel-target="sheet"]'))['width'].round).to eq(820)
+
+    mark I18n.t('history.index.panel.earnings')
+    mark 'Uber'
+    mark I18n.t('history.index.panel.expenses')
+    mark 'Lavagem'
+
+    expect(panel).to have_text(I18n.t('history.index.panel.platforms_and_categories').upcase)
+
+    panel.click_button I18n.t('history.index.panel.submit', count: 2)
+
+    expect(page).to have_css('tbody tr', count: 2)
+    expect(page).to have_text('2 lançamentos · maio 2026')
+    expect(page).to have_link(I18n.t('history.index.filters.clear'))
+  end
+end

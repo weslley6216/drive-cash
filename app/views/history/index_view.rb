@@ -73,7 +73,10 @@ module History
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
         div(class: 'space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
           div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
-          render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
+          div(class: 'relative', data: { controller: 'history-filter-panel' }) do
+            render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
+            render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
+          end
         end
         render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
       end
