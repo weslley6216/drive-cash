@@ -74,7 +74,7 @@ module History
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
         div(class: 'relative space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
           div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
-          div(data: { controller: 'history-filter-panel' }) do
+          div(class: 'lg:flex-1', data: { controller: 'history-filter-panel' }) do
             render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
             render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
           end
@@ -91,7 +91,7 @@ module History
       return render History::PeriodSummaryComponent.new(summary: slice_summary) if slice_summary[:kind] == :mixed
 
       div(class: class_names('flex flex-col gap-4', @feed[:trend] ? 'lg:grid lg:grid-cols-[1fr_1.4fr]' : 'lg:grid lg:grid-cols-1')) do
-        render History::SliceTrendComponent.new(trend: @feed[:trend]) if @feed[:trend]
+        render History::SliceTrendComponent.new(trend: @feed[:trend], slice: @slice, query: @query) if @feed[:trend]
         render History::SliceSummaryComponent.new(summary: slice_summary)
         no_trend_hint
       end

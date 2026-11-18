@@ -88,4 +88,16 @@ RSpec.describe History::FilterChipsComponent, type: :component do
       expect(clear[:class]).to include('hidden lg:inline')
     end
   end
+
+  it 'ends the desktop chip bar with the mode toggle for a single series with a month' do
+    page = Capybara.string(view_context.render(described_class.new(slice: History::Slice.new(categories: %w[insurance]), query: nil, year: 2026, month: 5)))
+
+    expect(page.find('.hidden.lg\:block.ml-auto')).to have_link(I18n.t('history.index.mode.twelve_months'))
+  end
+
+  it 'leaves the mode toggle out for a slice of two categories' do
+    page = Capybara.string(view_context.render(described_class.new(slice: History::Slice.new(categories: %w[fuel insurance]), query: nil, year: 2026, month: 5)))
+
+    expect(page).to have_no_css('[data-mode-toggle]')
+  end
 end

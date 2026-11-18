@@ -10,6 +10,9 @@ pt-BR:
       new_record: "Novo"
       search_placeholder: "Buscar por descrição, posto, plataforma..."
       search_clear: "Limpar busca"
+      mode:
+        month: "Mês"
+        twelve_months: "12 meses"
       filters:
         all: "Todos"
         earnings: "Receitas"
