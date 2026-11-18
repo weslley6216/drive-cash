@@ -134,7 +134,7 @@ RSpec.describe 'History', type: :system, js: true do
     create(:earning, user: current_user, date: Date.new(2025, 11, 10), amount: 75, platform: 'ifood', trips_count: 1)
 
     visit history_path
-    click_button I18n.t('filter_component.title')
+    find('[data-controller="filter-popover"] button.lg\\:hidden').click
     find('[data-filter-popover-target="panel"]').click_link I18n.t('filter_component.previous_year')
     reopened = find('[data-filter-popover-target="panel"]')
 

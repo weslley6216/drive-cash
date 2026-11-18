@@ -44,4 +44,48 @@ RSpec.describe History::FilterChipsComponent, type: :component do
   it 'renders chips in a horizontally scrollable row' do
     expect(html).to include('overflow-x-auto')
   end
+
+  it 'renders the light filters button before the type chips without a slice' do
+    button = Capybara.string(html).find('button', text: I18n.t('history.index.filters.button'), exact_text: true)
+
+    expect(button[:class]).to include('bg-white border border-slate-200 text-slate-700')
+    expect(button['data-action']).to eq('history-filter-panel#open')
+  end
+
+  context 'with a slice that marks levels below the type' do
+    let(:slice) { History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }) }
+    let(:page) { Capybara.string(view_context.render(described_class.new(slice: slice, query: 'posto', year: 2026, month: 5))) }
+
+    it 'darkens the filters button with the number of marked items' do
+      button = page.find('button', text: I18n.t('history.index.filters.button_count', count: 2))
+
+      expect(button[:class]).to include('bg-slate-800 text-white')
+    end
+
+    it 'swaps the type chips for the pills, with a chevron before the vendor pill' do
+      expect(page).to have_no_link(I18n.t('history.index.filters.all'))
+      expect(page.all('[data-slice-pill]').map(&:text)).to eq(['Combustível', 'Posto Orense'])
+      expect(page).to have_css('svg + span[data-slice-pill="vendors"]')
+    end
+
+    it 'removes a level from the pill cross, keeping the search and the period' do
+      remove = page.find("a[aria-label='#{I18n.t('history.index.trail.remove', label: 'Combustível')}']")
+
+      expect(remove[:href]).to eq(helpers.history_path(types: %w[expenses], q: 'posto', year: 2026, month: 5))
+    end
+
+    it 'reopens the panel at the pill level from the pill body' do
+      body = page.find('[data-slice-pill="vendors"] button')
+
+      expect(body['data-action']).to eq('history-filter-panel#open')
+      expect(body['data-history-filter-panel-level-param']).to eq('vendors')
+    end
+
+    it 'offers a desktop link that clears the slice, keeping the search and the period' do
+      clear = page.find('a', text: I18n.t('history.index.filters.clear'), exact_text: true)
+
+      expect(clear[:href]).to eq(helpers.history_path(q: 'posto', year: 2026, month: 5))
+      expect(clear[:class]).to include('hidden lg:inline')
+    end
+  end
 end

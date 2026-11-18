@@ -15,6 +15,9 @@ pt-BR:
         earnings: "Receitas"
         expenses: "Despesas"
         unpaid: "Não pagas"
+        button: "Filtros"
+        button_count: "Filtros · %{count}"
+        clear: "Limpar"
       trail:
         remove: "Remover %{label}"
         fuel_vendors: "%{count} postos"
