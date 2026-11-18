@@ -39,10 +39,16 @@ module Goals
       MetricValue.of(goal, earned: earned, spent: spent)
     end
 
+    def earned_in(range)
+      range.sum { |day| @earnings_by_day.fetch(day, 0) }
+    end
+
+    def spent_in(range)
+      range.sum { |day| @expenses_by_day.fetch(day, 0) }
+    end
+
     def profit_in(range)
-      earned = range.sum { |day| @earnings_by_day.fetch(day, 0) }
-      spent = range.sum { |day| @expenses_by_day.fetch(day, 0) }
-      earned - spent
+      earned_in(range) - spent_in(range)
     end
 
     def active_in?(range)

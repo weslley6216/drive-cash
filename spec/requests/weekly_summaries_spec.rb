@@ -30,6 +30,12 @@ RSpec.describe 'WeeklySummaries', type: :request do
 
         expect(response).to have_http_status(:not_found)
       end
+
+      it 'responds not found for a future week' do
+        get weekly_summary_path((Date.current + 7).iso8601)
+
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
 end
