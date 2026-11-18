@@ -195,6 +195,16 @@ export default class extends Controller {
       const cents = Math.round(val * 100)
       this.amountDisplayTarget.value = (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
     }
+    this.fitAmountWidth(this.amountDisplayTarget)
+  }
+
+  fitAmountWidth(input) {
+    const style = getComputedStyle(input)
+    this.textMeasure ||= document.createElement('canvas').getContext('2d')
+    this.textMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+    this.textMeasure.letterSpacing = style.letterSpacing
+    const width = Math.ceil(this.textMeasure.measureText(input.value || input.placeholder).width) + 2
+    input.style.setProperty('--amount-width', `${width}px`)
   }
 
   formatAmount(event) {
@@ -203,6 +213,7 @@ export default class extends Controller {
     const value = cents / 100
     event.target.value = cents === 0 ? '' : value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
     event.target.setSelectionRange(event.target.value.length, event.target.value.length)
+    this.fitAmountWidth(event.target)
     if (this.hasAmountInputTarget) {
       this.amountInputTarget.value = value.toFixed(2)
     }

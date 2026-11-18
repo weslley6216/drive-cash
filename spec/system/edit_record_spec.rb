@@ -25,6 +25,18 @@ RSpec.describe 'Edit record', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'shows the whole prefilled amount in the thousands on a phone' do
+    create(:earning, user: current_user, date: Date.new(2026, 5, 20), amount: 1245, platform: 'uber', trips_count: 3)
+    visit history_path
+
+    find("a[aria-label='#{I18n.t('history.index.edit.earning')}']", match: :first).click
+
+    amount = find('[data-record-form-target="amountDisplay"]')
+    expect(amount.value).to eq('1.245,00')
+    expect(amount.evaluate_script('this.scrollWidth <= this.clientWidth')).to be(true)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'saves the edited earning and lands on the month detail on a phone' do
     earning = create(:earning, user: current_user, date: Date.new(2026, 5, 20), amount: 120, platform: 'uber', trips_count: 3)
     visit history_path
