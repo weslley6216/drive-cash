@@ -5,6 +5,7 @@ RSpec.describe Notifications::Registry do
     expect(described_class::GENERATORS).to contain_exactly(
       Notifications::Generators::MaintenanceDue,
       Notifications::Generators::GoalReached,
+      Notifications::Generators::GoalMissed,
       Notifications::Generators::TankLow,
       Notifications::Generators::WeeklySummary,
       Notifications::Generators::LogReminder
@@ -13,7 +14,7 @@ RSpec.describe Notifications::Registry do
 
   it 'derives one kind per generator from its class name' do
     expect(described_class::KINDS).to contain_exactly(
-      'maintenance_due', 'goal_reached', 'tank_low', 'weekly_summary', 'log_reminder'
+      'maintenance_due', 'goal_reached', 'goal_missed', 'tank_low', 'weekly_summary', 'log_reminder'
     )
   end
 
@@ -24,7 +25,7 @@ RSpec.describe Notifications::Registry do
   end
 
   it 'orders kinds as the preferences screen shows them' do
-    expect(described_class::KINDS).to eq(%w[maintenance_due tank_low goal_reached weekly_summary log_reminder])
+    expect(described_class::KINDS).to eq(%w[maintenance_due tank_low goal_reached goal_missed weekly_summary log_reminder])
   end
 
   it 'derives the kind for a single generator' do

@@ -12,6 +12,13 @@ RSpec.describe Notifications::IconTileComponent, type: :component do
     expect(html).to include('text-red-600')
   end
 
+  it 'paints the attention palette in the amber of the prototype' do
+    html = render_tile(palette_key: :attention)
+
+    expect(html).to include('bg-amber-50')
+    expect(html).to include('text-amber-600')
+  end
+
   it 'falls back to neutral for an unknown key' do
     html = render_tile(palette_key: :unknown)
 

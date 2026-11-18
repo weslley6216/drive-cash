@@ -12,7 +12,7 @@ module GoalOutcomeVisit
     head :not_found if @goal.nil? || @goal.period_start.to_s != params[:period_start]
   end
 
-  def celebrate_real_visit
-    request.headers['X-Sec-Purpose'] != 'prefetch' && @goal.celebrate!
+  def celebrate_real_visit(outcome)
+    outcome.celebration? && request.headers['X-Sec-Purpose'] != 'prefetch' && @goal.celebrate!
   end
 end

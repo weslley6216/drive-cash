@@ -69,4 +69,15 @@ RSpec.describe Notifications::Sweeper do
 
     expect(created.map(&:kind)).to include('log_reminder')
   end
+
+  it 'notifies a missed goal once when the sweep runs twice' do
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_100,
+                  period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+    create(:earning, user: user, date: Date.new(2026, 7, 8), amount: 500)
+    described_class.new(user: user, date: Date.new(2026, 7, 13)).call
+
+    described_class.new(user: user, date: Date.new(2026, 7, 13)).call
+
+    expect(user.notifications.where(kind: 'goal_missed').count).to eq(1)
+  end
 end

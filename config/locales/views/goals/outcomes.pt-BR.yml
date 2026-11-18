@@ -57,3 +57,42 @@ pt-BR:
           raise: "Subir a meta"
           keep: "Manter %{amount}"
           view_next: "Ver meta de %{period}"
+      missed:
+        title: "Resultado da meta"
+        view_entries:
+          weekly: "Ver lançamentos da semana"
+          monthly: "Ver lançamentos do mês"
+          annual: "Ver lançamentos do ano"
+        hero:
+          percent_of_target: "da meta"
+          heading:
+            near: "Não foi dessa vez, mas foi perto"
+            closed: "Não foi dessa vez"
+          made_before:
+            weekly: "Na semana de %{period} você fez "
+            monthly: "Em %{period} você fez "
+            annual: "Em %{period} você fez "
+          short_by: ". Faltaram "
+          short_after: " para os %{target}."
+          shortfall: "Faltaram"
+        went_well:
+          title: "O que foi bem"
+          track_record:
+            weekly: "Você bateu %{hits} das últimas %{total} metas semanais."
+            monthly: "Você bateu %{hits} das últimas %{total} metas mensais."
+            annual: "Você bateu %{hits} das últimas %{total} metas anuais."
+        next_step:
+          within_reach: "%{amount} continua ao seu alcance"
+          pace:
+            one: "Para %{period}: %{per_day} por dia em %{count} dia de trabalho."
+            other: "Para %{period}: %{per_day} por dia em %{count} dias de trabalho."
+          shorter:
+            weekly: "Se a semana for mais curta, ajuste a meta sem culpa."
+            monthly: "Se o mês for mais curto, ajuste a meta sem culpa."
+            annual: "Se o ano for mais curto, ajuste a meta sem culpa."
+          current_period:
+            weekly: "esta semana"
+            monthly: "este mês"
+            annual: "este ano"
+          keep: "Manter a meta"
+          adjust: "Ajustar para %{amount}"

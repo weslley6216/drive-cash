@@ -24,9 +24,12 @@ module Goals
     end
 
     def metric_for(goal)
-      period = goal.period_start..goal.period_end
-      earned = period.sum { |day| @earnings_by_day.fetch(day, 0) }
-      spent = period.sum { |day| @expenses_by_day.fetch(day, 0) }
+      metric_in(goal, goal.period_start..goal.period_end)
+    end
+
+    def metric_in(goal, range)
+      earned = range.sum { |day| @earnings_by_day.fetch(day, 0) }
+      spent = range.sum { |day| @expenses_by_day.fetch(day, 0) }
       MetricValue.of(goal, earned: earned, spent: spent)
     end
 
