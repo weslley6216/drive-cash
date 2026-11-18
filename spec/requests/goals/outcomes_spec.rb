@@ -61,6 +61,27 @@ RSpec.describe 'Goals::Outcomes', type: :request do
         expect(open_goal.reload.celebrated_at).to be_nil
       end
 
+      it 'renders the missed outcome of an ended period without the confetti or a celebration stamp' do
+        create(:earning, user: user, date: Date.new(2026, 6, 10), amount: 900)
+
+        get goal_outcome_path(goal, '2026-06-01')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Não foi dessa vez, mas foi perto')
+        expect(response.body).not_to include('dc-confetti')
+        expect(goal.reload.celebrated_at).to be_nil
+      end
+
+      it 'responds not found for the missed goal of another user' do
+        other_goal = create(:goal, kind: 'monthly', metric: 'earnings', target_amount: 1_000,
+                                   period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+        create(:earning, user: other_goal.user, date: Date.new(2026, 6, 10), amount: 900)
+
+        get goal_outcome_path(other_goal, '2026-06-01')
+
+        expect(response).to have_http_status(:not_found)
+      end
+
       it 'responds not found for a period start that is not the goal period' do
         get goal_outcome_path(goal, '2026-05-01')
 

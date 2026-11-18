@@ -148,4 +148,22 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
     expect(render_view(confetti: true)).to include('dc-confetti')
     expect(render_view(confetti: false)).not_to include('dc-confetti')
   end
+
+  it 'renders the missed screen for a missed outcome' do
+    weekly_goal = build_stubbed(:goal, kind: 'weekly', metric: 'profit', target_amount: 1_100,
+                                       period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+    missed = Goals::Outcomes::Missed::Result.new(
+      goal: weekly_goal, target: weekly_goal.target_amount, achieved: BigDecimal('990'), percent: 90,
+      shortfall: BigDecimal('110'), near: true, worked_days: 4, per_day: BigDecimal('247.5'),
+      best_day: Goals::Outcomes::Base::BestDay.new(date: Date.new(2026, 7, 10), value: BigDecimal('270')),
+      track_record: nil, next_period: nil, next_goal: nil, adjusted_target: nil, work_days: 4,
+      per_work_day: BigDecimal('275')
+    )
+
+    html = render_view(missed)
+
+    expect(html).to include('Resultado da meta').and include('Não foi dessa vez, mas foi perto')
+    expect(html).not_to include('Meta batida')
+    expect(render_view).to include('Meta batida')
+  end
 end

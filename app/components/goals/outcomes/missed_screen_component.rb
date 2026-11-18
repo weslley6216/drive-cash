@@ -11,7 +11,7 @@ module Goals
         @outcome = outcome
       end
 
-      def title = t('goals.outcomes.missed.title')
+      def title = I18n.t('goals.outcomes.missed.title')
 
       def view_template
         div(class: 'flex-1 flex flex-col min-h-0 bg-gradient-to-br from-slate-50 to-slate-100 lg:bg-none lg:bg-slate-50') do
