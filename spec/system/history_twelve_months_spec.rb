@@ -55,6 +55,15 @@ RSpec.describe 'History twelve months', type: :system, js: true do
     expect(page).to have_text(I18n.t('history.index.count_subtitle', count: 1, period: 'maio 2026'))
   end
 
+  it 'opens a month from anywhere on its table row on a desktop screen' do
+    emulate_desktop_screen
+    visit history_path(categories: %w[insurance], range: '12m')
+
+    find('[data-month-row="desktop"]', text: 'Jan/26').click
+
+    expect(page).to have_text(I18n.t('history.index.count_subtitle', count: 1, period: 'janeiro 2026'))
+  end
+
   it 'offers the last twelve months from an empty month of one category and explains an empty window on a phone' do
     visit history_path(year: 2026, month: 5, categories: %w[documentation])
     click_link I18n.t('empty_states.history.slice.cta_twelve_months')

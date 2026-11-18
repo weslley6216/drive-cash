@@ -79,7 +79,7 @@ module History
 
     def desktop_row(row)
       entry = entry_for(row)
-      tr(class: 'relative hover:bg-slate-50 border-b border-slate-100 last:border-b-0', data: { month_row: 'desktop' }) do
+      tr(class: 'relative cursor-pointer hover:bg-slate-50 border-b border-slate-100 last:border-b-0', data: { month_row: 'desktop' }) do
         td(class: 'px-5 py-3 text-slate-500 whitespace-nowrap') { month_short(row) }
         td(class: 'px-5 py-3') do
           div(class: 'flex items-center gap-2') do
@@ -95,7 +95,7 @@ module History
     end
 
     def desktop_chevron(row)
-      link_to(path_for(row), class: 'relative after:absolute after:inset-0 inline-flex text-slate-400', aria: { label: month_title(row) }) do
+      link_to(path_for(row), class: 'after:absolute after:inset-0 inline-flex text-slate-400', aria: { label: month_title(row) }) do
         render PhlexIcons::Lucide::ChevronRight.new(class: 'w-3.5 h-3.5')
       end
     end
