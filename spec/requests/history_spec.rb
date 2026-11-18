@@ -5,6 +5,10 @@ RSpec.describe 'History', type: :request do
 
   before { login_as(current_user) }
 
+  def feed_text
+    Nokogiri::HTML(response.body).at_css('#history-feed').text
+  end
+
   describe 'GET /history' do
     it 'returns 200' do
       get history_path
@@ -48,8 +52,8 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025, types: %w[earnings])
 
-      expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
-      expect(response.body).not_to include('Posto Shell')
+      expect(feed_text).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).not_to include('Posto Shell')
     end
 
     it 'filters by unpaid expenses only' do
@@ -59,9 +63,9 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025, types: %w[expenses], unpaid: '1')
 
-      expect(response.body).to include('Lanchonete')
-      expect(response.body).not_to include('Posto X')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).to include('Lanchonete')
+      expect(feed_text).not_to include('Posto X')
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
     it 'filters by an expense category' do
@@ -71,9 +75,9 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025, month: 6, categories: %w[fuel])
 
-      expect(response.body).to include('Posto Shell')
-      expect(response.body).not_to include('Lanchonete')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).to include('Posto Shell')
+      expect(feed_text).not_to include('Lanchonete')
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
     it 'narrows a category to the marked vendor, ignoring the same vendor of another user' do
@@ -83,9 +87,9 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025, month: 6, categories: %w[fuel], vendors: { fuel: ['Posto Shell'] })
 
-      expect(response.body).to include('Posto Shell')
-      expect(response.body).not_to include('Ipiranga')
-      expect(response.body).not_to include('999,00')
+      expect(feed_text).to include('Posto Shell')
+      expect(feed_text).not_to include('Ipiranga')
+      expect(feed_text).not_to include('999,00')
     end
 
     it 'lists unpaid expenses in the default feed and sums them into the expenses tile only' do
@@ -140,7 +144,7 @@ RSpec.describe 'History', type: :request do
 
       expect(response.body).to include('200,00')
       expect(response.body).to include('80,00')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
     it 'renders the FAB positioned above the bottom nav' do
