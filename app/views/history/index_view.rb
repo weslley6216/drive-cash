@@ -53,7 +53,8 @@ module History
               periods:        @periods,
               variant:        :popover,
               action_path:    history_path,
-              trigger_icon:   PhlexIcons::Lucide::Calendar
+              trigger_icon:   PhlexIcons::Lucide::Calendar,
+              label:          (t('filter_component.last_twelve_months') if @slice.twelve_months?)
             )
             new_record_link
           end
@@ -74,7 +75,7 @@ module History
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
         div(class: 'relative space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
           div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
-          div(data: { controller: 'history-filter-panel' }) do
+          div(class: 'lg:flex-1', data: { controller: 'history-filter-panel' }) do
             render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
             render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
           end
@@ -84,6 +85,7 @@ module History
     end
 
     def summary_section
+      return twelve_months_summary if @slice.twelve_months?
       return if no_result?
 
       slice_summary = @feed[:slice_summary]
@@ -91,10 +93,17 @@ module History
       return render History::PeriodSummaryComponent.new(summary: slice_summary) if slice_summary[:kind] == :mixed
 
       div(class: class_names('flex flex-col gap-4', @feed[:trend] ? 'lg:grid lg:grid-cols-[1fr_1.4fr]' : 'lg:grid lg:grid-cols-1')) do
-        render History::SliceTrendComponent.new(trend: @feed[:trend]) if @feed[:trend]
+        render History::SliceTrendComponent.new(trend: @feed[:trend], slice: @slice, query: @query) if @feed[:trend]
         render History::SliceSummaryComponent.new(summary: slice_summary)
         no_trend_hint
       end
+    end
+
+    def twelve_months_summary
+      data = @feed[:twelve_months]
+      return unless data[:rows].any?
+
+      render History::SliceYearComponent.new(year: data, slice: @slice, query: @query)
     end
 
     def no_trend_hint
@@ -104,6 +113,8 @@ module History
     end
 
     def feed_section
+      return twelve_months_feed if @slice.twelve_months?
+
       if @feed[:groups].empty?
         empty_state
       else
@@ -121,6 +132,24 @@ module History
       end
     end
 
+    def twelve_months_feed
+      data = @feed[:twelve_months]
+      return render History::MonthRowsComponent.new(rows: data[:rows], slice: @slice, query: @query) if data[:rows].any?
+
+      div(class: CARD) { render twelve_months_empty_state }
+    end
+
+    def twelve_months_empty_state
+      EmptyStateComponent.new(
+        icon:        PhlexIcons::Lucide::SlidersHorizontal,
+        title:       t('empty_states.history.twelve_months.title'),
+        description: t('empty_states.history.twelve_months.description', slice: History::SliceTrail.new(@slice).sentence),
+        cta_label:   t('empty_states.history.cta'),
+        cta_path:    history_path(year: @year, month: @month),
+        cta_icon:    PhlexIcons::Lucide::X
+      )
+    end
+
     def load_more_button
       return unless @feed[:next_page]
 
@@ -132,6 +161,7 @@ module History
     end
 
     def period_label
+      return t('history.index.twelve_months.period') if @slice.twelve_months?
       return @year.to_s if @month.blank?
 
       "#{I18n.t('date.month_names')[@month]} #{@year}"
@@ -172,6 +202,8 @@ module History
     end
 
     def slice_empty_state
+      return single_series_empty_state if @slice.single_series?
+
       EmptyStateComponent.new(
         icon:        PhlexIcons::Lucide::SlidersHorizontal,
         title:       slice_empty_title,
@@ -179,6 +211,19 @@ module History
         cta_label:   t('empty_states.history.cta'),
         cta_path:    history_path(year: @year, month: @month),
         cta_icon:    PhlexIcons::Lucide::X
+      )
+    end
+
+    def single_series_empty_state
+      EmptyStateComponent.new(
+        icon:            PhlexIcons::Lucide::ChartColumn,
+        title:           slice_empty_title,
+        description:     t('empty_states.history.slice.description', slice: History::SliceTrail.new(@slice).sentence, period: slice_empty_period),
+        cta_label:       t('empty_states.history.slice.cta_twelve_months'),
+        cta_path:        history_path(**@slice.with_twelve_months.to_params),
+        cta_icon:        PhlexIcons::Lucide::ChartColumn,
+        secondary_label: t('empty_states.history.cta'),
+        secondary_path:  history_path(year: @year, month: @month)
       )
     end
 

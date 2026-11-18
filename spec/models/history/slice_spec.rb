@@ -125,6 +125,40 @@ RSpec.describe History::Slice do
     end
   end
 
+  describe 'range' do
+    it 'keeps the twelve month range over a single series and carries it in the params' do
+      slice = described_class.new(categories: %w[insurance], range: '12m')
+
+      expect(slice).to be_twelve_months
+      expect(slice.to_params).to eq(types: %w[expenses], categories: %w[insurance], range: '12m')
+    end
+
+    it 'drops the range when the slice is not a single series or the value is unknown' do
+      expect(described_class.new(categories: %w[fuel car_wash], range: '12m')).not_to be_twelve_months
+      expect(described_class.new(range: '12m')).not_to be_twelve_months
+      expect(described_class.new(platforms: %w[uber], range: '6m')).not_to be_twelve_months
+    end
+
+    it 'reads the range from the request params' do
+      expect(described_class.from_params('platforms' => %w[uber], 'range' => '12m')).to be_twelve_months
+    end
+
+    it 'switches between the month and the twelve month modes keeping the slice' do
+      slice = described_class.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] })
+
+      expect(slice.with_twelve_months.to_params).to eq(types: %w[expenses], categories: %w[fuel],
+                                                       vendors: { 'fuel' => ['Posto Orense'] }, range: '12m')
+      expect(slice.with_twelve_months.without_range.to_params).to eq(slice.to_params)
+    end
+
+    it 'loses the range once removing a level breaks the single series' do
+      slice = described_class.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }, range: '12m')
+
+      expect(slice.without_vendors('fuel')).to be_twelve_months
+      expect(slice.without_category('fuel')).not_to be_twelve_months
+    end
+  end
+
   describe 'removing a level' do
     let(:slice) do
       described_class.new(categories: %w[fuel car_wash], platforms: %w[uber nine_nine], unpaid: '1',

@@ -13,6 +13,8 @@ module History
     end
 
     def call
+      return twelve_months_feed if slice.twelve_months?
+
       items = paged_items
       grouped = items.group_by(&:date).sort_by { |date, _| date }.reverse
       groups = grouped.map { |date, day_items| build_group(date, day_items) }
@@ -22,7 +24,7 @@ module History
         summary:       build_summary,
         total_count:   total_count,
         next_page:     next_page(items.size),
-        facets:        SliceFacets.new(user: @user, year: year, month: month, query: query).call,
+        facets:        facets,
         slice_summary: (SliceSummary.new(slice: slice, user: @user, year: year, month: month).call if slice.filtering?),
         trend:         SliceTrend.new(slice: slice, user: @user, year: year, month: month).call
       }
@@ -31,6 +33,16 @@ module History
     private
 
     attr_reader :year, :month, :query, :slice, :focus_day, :page
+
+    def twelve_months_feed
+      data = SliceYear.new(slice: slice, user: @user, query: query).call
+
+      { twelve_months: data, total_count: data[:count], groups: [], next_page: nil, facets: facets }
+    end
+
+    def facets
+      SliceFacets.new(user: @user, year: year, month: month, query: query).call
+    end
 
     def paged_items
       requested = page * PER_PAGE

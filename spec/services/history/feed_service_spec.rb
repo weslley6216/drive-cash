@@ -357,6 +357,24 @@ RSpec.describe History::FeedService do
       end
     end
 
+    context 'in the twelve month mode' do
+      before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
+
+      it 'returns the twelve month breakdown and its count instead of the day groups' do
+        create(:expense, user: user, date: Date.new(2025, 9, 10), amount: 189.9, category: 'insurance', paid: true)
+        create(:expense, user: user, date: Date.new(2026, 5, 10), amount: 214.3, category: 'insurance', paid: true)
+        slice = History::Slice.new(categories: %w[insurance], range: '12m')
+
+        result = described_class.new(year: 2026, slice: slice, user: user).call
+
+        expect(result[:twelve_months]).to include(total: 404.2, count: 2)
+        expect(result[:total_count]).to eq(2)
+        expect(result[:groups]).to eq([])
+        expect(result[:next_page]).to be_nil
+        expect(result[:facets][:categories]).to eq('insurance' => { count: 1, total: 214.3 })
+      end
+    end
+
     context 'with query parameter' do
       it 'delegates matching to RecordSearch for both earnings and expenses' do
         match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)

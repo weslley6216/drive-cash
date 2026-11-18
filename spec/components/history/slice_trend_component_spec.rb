@@ -7,7 +7,9 @@ RSpec.describe History::SliceTrendComponent, type: :component do
   end
   let(:trend) { { kind: :expenses, months: months, change: 25.0, in_progress: false } }
 
-  def render_trend(overrides = {}) = Capybara.string(view_context.render(described_class.new(trend: trend.merge(overrides))))
+  def render_trend(overrides = {})
+    Capybara.string(view_context.render(described_class.new(trend: trend.merge(overrides), slice: History::Slice.new(categories: %w[fuel]), query: nil)))
+  end
 
   let(:page) { render_trend }
 
@@ -46,5 +48,9 @@ RSpec.describe History::SliceTrendComponent, type: :component do
 
   it 'leaves the comparison out when the previous month had nothing' do
     expect(render_trend(change: nil)).to have_no_css('[data-trend-change]')
+  end
+
+  it 'puts the mode toggle in the header on phones only' do
+    expect(page.find('[data-slice-summary="trend"] .lg\:hidden')).to have_link(I18n.t('history.index.mode.twelve_months'))
   end
 end

@@ -1,6 +1,7 @@
 module History
   class Slice
     TYPES = %w[earnings expenses].freeze
+    RANGES = %w[12m].freeze
     NO_VENDOR = '__none__'.freeze
     PRESETS = {
       'all'      => {},
@@ -9,24 +10,25 @@ module History
       'unpaid'   => { types: %w[expenses], unpaid: '1' }
     }.freeze
 
-    attr_reader :types, :categories, :platforms, :vendors
+    attr_reader :types, :categories, :platforms, :vendors, :range
 
     def self.from_params(params)
       params = params.with_indifferent_access
       new(types: params[:types], unpaid: params[:unpaid], categories: params[:categories],
-          platforms: params[:platforms], vendors: params[:vendors])
+          platforms: params[:platforms], vendors: params[:vendors], range: params[:range])
     end
 
     def self.preset(key)
       new(**PRESETS.fetch(key, {}))
     end
 
-    def initialize(types: [], unpaid: nil, categories: [], platforms: [], vendors: {})
+    def initialize(types: [], unpaid: nil, categories: [], platforms: [], vendors: {}, range: nil)
       @categories = sanitize_list(categories, Expense.categories.keys)
       @platforms = sanitize_list(platforms, Earning.platforms.keys)
       @unpaid = %w[1 true].include?(unpaid.to_s)
       @types = sanitize_types(types)
       @vendors = sanitize_vendors(vendors)
+      @range = sanitize_range(range)
     end
 
     def unpaid?
@@ -54,6 +56,10 @@ module History
         (@platforms.one? && @categories.empty? && !include_expenses?)
     end
 
+    def twelve_months?
+      @range == '12m'
+    end
+
     def active_preset
       return nil if filtering?
 
@@ -67,6 +73,7 @@ module History
       params[:categories] = @categories if @categories.any?
       params[:platforms] = @platforms if @platforms.any?
       params[:vendors] = @vendors if @vendors.any?
+      params[:range] = @range if @range
       params
     end
 
@@ -84,6 +91,14 @@ module History
 
     def without_unpaid
       self.class.from_params(to_params.except(:unpaid))
+    end
+
+    def with_twelve_months
+      self.class.from_params(to_params.merge(range: '12m'))
+    end
+
+    def without_range
+      self.class.from_params(to_params.except(:range))
     end
 
     private
@@ -106,6 +121,10 @@ module History
         sanitized = Array(names).map { |name| name.to_s.strip }.reject(&:blank?).uniq
         [category.to_s, sanitized] if sanitized.any?
       end.to_h
+    end
+
+    def sanitize_range(range)
+      range.to_s if RANGES.include?(range.to_s) && single_series?
     end
 
     def preset_matches?(key)

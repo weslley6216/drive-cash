@@ -13,10 +13,17 @@ module History
         filters_button
         @slice.filtering? ? pills : Slice::PRESETS.each_key { |key| chip(key) }
         clear_link if @slice.filtering?
+        mode_toggle
       end
     end
 
     private
+
+    def mode_toggle
+      return unless @slice.single_series? && (@month.present? || @slice.twelve_months?)
+
+      div(class: 'hidden lg:block ml-auto -mr-0.5') { render ModeToggleComponent.new(slice: @slice, query: @query) }
+    end
 
     def filters_button
       button(
