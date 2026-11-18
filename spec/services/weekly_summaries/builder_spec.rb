@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe WeeklySummaries::Builder do
   let(:user) { create(:user) }
-  let(:week) { Date.new(2026, 7, 6)..Date.new(2026, 7, 12) }
+  let(:week) { Calendars::Week.containing(Date.new(2026, 7, 6)) }
 
   describe '.for' do
-    it 'normalizes any date to the monday that starts its week' do
+    it 'normalizes any date to the week that contains it' do
       midweek_summary = described_class.for(user: user, week_start: '2026-07-09').call
       sunday_summary = described_class.for(user: user, week_start: '2026-07-12').call
 
@@ -15,6 +15,15 @@ RSpec.describe WeeklySummaries::Builder do
 
     it 'raises not found for a malformed week start' do
       expect { described_class.for(user: user, week_start: 'abc') }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'raises not found for a future week and opens the current one' do
+      travel_to Time.zone.local(2026, 7, 14, 10, 0)
+
+      current_summary = described_class.for(user: user, week_start: '2026-07-13').call
+
+      expect(current_summary.week).to eq(Calendars::Week.containing(Date.new(2026, 7, 13)))
+      expect { described_class.for(user: user, week_start: '2026-07-20') }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -31,6 +40,18 @@ RSpec.describe WeeklySummaries::Builder do
       expect(summary.profit).to eq(750)
       expect(summary.trips).to eq(25)
       expect(summary.days_worked).to eq(2)
+    end
+
+    it 'sums earnings and paid expenses of the week' do
+      create(:earning, user: user, date: Date.new(2026, 7, 6), amount: 300, trips_count: 10)
+      create(:earning, user: user, date: Date.new(2026, 7, 10), amount: 600, trips_count: 12)
+      create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 150, paid: true)
+      create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 999, paid: false)
+
+      summary = described_class.new(user: user, week: week).call
+
+      expect(summary.earnings_total).to eq(900)
+      expect(summary.expenses_total).to eq(150)
     end
 
     it 'ignores records outside the week' do
@@ -109,14 +130,23 @@ RSpec.describe WeeklySummaries::Builder do
       expect(summary.per_km).to be_nil
     end
 
-    it 'reports the paid category with the highest total' do
+    it 'ranks the three paid categories with the highest totals' do
       create(:expense, user: user, date: Date.new(2026, 7, 6), amount: 200, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 112, category: 'fuel', paid: true)
       create(:expense, user: user, date: Date.new(2026, 7, 9), amount: 80, category: 'meals', paid: true)
+      create(:expense, user: user, date: Date.new(2026, 7, 9), amount: 64, category: 'toll', paid: true)
+      create(:expense, user: user, date: Date.new(2026, 7, 10), amount: 10, category: 'parking', paid: true)
+      create(:expense, user: user, date: Date.new(2026, 7, 10), amount: 999, category: 'maintenance', paid: false)
 
       summary = described_class.new(user: user, week: week).call
 
-      expect(summary.top_category).to eq(WeeklySummaries::Builder::TopCategory.new(key: 'fuel', amount: 312))
+      expect(summary.top_categories).to eq(
+        [
+          WeeklySummaries::Builder::TopCategory.new(key: 'fuel', amount: 312),
+          WeeklySummaries::Builder::TopCategory.new(key: 'meals', amount: 80),
+          WeeklySummaries::Builder::TopCategory.new(key: 'toll', amount: 64)
+        ]
+      )
     end
 
     it 'breaks category ties by enum order' do
@@ -125,19 +155,88 @@ RSpec.describe WeeklySummaries::Builder do
 
       summary = described_class.new(user: user, week: week).call
 
-      expect(summary.top_category.key).to eq('fuel')
+      expect(summary.top_categories.map(&:key)).to eq(%w[fuel maintenance])
+    end
+
+    context 'with a weekly goal' do
+      before do
+        create(:earning, user: user, date: Date.new(2026, 7, 6), amount: 900, trips_count: 10)
+        create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 150, paid: true)
+      end
+
+      it 'measures a profit goal below its target' do
+        goal = create(:goal, user: user, kind: 'weekly', metric: 'profit', target_amount: 1_000,
+                             period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+
+        summary = described_class.new(user: user, week: week).call
+
+        expect(summary.goal).to have_attributes(goal: goal, achieved: 750, percent: 75, hit: false)
+      end
+
+      it 'marks a goal reached from its target on' do
+        create(:goal, user: user, kind: 'weekly', metric: 'profit', target_amount: 700,
+                      period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+
+        summary = described_class.new(user: user, week: week).call
+
+        expect(summary.goal).to have_attributes(achieved: 750, percent: 107, hit: true)
+      end
+
+      it 'measures an earnings goal by the earnings only' do
+        create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000,
+                      period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+
+        summary = described_class.new(user: user, week: week).call
+
+        expect(summary.goal).to have_attributes(achieved: 900, percent: 90, hit: false)
+      end
+
+      it 'has no goal without a weekly goal starting on the monday' do
+        create(:goal, user: user, kind: 'monthly', period_start: Date.new(2026, 7, 1), period_end: Date.new(2026, 7, 31))
+        create(:goal, user: user, kind: 'weekly', period_start: Date.new(2026, 7, 13), period_end: Date.new(2026, 7, 19))
+        create(:goal, kind: 'weekly', period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+
+        summary = described_class.new(user: user, week: week).call
+
+        expect(summary.goal).to be_nil
+      end
+    end
+
+    it 'lists the days without any earning or expense, paid or not' do
+      create(:earning, user: user, date: Date.new(2026, 7, 6), amount: 300, trips_count: 10)
+      create(:earning, user: user, date: Date.new(2026, 7, 10), amount: 500, trips_count: 12)
+      create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 999, paid: false)
+
+      summary = described_class.new(user: user, week: week).call
+
+      expect(summary.empty_days).to eq([Date.new(2026, 7, 7), Date.new(2026, 7, 9), Date.new(2026, 7, 11), Date.new(2026, 7, 12)])
+      expect(summary.blank_week).to be(false)
+    end
+
+    it 'leaves the days after today out of the empty days of the current week' do
+      travel_to Time.zone.local(2026, 7, 8, 10, 0)
+      create(:earning, user: user, date: Date.new(2026, 7, 6), amount: 300, trips_count: 10)
+
+      summary = described_class.new(user: user, week: week).call
+
+      expect(summary.empty_days).to eq([Date.new(2026, 7, 7), Date.new(2026, 7, 8)])
     end
 
     it 'returns zeros and no highlights for an empty week' do
       summary = described_class.new(user: user, week: week).call
 
       expect(summary.profit).to eq(0)
+      expect(summary.earnings_total).to eq(0)
+      expect(summary.expenses_total).to eq(0)
       expect(summary.trips).to eq(0)
       expect(summary.days_worked).to eq(0)
       expect(summary.daily_profits).to eq([0, 0, 0, 0, 0, 0, 0])
       expect(summary.best_day_index).to be_nil
-      expect(summary.top_category).to be_nil
+      expect(summary.top_categories).to eq([])
+      expect(summary.goal).to be_nil
       expect(summary.per_km).to be_nil
+      expect(summary.empty_days).to eq(week.range.to_a)
+      expect(summary.blank_week).to be(true)
     end
   end
 end

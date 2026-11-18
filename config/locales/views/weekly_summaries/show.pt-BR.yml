@@ -3,17 +3,25 @@ pt-BR:
     show:
       title: Sua semana
       back: Voltar para notificações
-      range:
-        same_month: "%{start_day} a %{end_day} de %{month}"
-        cross_month: "%{start_day} de %{start_month} a %{end_day} de %{end_month}"
-        cross_year: "%{start_day} de %{start_month} de %{start_year} a %{end_day} de %{end_month} de %{end_year}"
       profit: Lucro líquido
+      earnings: receitas
+      expenses: despesas
       trips: Corridas
       days_worked: Dias rodados
       per_km: R$ / km
       empty_value: "—"
+      previous_week: Semana anterior
+      next_week: Próxima semana
       daily_title: Lucro por dia
       best_day: "%{day} foi o melhor dia:"
-      top_expense: Maior gasto
-      cta: Ver análise completa
+      empty_days: "%{days} sem lançamentos."
+      blank_week: Nenhum lançamento nesta semana.
+      goal:
+        title: Meta da semana
+        progress: "%{achieved} de %{target}"
+        link: Ver resultado da meta
+      top_categories:
+        title: Onde foi o dinheiro
       weekdays: [Domingo, Segunda, Terça, Quarta, Quinta, Sexta, Sábado]
+      cta: Ver lançamentos da semana
+      analysis_link: "Análise de %{month} →"

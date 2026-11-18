@@ -24,6 +24,19 @@ RSpec.describe Goals::DailyTotals do
       expect(totals.metric_for(goal)).to eq(300)
     end
 
+    it 'sums earnings and paid expenses of a range apart' do
+      create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 500)
+      create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 200, paid: true)
+      create(:expense, user: user, date: Date.new(2026, 6, 6), amount: 999, paid: false)
+      june = Date.new(2026, 6, 1)..Date.new(2026, 6, 30)
+
+      totals = described_class.for(user: user, range: june)
+
+      expect(totals.earned_in(june)).to eq(500)
+      expect(totals.spent_in(june)).to eq(200)
+      expect(totals.profit_in(june)).to eq(300)
+    end
+
     it 'ignores unpaid expenses for a profit goal' do
       goal = build(:goal, metric: 'profit', period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
       create(:earning, user: user, date: Date.new(2026, 6, 5), amount: 500)

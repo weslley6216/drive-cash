@@ -340,4 +340,62 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include(I18n.t('history.index.gap_day.title'))
     end
   end
+
+  describe 'GET /history with week' do
+    before do
+      create(:earning, user: current_user, date: Date.new(2025, 6, 29), amount: 999, platform: 'uber')
+      create(:earning, user: current_user, date: Date.new(2025, 6, 30), amount: 200, platform: 'uber')
+      create(:expense, user: current_user, date: Date.new(2025, 7, 5), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:earning, user: current_user, date: Date.new(2025, 7, 7), amount: 999, platform: 'uber')
+    end
+
+    it 'lists the monday to sunday records of a week across two months' do
+      get history_path(week: '2025-07-02')
+
+      expect(response.body).to include('day-2025-06-30')
+      expect(response.body).to include('day-2025-07-05')
+      expect(response.body).not_to include('day-2025-06-29')
+      expect(response.body).not_to include('day-2025-07-07')
+    end
+
+    it 'shows the week chip that removes the week back to the month of the monday' do
+      get history_path(week: '2025-07-02')
+
+      page_html = Capybara.string(response.body)
+      expect(page_html).to have_text('Semana de 30 de junho a 6 de julho')
+      expect(page_html).to have_css("a[aria-label='Remover filtro da semana'][href='/history?month=6&year=2025']")
+    end
+
+    it 'swaps the search and the filters for the week chip' do
+      get history_path(year: 2025, month: 6)
+      month_html = Capybara.string(response.body)
+
+      get history_path(week: '2025-07-02', q: 'nada', types: %w[earnings])
+      week_html = Capybara.string(response.body)
+
+      expect(month_html).to have_field('q')
+      expect(week_html).to have_no_field('q')
+      expect(week_html).to have_text('Posto Shell')
+    end
+
+    it 'keeps the week on the next page' do
+      create_list(:earning, 25, user: current_user, date: Date.new(2025, 7, 3), platform: 'uber')
+      create_list(:earning, 25, user: current_user, date: Date.new(2025, 7, 2), platform: 'uber')
+
+      get history_path(week: '2025-07-02')
+
+      expect(response.body).to match(/href="[^"]*page=2[^"]*week=2025-06-30/)
+    end
+
+    it 'discards a malformed or future week' do
+      get history_path(week: 'ontem')
+      malformed_body = response.body
+
+      get history_path(week: (Date.current + 7).iso8601)
+
+      expect(malformed_body).not_to include('Remover filtro da semana')
+      expect(response.body).not_to include('Remover filtro da semana')
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end

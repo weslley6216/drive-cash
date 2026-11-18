@@ -1,13 +1,15 @@
 module WeeklySummaries
   class Builder
-    Summary = Data.define(:week, :profit, :trips, :days_worked, :per_km, :daily_profits, :best_day_index, :top_category)
+    Summary = Data.define(:week, :profit, :earnings_total, :expenses_total, :trips, :days_worked, :per_km,
+                          :daily_profits, :best_day_index, :goal, :top_categories, :empty_days, :blank_week)
     TopCategory = Data.define(:key, :amount)
+    GoalProgress = Data.define(:goal, :achieved, :percent, :hit)
 
     def self.for(user:, week_start:)
-      monday = Date.iso8601(week_start).beginning_of_week
-      new(user: user, week: monday..monday.end_of_week)
-    rescue Date::Error
-      raise ActiveRecord::RecordNotFound
+      week = Calendars::Week.parse(week_start)
+      raise ActiveRecord::RecordNotFound if week.nil? || week.future?
+
+      new(user: user, week: week)
     end
 
     def initialize(user:, week:)
@@ -19,17 +21,22 @@ module WeeklySummaries
       Summary.new(
         week:           @week,
         profit:         profit,
+        earnings_total: earnings_total,
+        expenses_total: expenses_total,
         trips:          trips,
         days_worked:    days_worked,
         per_km:         per_km,
         daily_profits:  daily_profits,
         best_day_index: best_day_index,
-        top_category:   top_category
+        goal:           goal,
+        top_categories: top_categories,
+        empty_days:     empty_days,
+        blank_week:     blank_week
       )
     end
 
     def profit
-      @profit ||= earnings.sum(:amount) - paid_expenses.sum(:amount)
+      @profit ||= totals.profit_in(range)
     end
 
     def trips
@@ -37,23 +44,34 @@ module WeeklySummaries
     end
 
     def days_worked
-      @days_worked ||= earnings.distinct.count(:date)
+      @days_worked ||= totals.worked_days_in(range)
     end
 
     private
 
+    def range
+      @week.range
+    end
+
+    def totals
+      @totals ||= Goals::DailyTotals.for(user: @user, range: range)
+    end
+
+    def earnings_total
+      @earnings_total ||= totals.earned_in(range)
+    end
+
+    def expenses_total
+      @expenses_total ||= totals.spent_in(range)
+    end
+
     def per_km
-      km = Dashboard::KmDriven.new(user: @user, range: @week).call
+      km = Dashboard::KmDriven.new(user: @user, range: range).call
       km ? profit / km : nil
     end
 
     def daily_profits
-      @daily_profits ||= begin
-        earnings_by_day = earnings.group(:date).sum(:amount)
-        expenses_by_day = paid_expenses.group(:date).sum(:amount)
-
-        @week.to_a.map { |date| earnings_by_day.fetch(date, 0) - expenses_by_day.fetch(date, 0) }
-      end
+      @daily_profits ||= range.map { |day| totals.profit_in(day..day) }
     end
 
     def best_day_index
@@ -71,28 +89,48 @@ module WeeklySummaries
       best_index
     end
 
-    def top_category
-      totals = paid_expenses.group(:category).sum(:amount)
-      best_key = nil
-      best_amount = 0
-
-      Expense.categories.each_key do |category|
-        amount = totals[category]
-        next unless amount && amount > best_amount
-
-        best_key = category
-        best_amount = amount
+    def goal
+      @goal ||= begin
+        record = @user.goals.kind_weekly.find_by(period_start: @week.monday)
+        record && goal_progress(record)
       end
+    end
 
-      best_key ? TopCategory.new(key: best_key, amount: best_amount) : nil
+    def goal_progress(record)
+      achieved = totals.metric_for(record)
+      percent = Goals::Shortfall.new(target: record.target_amount, achieved: achieved).percent
+
+      GoalProgress.new(goal: record, achieved: achieved, percent: percent, hit: achieved >= record.target_amount)
+    end
+
+    def top_categories
+      category_order = Expense.categories.keys
+
+      paid_expenses.group(:category).sum(:amount)
+        .sort_by { |key, amount| [-amount, category_order.index(key)] }
+        .first(3)
+        .map { |key, amount| TopCategory.new(key: key, amount: amount) }
+    end
+
+    def recorded_days
+      @recorded_days ||= @user.earnings.where(date: range).distinct.pluck(:date) |
+                          @user.expenses.where(date: range).distinct.pluck(:date)
+    end
+
+    def empty_days
+      range.select { |day| day <= Date.current && !recorded_days.include?(day) }
+    end
+
+    def blank_week
+      recorded_days.empty?
     end
 
     def earnings
-      @user.earnings.where(date: @week)
+      @user.earnings.where(date: range)
     end
 
     def paid_expenses
-      @user.expenses.paid_only.where(date: @week)
+      @user.expenses.paid_only.where(date: range)
     end
   end
 end

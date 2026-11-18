@@ -22,10 +22,10 @@ module Notifications
       private
 
       def week
-        @week ||= (@context.date - 1.week).all_week
+        @week ||= Calendars::Week.containing(@context.date - 1.week)
       end
 
-      def week_start = week.first.to_s
+      def week_start = week.to_param
 
       def builder
         @builder ||= WeeklySummaries::Builder.new(user: @context.user, week: week)

@@ -2,12 +2,13 @@ module History
   class FeedService
     PER_PAGE = 50
 
-    def initialize(year: Date.current.year, month: nil, query: nil, slice: Slice.new, focus_day: nil, page: 1, user: Current.user)
+    def initialize(year: Date.current.year, month: nil, query: nil, slice: Slice.new, focus_day: nil, week: nil, page: 1, user: Current.user)
       @year = year
       @month = month
       @query = query
       @slice = slice
       @focus_day = focus_day
+      @week = week
       @page = page
       @user = user
     end
@@ -82,11 +83,15 @@ module History
     end
 
     def filtered_earnings
-      search.earnings(slice_query.earnings(@user.earnings.in_period(year, month)))
+      search.earnings(slice_query.earnings(in_period(@user.earnings)))
     end
 
     def filtered_expenses
-      search.expenses(slice_query.expenses(@user.expenses.in_period(year, month)))
+      search.expenses(slice_query.expenses(in_period(@user.expenses)))
+    end
+
+    def in_period(relation)
+      @week ? relation.where(date: @week.range) : relation.in_period(year, month)
     end
 
     def slice_query
@@ -98,17 +103,17 @@ module History
     end
 
     def summary_earnings_scope
-      @user.earnings.in_period(year, month)
+      in_period(@user.earnings)
     end
 
     def summary_expenses_scope
-      @user.expenses.in_period(year, month)
+      in_period(@user.expenses)
     end
 
     def build_summary
       earnings_total = summary_earnings_scope.sum(:amount)
       expenses_total = summary_expenses_scope.sum(:amount)
-      paid_expenses_total = @user.expenses.paid_in_period(year, month).sum(:amount)
+      paid_expenses_total = in_period(@user.expenses.paid_only).sum(:amount)
 
       {
         earnings: earnings_total,

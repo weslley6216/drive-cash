@@ -2,14 +2,16 @@ module History
   class IndexView < ApplicationComponent
     include CardStyles
     include TopbarStyles
+    include WeekRangeLabel
 
-    def initialize(feed:, year:, month:, query:, slice:, periods:)
+    def initialize(feed:, year:, month:, query:, slice:, periods:, week: nil)
       @feed = feed
       @year = year
       @month = month
       @query = query
       @slice = slice
       @periods = periods
+      @week = week
     end
 
     def view_template
@@ -55,7 +57,7 @@ module History
               action_path:    history_path,
               trigger_icon:   PhlexIcons::Lucide::Calendar,
               label:          (t('filter_component.last_twelve_months') if @slice.twelve_months?)
-            )
+            ) unless @week
             new_record_link
           end
         end
@@ -74,13 +76,30 @@ module History
     def filter_toolbar
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
         div(class: 'relative space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
-          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
-          div(class: 'lg:flex-1', data: { controller: 'history-filter-panel' }) do
-            render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
-            render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
-          end
+          @week ? week_chip : search_and_filters
         end
         summary_section
+      end
+    end
+
+    def search_and_filters
+      div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
+      div(class: 'lg:flex-1', data: { controller: 'history-filter-panel' }) do
+        render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
+        render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
+      end
+    end
+
+    def week_chip
+      span(class: 'self-start w-fit flex items-center gap-1 pl-2.5 pr-1.5 py-1.5 rounded-full lg:rounded-lg text-xs ' \
+                  'font-semibold whitespace-nowrap bg-blue-50 border border-blue-200 text-blue-700') do
+        plain t('history.index.week_chip', range: week_range_text(@week))
+        link_to(history_path(year: @week.monday.year, month: @week.monday.month),
+                class: 'flex items-center py-4 -my-4 pl-2.5 -ml-2.5 pr-3.5 -mr-3.5',
+                data:  { turbo_frame: '_top' },
+                aria:  { label: t('history.index.week_chip_remove') }) do
+          render PhlexIcons::Lucide::X.new(class: 'w-3 h-3', 'stroke-width': '2.6')
+        end
       end
     end
 
@@ -161,6 +180,7 @@ module History
     end
 
     def period_label
+      return t('history.index.week_period', range: week_range_text(@week)) if @week
       return t('history.index.twelve_months.period') if @slice.twelve_months?
       return @year.to_s if @month.blank?
 
@@ -258,7 +278,7 @@ module History
     end
 
     def filter_context
-      { year: @year, month: @month, q: @query }.compact.merge(@slice.to_params)
+      { year: @year, month: @month, q: @query, week: @week&.to_param }.compact.merge(@slice.to_params)
     end
   end
 end

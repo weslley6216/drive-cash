@@ -2,6 +2,10 @@ require 'rails_helper'
 
 RSpec.describe 'Weekly summary', type: :system, js: true do
   let(:current_user) { create(:user) }
+  let(:goal) do
+    create(:goal, user: current_user, kind: 'weekly', metric: 'profit', target_amount: 1_100,
+                  period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+  end
 
   before do
     travel_to Time.zone.local(2026, 7, 14, 10, 0)
@@ -17,16 +21,66 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
   end
 
   it 'opens the week from the weekly summary notification on a phone' do
+    goal
+
     visit notifications_path
 
     click_on I18n.t('notifications.kinds.weekly_summary.title')
 
     expect(page).to have_current_path('/weekly_summaries/2026-07-06')
-    expect(page).to have_text('Sua semana')
     expect(page).to have_text('6 a 12 de julho')
-    expect(page).to have_text('Lucro por dia')
-    expect(page).to have_text('Maior gasto')
+    expect(page).to have_text('+R$ 1.000,00 receitas')
+    expect(page).to have_text('Meta da semana')
+    expect(page).to have_text('Sábado e domingo sem lançamentos.')
+    expect(page).to have_text('Onde foi o dinheiro')
     expect(page).to fit_the_phone_width
+  end
+
+  it 'walks back and forth between weeks on a phone' do
+    visit weekly_summary_path('2026-07-13')
+
+    expect(page).to have_css("button[disabled][aria-label='Próxima semana']")
+
+    find("a[aria-label='Semana anterior']").click
+
+    expect(page).to have_current_path('/weekly_summaries/2026-07-06')
+    expect(page).to have_text('6 a 12 de julho')
+
+    find("a[aria-label='Próxima semana']").click
+
+    expect(page).to have_current_path('/weekly_summaries/2026-07-13')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens the goal outcome from the goal block on a phone' do
+    goal
+
+    visit weekly_summary_path('2026-07-06')
+
+    expect(box(find_link('Ver resultado da meta'))['width']).to be < 200
+
+    click_on 'Ver resultado da meta'
+
+    expect(page).to have_current_path("/goals/#{goal.id}/outcomes/2026-07-06")
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens the entries of the week in the history on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    click_on 'Ver lançamentos da semana'
+
+    expect(page).to have_current_path('/history?week=2026-07-06')
+    expect(page).to have_text('Semana de 6 a 12 de julho')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'goes to the analysis of the month from the secondary link on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    click_on 'Análise de julho →'
+
+    expect(page).to have_current_path('/analysis?month=7&year=2026')
   end
 
   it 'keeps the weekly summary header still while the week scrolls on a phone' do
@@ -48,20 +102,38 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'goes to the analysis of the month from the CTA on a phone' do
+  it 'keeps the 16px prototype gap between the last card and the history CTA on a phone' do
     visit weekly_summary_path('2026-07-06')
 
-    click_on 'Ver análise completa'
+    last_card = find('#screen-content .rounded-xl', text: 'Onde foi o dinheiro')
+    cta = find_link('Ver lançamentos da semana')
 
-    expect(page).to have_current_path('/analysis?month=7&year=2026')
+    expect(box(cta)['y'] - box(last_card)['bottom']).to be_within(0.5).of(16)
+    expect(page).to fit_the_phone_width
   end
 
-  it 'centers the week in a narrow column on a desktop screen' do
+  it 'lays the hero and the goal on five columns beside the bars on a desktop screen' do
+    goal
     emulate_desktop_screen
 
     visit weekly_summary_path('2026-07-06')
 
-    expect(page).to have_css('.max-w-2xl', text: 'Sua semana')
+    hero = find('#screen-content .rounded-xl', text: I18n.t('weekly_summaries.show.profit'))
+    bars = find('#screen-content .rounded-xl', text: I18n.t('weekly_summaries.show.daily_title'))
+    goal_card = find('#screen-content .rounded-xl', text: 'Meta da semana')
+    grid = hero.find(:xpath, '../..')
+    track = find('[data-weekday="0"]').find(:xpath, '..')
+    topbar = find('#screen-header h1', text: 'Sua semana').find(:xpath, '../..')
+
+    expect(box(topbar)['y']).to eq(0)
+    expect(box(hero)['y'] - box(topbar)['bottom']).to be_within(1).of(32)
+    expect(box(hero)['width']).to be_within(2).of(((box(grid)['width'] * 5) - 140) / 12)
+    expect(box(goal_card)['y']).to be > box(hero)['bottom']
+    expect(box(bars)['x']).to be > box(hero)['right']
+    expect(box(track)['height']).to be_within(1).of(150)
+    expect(page).to have_text('6 a 12 de julho de 2026')
+    expect(page).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06')
+    expect(page).to have_link('Análise de julho →', href: '/analysis?month=7&year=2026')
     expect(page).to have_no_css("[aria-label='#{I18n.t('weekly_summaries.show.back')}']")
   end
 end

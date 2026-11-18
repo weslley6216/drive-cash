@@ -2,7 +2,7 @@ module Goals
   module Outcomes
     class MissedScreenComponent < ApplicationComponent
       HISTORY_PARAMS = {
-        'weekly'  => ->(period) { { focus_day: period.first } },
+        'weekly'  => ->(period) { { week: Calendars::Week.containing(period.first).to_param } },
         'monthly' => ->(period) { { year: period.first.year, month: period.first.month } },
         'annual'  => ->(period) { { year: period.first.year } }
       }.freeze
