@@ -4,6 +4,7 @@ module Notifications
       Generators::MaintenanceDue,
       Generators::TankLow,
       Generators::GoalReached,
+      Generators::GoalMissed,
       Generators::WeeklySummary,
       Generators::LogReminder
     ].freeze

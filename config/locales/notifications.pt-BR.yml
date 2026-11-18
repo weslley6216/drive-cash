@@ -48,6 +48,9 @@ pt-BR:
         goal_reached:
           title: "Meta batida"
           when: "No dia em que você bate uma meta: da semana, do mês ou do ano."
+        goal_missed:
+          title: "Meta não batida"
+          when: "No dia seguinte ao fim de uma meta que não foi batida."
         weekly_summary:
           title: "Resumo semanal"
           when: "Toda segunda, com o lucro da semana anterior."
@@ -66,6 +69,17 @@ pt-BR:
           monthly: "Meta mensal batida! 🎯"
           annual: "Meta anual batida! 🎯"
         body: "Você bateu a meta de %{period} com %{value}."
+      goal_missed:
+        title:
+          near:
+            weekly: "Meta da semana: faltou pouco"
+            monthly: "Meta de %{period}: faltou pouco"
+            annual: "Meta de %{period}: faltou pouco"
+          closed:
+            weekly: "Meta da semana encerrada"
+            monthly: "Meta de %{period} encerrada"
+            annual: "Meta de %{period} encerrada"
+        body: "Você chegou a %{percent}%% (%{current} de %{target})."
       tank_low:
         title: "Tanque no vermelho"
         body: "Você rodou além do último tanque. Registre um abastecimento."

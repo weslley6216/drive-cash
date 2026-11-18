@@ -28,6 +28,15 @@ RSpec.describe Notifications::PreferenceRows do
     expect(goal_reached.palette_key).to eq(:success)
   end
 
+  it 'lists the missed goal kind right after the reached one, on by default' do
+    rows = described_class.call(settings)
+    goal_missed = rows.find { |candidate| candidate.kind == 'goal_missed' }
+
+    expect(rows.map(&:kind).each_cons(2).to_a).to include(%w[goal_reached goal_missed])
+    expect(goal_missed).to have_attributes(title: 'Meta não batida', enabled: true, palette_key: :attention)
+    expect(goal_missed.rule).to eq('No dia seguinte ao fim de uma meta que não foi batida.')
+  end
+
   it 'flags a disabled kind' do
     disabled_settings = Notifications::Preferences.new('log_reminder' => false)
 

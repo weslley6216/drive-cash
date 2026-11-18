@@ -84,6 +84,45 @@ RSpec.describe Notifications::Presenters do
     end
   end
 
+  describe 'goal_missed' do
+    let(:data) do
+      { 'goal_id' => 1, 'period_start' => '2026-07-06', 'kind' => 'weekly', 'metric' => 'profit',
+        'target' => 1_100.0, 'current' => 990.0 }
+    end
+
+    it 'tells a near miss of the week with the percent and the amounts in BRL' do
+      row = present('goal_missed', data)
+
+      expect(row.title).to eq('Meta da semana: faltou pouco')
+      expect(row.body).to eq('Você chegou a 90% (R$ 990,00 de R$ 1.100,00).')
+      expect(row.palette_key).to eq(:attention)
+      expect(row.icon).to eq(PhlexIcons::Lucide::Target)
+    end
+
+    it 'closes a goal under eighty percent without the near miss wording' do
+      row = present('goal_missed', data.merge('current' => 700.0))
+
+      expect(row.title).to eq('Meta da semana encerrada')
+      expect(row.body).to eq('Você chegou a 63% (R$ 700,00 de R$ 1.100,00).')
+    end
+
+    it 'names a monthly goal by its month and an annual goal by its year' do
+      monthly = present('goal_missed', data.merge('kind' => 'monthly', 'period_start' => '2026-07-01'))
+      annual = present('goal_missed', data.merge('kind' => 'annual', 'period_start' => '2026-01-01',
+                                                 'current' => 500.0))
+
+      expect(monthly.title).to eq('Meta de julho: faltou pouco')
+      expect(annual.title).to eq('Meta de 2026 encerrada')
+    end
+
+    it 'links to the outcome of the goal period with no inline action' do
+      row = present('goal_missed', data)
+
+      expect(row.path).to eq('/goals/1/outcomes/2026-07-06')
+      expect(row.inline_action).to be_nil
+    end
+  end
+
   describe 'tank_low' do
     it 'renders the static copy with the danger palette' do
       row = present('tank_low', { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
@@ -163,6 +202,8 @@ RSpec.describe Notifications::Presenters do
       'tank_low'        => { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 },
       'goal_reached'    => { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
                              'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 },
+      'goal_missed'     => { 'goal_id' => 1, 'period_start' => '2026-07-06', 'kind' => 'weekly',
+                             'metric' => 'profit', 'target' => 1_100.0, 'current' => 990.0 },
       'weekly_summary'  => { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 },
       'log_reminder'    => { 'date' => '2026-07-14' }
     }
