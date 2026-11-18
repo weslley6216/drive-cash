@@ -69,6 +69,7 @@ pt-BR:
       day_abbr: "%d/%b"
       day_month: "%d/%m"
       day_abbr_spaced: "%d %b"
+      weekday_day_abbr: "%a, %d/%b"
     month_names:
     -
     - janeiro
