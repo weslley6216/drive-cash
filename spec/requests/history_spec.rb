@@ -78,15 +78,16 @@ RSpec.describe 'History', type: :request do
       expect(active_chip[:href]).to eq(history_path(filter: 'fuel', year: 2025, month: 6))
     end
 
-    it 'excludes unpaid expenses from the default feed and net summary' do
+    it 'lists unpaid expenses in the default feed and sums them into the expenses tile only' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Paid', paid: true)
-      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete Unpaid', paid: false)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 30, category: 'meals', vendor: 'Lanchonete Unpaid', paid: false)
 
       get history_path(year: 2025)
 
       expect(response.body).to include('Posto Paid')
-      expect(response.body).not_to include('Lanchonete Unpaid')
+      expect(response.body).to include('Lanchonete Unpaid')
+      expect(response.body).to include('110,00')
       expect(response.body).to include('120,00')
     end
 
@@ -100,14 +101,10 @@ RSpec.describe 'History', type: :request do
       expect(response.body).not_to include('Lanchonete')
     end
 
-    it 'renders the pending badge only inside the unpaid filter' do
+    it 'marks unpaid expenses with the pending badge in the default feed' do
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
       get history_path(year: 2025)
-
-      expect(response.body).not_to include(I18n.t('history.index.day_group.unpaid_badge'))
-
-      get history_path(year: 2025, filter: 'unpaid')
 
       expect(response.body).to include(I18n.t('history.index.day_group.unpaid_badge'))
       expect(response.body).to include('bg-amber-100')
@@ -208,6 +205,47 @@ RSpec.describe 'History', type: :request do
 
       expect(response.body).to include('href="/history?year=2024"')
       expect(response.body).to include(%(aria-label="#{I18n.t('filter_component.previous_year')}"))
+    end
+  end
+
+  describe 'GET /history with page' do
+    before do
+      stub_const('History::FeedService::PER_PAGE', 1)
+      create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
+      create(:earning, user: current_user, date: Date.new(2025, 6, 12), amount: 100, platform: 'ifood')
+    end
+
+    it 'loads the newest day and links to the next page inside the feed frame' do
+      get history_path(year: 2025, month: 6)
+
+      load_more = Capybara.string(response.body).find_link(I18n.t('history.index.load_more'))
+      expect(response.body).to include('day-2025-06-12')
+      expect(response.body).not_to include('day-2025-06-10')
+      expect(load_more[:href]).to eq(history_path(year: 2025, month: 6, page: 2))
+      expect(load_more['data-turbo-frame']).to eq('history-feed')
+    end
+
+    it 'accumulates the requested page and drops the link on the last one' do
+      get history_path(year: 2025, month: 6, page: 2)
+
+      expect(response.body).to include('day-2025-06-12')
+      expect(response.body).to include('day-2025-06-10')
+      expect(response.body).not_to include(I18n.t('history.index.load_more'))
+    end
+
+    it 'falls back to the first page when the page is not a small positive number' do
+      ['abc', '0', '-3', '9' * 200].each do |page|
+        get history_path(year: 2025, month: 6, page: page)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(I18n.t('history.index.load_more'))
+      end
+    end
+
+    it 'restarts from the first page while focusing a day' do
+      get history_path(focus_day: '2025-06-12', page: 2)
+
+      expect(response.body).to include(I18n.t('history.index.load_more'))
     end
   end
 

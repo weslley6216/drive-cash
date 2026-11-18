@@ -51,6 +51,33 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'shows the unpaid expense with the pending badge among all records on a phone' do
+    create(:expense, user: current_user, date: Date.new(2026, 5, 20), amount: 35, category: 'car_wash', paid: false)
+
+    visit history_path(year: 2026, month: 5)
+
+    within('#day-2026-05-20') { expect(page).to have_text(I18n.t('history.index.day_group.unpaid_badge').upcase) }
+    expect(page).to have_text('R$ 10.485,00')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'loads the next page below the feed without leaving the History on a phone' do
+    stub_const('History::FeedService::PER_PAGE', 1)
+
+    visit history_path(year: 2026, month: 5)
+    load_more = find_link(I18n.t('history.index.load_more'))
+
+    expect(page).to have_no_css('#day-2026-05-21')
+    expect(box(load_more)['height']).to be >= 44
+
+    load_more.click
+
+    expect(page).to have_css('#day-2026-05-21')
+    expect(page).to have_current_path(history_path(year: 2026, month: 5, page: 2))
+    expect(page).to have_no_link(I18n.t('history.index.load_more'))
+    expect(page).to fit_the_phone_width
+  end
+
   it 'echoes the search term and keeps a 44px clear button when nothing matches on a phone' do
     visit history_path(year: 2026, month: 5, q: 'posto ipiranga')
 
@@ -92,6 +119,22 @@ RSpec.describe 'History', type: :system, js: true do
     expect(headers).to eq(%w[date type description status amount].map { |column| I18n.t("history.index.table.#{column}").upcase })
     expect(page).to have_css('tbody tr', count: 2)
     expect(page).to have_no_css('[data-controller="fab"]', visible: true)
+  end
+
+  it 'counts the records of the period in the subtitle and loads more rows below the table on a desktop screen' do
+    stub_const('History::FeedService::PER_PAGE', 1)
+    emulate_desktop_screen
+
+    visit history_path(year: 2026, month: 5)
+
+    expect(page).to have_text('2 lançamentos · maio 2026')
+    expect(page).to have_no_text(I18n.t('history.index.subtitle'))
+    expect(page).to have_css('tbody tr', count: 1)
+
+    click_link I18n.t('history.index.load_more')
+
+    expect(page).to have_css('tbody tr', count: 2)
+    expect(page).to have_no_link(I18n.t('history.index.load_more'))
   end
 
   it 'filters the period from the single month and year pill on a desktop screen' do
