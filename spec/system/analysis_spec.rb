@@ -146,8 +146,8 @@ RSpec.describe 'Analysis', type: :system, js: true do
 
     click_link I18n.t('analysis.show_view.insights.category_share.link')
 
-    expect(page).to have_current_path(history_path(filter: 'fuel', year: 2026, month: 5))
-    expect(page).to have_css('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.fuel'), exact_text: true)
+    expect(page).to have_current_path(history_path(categories: ['fuel'], year: 2026, month: 5))
+    expect(page).to have_css('[data-slice-pill="categories"]', text: I18n.t('activerecord.attributes.expense.categories.fuel'))
     expect(page).to have_css('tbody tr', count: 1)
   end
 

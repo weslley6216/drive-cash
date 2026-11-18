@@ -48,13 +48,13 @@ RSpec.describe Analysis::InsightCardComponent, type: :component do
   end
 
   it 'links to the filtered history on a desktop screen like the prototype when the insight has a link' do
-    linked = insight.merge(link: { label: 'Ver lançamentos →', params: { filter: 'fuel', year: 2026, month: 5 } })
+    linked = insight.merge(link: { label: 'Ver lançamentos →', params: { categories: ['fuel'], year: 2026, month: 5 } })
 
     html = view_context.render(described_class.new(insight: linked))
 
     link = Capybara.string(html).find('a')
     expect(link.text).to eq('Ver lançamentos →')
-    expect(link[:href]).to eq(Rails.application.routes.url_helpers.history_path(filter: 'fuel', year: 2026, month: 5))
+    expect(link[:href]).to eq(Rails.application.routes.url_helpers.history_path(categories: ['fuel'], year: 2026, month: 5))
     expect(link[:class]).to eq('hidden lg:inline text-xs font-medium text-amber-900 hover:underline whitespace-nowrap self-center')
     expect(link['data-turbo-frame']).to eq('_top')
     expect(html).to include('<div class="flex-1 min-w-0">')
