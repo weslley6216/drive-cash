@@ -97,3 +97,9 @@ pt-BR:
       edit:
         earning: "Editar receita"
         expense: "Editar despesa"
+      twelve_months:
+        period: "últimos 12 meses"
+        title: "%{label} · por mês"
+        summary: "em 12 meses · média %{average}/mês"
+        adjustment: "Reajuste %{change} em %{month}"
+        adjustment_levels: "· %{from} → %{to}"
