@@ -8,7 +8,7 @@ module History
     end
 
     def view_template
-      div(class: 'flex gap-2 overflow-x-auto -mx-1 px-1 lg:flex-wrap lg:overflow-visible lg:mx-0 lg:px-0',
+      div(class: 'flex items-center gap-2 overflow-x-auto -mx-1 px-1 py-2 -my-2 lg:flex-wrap lg:overflow-visible lg:mx-0 lg:px-0',
           data:  { controller: 'chip-strip' }) do
         filters_button
         @slice.filtering? ? pills : Slice::PRESETS.each_key { |key| chip(key) }
@@ -38,9 +38,10 @@ module History
 
     def pill_chip(pill)
       span(data: { slice_pill: pill.level }, class: pill_classes) do
-        button(type: 'button', data: { action: 'history-filter-panel#open', history_filter_panel_level_param: pill.level }) { plain pill.label }
+        button(type: 'button', class: 'py-[14px] -my-[14px]', data: { action: 'history-filter-panel#open', history_filter_panel_level_param: pill.level }) { plain pill.label }
         link_to(history_path(**pill.remove_params, q: @query.presence, year: @year, month: @month),
-                aria: { label: t('history.index.trail.remove', label: pill.label) }) do
+                class: 'flex items-center py-4 -my-4 pl-2.5 -ml-2.5 pr-3.5 -mr-3.5',
+                aria:  { label: t('history.index.trail.remove', label: pill.label) }) do
           render PhlexIcons::Lucide::X.new(class: 'w-3 h-3', 'stroke-width': '2.6')
         end
       end
@@ -61,7 +62,8 @@ module History
     end
 
     def filters_button_base_classes
-      'flex items-center gap-1.5 px-3 py-1.5 rounded-full lg:rounded-lg text-xs font-semibold whitespace-nowrap flex-shrink-0'
+      'relative flex items-center gap-1.5 px-3 py-1.5 rounded-full lg:rounded-lg text-xs font-semibold whitespace-nowrap flex-shrink-0 ' \
+        "after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']"
     end
 
     def pill_classes

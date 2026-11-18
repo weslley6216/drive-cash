@@ -77,6 +77,21 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'gives the filters button and the pill controls a touch target of at least 44px on a phone' do
+    visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
+    button = find('button', text: I18n.t('history.index.filters.button_count', count: 2))
+    remove = find("a[aria-label='#{I18n.t('history.index.trail.remove', label: 'Combustível')}']")
+    reopen = find('[data-slice-pill="categories"] button')
+
+    tapped = button.evaluate_script('(() => { const rect = this.getBoundingClientRect(); return document.elementFromPoint(rect.left + 10, rect.top - 7).closest("button") === this })()')
+
+    expect(tapped).to be(true)
+    expect(box(remove)['height']).to be >= 44
+    expect(box(reopen)['height']).to be >= 44
+    expect(box(button)['height'].round).to eq(28)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'reopens the panel with the marks of the slice from the pill body on a phone' do
     visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
     find('[data-slice-pill="vendors"] button').click
