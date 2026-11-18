@@ -11,7 +11,7 @@ module History
       return nil unless @slice.single_series? && @month.present?
 
       totals = monthly_totals
-      months = window.map { |year, month| { year: year, month: month, total: totals[[year, month]] || 0 } }
+      months = window.map { |year, month| { year: year, month: month, total: totals.dig([year, month], :total) || 0 } }
 
       { kind: kind, months: months, change: change(months), in_progress: current_month? }
     end
@@ -32,18 +32,7 @@ module History
       last_year, last_month = window.last
       range = Date.new(first_year, first_month, 1)..Date.new(last_year, last_month, -1)
 
-      base_scope.where(date: range).group(Arel.sql("DATE_TRUNC('month', date)")).sum(:amount)
-        .each_with_object({}) { |(month_date, total), totals| totals[month_key(month_date)] = total.to_f }
-    end
-
-    def month_key(month_date)
-      date = month_date.respond_to?(:to_date) ? month_date.to_date : Date.parse(month_date.to_s)
-      [date.year, date.month]
-    end
-
-    def base_scope
-      query = SliceQuery.new(@slice)
-      kind == :earnings ? query.earnings(@user.earnings) : query.expenses(@user.expenses)
+      SliceMonthlyTotals.new(slice: @slice, user: @user, period: range).call
     end
 
     def change(months)
