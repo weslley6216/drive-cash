@@ -20,11 +20,18 @@ RSpec.describe History::SliceYearComponent, type: :component do
     Capybara.string(view_context.render(described_class.new(year: year.merge(overrides), slice: slice, query: nil)))
   end
 
-  it 'titles the card by the series and shows the window total with the monthly average' do
+  it 'titles the card by the series and shows the window total in red' do
     expect(page).to have_text('Seguro · por mês')
     expect(page.find('[data-twelve-months="total"]').text).to eq('R$ 2.400,80')
     expect(page.find('[data-twelve-months="total"]')[:class]).to include('text-red-700')
-    expect(page).to have_text('em 12 meses · média R$ 200,07/mês')
+  end
+
+  it 'keeps the currency glued to the average so the line never breaks after R$' do
+    expect(page.find('[data-twelve-months="summary"]').native.text).to eq("em 12 meses · média R$\u00A0200,07/mês")
+  end
+
+  it 'drops the totals spacing on desktop so the bars align with the badge' do
+    expect(page.find('[data-twelve-months="totals"]')[:class].split).to include('mb-2', 'lg:mb-0')
   end
 
   it 'flags the raise in amber with the levels on desktop' do

@@ -3,6 +3,8 @@ module History
     include CardStyles
     include SignedPercent
 
+    NO_BREAK_SPACE = "\u00A0".freeze
+
     def initialize(year:, slice:, query:)
       @year = year
       @slice = slice
@@ -33,10 +35,10 @@ module History
     end
 
     def totals_row
-      div(class: 'flex items-end justify-between gap-2 mb-2 lg:block') do
+      div(class: 'flex items-end justify-between gap-2 mb-2 lg:mb-0 lg:block', data: { twelve_months: 'totals' }) do
         div do
           p(class: "text-xl font-bold tabular-nums lg:text-3xl lg:mt-1 #{total_color}", data: { twelve_months: 'total' }) { format_currency(@year[:total]) }
-          p(class: 'text-[11px] text-slate-500 lg:text-xs') { summary_text }
+          p(class: 'text-[11px] text-slate-500 lg:text-xs', data: { twelve_months: 'summary' }) { summary_text }
         end
         adjustment_badge if shift
       end
@@ -68,7 +70,7 @@ module History
     end
 
     def summary_text
-      t('history.index.twelve_months.summary', average: format_currency(@year[:average]))
+      t('history.index.twelve_months.summary', average: format_currency(@year[:average]).sub(' ', NO_BREAK_SPACE))
     end
 
     def label

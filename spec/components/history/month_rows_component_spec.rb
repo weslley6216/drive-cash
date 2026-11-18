@@ -34,6 +34,15 @@ RSpec.describe History::MonthRowsComponent, type: :component do
     expect(variations[0][:class]).to include('text-slate-400')
   end
 
+  it 'stacks the phone variation under the amount and sizes the desktop one like the table text' do
+    phone_variation = page.find('[data-month-row="phone"] [data-month-variation]', match: :first)
+    desktop_variation = page.find('[data-month-row="desktop"] [data-month-variation]', match: :first)
+
+    expect(phone_variation.tag_name).to eq('p')
+    expect(phone_variation[:class]).to include('text-[10px]')
+    expect(desktop_variation[:class]).to include('text-xs')
+  end
+
   it 'opens the month in the month mode with the slice and the search' do
     expect(phone_rows.first[:href]).to eq('/history?categories%5B%5D=insurance&month=5&q=porto&types%5B%5D=expenses&year=2026')
   end

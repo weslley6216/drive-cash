@@ -43,15 +43,23 @@ module History
     def phone_amount(row, entry)
       div(class: 'text-right') do
         p(class: "text-sm font-bold tabular-nums whitespace-nowrap #{entry.amount_color}", data: { month_amount: true }) { amount_text(row, entry) }
-        variation(row)
+        phone_variation(row)
       end
     end
 
-    def variation(row)
+    def phone_variation(row)
       return if row[:change].nil?
 
-      span(class: "text-[10px] font-semibold #{row[:shift] ? 'text-amber-700' : 'text-slate-400'}", data: { month_variation: true }) { variation_text(row) }
+      p(class: "text-[10px] font-semibold #{variation_color(row)}", data: { month_variation: true }) { variation_text(row) }
     end
+
+    def desktop_variation(row)
+      return if row[:change].nil?
+
+      span(class: "text-xs font-semibold #{variation_color(row)}", data: { month_variation: true }) { variation_text(row) }
+    end
+
+    def variation_color(row) = row[:shift] ? 'text-amber-700' : 'text-slate-400'
 
     def desktop_table
       div(class: 'hidden lg:block') do
@@ -88,7 +96,7 @@ module History
           end
         end
         td(class: 'px-5 py-3 text-slate-600') { description(row, entry) }
-        td(class: 'px-5 py-3') { variation(row) }
+        td(class: 'px-5 py-3') { desktop_variation(row) }
         td(class: "px-5 py-3 text-right font-semibold tabular-nums whitespace-nowrap #{entry.amount_color}") { amount_text(row, entry) }
         td(class: 'px-5 py-3 text-right') { desktop_chevron(row) }
       end
