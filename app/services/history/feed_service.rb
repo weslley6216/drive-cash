@@ -18,11 +18,13 @@ module History
       groups = grouped.map { |date, day_items| build_group(date, day_items) }
 
       {
-        groups:      with_focus_gap(groups),
-        summary:     build_summary,
-        total_count: total_count,
-        next_page:   next_page(items.size),
-        facets:      SliceFacets.new(user: @user, year: year, month: month, query: query).call
+        groups:        with_focus_gap(groups),
+        summary:       build_summary,
+        total_count:   total_count,
+        next_page:     next_page(items.size),
+        facets:        SliceFacets.new(user: @user, year: year, month: month, query: query).call,
+        slice_summary: (SliceSummary.new(slice: slice, user: @user, year: year, month: month).call if slice.filtering?),
+        trend:         SliceTrend.new(slice: slice, user: @user, year: year, month: month).call
       }
     end
 

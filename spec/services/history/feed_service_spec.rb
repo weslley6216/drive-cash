@@ -339,6 +339,24 @@ RSpec.describe History::FeedService do
       end
     end
 
+    context 'with the slice summary and the band' do
+      it 'leaves both out without a marked level' do
+        result = described_class.new(year: 2025, month: 6, slice: History::Slice.preset('expenses'), user: user).call
+
+        expect(result[:slice_summary]).to be_nil
+        expect(result[:trend]).to be_nil
+      end
+
+      it 'summarizes the slice and returns its six month band' do
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Orense', paid: true)
+
+        result = described_class.new(year: 2025, month: 6, slice: History::Slice.new(categories: %w[fuel]), user: user).call
+
+        expect(result[:slice_summary]).to include(kind: :expenses, total: 80, count: 1)
+        expect(result[:trend][:months].last).to eq(year: 2025, month: 6, total: 80)
+      end
+    end
+
     context 'with query parameter' do
       it 'delegates matching to RecordSearch for both earnings and expenses' do
         match = create(:expense, user: user, date: Date.new(2025, 6, 10), amount: 80, category: 'fuel', vendor: 'Posto Florense', paid: true)
