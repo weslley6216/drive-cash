@@ -44,8 +44,8 @@ module Goals
       def desktop_header
         div(class: "#{DESKTOP_BAR} hidden lg:flex items-center justify-between") do
           div do
-            h1(class: 'text-2xl font-bold text-slate-800') { t('goals.outcomes.show.title') }
-            p(class: 'text-sm text-slate-500 mt-1') { desktop_subtitle }
+            h1(class: 'text-2xl font-bold text-slate-900 tracking-tight') { t('goals.outcomes.show.title') }
+            p(class: 'text-sm text-slate-500 mt-0.5') { desktop_subtitle }
           end
           link_to(helpers.goals_path, class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg ' \
                                              'px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50') do
