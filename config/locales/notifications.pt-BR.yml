@@ -47,7 +47,7 @@ pt-BR:
           when: "Quando o tanque estimado cai abaixo de 1/4 ou você roda além do último abastecimento."
         goal_reached:
           title: "Meta batida"
-          when: "No dia em que você bate a meta do mês."
+          when: "No dia em que você bate uma meta: da semana, do mês ou do ano."
         weekly_summary:
           title: "Resumo semanal"
           when: "Toda segunda, com o lucro da semana anterior."
