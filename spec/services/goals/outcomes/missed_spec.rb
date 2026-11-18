@@ -8,7 +8,7 @@ RSpec.describe Goals::Outcomes::Missed do
     create(:goal, user: user, kind: 'weekly', metric: 'profit', target_amount: target,
                   period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
   end
-  let(:totals) { Goals::DailyTotals.for(user: user, range: goal.period_start..goal.period_end) }
+  let(:totals) { Goals::DailyTotals.for(user: user, range: Goals::RecentPeriods.span(goal)) }
   let(:outcome) { described_class.new(goal: goal, totals: totals, date: date).call }
 
   before do
@@ -75,7 +75,7 @@ RSpec.describe Goals::Outcomes::Missed do
   it 'keeps the pace at zero for a period without a worked day' do
     empty_week = create(:goal, user: user, kind: 'weekly', metric: 'profit', target_amount: 1_100,
                                period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 7))
-    empty_totals = Goals::DailyTotals.for(user: user, range: empty_week.period_start..empty_week.period_end)
+    empty_totals = Goals::DailyTotals.for(user: user, range: Goals::RecentPeriods.span(empty_week))
 
     result = described_class.new(goal: empty_week, totals: empty_totals, date: date).call
 

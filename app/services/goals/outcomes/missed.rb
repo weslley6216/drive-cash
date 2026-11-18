@@ -15,8 +15,8 @@ module Goals
 
       def call
         shortfall = Goals::Shortfall.new(target: @goal.target_amount, achieved: achieved)
-        recent = Goals::RecentPeriods.new(goal: @goal)
-        days = recent.average_worked_days ? recent.average_worked_days.round.clamp(1, @goal.next_period.count) : @goal.next_period.count
+        recent = Goals::RecentPeriods.new(goal: @goal, totals: @totals)
+        days = work_days(recent.average_worked_days)
 
         Result.new(
           goal:            @goal,
@@ -35,6 +35,14 @@ module Goals
           work_days:       days,
           per_work_day:    @goal.target_amount / days
         )
+      end
+
+      private
+
+      def work_days(average)
+        return @goal.next_period.count unless average
+
+        average.round.clamp(1, @goal.next_period.count)
       end
     end
   end

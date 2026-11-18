@@ -8,7 +8,7 @@ module Goals
     end
 
     def call
-      totals = Goals::DailyTotals.for(user: @goal.user, range: @goal.period_start..@goal.period_end)
+      totals = Goals::DailyTotals.for(user: @goal.user, range: Goals::RecentPeriods.span(@goal))
       achieved = totals.metric_for(@goal)
       state = STATES.find { |candidate| candidate.applies?(goal: @goal, achieved: achieved, date: @date) }
       return nil unless state

@@ -8,6 +8,11 @@ RSpec.describe Goals::RecentPeriods do
                   period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
   end
 
+  def recent_for(target_goal)
+    totals = Goals::DailyTotals.for(user: target_goal.user, range: described_class.span(target_goal))
+    described_class.new(goal: target_goal, totals: totals)
+  end
+
   def earn(date, amount, owner: user)
     create(:earning, user: owner, date: date, amount: amount)
   end
@@ -19,7 +24,7 @@ RSpec.describe Goals::RecentPeriods do
     earn(Date.new(2026, 7, 7), 900)
     earn(Date.new(2026, 6, 9), 5_000)
 
-    average = described_class.new(goal: goal).average_result
+    average = recent_for(goal).average_result
 
     expect(average).to eq(1_050)
   end
@@ -28,7 +33,7 @@ RSpec.describe Goals::RecentPeriods do
     earn(Date.new(2026, 6, 23), 1_100)
     earn(Date.new(2026, 7, 7), 900)
 
-    average = described_class.new(goal: goal).average_result
+    average = recent_for(goal).average_result
 
     expect(average).to eq(1_000)
   end
@@ -40,7 +45,7 @@ RSpec.describe Goals::RecentPeriods do
       earn(Date.new(2026, 7, 7), 1_000)
       create(:expense, user: user, date: Date.new(2026, 6, 23), amount: 200, paid: true)
 
-      average = described_class.new(goal: goal).average_result
+      average = recent_for(goal).average_result
 
       expect(average).to eq(400)
     end
@@ -53,7 +58,7 @@ RSpec.describe Goals::RecentPeriods do
     earn(Date.new(2026, 7, 10), 800)
     earn(Date.new(2026, 3, 10), 9_000)
 
-    average = described_class.new(goal: july).average_result
+    average = recent_for(july).average_result
 
     expect(average).to eq(600)
   end
@@ -62,13 +67,13 @@ RSpec.describe Goals::RecentPeriods do
     [23, 24, 25].each { |day| earn(Date.new(2026, 6, day), 100) }
     [7, 8, 9, 10].each { |day| earn(Date.new(2026, 7, day), 100) }
 
-    worked_days = described_class.new(goal: goal).average_worked_days
+    worked_days = recent_for(goal).average_worked_days
 
     expect(worked_days).to eq(3.5)
   end
 
   it 'has no average without any entry in the four periods' do
-    recent = described_class.new(goal: goal)
+    recent = recent_for(goal)
 
     expect(recent).to have_attributes(average_result: nil, average_worked_days: nil)
   end
@@ -76,7 +81,7 @@ RSpec.describe Goals::RecentPeriods do
   it 'ignores the entries of another user' do
     earn(Date.new(2026, 7, 7), 900, owner: create(:user))
 
-    average = described_class.new(goal: goal).average_result
+    average = recent_for(goal).average_result
 
     expect(average).to be_nil
   end

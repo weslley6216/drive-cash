@@ -96,5 +96,13 @@ RSpec.describe Goals::Outcome do
     it 'resolves the missed outcome' do
       expect(outcome).to have_attributes(state: 'missed', achieved: 1_320, celebration?: false)
     end
+
+    it 'loads the daily totals of the recent periods once for the missed outcome' do
+      allow(Goals::DailyTotals).to receive(:for).and_call_original
+
+      outcome
+
+      expect(Goals::DailyTotals).to have_received(:for).once
+    end
   end
 end
