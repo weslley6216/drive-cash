@@ -126,6 +126,21 @@ RSpec.describe Goals::DailyTotals do
     end
   end
 
+  describe '#metric_in' do
+    it 'measures the goal metric over any range inside the loaded days' do
+      goal = build(:goal, metric: 'profit')
+      create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 300)
+      create(:expense, user: user, date: Date.new(2026, 6, 3), amount: 100, paid: true)
+      create(:earning, user: user, date: Date.new(2026, 6, 9), amount: 500)
+      may_to_june = Date.new(2026, 5, 1)..Date.new(2026, 6, 30)
+      first_week = Date.new(2026, 6, 1)..Date.new(2026, 6, 7)
+
+      metric = described_class.for(user: user, range: may_to_june).metric_in(goal, first_week)
+
+      expect(metric).to eq(200)
+    end
+  end
+
   describe '#worked_days_in' do
     it 'counts the days with an earning and skips the days with only an expense' do
       create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 100)
