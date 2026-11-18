@@ -2,12 +2,14 @@ module History
   class SliceTrendComponent < ApplicationComponent
     include CardStyles
 
+    BAR_HEIGHT = 'h-[max(3px,calc(var(--bar)*56px))] lg:h-[max(3px,calc(var(--bar)*40px))]'.freeze
+
     def initialize(trend:)
       @trend = trend
     end
 
     def view_template
-      div(class: "#{CARD} p-4 order-first lg:order-last", data: { slice_summary: 'trend' }) do
+      div(class: "#{CARD} p-4 grid grid-cols-[1fr_auto] order-first lg:order-last lg:px-5 lg:py-3", data: { slice_summary: 'trend' }) do
         header
         bars
         comparison if @trend[:change]
@@ -17,21 +19,21 @@ module History
     private
 
     def header
-      div(class: 'flex items-center justify-between mb-2') do
+      div(class: 'col-span-2 flex items-center justify-between mb-2 lg:col-span-1 lg:mb-1') do
         p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500') { t("history.index.slice_summary.trend_title.#{@trend[:kind]}") }
       end
     end
 
     def bars
-      div(class: 'flex items-end gap-1.5 h-14 lg:h-10') do
+      div(class: 'col-span-2 flex items-end gap-1.5 h-[70px] lg:h-[54px]') do
         @trend[:months].each_with_index { |month, index| bar(month, index) }
       end
     end
 
     def bar(month, index)
       selected = index == @trend[:months].size - 1
-      div(class: 'flex-1 flex flex-col items-center gap-1 h-full justify-end') do
-        div(class: "w-full rounded-t #{bar_classes(selected)}", data: { trend_bar: true }, style: "height: max(3px, #{percentage(month[:total])}%)")
+      div(class: 'flex-1 flex flex-col items-center gap-1') do
+        div(class: "w-full rounded-t #{BAR_HEIGHT} #{bar_classes(selected)}", data: { trend_bar: true }, style: "--bar: #{ratio(month[:total])}")
         span(class: "text-[9px] #{selected ? 'font-bold text-slate-700' : 'text-slate-400'}", data: { trend_label: true }) { month_abbr(month[:month]) }
       end
     end
@@ -41,17 +43,17 @@ module History
       selected ? strong : base
     end
 
-    def percentage(total)
+    def ratio(total)
       max = @trend[:months].map { |month| month[:total] }.max.to_f
-      return 0 if max.zero?
+      return 0.0 if max.zero?
 
-      (total / max * 100).round
+      (total / max).round(2)
     end
 
     def month_abbr(month) = I18n.t('date.abbr_month_names')[month]
 
     def comparison
-      p(class: 'text-[11px] text-slate-500 mt-1') do
+      p(class: 'col-span-2 text-[11px] text-slate-500 mt-1 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mt-0 lg:mb-1') do
         change_span
         plain " #{t('history.index.slice_summary.versus', month: previous_month_name)}"
         plain " · #{t('history.index.slice_summary.in_progress')}" if @trend[:in_progress]

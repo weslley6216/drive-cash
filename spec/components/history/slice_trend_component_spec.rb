@@ -19,8 +19,7 @@ RSpec.describe History::SliceTrendComponent, type: :component do
     bars = page.all('[data-trend-bar]')
 
     expect(bars.map { |bar| bar[:style] }).to eq(
-      ['height: max(3px, 64%)', 'height: max(3px, 0%)', 'height: max(3px, 0%)', 'height: max(3px, 0%)',
-       'height: max(3px, 80%)', 'height: max(3px, 100%)']
+      ['--bar: 0.64', '--bar: 0.0', '--bar: 0.0', '--bar: 0.0', '--bar: 0.8', '--bar: 1.0']
     )
     expect(bars.first[:class]).to include('bg-red-200')
     expect(bars.last[:class]).to include('bg-red-600')
