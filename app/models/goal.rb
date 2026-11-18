@@ -1,6 +1,11 @@
 class Goal < ApplicationRecord
   KINDS = %w[weekly monthly annual].freeze
   METRICS = %w[profit earnings].freeze
+  PERIOD_BUILDERS = {
+    'weekly'  => ->(date) { [date.beginning_of_week, date.end_of_week] },
+    'monthly' => ->(date) { [date.beginning_of_month, date.end_of_month] },
+    'annual'  => ->(date) { [Date.new(date.year, 1, 1), Date.new(date.year, 12, 31)] }
+  }.freeze
 
   belongs_to :user
 
@@ -25,8 +30,24 @@ class Goal < ApplicationRecord
     }
   end
 
+  def self.period_for(kind, date)
+    start_date, end_date = PERIOD_BUILDERS.fetch(kind).call(date)
+    start_date..end_date
+  end
+
   def ended?
     period_end < Date.current
+  end
+
+  def next_period
+    Goal.period_for(kind, period_end + 1)
+  end
+
+  def celebrate!
+    return false if celebrated_at.present?
+
+    update!(celebrated_at: Time.current)
+    true
   end
 
   private
