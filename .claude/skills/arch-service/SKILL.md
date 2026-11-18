@@ -1,6 +1,6 @@
 ---
 name: arch-service
-description: Use when creating, altering, or reviewing a service object in DriveCash — a class under app/services/<domain>/ that orchestrates a use case with a side effect (persists, opens a transaction, calls the Groq/Gemini API) or is a pure step-calculator, returning a semantic payload (a Data or hash of raw values), never presentation. Use for Creator/Updater/*Service/*Calculator classes, the self.call entry point, OCP registries (Ai::Tools::Registry, History::FeedService::FILTERS), and thin jobs over services. NOT for persistence models (arch-model), value objects with invariants (arch-value-object), or view formatting (arch-component). Takes precedence over divergent legacy code.
+description: Use when creating, altering, or reviewing a service object in DriveCash — a class under app/services/<domain>/ that orchestrates a use case with a side effect (persists, opens a transaction, calls the Groq/Gemini API) or is a pure step-calculator, returning a semantic payload (a Data or hash of raw values), never presentation. Use for Creator/Updater/*Service/*Calculator classes, the self.call entry point, OCP registries (Ai::Tools::Registry, History::Slice::PRESETS), and thin jobs over services. NOT for persistence models (arch-model), value objects with invariants (arch-value-object), or view formatting (arch-component). Takes precedence over divergent legacy code.
 ---
 
 # Skill: Services
@@ -55,8 +55,8 @@ Leia o código real destes antes de escrever um novo:
   `@user.earnings.new`, devolve `Result = Data.define(:success?, :earning)`, descarta `user_id` forjado.
 - **`app/services/refuelings/vendor_efficiency.rb`** — calculador puro (sem efeito colateral): threshold
   em constante, derivados memoizados, devolve `Comparison = Data.define(...)` de dado cru.
-- **`app/services/history/feed_service.rb`** — registry `FILTERS` (`Data` de lambdas) com `.fetch` e
-  default; devolve hash (`groups`/`summary`) de dado cru.
+- **`app/services/history/feed_service.rb`** — orquestra a página do Histórico compondo
+  `SliceQuery`/`SliceFacets`/`SliceSummary`/`SliceTrend`; devolve hash (`groups`/`summary`/`facets`/`trend`) de dado cru.
 - **`app/services/ai/tools/registry.rb`** — o registry OCP grande: `TOOLS`/`QUERY_KINDS` congelados,
   uma entrada por variante, **referenciando** colaboradores (persister, presenter) sem contê-los.
 - **`app/jobs/export_job.rb`** — job casca fina: acha `Export`, muda status, chama `Exports::Builder` +
