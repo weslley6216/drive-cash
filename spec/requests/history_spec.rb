@@ -5,6 +5,10 @@ RSpec.describe 'History', type: :request do
 
   before { login_as(current_user) }
 
+  def feed_text
+    Nokogiri::HTML(response.body).at_css('#history-feed').text
+  end
+
   describe 'GET /history' do
     it 'returns 200' do
       get history_path
@@ -46,10 +50,10 @@ RSpec.describe 'History', type: :request do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
 
-      get history_path(year: 2025, filter: 'earnings')
+      get history_path(year: 2025, types: %w[earnings])
 
-      expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
-      expect(response.body).not_to include('Posto Shell')
+      expect(feed_text).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).not_to include('Posto Shell')
     end
 
     it 'filters by unpaid expenses only' do
@@ -57,25 +61,35 @@ RSpec.describe 'History', type: :request do
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto X', paid: true)
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: false)
 
-      get history_path(year: 2025, filter: 'unpaid')
+      get history_path(year: 2025, types: %w[expenses], unpaid: '1')
 
-      expect(response.body).to include('Lanchonete')
-      expect(response.body).not_to include('Posto X')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).to include('Lanchonete')
+      expect(feed_text).not_to include('Posto X')
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
     end
 
-    it 'filters by an expense category and marks its chip active' do
+    it 'filters by an expense category' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 40, category: 'meals', vendor: 'Lanchonete', paid: true)
 
-      get history_path(year: 2025, month: 6, filter: 'fuel')
+      get history_path(year: 2025, month: 6, categories: %w[fuel])
 
-      expect(response.body).to include('Posto Shell')
-      expect(response.body).not_to include('Lanchonete')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
-      active_chip = Capybara.string(response.body).find('a.bg-slate-800.text-white', text: I18n.t('activerecord.attributes.expense.categories.fuel'), exact_text: true)
-      expect(active_chip[:href]).to eq(history_path(filter: 'fuel', year: 2025, month: 6))
+      expect(feed_text).to include('Posto Shell')
+      expect(feed_text).not_to include('Lanchonete')
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+    end
+
+    it 'narrows a category to the marked vendor, ignoring the same vendor of another user' do
+      create(:expense, user: create(:user), date: Date.new(2025, 6, 10), amount: 999, category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
+      create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 70, category: 'fuel', vendor: 'Ipiranga', paid: true)
+
+      get history_path(year: 2025, month: 6, categories: %w[fuel], vendors: { fuel: ['Posto Shell'] })
+
+      expect(feed_text).to include('Posto Shell')
+      expect(feed_text).not_to include('Ipiranga')
+      expect(feed_text).not_to include('999,00')
     end
 
     it 'lists unpaid expenses in the default feed and sums them into the expenses tile only' do
@@ -126,11 +140,19 @@ RSpec.describe 'History', type: :request do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
-      get history_path(year: 2025, filter: 'expenses')
+      get history_path(year: 2025, types: %w[expenses])
 
       expect(response.body).to include('200,00')
       expect(response.body).to include('80,00')
-      expect(response.body).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+      expect(feed_text).not_to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
+    end
+
+    it 'describes a search without results under a type combination that matches no chip' do
+      create(:earning, user: current_user, date: Date.current)
+
+      get history_path(types: %w[earnings], unpaid: '1', q: 'nao-existe')
+
+      expect(Nokogiri::HTML(response.body).text).to include(I18n.t('empty_states.history.description_query', query: 'nao-existe'))
     end
 
     it 'renders the FAB positioned above the bottom nav' do
@@ -173,11 +195,11 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include('outline-amber-400')
     end
 
-    it 'falls back to filter "all" when the param is invalid' do
+    it 'ignores unknown slice values and the legacy filter param' do
       create(:earning, user: current_user, date: Date.new(2025, 6, 10), amount: 200, platform: 'uber')
       create(:expense, user: current_user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', paid: true)
 
-      get history_path(year: 2025, filter: 'nonsense')
+      get history_path(year: 2025, filter: 'fuel', types: %w[bogus], categories: %w[nonsense])
 
       expect(response.body).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
       expect(response.body).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
@@ -263,7 +285,7 @@ RSpec.describe 'History', type: :request do
     it 'ignores the search and the chip filter while focusing a day' do
       create(:expense, user: current_user, date: Date.new(2025, 6, 12), amount: 80, category: 'fuel', vendor: 'Posto Shell', paid: true)
 
-      get history_path(focus_day: '2025-06-11', q: 'nada', filter: 'earnings')
+      get history_path(focus_day: '2025-06-11', q: 'nada', types: %w[earnings])
 
       expect(response.body).to include('Posto Shell')
       expect(response.body).to include(I18n.t('history.index.gap_day.title'))

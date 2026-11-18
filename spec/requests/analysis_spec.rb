@@ -124,7 +124,7 @@ RSpec.describe 'Analysis', type: :request do
 
       get analysis_path, params: { year: 2025, month: 2 }
 
-      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(filter: 'fuel', year: 2025, month: 2))}"))
+      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(categories: ['fuel'], year: 2025, month: 2))}"))
       expect(response.body).to include(I18n.t('analysis.show_view.insights.category_share.link'))
     end
 
@@ -133,7 +133,7 @@ RSpec.describe 'Analysis', type: :request do
 
       get analysis_path, params: { year: 2025 }
 
-      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(filter: 'fuel', year: 2025))}"))
+      expect(response.body).to include(%(href="#{CGI.escapeHTML(history_path(categories: ['fuel'], year: 2025))}"))
     end
 
     it 'titles the dimmed chart frame of the empty state like the prototype' do

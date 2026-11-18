@@ -7,13 +7,15 @@ class FilterComponent < ApplicationComponent
   MONTH_LINK = 'px-1 py-1.5 rounded-lg text-xs text-center'.freeze
   YEAR_ARROW = 'w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100'.freeze
 
-  def initialize(selected_year:, selected_month:, available_years: [], periods: {}, variant: :compact, action_path: nil)
+  def initialize(selected_year:, selected_month:, available_years: [], periods: {}, variant: :compact, action_path: nil,
+                 trigger_icon: PhlexIcons::Lucide::Funnel)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
     @periods = periods
     @variant = variant
     @action_path = action_path
+    @trigger_icon = trigger_icon
   end
 
   def view_template
@@ -55,7 +57,7 @@ class FilterComponent < ApplicationComponent
              'text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer',
       title: t('.title'),
       data:  { action: 'click->filter-popover#toggle' }
-    ) { render PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]') }
+    ) { render @trigger_icon.new(class: 'w-[18px] h-[18px]') }
   end
 
   def popover_pill

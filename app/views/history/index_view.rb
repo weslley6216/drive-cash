@@ -3,12 +3,12 @@ module History
     include CardStyles
     include TopbarStyles
 
-    def initialize(feed:, year:, month:, query:, filter:, periods:)
+    def initialize(feed:, year:, month:, query:, slice:, periods:)
       @feed = feed
       @year = year
       @month = month
       @query = query
-      @filter = filter
+      @slice = slice
       @periods = periods
     end
 
@@ -41,7 +41,7 @@ module History
             h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate lg:leading-8 lg:text-slate-900 lg:tracking-tight') do
               t('history.index.title')
             end
-            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { t('history.index.subtitle') }
+            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { phone_subtitle }
             p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') do
               t('history.index.count_subtitle', count: @feed[:total_count], period: period_label)
             end
@@ -52,7 +52,8 @@ module History
               selected_month: @month,
               periods:        @periods,
               variant:        :popover,
-              action_path:    history_path
+              action_path:    history_path,
+              trigger_icon:   PhlexIcons::Lucide::Calendar
             )
             new_record_link
           end
@@ -71,12 +72,35 @@ module History
 
     def filter_toolbar
       div(class: 'px-5 sm:px-6 pb-3 space-y-3 lg:px-0 lg:pt-8 lg:pb-5 lg:space-y-5') do
-        div(class: 'space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
-          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, filter: @filter) }
-          render History::FilterChipsComponent.new(current_filter: @filter, query: @query, year: @year, month: @month)
+        div(class: 'relative space-y-3 lg:space-y-0 lg:flex lg:items-center lg:gap-3') do
+          div(class: 'lg:flex-1 lg:max-w-md') { render History::SearchBarComponent.new(query: @query, slice: @slice) }
+          div(data: { controller: 'history-filter-panel' }) do
+            render History::FilterChipsComponent.new(slice: @slice, query: @query, year: @year, month: @month)
+            render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
+          end
         end
-        render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
+        summary_section
       end
+    end
+
+    def summary_section
+      return if no_result?
+
+      slice_summary = @feed[:slice_summary]
+      return render History::PeriodSummaryComponent.new(summary: @feed[:summary]) if slice_summary.nil?
+      return render History::PeriodSummaryComponent.new(summary: slice_summary) if slice_summary[:kind] == :mixed
+
+      div(class: class_names('flex flex-col gap-4', @feed[:trend] ? 'lg:grid lg:grid-cols-[1fr_1.4fr]' : 'lg:grid lg:grid-cols-1')) do
+        render History::SliceTrendComponent.new(trend: @feed[:trend]) if @feed[:trend]
+        render History::SliceSummaryComponent.new(summary: slice_summary)
+        no_trend_hint
+      end
+    end
+
+    def no_trend_hint
+      return unless @slice.categories.size > 1
+
+      p(class: 'text-[11px] text-slate-500 px-1 leading-relaxed') { t('history.index.slice_summary.no_trend_hint') }
     end
 
     def feed_section
@@ -104,9 +128,7 @@ module History
     end
 
     def load_more_path
-      context = filter_context.except(:filter)
-      context[:filter] = @filter unless @filter == 'all'
-      history_path(**context, page: @feed[:next_page])
+      history_path(**filter_context, page: @feed[:next_page])
     end
 
     def period_label
@@ -115,9 +137,18 @@ module History
       "#{I18n.t('date.month_names')[@month]} #{@year}"
     end
 
+    def phone_subtitle
+      return t('history.index.count_subtitle', count: @feed[:total_count], period: period_label) if @slice.filtering? && @feed[:total_count].positive?
+      return period_label.capitalize if @slice.filtering? && @query.blank? && @feed[:total_count].zero?
+
+      t('history.index.subtitle')
+    end
+
     def empty_state
       div(class: CARD) do
-        if filtering?
+        if @query.blank? && @slice.filtering?
+          render slice_empty_state
+        elsif filtering?
           render EmptyStateComponent.new(
             icon:        PhlexIcons::Lucide::Search,
             title:       t('empty_states.history.title'),
@@ -140,11 +171,37 @@ module History
       end
     end
 
+    def slice_empty_state
+      EmptyStateComponent.new(
+        icon:        PhlexIcons::Lucide::SlidersHorizontal,
+        title:       slice_empty_title,
+        description: t('empty_states.history.slice.description', slice: History::SliceTrail.new(@slice).sentence, period: slice_empty_period),
+        cta_label:   t('empty_states.history.cta'),
+        cta_path:    history_path(year: @year, month: @month),
+        cta_icon:    PhlexIcons::Lucide::X
+      )
+    end
+
+    def slice_empty_title
+      return t('empty_states.history.slice.title_year', year: @year) if @month.blank?
+
+      t('empty_states.history.slice.title_month', month: I18n.t('date.month_names')[@month])
+    end
+
+    def slice_empty_period
+      return @year.to_s if @month.blank?
+
+      t('empty_states.history.slice.period_month', month: I18n.t('date.month_names')[@month], year: @year)
+    end
+
     def no_result_description
       return t('empty_states.history.description') if @query.blank?
-      return t('empty_states.history.description_query', query: @query) if @filter == 'all'
 
-      t('empty_states.history.description_query_filter', query: @query, filter: t(History::FeedService::FILTERS.fetch(@filter).label_key))
+      preset = @slice.active_preset
+      return t('empty_states.history.description_query', query: @query) if preset == 'all' || (preset.nil? && !@slice.filtering?)
+
+      filter_label = @slice.filtering? ? History::SliceTrail.new(@slice).sentence : t("history.index.filters.#{preset}")
+      t('empty_states.history.description_query_filter', query: @query, filter: filter_label)
     end
 
     def no_result?
@@ -152,11 +209,11 @@ module History
     end
 
     def filtering?
-      @query.present? || (@filter.present? && @filter != 'all')
+      @query.present? || @slice.active_preset != 'all'
     end
 
     def filter_context
-      { year: @year, month: @month, q: @query, filter: @filter }.compact
+      { year: @year, month: @month, q: @query }.compact.merge(@slice.to_params)
     end
   end
 end

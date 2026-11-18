@@ -56,7 +56,7 @@ Nunca apagar o volume `ruby_gems` (destrutivo, reinstala tudo à toa).
 - **LLM fallback**: se o Groq falha (rate limit, cota, config ou rede), cai automaticamente no Gemini. Rate limit/cota loga `warn`; qualquer outro `Llm::Error` loga `error`. Cota diária esgotada vira `Llm::QuotaExhaustedError` (classificada no `handle_error!` de cada adapter) com mensagem própria.
 - **i18n**: todas as strings visíveis em `config/locales/pt-BR.yml`.
 - **Namespaces sempre no plural**: diretórios e módulos usam a forma plural (`module Vehicles`, `module Expenses`, `module Maintenances`). Nunca usar `class ModelName` para criar namespace — se o nome do namespace coincidir com um model AR (singular), renomear para plural. Isso evita o `TypeError: X is not a module`.
-- **Variação de domínio estende, não edita (OCP)**: conjunto que cresce (período de parcelamento, tipo de insight, ferramenta de chat, filtro de histórico) despacha via registry de dados ou uma classe por variante resolvida por convenção — nunca `case/when`/`if-elsif` espalhado por vários arquivos. Adicionar uma variante = uma entrada declarativa + suas classes colaboradoras, sem tocar na lógica de despacho. Registries: `Expenses::InstallmentPlan::PERIOD_ADVANCE`, `Dashboard::Insights::Presenters` (um presenter por tipo), `Ai::Tools::Registry`, `History::FeedService::FILTERS`. Mapa de lookup com fallback default (paletas) também conta como registry. **OCP não revoga SRP**: o registry referencia colaboradores, não os contém — cálculo de domínio e apresentação seguem em classes separadas.
+- **Variação de domínio estende, não edita (OCP)**: conjunto que cresce (período de parcelamento, tipo de insight, ferramenta de chat, filtro de histórico) despacha via registry de dados ou uma classe por variante resolvida por convenção — nunca `case/when`/`if-elsif` espalhado por vários arquivos. Adicionar uma variante = uma entrada declarativa + suas classes colaboradoras, sem tocar na lógica de despacho. Registries: `Expenses::InstallmentPlan::PERIOD_ADVANCE`, `Dashboard::Insights::Presenters` (um presenter por tipo), `Ai::Tools::Registry`, `History::Slice::PRESETS` (chips do Histórico; os níveis do recorte compõem em `History::SliceQuery`). Mapa de lookup com fallback default (paletas) também conta como registry. **OCP não revoga SRP**: o registry referencia colaboradores, não os contém — cálculo de domínio e apresentação seguem em classes separadas.
 
 ## Convenções de código
 
@@ -92,7 +92,7 @@ app/services/
 ├── expenses/       # Creator, InstallmentCreator
 ├── exports/        # Builder, generators/ (Pdf, Csv, Json), Registry
 ├── goals/          # Creator, ProgressService, AchievementsService
-├── history/        # FeedService (registry FILTERS), RecordSearch
+├── history/        # FeedService, SliceQuery, SliceFacets, SliceSummary, SliceTrend, RecordSearch
 ├── notifications/  # generators/ por kind, Registry, Sweeper, Grouping
 ├── refuelings/     # Creator, Updater, Moves, VendorEfficiency
 └── vehicles/       # MaintenanceService, TankBalanceService, TankStatus, Statistics

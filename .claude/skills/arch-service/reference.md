@@ -73,13 +73,14 @@ Conjunto que cresce (ferramenta de chat, filtro de histórico, tipo de export, g
 variante = uma entrada declarativa + seus colaboradores; nunca `case/when`/`if-elsif` espalhado.
 
 ```ruby
-FILTERS = {
-  'all'      => Filter.new(earnings: true,  expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) }),
-  'earnings' => Filter.new(earnings: true,  expense_scope: nil),
-  'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.paid_in_period(year, month) })
+PRESETS = {
+  'all'      => {},
+  'earnings' => { types: %w[earnings] },
+  'expenses' => { types: %w[expenses] },
+  'unpaid'   => { types: %w[expenses], unpaid: '1' }
 }.freeze
 
-def filter_config = FILTERS.fetch(filter, FILTERS.fetch('all'))
+def self.preset(key) = new(**PRESETS.fetch(key, {}))
 ```
 
 **OCP não revoga SRP**: o registry **referencia** colaboradores (reader, persister, presenter) — não os

@@ -1,34 +1,12 @@
 module History
   class FeedService
-    Filter = Data.define(:earnings, :expense_scope, :label_key, :chip)
-
-    TYPE_FILTERS = {
-      'all'      => Filter.new(earnings: true, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month) }, label_key: 'history.index.filters.all', chip: :always),
-      'earnings' => Filter.new(earnings: true, expense_scope: nil, label_key: 'history.index.filters.earnings', chip: :always),
-      'expenses' => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month) }, label_key: 'history.index.filters.expenses', chip: :always),
-      'unpaid'   => Filter.new(earnings: false, expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(paid: false) }, label_key: 'history.index.filters.unpaid', chip: :always)
-    }.freeze
-
-    CATEGORY_FILTERS = Expense.categories.keys.index_with do |category|
-      Filter.new(
-        earnings:      false,
-        expense_scope: ->(user, year, month) { user.expenses.in_period(year, month).where(category:) },
-        label_key:     "activerecord.attributes.expense.categories.#{category}",
-        chip:          :when_active
-      )
-    end.freeze
-
-    FILTERS = TYPE_FILTERS.merge(CATEGORY_FILTERS).freeze
-
     PER_PAGE = 50
 
-    def self.filter_names = FILTERS.keys
-
-    def initialize(year: Date.current.year, month: nil, query: nil, filter: 'all', focus_day: nil, page: 1, user: Current.user)
+    def initialize(year: Date.current.year, month: nil, query: nil, slice: Slice.new, focus_day: nil, page: 1, user: Current.user)
       @year = year
       @month = month
       @query = query
-      @filter = filter
+      @slice = slice
       @focus_day = focus_day
       @page = page
       @user = user
@@ -40,16 +18,19 @@ module History
       groups = grouped.map { |date, day_items| build_group(date, day_items) }
 
       {
-        groups:      with_focus_gap(groups),
-        summary:     build_summary,
-        total_count: total_count,
-        next_page:   next_page(items.size)
+        groups:        with_focus_gap(groups),
+        summary:       build_summary,
+        total_count:   total_count,
+        next_page:     next_page(items.size),
+        facets:        SliceFacets.new(user: @user, year: year, month: month, query: query).call,
+        slice_summary: (SliceSummary.new(slice: slice, user: @user, year: year, month: month).call if slice.filtering?),
+        trend:         SliceTrend.new(slice: slice, user: @user, year: year, month: month).call
       }
     end
 
     private
 
-    attr_reader :year, :month, :query, :filter, :focus_day, :page
+    attr_reader :year, :month, :query, :slice, :focus_day, :page
 
     def paged_items
       requested = page * PER_PAGE
@@ -89,16 +70,15 @@ module History
     end
 
     def filtered_earnings
-      search.earnings(@user.earnings.in_period(year, month))
+      search.earnings(slice_query.earnings(@user.earnings.in_period(year, month)))
     end
 
     def filtered_expenses
-      base = filter_config.expense_scope.call(@user, year, month)
-      search.expenses(base)
+      search.expenses(slice_query.expenses(@user.expenses.in_period(year, month)))
     end
 
-    def filter_config
-      @filter_config ||= FILTERS.fetch(filter, FILTERS.fetch('all'))
+    def slice_query
+      @slice_query ||= SliceQuery.new(slice)
     end
 
     def search
@@ -126,11 +106,11 @@ module History
     end
 
     def include_earnings?
-      filter_config.earnings
+      slice.include_earnings?
     end
 
     def include_expenses?
-      !filter_config.expense_scope.nil?
+      slice.include_expenses?
     end
 
     def build_group(date, day_items)

@@ -15,7 +15,7 @@ module Dashboard
         end
 
         def link
-          { label: translate('link'), params: { filter: payload[:category_id], year: payload[:year], month: payload[:month] } }
+          { label: translate('link'), params: { categories: [payload[:category_id]], year: payload[:year], month: payload[:month] } }
         end
       end
     end

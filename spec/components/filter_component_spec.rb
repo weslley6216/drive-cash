@@ -88,6 +88,19 @@ RSpec.describe FilterComponent, type: :component do
       expect(html).to match(/class="hidden absolute right-0 top-full/)
     end
 
+    it 'shows the funnel on the phone trigger by default' do
+      trigger = Capybara.string(html).find('button.lg\:hidden')
+
+      expect(trigger.native.inner_html).to include(PhlexIcons::Lucide::Funnel.new(class: 'w-[18px] h-[18px]').call)
+    end
+
+    it 'shows the given trigger icon on the phone trigger' do
+      calendar = render_filter(variant: :popover, periods: periods, action_path: '/history', trigger_icon: PhlexIcons::Lucide::Calendar)
+      trigger = Capybara.string(calendar).find('button.lg\:hidden')
+
+      expect(trigger.native.inner_html).to include(PhlexIcons::Lucide::Calendar.new(class: 'w-[18px] h-[18px]').call)
+    end
+
     it 'lists only the months of the selected year from the calendar as links' do
       expect(html).to include(">#{I18n.t('filter_component.all_months')}</a>")
       expect(html).to include('href="/analysis?month=5&year=2026"')

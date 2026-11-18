@@ -89,26 +89,6 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'shows only the active category with its chip after the type chips on a phone' do
-    visit history_path(year: 2026, month: 5, filter: 'maintenance')
-
-    expect(page).to have_css('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.maintenance'), exact_text: true)
-    expect(page).to have_text('−R$ 10.450,00')
-    expect(page).to have_no_text('+R$ 32,50')
-    expect(page).to fit_the_phone_width
-  end
-
-  it 'scrolls the chip row so the active category chip sits inside it on a phone' do
-    visit history_path(year: 2026, month: 5, filter: 'maintenance')
-
-    chip = find('a.bg-slate-800', text: I18n.t('activerecord.attributes.expense.categories.maintenance'), exact_text: true)
-    strip = chip.find(:xpath, 'ancestor::div[@data-controller="chip-strip"][1]')
-
-    expect(box(chip)['left']).to be >= box(strip)['left']
-    expect(box(chip)['right']).to be <= box(strip)['right']
-    expect(page).to fit_the_phone_width
-  end
-
   it 'shows the records as a table with the design column order and no FAB on a desktop screen' do
     emulate_desktop_screen
 
@@ -154,7 +134,7 @@ RSpec.describe 'History', type: :system, js: true do
     create(:earning, user: current_user, date: Date.new(2025, 11, 10), amount: 75, platform: 'ifood', trips_count: 1)
 
     visit history_path
-    click_button I18n.t('filter_component.title')
+    find('[data-controller="filter-popover"] button.lg\\:hidden').click
     find('[data-filter-popover-target="panel"]').click_link I18n.t('filter_component.previous_year')
     reopened = find('[data-filter-popover-target="panel"]')
 
