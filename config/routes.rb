@@ -24,8 +24,8 @@ Rails.application.routes.draw do
   get 'dashboard/earnings_detail', to: 'dashboard#earnings_detail', as: :dashboard_earnings_detail
   get 'dashboard/expenses_detail', to: 'dashboard#expenses_detail', as: :dashboard_expenses_detail
 
-  resources :expenses, only: %i[new create edit update destroy]
-  resources :earnings, only: %i[new create edit update destroy]
+  resources :expenses, only: %i[edit update destroy]
+  resources :earnings, only: %i[edit update destroy]
 
   get '/records/new', to: 'records#new', as: :new_record
   post '/records', to: 'records#create', as: :records

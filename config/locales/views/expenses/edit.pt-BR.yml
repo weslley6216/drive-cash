@@ -1,27 +1,5 @@
 pt-BR:
   expenses:
-    edit_view:
-      title: "Editar Despesa"
-      subtitle: "Ajuste os dados da despesa"
-      labels:
-        date: "Data"
-        amount: "Valor da Despesa"
-        category: "Categoria"
-        vendor: "Estabelecimento"
-        description: "Descrição (Opcional)"
-        paid: "Marcar como paga (entra no lucro do período)"
-      paid_states:
-        on: "Pago: já entra no lucro líquido do período"
-        off: "A pagar: não entra no lucro até ser quitada"
-      placeholders:
-        money: "R$ 0,00"
-        select: "Selecione..."
-        vendor: "Ex: Posto, Oficina..."
-        description: "Detalhes adicionais..."
-      buttons:
-        cancel: "Cancelar"
-        save: "Salvar"
-        saving: "Salvando..."
     update:
       success: "Despesa atualizada com sucesso!"
     destroy:

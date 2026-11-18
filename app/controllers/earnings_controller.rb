@@ -1,21 +1,5 @@
 class EarningsController < ApplicationController
-  include RecordRedirect
-
   before_action :find_earning, only: [:edit, :update, :destroy]
-
-  def new
-    redirect_to_new_record('earning')
-  end
-
-  def create
-    result = create_earning_via_creator(:earning)
-
-    if result.success?
-      turbo_success(Earnings::CreateView, record: result.earning, record_key: :earning)
-    else
-      turbo_error(Earnings::CreateView, record: result.earning, record_key: :earning)
-    end
-  end
 
   def edit
     render Records::EditView.new(earning: @earning, context: params[:context])

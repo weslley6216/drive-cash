@@ -5,135 +5,18 @@ RSpec.describe 'Expenses', type: :request do
 
   before { login_as(current_user) }
 
-  describe 'GET /expenses/new' do
-    it 'redirects to /records/new?type=expense' do
-      get new_expense_path
+  describe 'retired expense routes' do
+    it 'no longer serves the old new expense form' do
+      get '/expenses/new'
 
-      expect(response).to redirect_to(new_record_path(type: 'expense'))
+      expect(response).to have_http_status(:not_found)
     end
 
-    it 'preserves context params on redirect' do
-      get new_expense_path, params: { context: { year: 2026 } }
-
-      expect(response.location).to include('context%5Byear%5D=2026')
-    end
-
-    it 'drops context keys outside the year/month whitelist' do
-      get new_expense_path, params: { context: { year: 2026, evil: 'x' } }
-
-      expect(response.location).to include('context%5Byear%5D=2026')
-      expect(response.location).not_to include('evil')
-    end
-
-    it 'ignores a non-hash context instead of erroring' do
-      get new_expense_path, params: { context: 'evil' }
-
-      expect(response).to have_http_status(:redirect)
-      expect(response.location).not_to include('evil')
-    end
-  end
-
-  describe 'POST /expenses' do
-    let(:valid_params) do
-      {
-        expense: {
-          date:        '2026-01-23',
-          amount:      150.50,
-          category:    'maintenance',
-          vendor:      'Oficina do João',
-          description: 'Troca de óleo'
-        },
-        context: { year: 2026 }
-      }
-    end
-
-    it 'creates a new expense' do
+    it 'no longer creates expenses outside the records form' do
       expect {
-        post expenses_path, params: valid_params, as: :turbo_stream
-      }.to change(Expense, :count).by(1)
-    end
-
-    it 'creates multiple installments when repeat is enabled' do
-      params = {
-        expense:     {
-          date:        '2026-01-10',
-          amount:      300.00,
-          category:    'maintenance',
-          vendor:      'Oficina',
-          description: 'Pneus'
-        },
-        installment: {
-          repeat:      '1',
-          period:      'monthly',
-          repetitions: '3'
-        },
-        context:     { year: 2026 }
-      }
-
-      expect {
-        post expenses_path, params: params, as: :turbo_stream
-      }.to change(Expense, :count).by(3)
-
-      expect(Expense.order(:installment_number).pluck(:paid)).to all(eq(false))
-      expect(Expense.distinct.pluck(:installment_series_id).compact.size).to eq(1)
-    end
-
-    it 'responds with a turbo stream refresh so only changed content updates' do
-      post expenses_path, params: valid_params, as: :turbo_stream
-
-      expect(response.media_type).to eq Mime[:turbo_stream]
-      expect(response.body).to include('action="refresh"')
-      expect(response.body).not_to include('target="stats_grid"')
-    end
-
-    it 'handles validation errors by re-rendering the modal' do
-      post expenses_path,
-           params: { expense: { amount: 0, category: 'fuel' } },
-           as:     :turbo_stream
-
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('expenses.new_view.title'))
-    end
-
-    it 're-renders the refueling extension visible when the failed expense is fuel' do
-      post expenses_path,
-           params: { expense: { amount: 0, category: 'fuel' } },
-           as:     :turbo_stream
-
-      expect(response.body).to include('data-refueling-fields-target="extension"')
-      expect(response.body).to include(I18n.t('expenses.refueling_extension.heading'))
-      expect(response.body).not_to include('class="mt-2 hidden" data-refueling-fields-target="extension"')
-    end
-
-    it 're-renders the refueling extension hidden when the failed expense is not fuel' do
-      post expenses_path,
-           params: { expense: { amount: 0, category: 'meals' } },
-           as:     :turbo_stream
-
-      expect(response.body).to include('class="mt-2 hidden" data-refueling-fields-target="extension"')
-    end
-
-    it 're-renders new expense when installment parameters are invalid' do
-      params = {
-        expense:     {
-          date:        '2026-01-10',
-          amount:      300.00,
-          category:    'maintenance',
-          vendor:      'Oficina',
-          description: 'Pneus'
-        },
-        installment: {
-          repeat:      '1',
-          period:      'monthly',
-          repetitions: '1'
-        },
-        context:     { year: 2026 }
-      }
-
-      post expenses_path, params: params, as: :turbo_stream
-
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('expenses.new_view.title'))
+        post '/expenses', params: { expense: { date: '2026-01-23', amount: 150.5, category: 'maintenance' } }, as: :turbo_stream
+      }.not_to change(Expense, :count)
+      expect(response).to have_http_status(:not_found)
     end
   end
 
@@ -269,64 +152,6 @@ RSpec.describe 'Expenses', type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(Expense.exists?(other_expense.id)).to be(true)
-    end
-
-    it 'creates expenses associated to current user' do
-      post expenses_path,
-           params: {
-             expense: { date: '2026-01-23', amount: 150.50, category: 'maintenance', vendor: 'Oficina' },
-             context: { year: 2026 }
-           },
-           as:     :turbo_stream
-
-      expect(Expense.last.user).to eq(current_user)
-    end
-  end
-
-  describe 'POST /expenses with fuel category and refueling params' do
-    let(:vehicle) { create(:vehicle, user: current_user) }
-
-    before { vehicle }
-
-    it 'creates a Refueling linked to the expense' do
-      post expenses_path, params: {
-        expense:   { date: Date.current.to_s, amount: '180,50', category: 'fuel', vendor: 'Posto Orense' },
-        refueling: { liters: '32,5', odometer_km: '48230', full_tank: '1' }
-      }, as: :turbo_stream
-
-      expect(Refueling.count).to eq(1)
-      expect(Refueling.last.expense).to eq(Expense.last)
-      expect(Refueling.last.odometer_km).to eq(48_230)
-    end
-
-    it 'creates expense without refueling when fields are blank' do
-      post expenses_path, params: {
-        expense:   { date: Date.current.to_s, amount: '180,50', category: 'fuel' },
-        refueling: { liters: '', odometer_km: '' }
-      }, as: :turbo_stream
-
-      expect(Expense.count).to eq(1)
-      expect(Refueling.count).to eq(0)
-    end
-
-    it 'does not create refueling when category is not fuel' do
-      post expenses_path, params: {
-        expense:   { date: Date.current.to_s, amount: '50,00', category: 'meals' },
-        refueling: { liters: '32,5', odometer_km: '48230' }
-      }, as: :turbo_stream
-
-      expect(Refueling.count).to eq(0)
-    end
-
-    it 'rolls back the expense and refueling when the refueling data is invalid' do
-      post expenses_path, params: {
-        expense:   { date: Date.current.to_s, amount: '180,50', category: 'fuel', vendor: 'Posto' },
-        refueling: { liters: '0', odometer_km: '48230', full_tank: '1' }
-      }, as: :turbo_stream
-
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(Expense.count).to eq(0)
-      expect(Refueling.count).to eq(0)
     end
   end
 

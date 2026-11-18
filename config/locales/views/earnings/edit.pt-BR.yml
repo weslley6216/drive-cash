@@ -1,22 +1,5 @@
 pt-BR:
   earnings:
-    edit_view:
-      title: "Editar Receita"
-      subtitle: "Ajuste os dados da receita"
-      labels:
-        date: "Data"
-        amount: "Valor da Receita"
-        platform: "Plataforma"
-        notes: "Descrição (Opcional)"
-        trips_count: "Quantidade de Rotas"
-      placeholders:
-        money: "R$ 0,00"
-        select: "Selecione..."
-        notes: "Detalhes adicionais..."
-      buttons:
-        cancel: "Cancelar"
-        save: "Salvar"
-        saving: "Salvando..."
     update:
       success: "Receita atualizada com sucesso!"
     destroy:
