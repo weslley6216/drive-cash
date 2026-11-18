@@ -131,13 +131,16 @@ module History
 
     def phone_subtitle
       return t('history.index.count_subtitle', count: @feed[:total_count], period: period_label) if @slice.filtering? && @feed[:total_count].positive?
+      return period_label.capitalize if @slice.filtering? && @query.blank? && @feed[:total_count].zero?
 
       t('history.index.subtitle')
     end
 
     def empty_state
       div(class: CARD) do
-        if filtering?
+        if @query.blank? && @slice.filtering?
+          render slice_empty_state
+        elsif filtering?
           render EmptyStateComponent.new(
             icon:        PhlexIcons::Lucide::Search,
             title:       t('empty_states.history.title'),
@@ -158,6 +161,29 @@ module History
           )
         end
       end
+    end
+
+    def slice_empty_state
+      EmptyStateComponent.new(
+        icon:        PhlexIcons::Lucide::SlidersHorizontal,
+        title:       slice_empty_title,
+        description: t('empty_states.history.slice.description', slice: History::SliceTrail.new(@slice).sentence, period: slice_empty_period),
+        cta_label:   t('empty_states.history.cta'),
+        cta_path:    history_path(year: @year, month: @month),
+        cta_icon:    PhlexIcons::Lucide::X
+      )
+    end
+
+    def slice_empty_title
+      return t('empty_states.history.slice.title_year', year: @year) if @month.blank?
+
+      t('empty_states.history.slice.title_month', month: I18n.t('date.month_names')[@month])
+    end
+
+    def slice_empty_period
+      return @year.to_s if @month.blank?
+
+      t('empty_states.history.slice.period_month', month: I18n.t('date.month_names')[@month], year: @year)
     end
 
     def no_result_description

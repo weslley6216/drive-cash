@@ -158,4 +158,14 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(box(band)['left']).to be > box(tiles)['right']
     expect(box(band)['top'].round).to eq(box(tiles)['top'].round)
   end
+
+  it 'keeps the slice when the month has nothing in it and offers to clear it on a phone' do
+    visit history_path(year: 2026, month: 3, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
+
+    expect(page).to have_text(I18n.t('empty_states.history.slice.title_month', month: 'março'))
+    expect(page).to have_text(I18n.t('empty_states.history.slice.description', slice: 'Combustível (Posto Orense)', period: 'março de 2026'))
+    expect(page).to have_css('[data-slice-pill="categories"]', text: 'Combustível')
+    expect(page).to have_link(I18n.t('empty_states.history.cta'), href: history_path(year: 2026, month: 3))
+    expect(page).to fit_the_phone_width
+  end
 end

@@ -22,6 +22,11 @@ pt-BR:
         title: "Sem lançamentos no período"
         description: "Registre um ganho ou gasto para ver seu histórico aqui."
         cta: "Registrar"
+      slice:
+        title_month: "Nada neste recorte em %{month}"
+        title_year: "Nada neste recorte em %{year}"
+        description: "Você não lançou %{slice} em %{period}. O recorte continua ativo ao trocar de mês."
+        period_month: "%{month} de %{year}"
     analysis:
       title: "Sem dados em %{period}"
       description: "Registre ganhos e gastos do mês pra ver seus gráficos e métricas aqui."

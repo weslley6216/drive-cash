@@ -170,4 +170,28 @@ RSpec.describe History::IndexView, type: :component do
       expect(Capybara.string(render_slice(trend: trend))).to have_css('[data-slice-summary="trend"]')
     end
   end
+
+  context 'when a slice has nothing in the period' do
+    let(:slice) { History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }) }
+
+    def render_empty(month:)
+      view_context.render(described_class.new(feed: feed, year: 2026, month: month, query: nil, slice: slice, periods: { 2026 => [5] }))
+    end
+
+    it 'names the month and the slice and offers to clear the filters' do
+      page = Capybara.string(render_empty(month: 6))
+
+      expect(page).to have_text(I18n.t('empty_states.history.slice.title_month', month: 'junho'))
+      expect(page).to have_text(I18n.t('empty_states.history.slice.description', slice: 'Combustível (Posto Orense)', period: 'junho de 2026'))
+      expect(page).to have_link(I18n.t('empty_states.history.cta'), href: '/history?month=6&year=2026')
+    end
+
+    it 'names the year when no month is picked' do
+      expect(render_empty(month: nil)).to include(I18n.t('empty_states.history.slice.title_year', year: 2026))
+    end
+
+    it 'shows the period instead of the record count in the phone subtitle' do
+      expect(Capybara.string(render_empty(month: 6)).find('p.lg\:hidden', match: :first).text).to eq('Junho 2026')
+    end
+  end
 end
