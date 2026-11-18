@@ -59,6 +59,18 @@ pt-BR:
         earnings: "Receitas"
         expenses: "Despesas"
         net: "Líquido"
+      slice_summary:
+        spent: "Gasto"
+        received: "Recebido"
+        records: "Lançam."
+        refuelings: "Abastec."
+        average: "Média"
+        pending: "Pendente"
+        trend_title:
+          expenses: "Gasto · últimos 6 meses"
+          earnings: "Recebido · últimos 6 meses"
+        versus: "vs %{month}"
+        in_progress: "mês ainda em andamento"
       day_group:
         unpaid_badge: "Pendente"
         weekdays: ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"]

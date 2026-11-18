@@ -137,4 +137,37 @@ RSpec.describe History::IndexView, type: :component do
       expect(render_with(query: nil, slice: History::Slice.preset('unpaid'))).to include(I18n.t('empty_states.history.description'))
     end
   end
+
+  context 'with a slice that has records' do
+    let(:expense) { build_stubbed(:expense, date: Date.new(2026, 5, 22), amount: 60, category: 'fuel', vendor: 'Posto Orense') }
+    let(:group) { { date: expense.date, items: [expense], earnings_total: 0, expenses_total: 60 } }
+    let(:slice_summary) { { kind: :expenses, total: 60, count: 1, average: 60, pending: 0, category: 'fuel' } }
+
+    def render_slice(**overrides)
+      view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 1, slice_summary: slice_summary, trend: nil, **overrides),
+                                              year: 2026, month: 5, query: nil, slice: History::Slice.new(categories: %w[fuel]),
+                                              periods: { 2026 => [5] }))
+    end
+
+    it 'counts the slice records in the phone subtitle' do
+      expect(Capybara.string(render_slice).find('p.lg\:hidden', match: :first).text).to eq('1 lançamento · maio 2026')
+    end
+
+    it 'swaps the period tiles for the slice tiles' do
+      html = render_slice
+
+      expect(html).to include(I18n.t('history.index.slice_summary.spent'))
+      expect(html).not_to include(I18n.t('history.index.summary.net'))
+    end
+
+    it 'keeps the three totals for a mixed slice' do
+      expect(render_slice(slice_summary: { kind: :mixed, earnings: 50, expenses: 60, net: -10 })).to include(I18n.t('history.index.summary.net'))
+    end
+
+    it 'adds the six month band when the feed brings one' do
+      trend = { kind: :expenses, months: (1..6).map { |month| { year: 2026, month: month, total: 10 } }, change: nil, in_progress: false }
+
+      expect(Capybara.string(render_slice(trend: trend))).to have_css('[data-slice-summary="trend"]')
+    end
+  end
 end

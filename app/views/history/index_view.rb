@@ -41,7 +41,7 @@ module History
             h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate lg:leading-8 lg:text-slate-900 lg:tracking-tight') do
               t('history.index.title')
             end
-            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { t('history.index.subtitle') }
+            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { phone_subtitle }
             p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') do
               t('history.index.count_subtitle', count: @feed[:total_count], period: period_label)
             end
@@ -78,7 +78,20 @@ module History
             render History::FilterPanelComponent.new(slice: @slice, facets: @feed[:facets], year: @year, month: @month, query: @query)
           end
         end
-        render History::PeriodSummaryComponent.new(summary: @feed[:summary]) unless no_result?
+        summary_section
+      end
+    end
+
+    def summary_section
+      return if no_result?
+
+      slice_summary = @feed[:slice_summary]
+      return render History::PeriodSummaryComponent.new(summary: @feed[:summary]) if slice_summary.nil?
+      return render History::PeriodSummaryComponent.new(summary: slice_summary) if slice_summary[:kind] == :mixed
+
+      div(class: class_names('flex flex-col gap-3', @feed[:trend] ? 'lg:grid lg:grid-cols-[1fr_1.4fr] lg:gap-4' : 'lg:grid lg:grid-cols-1')) do
+        render History::SliceTrendComponent.new(trend: @feed[:trend]) if @feed[:trend]
+        render History::SliceSummaryComponent.new(summary: slice_summary)
       end
     end
 
@@ -114,6 +127,12 @@ module History
       return @year.to_s if @month.blank?
 
       "#{I18n.t('date.month_names')[@month]} #{@year}"
+    end
+
+    def phone_subtitle
+      return t('history.index.count_subtitle', count: @feed[:total_count], period: period_label) if @slice.filtering? && @feed[:total_count].positive?
+
+      t('history.index.subtitle')
     end
 
     def empty_state

@@ -121,4 +121,41 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(page).to have_text('2 lançamentos · maio 2026')
     expect(page).to have_link(I18n.t('history.index.filters.clear'))
   end
+
+  it 'sums the station slice with its six month band and counts the records in the subtitle on a phone' do
+    visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
+
+    within('[data-slice-summary="tiles"]') do
+      expect(page).to have_text('R$ 125,00')
+      expect(page).to have_text(I18n.t('history.index.slice_summary.refuelings').upcase)
+      expect(page).to have_text('R$ 62,50')
+    end
+    expect(page).to have_text(I18n.t('history.index.count_subtitle', count: 2, period: 'maio 2026'))
+    expect(page).to have_css('[data-trend-bar]', count: 6)
+    expect(page).to have_text("+25% #{I18n.t('history.index.slice_summary.versus', month: 'abril')}")
+    expect(page).to have_no_text(I18n.t('history.index.summary.net').upcase)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'shows the pending tile and no band for a slice of two categories on a phone' do
+    visit history_path(year: 2026, month: 5, categories: %w[fuel car_wash])
+
+    within('[data-slice-summary="tiles"]') do
+      expect(page).to have_text(I18n.t('history.index.slice_summary.pending').upcase)
+      expect(page).to have_text('R$ 35,00')
+    end
+    expect(page).to have_no_css('[data-slice-summary="trend"]')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'puts the slice tiles beside the six month band on a desktop screen' do
+    emulate_desktop_screen
+    visit history_path(year: 2026, month: 5, categories: %w[fuel])
+
+    tiles = find('[data-slice-summary="tiles"]')
+    band = find('[data-slice-summary="trend"]')
+
+    expect(box(band)['left']).to be > box(tiles)['right']
+    expect(box(band)['top'].round).to eq(box(tiles)['top'].round)
+  end
 end
