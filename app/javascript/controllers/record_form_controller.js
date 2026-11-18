@@ -127,10 +127,12 @@ export default class extends Controller {
   applyType(type) {
     const isEarn = type === 'earning'
     this.element.dataset.type = type
-    this.earningFieldsTarget.classList.toggle('hidden', !isEarn)
-    this.expenseFieldsTarget.classList.toggle('hidden', isEarn)
-    this.toggleFieldset(this.earningFieldsTarget, !isEarn)
-    this.toggleFieldset(this.expenseFieldsTarget, isEarn)
+    if (this.hasEarningFieldsTarget && this.hasExpenseFieldsTarget) {
+      this.earningFieldsTarget.classList.toggle('hidden', !isEarn)
+      this.expenseFieldsTarget.classList.toggle('hidden', isEarn)
+      this.toggleFieldset(this.earningFieldsTarget, !isEarn)
+      this.toggleFieldset(this.expenseFieldsTarget, isEarn)
+    }
     this.applyCtaTheme(isEarn)
     this.applyToggleVisual(isEarn)
     this.applyAmountTheme(isEarn)

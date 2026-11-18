@@ -71,20 +71,24 @@ RSpec.describe 'Earnings', type: :request do
   end
 
   describe 'GET /earnings/:id/edit' do
-    it 'renders edit modal form with platform options' do
-      earning = create(:earning, user: current_user, amount: 100)
+    it 'renders the new record form prefilled inside the modal frame with the earning theme and no type toggle' do
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10), amount: 120, platform: 'uber', trips_count: 3, notes: 'Bônus de domingo')
 
       get edit_earning_path(earning), params: { context: { year: 2026, month: 1 } }
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('earnings.edit_view.title'))
+      expect(response.body).to include(I18n.t('records.edit_view.title'))
+      expect(response.body).to include('data-record-form-type-value="earning"')
+      expect(response.body).to include(%(action="#{earning_path(earning)}"))
+      expect(response.body).to include('name="_method" value="patch"')
+      expect(response.body).to include('value="uber" checked')
+      expect(response.body).to include('name="record[trips_count]" value="3"')
+      expect(response.body).to include('Bônus de domingo')
       expect(response.body).to include('value="2026"')
-      expect(response.body).to include('Amazon')
-      expect(response.body).to include('Mercado Livre')
+      expect(response.body).to include(I18n.t('records.new_view.save_earning'))
+      expect(response.body).not_to include('data-record-form-target="expenseToggle"')
       expect(response.body).not_to include('Translation missing')
-      expect(response.body).to include('Editar Receita')
-      expect(response.body).to include('Ajuste os dados da receita')
     end
   end
 
@@ -94,7 +98,7 @@ RSpec.describe 'Earnings', type: :request do
     it 'updates earning attributes' do
       patch earning_path(earning),
             params: {
-              earning: {
+              record:  {
                 date:     '2026-01-12',
                 amount:   200.50,
                 platform: 'uber',
@@ -114,29 +118,30 @@ RSpec.describe 'Earnings', type: :request do
     it 'renders the earnings detail list after successful update' do
       patch earning_path(earning),
             params: {
-              earning: { amount: 300.00, platform: 'uber' },
+              record:  { amount: 300.00, platform: 'uber' },
               context: { year: 2026, month: 1 }
             },
             as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.earnings_detail_view.title_month'))
-      expect(response.body).not_to include(I18n.t('earnings.edit_view.title'))
+      expect(response.body).not_to include(I18n.t('records.edit_view.title'))
       expect(response.body).to include('action="refresh"')
     end
 
     it 'handles validation errors on update' do
       patch earning_path(earning),
-            params: { earning: { amount: 0 }, context: { year: 2026, month: 1 } },
+            params: { record: { amount: 0 }, context: { year: 2026, month: 1 } },
             as:     :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('earnings.edit_view.title'))
+      expect(response.body).to include(I18n.t('records.edit_view.title'))
+      expect(response.body).to include('bg-red-50')
     end
 
     it 'responds with a turbo stream refresh so only changed content updates' do
       patch earning_path(earning),
-            params: { earning: { amount: 200.50 }, context: { year: 2026, month: 1 } },
+            params: { record: { amount: 200.50 }, context: { year: 2026, month: 1 } },
             as:     :turbo_stream
 
       expect(response.body).to include('action="refresh"')
@@ -152,6 +157,24 @@ RSpec.describe 'Earnings', type: :request do
       get edit_earning_path(other_earning), params: { context: { year: 2026, month: 1 } }
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 404 when updating another user earning' do
+      other_earning = create(:earning, user: create(:user), amount: 100)
+
+      patch earning_path(other_earning), params: { record: { amount: 999 } }, as: :turbo_stream
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_earning.reload.amount).to eq(100)
+    end
+
+    it 'returns 404 when deleting another user earning' do
+      other_earning = create(:earning, user: create(:user))
+
+      delete earning_path(other_earning), as: :turbo_stream
+
+      expect(response).to have_http_status(:not_found)
+      expect(Earning.exists?(other_earning.id)).to be(true)
     end
 
     it 'creates earnings associated to current user' do

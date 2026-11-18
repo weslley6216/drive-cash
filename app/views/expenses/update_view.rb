@@ -12,7 +12,7 @@ module Expenses
     def view_template
       render_turbo_streams(
         record:      @expense,
-        edit_view:   Expenses::EditView,
+        edit_view:   Records::EditView,
         record_key:  :expense,
         detail:      @detail,
         detail_view: Dashboard::ExpensesDetailView

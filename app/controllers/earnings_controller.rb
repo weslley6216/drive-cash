@@ -18,11 +18,11 @@ class EarningsController < ApplicationController
   end
 
   def edit
-    render Earnings::EditView.new(earning: @earning, context: params[:context])
+    render Records::EditView.new(earning: @earning, context: params[:context])
   end
 
   def update
-    if @earning.update(earning_attributes(:earning))
+    if @earning.update(earning_attributes(:record))
       turbo_success(Earnings::UpdateView, record: @earning, record_key: :earning, detail_service: Dashboard::EarningsDetailService)
     else
       turbo_error(Earnings::UpdateView, record: @earning, record_key: :earning)

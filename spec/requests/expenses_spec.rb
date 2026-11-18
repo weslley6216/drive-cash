@@ -138,32 +138,31 @@ RSpec.describe 'Expenses', type: :request do
   end
 
   describe 'GET /expenses/:id/edit' do
-    it 'renders edit modal form' do
-      expense = create(:expense, user: current_user, category: 'fuel', amount: 80)
+    it 'renders the new record form prefilled with the expense theme, the paid state and no recurrence' do
+      expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10), amount: 80, category: 'maintenance', vendor: 'Oficina Azul', paid: false)
 
       get edit_expense_path(expense), params: { context: { year: 2026, month: 1 } }
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('turbo-frame id="modal"')
-      expect(response.body).to include(I18n.t('expenses.edit_view.title'))
+      expect(response.body).to include(I18n.t('records.edit_view.title'))
+      expect(response.body).to include('data-record-form-type-value="expense"')
+      expect(response.body).to include(%(action="#{expense_path(expense)}"))
+      expect(response.body).to include('value="maintenance" checked')
+      expect(response.body).to include('value="Oficina Azul"')
+      expect(response.body).to include('name="record[paid]" value="1" class="peer sr-only"')
       expect(response.body).to include('value="2026"')
-      expect(response.body).to include('expense[paid]')
+      expect(response.body).to include(I18n.t('records.new_view.save_expense'))
+      expect(response.body).not_to include('installment[repeat]')
+      expect(response.body).not_to include('data-record-form-target="earningToggle"')
     end
 
-    it 'does not render the refueling extension when editing' do
-      expense = create(:expense, user: current_user, category: 'fuel', amount: 80)
+    it 'shows the paid toggle on for a paid expense' do
+      expense = create(:expense, user: current_user, category: 'fuel', paid: true)
 
       get edit_expense_path(expense)
 
-      expect(response.body).not_to include(I18n.t('expenses.refueling_extension.heading'))
-    end
-
-    it 'preselects the expense category' do
-      expense = create(:expense, user: current_user, category: 'maintenance', amount: 80)
-
-      get edit_expense_path(expense)
-
-      expect(response.body).to include('selected="selected" value="maintenance"')
+      expect(response.body).to include('name="record[paid]" value="1" checked')
     end
   end
 
@@ -173,7 +172,7 @@ RSpec.describe 'Expenses', type: :request do
     it 'updates expense attributes' do
       patch expense_path(expense),
             params: {
-              expense: {
+              record:  {
                 date:        '2026-01-11',
                 amount:      120.75,
                 category:    'maintenance',
@@ -192,32 +191,41 @@ RSpec.describe 'Expenses', type: :request do
       expect(response.body).to include('action="refresh"')
     end
 
+    it 'marks the expense as unpaid from the paid toggle' do
+      patch expense_path(expense),
+            params: { record: { paid: '0' }, context: { year: 2026, month: 1 } },
+            as:     :turbo_stream
+
+      expect(expense.reload.paid).to be(false)
+    end
+
     it 'renders the expenses detail list after successful update' do
       patch expense_path(expense),
             params: {
-              expense: { amount: 200.00, category: 'maintenance' },
+              record:  { amount: 200.00, category: 'maintenance' },
               context: { year: 2026, month: 1 }
             },
             as:     :turbo_stream
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(I18n.t('dashboard.expenses_detail_view.title_month'))
-      expect(response.body).not_to include(I18n.t('expenses.edit_view.title'))
+      expect(response.body).not_to include(I18n.t('records.edit_view.title'))
       expect(response.body).to include('action="refresh"')
     end
 
     it 'handles validation errors on update' do
       patch expense_path(expense),
-            params: { expense: { amount: 0 }, context: { year: 2026, month: 1 } },
+            params: { record: { amount: 0 }, context: { year: 2026, month: 1 } },
             as:     :turbo_stream
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include(I18n.t('expenses.edit_view.title'))
+      expect(response.body).to include(I18n.t('records.edit_view.title'))
+      expect(response.body).to include('bg-red-50')
     end
 
     it 'responds with a turbo stream refresh so only changed content updates' do
       patch expense_path(expense),
-            params: { expense: { amount: 120.75 }, context: { year: 2026, month: 1 } },
+            params: { record: { amount: 120.75 }, context: { year: 2026, month: 1 } },
             as:     :turbo_stream
 
       expect(response.body).to include('action="refresh"')
@@ -233,6 +241,24 @@ RSpec.describe 'Expenses', type: :request do
       get edit_expense_path(other_expense), params: { context: { year: 2026, month: 1 } }
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 404 when updating another user expense' do
+      other_expense = create(:expense, user: create(:user), amount: 80)
+
+      patch expense_path(other_expense), params: { record: { amount: 999 } }, as: :turbo_stream
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_expense.reload.amount).to eq(80)
+    end
+
+    it 'returns 404 when deleting another user expense' do
+      other_expense = create(:expense, user: create(:user))
+
+      delete expense_path(other_expense), as: :turbo_stream
+
+      expect(response).to have_http_status(:not_found)
+      expect(Expense.exists?(other_expense.id)).to be(true)
     end
 
     it 'creates expenses associated to current user' do

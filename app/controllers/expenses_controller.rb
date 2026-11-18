@@ -19,11 +19,11 @@ class ExpensesController < ApplicationController
   end
 
   def edit
-    render Expenses::EditView.new(expense: @expense, context: params[:context])
+    render Records::EditView.new(expense: @expense, context: params[:context])
   end
 
   def update
-    if @expense.update(expense_attributes(:expense))
+    if @expense.update(expense_attributes(:record))
       turbo_success(Expenses::UpdateView, record: @expense, record_key: :expense, detail_service: Dashboard::ExpensesDetailService)
     else
       turbo_error(Expenses::UpdateView, record: @expense, record_key: :expense)
