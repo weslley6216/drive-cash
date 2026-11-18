@@ -8,8 +8,8 @@ module Records
     end
 
     def view_template
-      div(class: Records::NewView::DETAIL_CARD) do
-        p(class: Records::NewView::DETAIL_LABEL) do
+      div(class: Records::DetailsSectionComponent::CARD) do
+        p(class: Records::DetailsSectionComponent::LABEL) do
           span(class: 'lg:hidden') { t('records.new_view.trips_count') }
           span(class: 'hidden lg:inline') { t('records.new_view.trips_count_long') }
         end
