@@ -37,6 +37,19 @@ RSpec.describe 'Edit record', type: :system, js: true do
     expect(earning.reload.trips_count).to eq(4)
   end
 
+  it 'deletes the expense from the edit form after confirming and lands on the month detail on a phone' do
+    create(:expense, user: current_user, date: Date.new(2026, 5, 20), amount: 80, category: 'maintenance')
+    visit history_path
+    find("a[aria-label='#{I18n.t('history.index.edit.expense')}']", match: :first).click
+
+    click_on I18n.t('records.edit_view.delete')
+    within('[data-confirm-action-target="overlay"]') { click_on I18n.t('records.edit_view.delete_confirm') }
+
+    expect(page).to have_text(I18n.t('dashboard.expenses_detail_view.title_month'))
+    expect(page).to have_text(I18n.t('dashboard.expenses_detail_view.empty'))
+    expect(current_user.expenses.count).to eq(0)
+  end
+
   it 'opens the expense from the history as the centered record modal on a desktop screen' do
     emulate_desktop_screen
     create(:expense, user: current_user, date: Date.new(2026, 5, 20), amount: 80, category: 'maintenance', paid: false)

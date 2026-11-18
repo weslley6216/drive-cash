@@ -90,6 +90,16 @@ RSpec.describe 'Earnings', type: :request do
       expect(response.body).not_to include('data-record-form-target="expenseToggle"')
       expect(response.body).not_to include('Translation missing')
     end
+
+    it 'offers to delete the earning returning to the period it came from' do
+      earning = create(:earning, user: current_user, date: Date.new(2026, 1, 10))
+
+      get edit_earning_path(earning), params: { context: { year: 2026, month: 1 } }
+
+      expect(response.body).to include(I18n.t('records.edit_view.delete'))
+      expect(response.body).to include(%(action="#{earning_path(earning, context: { year: '2026', month: '1' })}"))
+      expect(response.body).to include('name="_method" value="delete"')
+    end
   end
 
   describe 'PATCH /earnings/:id' do

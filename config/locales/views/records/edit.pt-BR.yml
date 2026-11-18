@@ -2,3 +2,7 @@ pt-BR:
   records:
     edit_view:
       title: "Editar lançamento"
+      delete: "Excluir lançamento"
+      delete_confirm: "Excluir"
+      confirm_title: "Excluir lançamento?"
+      confirm_description: "Essa ação não poderá ser desfeita."

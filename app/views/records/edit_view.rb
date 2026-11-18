@@ -26,7 +26,10 @@ module Records
               desktop_header
               scrollable_body
             end
-            render Records::StickyActionBarComponent.new(theme: cta_theme, form: FORM_ID) { cancel_button }
+            render Records::StickyActionBarComponent.new(theme: cta_theme, form: FORM_ID) do
+              delete_action
+              cancel_button
+            end
           end
         end
       end
@@ -80,6 +83,33 @@ module Records
 
     def cancel_button
       button(type: 'button', data: { action: 'modal#close' }, class: 'hidden lg:inline px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900') { t('records.new_view.cancel') }
+    end
+
+    def delete_action
+      div(class: 'mb-2 lg:mb-0 lg:mr-auto') do
+        render ConfirmActionComponent.new(
+          title:          t('records.edit_view.confirm_title'),
+          icon:           PhlexIcons::Lucide::Trash2,
+          confirm_path:   confirm_delete_path,
+          confirm_method: :delete,
+          confirm_label:  t('records.edit_view.delete_confirm'),
+          cancel_label:   t('records.new_view.cancel'),
+          description:    t('records.edit_view.confirm_description')
+        ) { delete_trigger }
+      end
+    end
+
+    def confirm_delete_path
+      earning? ? earning_path(@earning, context: @context) : expense_path(@expense, context: @context)
+    end
+
+    def delete_trigger
+      button(type:  'button',
+             data:  { action: 'click->confirm-action#open' },
+             class: 'w-full h-11 rounded-xl text-sm font-semibold text-red-600 flex items-center justify-center gap-1.5 lg:w-auto lg:px-2 cursor-pointer') do
+        render PhlexIcons::Lucide::Trash2.new(class: 'w-[15px] h-[15px]')
+        plain t('records.edit_view.delete')
+      end
     end
   end
 end

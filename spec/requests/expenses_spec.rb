@@ -164,6 +164,16 @@ RSpec.describe 'Expenses', type: :request do
 
       expect(response.body).to include('name="record[paid]" value="1" checked')
     end
+
+    it 'offers to delete the expense returning to the period it came from' do
+      expense = create(:expense, user: current_user, date: Date.new(2026, 1, 10))
+
+      get edit_expense_path(expense), params: { context: { year: 2026, month: 1 } }
+
+      expect(response.body).to include(I18n.t('records.edit_view.delete'))
+      expect(response.body).to include(%(action="#{expense_path(expense, context: { year: '2026', month: '1' })}"))
+      expect(response.body).to include('name="_method" value="delete"')
+    end
   end
 
   describe 'PATCH /expenses/:id' do
