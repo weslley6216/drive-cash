@@ -150,6 +150,7 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(box(all('[data-trend-bar]').last)['height'].round).to eq(56)
     expect(page).to have_text("+25% #{I18n.t('history.index.slice_summary.versus', month: 'abril')}")
     expect(page).to have_no_text(I18n.t('history.index.summary.net').upcase)
+    expect(page).to have_no_text(I18n.t('history.index.slice_summary.no_trend_hint'))
     expect(page).to fit_the_phone_width
   end
 
@@ -161,6 +162,7 @@ RSpec.describe 'History filters', type: :system, js: true do
       expect(page).to have_text('R$ 35,00')
     end
     expect(page).to have_no_css('[data-slice-summary="trend"]')
+    expect(page).to have_text(I18n.t('history.index.slice_summary.no_trend_hint'))
     expect(page).to fit_the_phone_width
   end
 

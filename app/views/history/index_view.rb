@@ -94,6 +94,13 @@ module History
         render History::SliceTrendComponent.new(trend: @feed[:trend]) if @feed[:trend]
         render History::SliceSummaryComponent.new(summary: slice_summary)
       end
+      no_trend_hint
+    end
+
+    def no_trend_hint
+      return unless @slice.categories.size > 1
+
+      p(class: 'text-[11px] text-slate-500 px-1 leading-relaxed') { t('history.index.slice_summary.no_trend_hint') }
     end
 
     def feed_section

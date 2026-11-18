@@ -66,6 +66,7 @@ pt-BR:
         refuelings: "Abastec."
         average: "Média"
         pending: "Pendente"
+        no_trend_hint: "Com mais de uma categoria, a faixa dos 6 meses some: só aparece quando o recorte é uma categoria ou uma plataforma."
         trend_title:
           expenses: "Gasto · últimos 6 meses"
           earnings: "Recebido · últimos 6 meses"
