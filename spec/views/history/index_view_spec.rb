@@ -199,5 +199,65 @@ RSpec.describe History::IndexView, type: :component do
     it 'shows the period instead of the record count in the phone subtitle' do
       expect(Capybara.string(render_empty(month: 6)).find('p.lg\:hidden', match: :first).text).to eq('Junho 2026')
     end
+
+    it 'offers the last twelve months of a single series before clearing the filters' do
+      page = Capybara.string(render_empty(month: 6))
+
+      expect(page).to have_link(I18n.t('empty_states.history.slice.cta_twelve_months'),
+                                href: '/history?categories%5B%5D=fuel&range=12m&types%5B%5D=expenses&vendors%5Bfuel%5D%5B%5D=Posto+Orense')
+    end
+
+    it 'only offers to clear the filters for a slice of two categories' do
+      page = Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: 6, query: nil,
+                                                                     slice: History::Slice.new(categories: %w[fuel car_wash]), periods: { 2026 => [5] })))
+
+      expect(page).to have_link(I18n.t('empty_states.history.cta'))
+      expect(page).to have_no_link(I18n.t('empty_states.history.slice.cta_twelve_months'))
+    end
+  end
+
+  context 'in the twelve month mode' do
+    let(:slice) { History::Slice.new(categories: %w[insurance], range: '12m') }
+    let(:bill) { build_stubbed(:expense, date: Date.new(2026, 5, 10), amount: 214.3, category: 'insurance', vendor: 'Porto Seguro') }
+    let(:twelve_months) do
+      months = (0..11).map do |offset|
+        date = Date.new(2025, 6, 1) >> offset
+        { year: date.year, month: date.month, total: offset == 11 ? 214.3 : 0, count: offset == 11 ? 1 : 0 }
+      end
+      { kind: :expenses, series: 'insurance', count: 1, total: 214.3, average: 214.3, shift: nil, highlighted: [11], months: months,
+        rows: [{ year: 2026, month: 5, total: 214.3, count: 1, previous_month: nil, change: nil, equal: false, shift: false, record: bill }] }
+    end
+
+    before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
+
+    def render_year(data)
+      feed = { twelve_months: data, total_count: data[:count], groups: [], next_page: nil, facets: facets }
+      Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: nil, query: nil, slice: slice, periods: { 2026 => [5] })))
+    end
+
+    it 'counts the window in the subtitle and labels the period pill as the last twelve months' do
+      page = render_year(twelve_months)
+
+      expect(page.find('p.lg\:hidden', match: :first).text).to eq('1 lançamento · últimos 12 meses')
+      expect(page).to have_button(text: I18n.t('filter_component.last_twelve_months'))
+    end
+
+    it 'swaps the tiles and the day list for the twelve month card and the month rows' do
+      page = render_year(twelve_months)
+
+      expect(page).to have_css('[data-twelve-months="card"]')
+      expect(page).to have_css('[data-month-row="phone"]', count: 1)
+      expect(page).to have_no_css('[data-slice-summary="tiles"]')
+    end
+
+    it 'offers to clear the filters when the window has nothing' do
+      page = render_year(twelve_months.merge(count: 0, total: 0, rows: []))
+
+      expect(page.find('p.lg\:hidden', match: :first).text).to eq('Últimos 12 meses')
+      expect(page).to have_text(I18n.t('empty_states.history.twelve_months.title'))
+      expect(page).to have_text(I18n.t('empty_states.history.twelve_months.description', slice: 'Seguro'))
+      expect(page).to have_link(I18n.t('empty_states.history.cta'), href: '/history?year=2026')
+      expect(page).to have_no_css('[data-twelve-months="card"]')
+    end
   end
 end

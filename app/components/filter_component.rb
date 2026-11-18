@@ -8,7 +8,7 @@ class FilterComponent < ApplicationComponent
   YEAR_ARROW = 'w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100'.freeze
 
   def initialize(selected_year:, selected_month:, available_years: [], periods: {}, variant: :compact, action_path: nil,
-                 trigger_icon: PhlexIcons::Lucide::Funnel)
+                 trigger_icon: PhlexIcons::Lucide::Funnel, label: nil)
     @selected_year = selected_year
     @selected_month = selected_month
     @available_years = available_years
@@ -16,6 +16,7 @@ class FilterComponent < ApplicationComponent
     @variant = variant
     @action_path = action_path
     @trigger_icon = trigger_icon
+    @label = label
   end
 
   def view_template
@@ -74,6 +75,7 @@ class FilterComponent < ApplicationComponent
   end
 
   def pill_label
+    return @label if @label.present?
     return t('.year_all_months', year: @selected_year) if @selected_month.blank?
 
     t('.month_year', month: I18n.t('date.month_names')[@selected_month.to_i].capitalize, year: @selected_year)

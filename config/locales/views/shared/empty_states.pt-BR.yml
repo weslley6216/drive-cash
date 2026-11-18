@@ -27,6 +27,10 @@ pt-BR:
         title_year: "Nada neste recorte em %{year}"
         description: "Você não lançou %{slice} em %{period}. O recorte continua ativo ao trocar de mês."
         period_month: "%{month} de %{year}"
+        cta_twelve_months: "Ver últimos 12 meses"
+      twelve_months:
+        title: "Nada neste recorte nos últimos 12 meses"
+        description: "Você não lançou %{slice} nos últimos 12 meses."
     analysis:
       title: "Sem dados em %{period}"
       description: "Registre ganhos e gastos do mês pra ver seus gráficos e métricas aqui."

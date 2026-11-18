@@ -143,5 +143,11 @@ RSpec.describe FilterComponent, type: :component do
       expect(annual).to include(I18n.t('filter_component.year_all_months', year: 2026))
       expect(annual).to include("bg-blue-50 text-blue-700 font-semibold\">#{I18n.t('filter_component.all_months')}</a>")
     end
+
+    it 'labels the desktop pill with the given label instead of the period' do
+      labelled = render_filter(variant: :popover, periods: periods, action_path: '/history', label: 'Últimos 12 meses')
+
+      expect(labelled).to include('<span>Últimos 12 meses</span>')
+    end
   end
 end

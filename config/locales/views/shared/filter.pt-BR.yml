@@ -7,3 +7,4 @@ pt-BR:
     next_year: "Próximo ano"
     month_year: "%{month} %{year}"
     year_all_months: "%{year} · todos os meses"
+    last_twelve_months: "Últimos 12 meses"

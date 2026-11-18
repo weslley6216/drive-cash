@@ -212,6 +212,25 @@ RSpec.describe 'History', type: :request do
       expect(response.body).to include(I18n.t('filter_component.year_all_months', year: 2026))
     end
 
+    context 'with the twelve month range' do
+      before do
+        travel_to Time.zone.local(2026, 5, 22, 10, 0)
+        create(:expense, user: current_user, date: Date.new(2025, 9, 10), amount: 189.9, category: 'insurance', paid: true)
+      end
+
+      it 'opens the twelve month mode of a single series' do
+        get history_path(categories: %w[insurance], range: '12m')
+
+        expect(response.body).to include('Seguro · por mês')
+      end
+
+      it 'ignores the twelve month range for a slice of two categories' do
+        get history_path(categories: %w[insurance fuel], range: '12m')
+
+        expect(response.body).not_to include('Seguro · por mês')
+      end
+    end
+
     it 'offers the current month in the period popover even when the user has no records' do
       get history_path
 

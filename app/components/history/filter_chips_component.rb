@@ -22,7 +22,7 @@ module History
     def mode_toggle
       return unless @slice.single_series? && (@month.present? || @slice.twelve_months?)
 
-      div(class: 'hidden lg:block ml-auto') { render ModeToggleComponent.new(slice: @slice, query: @query) }
+      div(class: 'hidden lg:block ml-auto -mr-0.5') { render ModeToggleComponent.new(slice: @slice, query: @query) }
     end
 
     def filters_button
