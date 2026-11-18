@@ -21,7 +21,8 @@ module History
         groups:      with_focus_gap(groups),
         summary:     build_summary,
         total_count: total_count,
-        next_page:   next_page(items.size)
+        next_page:   next_page(items.size),
+        facets:      SliceFacets.new(user: @user, year: year, month: month, query: query).call
       }
     end
 

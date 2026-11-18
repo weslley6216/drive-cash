@@ -329,6 +329,14 @@ RSpec.describe History::FeedService do
 
         expect(result[:groups].flat_map { |group| group[:items].map(&:id) }).to eq([mine.id])
       end
+
+      it 'returns the facets of the whole period for the filter panel, whatever the slice' do
+        create(:expense, user: user, date: Date.new(2025, 6, 11), amount: 80, category: 'fuel', vendor: 'Posto Orense', paid: true)
+
+        result = described_class.new(year: 2025, month: 6, slice: History::Slice.new(platforms: %w[uber]), user: user).call
+
+        expect(result[:facets][:categories]).to eq('fuel' => { count: 1, total: 80 })
+      end
     end
 
     context 'with query parameter' do
