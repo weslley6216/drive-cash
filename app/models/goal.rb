@@ -1,6 +1,7 @@
 class Goal < ApplicationRecord
   KINDS = %w[weekly monthly annual].freeze
   METRICS = %w[profit earnings].freeze
+  NEAR_MISS_PERCENT = 80
   PERIOD_BUILDERS = {
     'weekly'  => ->(date) { [date.beginning_of_week, date.end_of_week] },
     'monthly' => ->(date) { [date.beginning_of_month, date.end_of_month] },
