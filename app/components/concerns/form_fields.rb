@@ -77,12 +77,6 @@ module FormFields
     end
   end
 
-  def text_area(form, attribute, label:, theme: :blue, rows: 2, **options)
-    field_wrapper(label, theme: theme) do
-      render form.text_area(attribute, rows: rows, class: "#{input_classes(theme: theme)} resize-none", **options)
-    end
-  end
-
   def integer_field(form, attribute, label:, theme: :blue, help: nil, **options)
     raw_value = form.object.public_send(attribute)
     field_wrapper(label, theme: theme, help: help) do
@@ -101,19 +95,13 @@ module FormFields
     end
   end
 
-  def toggle_field(form, attribute, label:, theme: :blue, on_label: nil, off_label: nil)
+  def toggle_field(form, attribute, label:, theme: :blue)
     styles = theme_styles(theme)
-    checked = !!form.object.public_send(attribute)
     wrapper_classes = "mb-4 rounded-lg border #{styles[:border]} px-4 py-3"
 
     div(class: wrapper_classes) do
       div(class: 'flex items-center justify-between gap-3') do
-        div do
-          p(class: "text-sm font-medium #{styles[:label]}") { label }
-          if on_label && off_label
-            p(class: 'text-xs text-slate-500 mt-1') { checked ? on_label : off_label }
-          end
-        end
+        p(class: "text-sm font-medium #{styles[:label]}") { label }
 
         label(for: form.field_id(attribute), class: 'relative inline-flex cursor-pointer items-center') do
           render form.check_box(
