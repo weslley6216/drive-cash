@@ -19,7 +19,7 @@ module History
     private
 
     def header
-      div(class: 'col-span-2 flex items-center justify-between mb-2 lg:col-span-1 lg:mb-1') do
+      div(class: 'col-span-2 flex items-center justify-between mb-2 lg:col-span-1 lg:mb-1 lg:items-start') do
         p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500') { t("history.index.slice_summary.trend_title.#{@trend[:kind]}") }
       end
     end

@@ -32,7 +32,7 @@ module History
     def sheet
       div(
         class: 'relative z-10 flex-1 bg-slate-50 flex flex-col shadow-2xl safe-top ' \
-               'lg:flex-none lg:w-[820px] lg:h-[470px] lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-2xl',
+               'lg:pt-0 lg:flex-none lg:w-[820px] lg:h-[470px] lg:bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-2xl',
         data:  { history_filter_panel_target: 'sheet' }
       ) do
         mobile_header
@@ -86,8 +86,23 @@ module History
         none:                     t('history.index.panel.submit_none'),
         platforms:                t('history.index.panel.platforms'),
         categories:               t('history.index.panel.categories'),
-        platforms_and_categories: t('history.index.panel.platforms_and_categories')
+        platforms_and_categories: t('history.index.panel.platforms_and_categories'),
+        platforms_subtitle:       t('history.index.panel.platforms_subtitle'),
+        categories_subtitle:      t('history.index.panel.categories_subtitle'),
+        vendors_all:              t('history.index.panel.vendors_all'),
+        vendors_marked:           t('history.index.panel.vendors_marked'),
+        all_feminine:             t('history.index.panel.all_feminine'),
+        all_masculine:            t('history.index.panel.all_masculine'),
+        connectors:               connectors
       ).to_json
+    end
+
+    def connectors
+      {
+        words:     t('support.array.words_connector'),
+        last_word: t('support.array.last_word_connector'),
+        two_words: t('support.array.two_words_connector')
+      }
     end
 
     def total_count
@@ -95,9 +110,9 @@ module History
     end
 
     def body
-      div(class: 'flex-1 overflow-y-auto px-4 py-4 space-y-3 lg:flex-1 lg:overflow-visible lg:p-0') do
+      div(class: 'flex-1 overflow-y-auto px-4 py-4 space-y-3 lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:px-0 lg:py-0 lg:space-y-0') do
         hint_section
-        div(class: 'space-y-3 lg:space-y-0 lg:flex lg:h-full') do
+        div(class: 'space-y-3 lg:space-y-0 lg:flex-1 lg:min-h-0 lg:flex') do
           type_section
           column2
           vendors_section
@@ -117,7 +132,7 @@ module History
         p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 px-1 lg:mb-0 lg:px-4 lg:pt-3 lg:pb-2') do
           t('history.index.panel.type')
         end
-        div(class: 'rounded-xl border border-slate-200 bg-white py-1 lg:rounded-none lg:border-0 lg:py-0 lg:flex-1 lg:overflow-y-auto') do
+        div(class: 'rounded-xl border border-slate-200 bg-white py-1 lg:rounded-none lg:border-0 lg:py-0 lg:px-1 lg:pb-2 lg:flex-1 lg:overflow-y-auto') do
           type_row('earnings', @facets[:earnings_count])
           type_row('expenses', @facets[:expenses_count])
           unpaid_row
@@ -131,7 +146,8 @@ module History
 
     def unpaid_row
       label(
-        class: 'flex items-center gap-3 pl-11 pr-3 min-h-[44px] border-t border-slate-100 cursor-pointer lg:pl-7 lg:border-t-0 lg:py-2',
+        class: 'flex items-center gap-3 pl-11 pr-3 min-h-[44px] border-t border-slate-100 cursor-pointer ' \
+               'lg:min-h-0 lg:py-2 lg:ml-7 lg:pl-3 lg:gap-2.5 lg:border-t-0',
         data:  { history_filter_panel_target: 'unpaidRow' }
       ) do
         input(type: 'checkbox', name: 'unpaid', value: '1', checked: @slice.unpaid?, class: 'peer sr-only')
@@ -148,32 +164,42 @@ module History
 
     def column2
       div(class: 'space-y-3 lg:space-y-0 lg:flex-1 lg:min-w-0 lg:flex lg:flex-col lg:border-r lg:border-slate-100') do
-        column2_desktop_header
-        platforms_section
-        categories_section
-      end
-    end
-
-    def column2_desktop_header
-      div(class: 'hidden lg:block px-3 pt-3 pb-2') do
-        p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500', data: { history_filter_panel_target: 'columnTitle' }) do
-          column2_title
+        column_header(column2_title, target: 'columnTitle')
+        div(class: 'space-y-3 lg:space-y-0 lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:px-1 lg:pb-2') do
+          column_empty('types')
+          platforms_section
+          categories_section
         end
       end
     end
 
-    def column2_title
-      return t('history.index.panel.platforms') if @slice.include_earnings? && !@slice.include_expenses?
-      return t('history.index.panel.categories') if @slice.include_expenses? && !@slice.include_earnings?
+    def column_header(title, target: nil)
+      div(class: 'hidden lg:block px-4 pt-3 pb-2') do
+        p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500', data: { history_filter_panel_target: target }) { title }
+        yield if block_given?
+      end
+    end
 
-      t('history.index.panel.platforms_and_categories')
+    def column2_title
+      return t('history.index.panel.platforms_and_categories') if (History::Slice::TYPES - @slice.types).empty?
+      return t('history.index.panel.platforms') if @slice.types == %w[earnings]
+
+      t('history.index.panel.categories')
+    end
+
+    def column_empty(kind)
+      p(
+        class: 'hidden px-3 py-6 text-xs text-slate-400 leading-relaxed text-center',
+        data:  { history_filter_panel_target: 'columnEmpty', empty: kind }
+      ) { t("history.index.panel.empty_#{kind}") }
     end
 
     def platforms_section
       div(class: group_card_classes, data: { level: 'platforms' }) do
         group_header(title: t('history.index.panel.platforms'), subtitle: t('history.index.panel.platforms_subtitle'), group: 'platforms')
-        div(class: group_body_classes, data: { history_filter_panel_target: 'columnEmpty' }) do
-          Earning.platforms.keys.each { |platform| platform_row(platform) }
+        column_subheading(t('history.index.panel.platforms'), spacing: 'pt-1')
+        div(class: group_body_classes, data: { group_body: true }) do
+          ordered_platforms.each { |platform| platform_row(platform) }
         end
       end
     end
@@ -181,10 +207,22 @@ module History
     def categories_section
       div(class: group_card_classes, data: { level: 'categories' }) do
         group_header(title: t('history.index.panel.categories'), subtitle: t('history.index.panel.categories_subtitle'), group: 'categories')
-        div(class: group_body_classes, data: { history_filter_panel_target: 'columnEmpty' }) do
-          Expense.categories.keys.each { |category| category_row(category) }
+        column_subheading(t('history.index.panel.categories'), spacing: 'pt-3')
+        div(class: group_body_classes, data: { group_body: true }) do
+          Expense::CATEGORIES_BY_GROUP.values.flatten.each { |category| category_row(category) }
         end
       end
+    end
+
+    def ordered_platforms
+      Earning.platforms.keys.sort_by.with_index { |platform, index| [-@facets[:platforms].dig(platform, :count).to_i, index] }
+    end
+
+    def column_subheading(text, spacing:)
+      p(
+        class: "hidden px-3 #{spacing} pb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400",
+        data:  { history_filter_panel_target: 'columnSubheading' }
+      ) { text }
     end
 
     def group_header(title:, subtitle:, group:)
@@ -201,23 +239,27 @@ module History
           class: 'min-w-[20px] h-5 px-1.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold items-center justify-center hidden',
           data:  { history_filter_panel_target: 'groupBadge', group: group }
         )
-        render PhlexIcons::Lucide::ChevronUp.new(class: 'w-4 h-4 text-slate-400')
+        render PhlexIcons::Lucide::ChevronUp.new(class: 'w-4 h-4 text-slate-400 transition-transform', data: { group_chevron: true })
       end
     end
 
     def group_card_classes
-      'rounded-xl border border-slate-200 bg-white overflow-hidden lg:rounded-none lg:border-0 lg:overflow-visible lg:flex-1 lg:flex lg:flex-col lg:min-h-0'
+      'rounded-xl border border-slate-200 bg-white overflow-hidden lg:rounded-none lg:border-0 lg:overflow-visible'
     end
 
     def group_body_classes
-      'border-t border-slate-100 py-1 lg:border-t-0 lg:py-0 lg:flex-1 lg:overflow-y-auto'
+      'border-t border-slate-100 py-1 lg:border-t-0 lg:py-0'
     end
 
     def vendors_section
-      div(class: 'lg:flex-1 lg:min-w-0 lg:flex lg:flex-col', data: { level: 'vendors' }) do
+      div(class: "#{group_card_classes} lg:flex-1 lg:min-w-0 lg:flex lg:flex-col", data: { level: 'vendors' }) do
         group_header(title: t('history.index.panel.vendors'), subtitle: nil, group: 'vendors')
-        div(class: 'hidden lg:block px-3 pt-3 pb-2') { p(class: 'text-[10px] font-bold uppercase tracking-wider text-slate-500') { t('history.index.panel.vendors') } }
-        div(class: group_body_classes) do
+        column_header(t('history.index.panel.vendors')) do
+          p(class: 'text-[11px] text-slate-400 mt-0.5', data: { history_filter_panel_target: 'groupSub', group: 'vendors_column' })
+        end
+        div(class: "#{group_body_classes} lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:px-1 lg:pb-2", data: { group_body: true }) do
+          column_empty('vendors_type')
+          column_empty('vendors_category')
           vendor_search
           @facets[:vendors].each_key { |category| vendor_block(category) }
         end
@@ -253,13 +295,14 @@ module History
     def vendor_row(category, vendor_data)
       vendor = vendor_data[:vendor]
       item_row(
-        name:         "vendors[#{category}][]",
-        value:        vendor,
-        text:         vendor_text(vendor),
-        checked:      @slice.vendors[category].to_a.include?(vendor),
-        count:        vendor_data[:count],
-        total:        vendor_data[:total],
-        text_classes: (vendor == History::Slice::NO_VENDOR ? 'italic text-slate-500' : nil)
+        name:          "vendors[#{category}][]",
+        value:         vendor,
+        text:          vendor_text(vendor),
+        checked:       @slice.vendors[category].to_a.include?(vendor),
+        count:         vendor_data[:count],
+        total:         vendor_data[:total],
+        desktop_total: true,
+        text_classes:  (vendor == History::Slice::NO_VENDOR ? 'italic text-slate-500' : nil)
       )
     end
 
@@ -274,7 +317,7 @@ module History
         value:   platform,
         text:    platform_label(platform),
         checked: @slice.platforms.include?(platform),
-        count:   data && data[:count],
+        count:   data ? data[:count] : 0,
         total:   data && data[:total],
         dim:     data.nil?
       ) { platform_lead(platform) }
@@ -287,24 +330,26 @@ module History
         value:   category,
         text:    category_label(category),
         checked: @slice.categories.include?(category),
-        count:   data && data[:count],
+        count:   data ? data[:count] : 0,
         total:   data && data[:total],
         dim:     data.nil?
       ) { category_lead(category) }
     end
 
-    def item_row(name:, value:, text:, checked:, count: nil, total: nil, dim: false, text_classes: nil, &lead)
+    def item_row(name:, value:, text:, checked:, count:, total: nil, desktop_total: false, dim: false, text_classes: nil, &lead)
       label(class: class_names(row_classes, dim ? 'opacity-40' : nil)) do
-        input(type: 'checkbox', name: name, value: value, checked: checked, class: 'peer sr-only', data: { action: 'change->history-filter-panel#sync' })
+        input(type: 'checkbox', name: name, value: value, checked: checked, class: 'peer sr-only',
+              data: { action: 'change->history-filter-panel#sync', label: text })
         checkbox_box
         lead&.call
         span(class: class_names(row_text_classes, text_classes)) { text }
-        count_block(count: count, total: total)
+        count_block(count: count, total: total, desktop_total: desktop_total)
       end
     end
 
     def row_classes
-      'flex items-center gap-3 px-3 min-h-[44px] lg:min-h-0 lg:gap-2.5 lg:py-2 lg:rounded-lg lg:hover:bg-slate-50 cursor-pointer'
+      'flex items-center gap-3 px-3 min-h-[44px] cursor-pointer ' \
+        'lg:min-h-0 lg:gap-2.5 lg:py-2 lg:rounded-lg lg:hover:bg-slate-50 lg:has-checked:bg-blue-50/60'
     end
 
     def row_text_classes
@@ -318,12 +363,20 @@ module History
       ) { render PhlexIcons::Lucide::Check.new(class: 'w-[13px] h-[13px] text-white opacity-0', 'stroke-width': '3') }
     end
 
-    def count_block(count:, total: nil)
-      return if count.nil?
+    def count_block(count:, total:, desktop_total:)
+      span(class: 'text-right leading-tight flex-shrink-0 lg:text-xs lg:leading-4') do
+        span(class: 'block text-xs font-semibold text-slate-500 tabular-nums lg:inline lg:font-normal', data: { row_count: true }) { count.to_s }
+        total_text(total, desktop_total) if total
+      end
+    end
 
-      span(class: 'text-right leading-tight flex-shrink-0') do
-        span(class: 'block text-xs font-semibold text-slate-500 tabular-nums lg:inline') { count.to_s }
-        span(class: 'block text-[10px] text-slate-400 tabular-nums lg:inline lg:ml-1') { "· #{format_currency_short(total)}" } if total
+    def total_text(total, desktop_total)
+      span(
+        class: class_names('block text-[10px] text-slate-400 tabular-nums', desktop_total ? 'lg:inline lg:text-xs' : 'lg:hidden'),
+        data:  { row_total: true }
+      ) do
+        span(class: 'hidden lg:inline') { ' · ' }
+        plain format_currency_short(total)
       end
     end
 
@@ -343,7 +396,7 @@ module History
     def footer
       div(class: 'flex gap-3 px-4 py-3 bg-white border-t border-slate-200 lg:items-center lg:justify-between lg:bg-slate-50 lg:rounded-b-xl') do
         p(class: 'hidden lg:block text-xs text-slate-500') { t('history.index.panel.period_note', period: period_label) }
-        div(class: 'flex gap-3 lg:gap-2') do
+        div(class: 'flex-1 flex gap-3 lg:flex-none lg:gap-2') do
           clear_button
           submit_button
         end

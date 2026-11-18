@@ -100,6 +100,37 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 2))
   end
 
+  it 'sums up the stations in the group subtitle and collapses them to the marked names on a phone' do
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+    mark I18n.t('history.index.panel.expenses')
+    mark 'Combustível'
+    vendors = panel.find('[data-level="vendors"]')
+
+    expect(vendors).to have_text(I18n.t('history.index.panel.vendors_all', categories: 'Combustível'))
+
+    mark 'Posto Orense'
+    expect(vendors).to have_text(I18n.t('history.index.panel.vendors_marked', count: 1))
+    vendors.find('button', text: I18n.t('history.index.panel.vendors')).click
+
+    expect(vendors).to have_css('[data-group="vendors"]', text: 'Posto Orense', exact_text: true)
+    expect(vendors).to have_no_css('label', text: 'Shell Av. Brasil')
+    expect(page).to have_no_text(I18n.t('history.index.panel.vendors').upcase)
+  end
+
+  it 'forgets the stations and their count once expenses are unmarked on a phone' do
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+    mark I18n.t('history.index.panel.expenses')
+    mark 'Combustível'
+    mark 'Posto Orense'
+
+    panel.uncheck(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+
+    expect(panel).to have_button(I18n.t('history.index.panel.submit_all', count: 6))
+    expect(panel).to have_no_css('[data-level="vendors"] label', text: 'Posto Orense')
+  end
+
   it 'searches the stations once there are more than six on a phone' do
     %w[Ale BR Ipiranga Petrobras Raízen Texaco].each do |name|
       create(:expense, user: current_user, date: Date.new(2026, 5, 10), amount: 50, category: 'fuel', vendor: name)
@@ -137,6 +168,25 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(page).to have_link(I18n.t('history.index.filters.clear'))
   end
 
+  it 'keeps the popover on screen, scrolling the categories inside it, with no platform for expenses on a desktop screen' do
+    emulate_desktop_screen
+    visit history_path(year: 2026, month: 5)
+    click_button I18n.t('history.index.filters.button')
+
+    expect(panel).to have_text(I18n.t('history.index.panel.empty_types'))
+    expect(panel).to have_text(I18n.t('history.index.panel.empty_vendors_type'))
+
+    mark I18n.t('history.index.panel.expenses')
+    sheet = panel.find('[data-history-filter-panel-target="sheet"]')
+
+    expect(panel).to have_css('label', text: 'Combustível')
+    expect(panel).to have_no_css('label', text: 'Uber')
+    expect(panel).to have_text(I18n.t('history.index.panel.empty_vendors_category'))
+    expect(box(sheet)['right']).to be <= 1280
+    expect(box(sheet)['left'].round).to eq(box(find('input[type="search"][name="q"]'))['left'].round)
+    expect(box(panel.find('button[type="submit"]'))['bottom']).to be <= box(sheet)['bottom']
+  end
+
   it 'sums the station slice with its six month band and counts the records in the subtitle on a phone' do
     visit history_path(year: 2026, month: 5, categories: %w[fuel], vendors: { fuel: ['Posto Orense'] })
 
@@ -148,6 +198,7 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(page).to have_text(I18n.t('history.index.count_subtitle', count: 2, period: 'maio 2026'))
     expect(page).to have_css('[data-trend-bar]', count: 6)
     expect(box(all('[data-trend-bar]').last)['height'].round).to eq(56)
+    expect((box(find('[data-slice-summary="tiles"]'))['top'] - box(find('[data-slice-summary="trend"]'))['bottom']).round).to eq(16)
     expect(page).to have_text("+25% #{I18n.t('history.index.slice_summary.versus', month: 'abril')}")
     expect(page).to have_no_text(I18n.t('history.index.summary.net').upcase)
     expect(page).to have_no_text(I18n.t('history.index.slice_summary.no_trend_hint'))
@@ -163,6 +214,7 @@ RSpec.describe 'History filters', type: :system, js: true do
     end
     expect(page).to have_no_css('[data-slice-summary="trend"]')
     expect(page).to have_text(I18n.t('history.index.slice_summary.no_trend_hint'))
+    expect((box(find('p', text: I18n.t('history.index.slice_summary.no_trend_hint')))['top'] - box(find('[data-slice-summary="tiles"]'))['bottom']).round).to eq(16)
     expect(page).to fit_the_phone_width
   end
 
@@ -176,7 +228,7 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(box(band)['left']).to be > box(tiles)['right']
     expect(box(band)['top'].round).to eq(box(tiles)['top'].round)
     expect(box(band.all('[data-trend-bar]').last)['height'].round).to eq(40)
-    expect(box(band.find('[data-trend-change]'))['top'].round).to eq(box(band.find('p', text: I18n.t('history.index.slice_summary.trend_title.expenses').upcase))['top'].round)
+    expect(box(band.find('[data-trend-change]').find(:xpath, '..'))['top'].round).to eq(box(band.find('p', text: I18n.t('history.index.slice_summary.trend_title.expenses').upcase))['top'].round)
   end
 
   it 'keeps the slice when the month has nothing in it and offers to clear it on a phone' do

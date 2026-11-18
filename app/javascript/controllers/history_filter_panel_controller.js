@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "panel", "sheet", "backdrop", "form", "submit", "clear", "hint", "unpaidRow",
-    "vendorBlock", "vendorHeading", "vendorSearch", "groupSub", "groupBadge", "columnTitle", "columnEmpty"
+    "vendorBlock", "vendorHeading", "vendorSearch", "groupSub", "groupBadge", "columnTitle", "columnEmpty", "columnSubheading"
   ]
 
   connect() {
@@ -45,11 +45,18 @@ export default class extends Controller {
   }
 
   toggleGroup(event) {
-    const body = event.currentTarget.nextElementSibling
-    if (body) body.classList.toggle("hidden")
+    const header = event.currentTarget
+    const body = header.parentElement.querySelector("[data-group-body]")
+    if (!body) return
+
+    body.classList.toggle("hidden")
+    header.querySelector("[data-group-chevron]").classList.toggle("rotate-180", body.classList.contains("hidden"))
+    this.sync()
   }
 
   sync() {
+    this.applyCascade(this.checkedValues("types[]"), this.checkedValues("categories[]"))
+
     const types = this.checkedValues("types[]")
     const categories = this.checkedValues("categories[]")
     const platforms = this.checkedValues("platforms[]")
@@ -59,15 +66,16 @@ export default class extends Controller {
     const includeEarnings = types.length === 0 || types.includes("earnings")
     const includeExpenses = types.length === 0 || types.includes("expenses")
 
-    this.applyCascade(types, categories)
     this.applyVisibility(includeEarnings, includeExpenses, categories)
+    this.applyColumns(types, categories)
     this.applyVendorSearchVisibility()
     this.applyBadges(categories, platforms, vendorsByCategory)
+    this.applySubtitles(categories)
     this.applyFooter(includeEarnings, includeExpenses, categories, platforms, unpaid, vendorsByCategory)
   }
 
   applyCascade(types, categories) {
-    if (types.length > 0 && !types.includes("expenses")) {
+    if (!types.includes("expenses")) {
       this.setChecked("unpaid", false)
       this.checkboxesNamed("categories[]").forEach((checkbox) => { checkbox.checked = false })
       this.vendorBlockTargets.forEach((block) => {
@@ -75,7 +83,7 @@ export default class extends Controller {
       })
     }
 
-    if (types.length > 0 && !types.includes("earnings")) {
+    if (!types.includes("earnings")) {
       this.checkboxesNamed("platforms[]").forEach((checkbox) => { checkbox.checked = false })
     }
 
@@ -103,16 +111,77 @@ export default class extends Controller {
       this.toggleHidden(heading, categories.length <= 1)
     })
 
-    if (this.hasColumnTitleTarget) {
-      this.columnTitleTarget.textContent = this.columnTitleFor(includeEarnings, includeExpenses, nothingMarked)
-    }
   }
 
-  columnTitleFor(includeEarnings, includeExpenses, nothingMarked) {
-    if (!nothingMarked && includeEarnings && !includeExpenses) return this.labels.platforms
-    if (!nothingMarked && includeExpenses && !includeEarnings) return this.labels.categories
+  applyColumns(types, categories) {
+    const earnings = types.includes("earnings")
+    const expenses = types.includes("expenses")
 
-    return this.labels.platforms_and_categories
+    this.columnTitleTarget.textContent = this.columnTitleFor(earnings, expenses)
+    this.columnSubheadingTargets.forEach((subheading) => this.toggleDesktop(subheading, earnings && expenses))
+    this.columnEmptyTargets.forEach((empty) => {
+      const shown = {
+        types: !earnings && !expenses,
+        vendors_type: !expenses,
+        vendors_category: expenses && categories.length === 0
+      }[empty.dataset.empty]
+      this.toggleDesktop(empty, shown)
+    })
+  }
+
+  columnTitleFor(earnings, expenses) {
+    if (earnings && expenses) return this.labels.platforms_and_categories
+    if (earnings) return this.labels.platforms
+
+    return this.labels.categories
+  }
+
+  applySubtitles(categories) {
+    const markedVendors = this.markedLabels(this.vendorBlockTargets.flatMap((block) => Array.from(block.querySelectorAll("input:checked"))))
+    const categoryNames = this.markedLabels(this.checkboxesNamed("categories[]").filter((checkbox) => checkbox.checked))
+    const platformNames = this.markedLabels(this.checkboxesNamed("platforms[]").filter((checkbox) => checkbox.checked))
+    const marked = markedVendors.length > 0 ? this.pluralize(this.labels.vendors_marked, markedVendors.length) : null
+    const vendorsOpen = marked || this.labels.vendors_all.replace("%{categories}", this.toSentence(categoryNames))
+    const vendorsColumn = categories.length > 0 ? (marked || this.labels.all_masculine) : ""
+
+    this.setSubtitle("platforms", this.labels.platforms_subtitle, this.summaryOf(platformNames, this.labels.all_feminine))
+    this.setSubtitle("categories", this.labels.categories_subtitle, this.summaryOf(categoryNames, this.labels.all_feminine))
+    this.setSubtitle("vendors", vendorsOpen, this.summaryOf(markedVendors, this.labels.all_masculine))
+    this.setSubtitle("vendors_column", vendorsColumn, null)
+  }
+
+  setSubtitle(group, open, collapsed) {
+    this.groupSubTargets.forEach((subtitle) => {
+      if (subtitle.dataset.group !== group) return
+
+      const body = subtitle.closest("[data-level]")?.querySelector("[data-group-body]")
+      const isCollapsed = collapsed !== null && body && body.classList.contains("hidden")
+      subtitle.textContent = isCollapsed ? collapsed : open
+    })
+  }
+
+  markedLabels(checkboxes) {
+    return checkboxes.map((checkbox) => checkbox.dataset.label)
+  }
+
+  summaryOf(names, fallback) {
+    return names.length > 0 ? names.join(this.labels.connectors.words) : fallback
+  }
+
+  toSentence(names) {
+    const { words, two_words: twoWords, last_word: lastWord } = this.labels.connectors
+    if (names.length <= 1) return names.join("")
+    if (names.length === 2) return names.join(twoWords)
+
+    return `${names.slice(0, -1).join(words)}${lastWord}${names[names.length - 1]}`
+  }
+
+  pluralize(forms, count) {
+    return (count === 1 ? forms.one : forms.other).replace("%{count}", count)
+  }
+
+  toggleDesktop(element, shown) {
+    element.classList.toggle("lg:block", shown)
   }
 
   applyVendorSearchVisibility() {

@@ -58,6 +58,33 @@ RSpec.describe History::FilterPanelComponent, type: :component do
     expect(page.find('label', text: 'Uber')).to have_text('2')
   end
 
+  it 'lists the categories in the vehicle then personal order of the prototype' do
+    expect(page.all('input[name="categories[]"]', visible: :all).map(&:value)).to eq(Expense::CATEGORIES_BY_GROUP.values.flatten)
+  end
+
+  it 'lists the busiest platforms first, then the rest in the enum order' do
+    expect(page.all('input[name="platforms[]"]', visible: :all).map(&:value)).to eq(%w[uber amazon ifood mercado_livre nine_nine rappi shopee other])
+  end
+
+  it 'counts zero on the rows without records' do
+    expect(page.find('label', text: 'Pedágio').find('[data-row-count]').text).to eq('0')
+    expect(page.find('label', text: 'Combustível').find('[data-row-count]').text).to eq('3')
+  end
+
+  it 'keeps the short total of categories to the phone and shows the vendor one on every screen' do
+    fuel_total = page.find('label', text: 'Combustível').find('[data-row-total]')
+    vendor_total = page.find('[data-category="fuel"] label', text: 'Posto Orense').find('[data-row-total]')
+
+    expect(fuel_total[:class]).to include('lg:hidden')
+    expect(vendor_total[:class]).not_to include('lg:hidden')
+    expect(vendor_total).to have_text('R$ 125')
+  end
+
+  it 'labels each checkbox for the collapsed group summaries' do
+    expect(page.find('input[name="categories[]"][value="fuel"]', visible: :all)['data-label']).to eq('Combustível')
+    expect(page.find('input[value="__none__"]', visible: :all)['data-label']).to eq(I18n.t('history.index.panel.no_vendor'))
+  end
+
   it 'groups the vendors by category, labelling the vendorless ones' do
     fuel = page.find('[data-history-filter-panel-target="vendorBlock"][data-category="fuel"]')
     wash = page.find('[data-history-filter-panel-target="vendorBlock"][data-category="car_wash"]')
@@ -90,9 +117,13 @@ RSpec.describe History::FilterPanelComponent, type: :component do
 
     expect(JSON.parse(form['data-facets'])).to eq([{ 'type' => 'earnings', 'platform' => 'uber', 'count' => 2 }])
     expect(JSON.parse(form['data-labels'])).to include(
-      'one'  => I18n.t('history.index.panel.submit.one'),
-      'all'  => I18n.t('history.index.panel.submit_all', count: 6),
-      'none' => I18n.t('history.index.panel.submit_none')
+      'one'            => I18n.t('history.index.panel.submit.one'),
+      'all'            => I18n.t('history.index.panel.submit_all', count: 6),
+      'none'           => I18n.t('history.index.panel.submit_none'),
+      'vendors_all'    => I18n.t('history.index.panel.vendors_all'),
+      'vendors_marked' => { 'one' => '%{count} marcado', 'other' => '%{count} marcados' },
+      'all_feminine'   => 'todas',
+      'connectors'     => { 'words' => ', ', 'last_word' => ' e ', 'two_words' => ' e ' }
     )
   end
 
