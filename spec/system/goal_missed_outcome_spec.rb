@@ -79,7 +79,8 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
 
     click_on 'Ver lançamentos da semana'
 
-    expect(page).to have_current_path(history_path(focus_day: '2026-07-06'))
+    expect(page).to have_current_path(history_path(week: '2026-07-06'))
+    expect(page).to have_text('Semana de 6 a 12 de julho')
     expect(page).to fit_the_phone_width
   end
 
@@ -96,7 +97,7 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     expect(box(hero)['width']).to be_within(2).of(((box(grid)['width'] * 7) - 100) / 12)
     expect(box(next_step)['x']).to be > box(hero)['right']
     expect(box(next_step)['y']).to be < box(went_well)['y']
-    expect(page).to have_link('Ver lançamentos da semana', href: history_path(focus_day: '2026-07-06'))
+    expect(page).to have_link('Ver lançamentos da semana', href: history_path(week: '2026-07-06'))
     expect(page).to have_text('06/jul a 12/jul · 2026 · meta semanal de lucro líquido')
   end
 end

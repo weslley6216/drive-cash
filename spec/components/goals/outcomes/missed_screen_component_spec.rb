@@ -137,7 +137,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   it 'links to the entries of the week from the top bar and the footer' do
     page_html = Capybara.string(render_screen)
 
-    expect(page_html).to have_link('Ver lançamentos da semana', href: '/history?focus_day=2026-07-06', count: 2)
+    expect(page_html).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06', count: 2)
   end
 
   it 'links a monthly goal to its month and an annual goal to its year in the history' do
