@@ -52,19 +52,34 @@ RSpec.describe Notifications::Presenters do
   end
 
   describe 'goal_reached' do
-    it 'renders the month name and the reached amount in BRL' do
-      row = present('goal_reached', { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+    let(:data) do
+      { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly', 'metric' => 'profit',
+        'target' => 1_000.0, 'current' => 1_200.0 }
+    end
 
-      expect(row.title).to eq('Meta batida! 🎯')
-      expect(row.body).to eq('Você bateu a meta de Julho com R$ 1.200,00.')
+    it 'titles the row by the goal kind and names the period with the reached amount in BRL' do
+      row = present('goal_reached', data)
+
+      expect(row.title).to eq('Meta mensal batida! 🎯')
+      expect(row.body).to eq('Você bateu a meta de julho com R$ 1.200,00.')
       expect(row.palette_key).to eq(:success)
       expect(row.icon).to eq(PhlexIcons::Lucide::Target)
     end
 
-    it 'links to goals with no inline action' do
-      row = present('goal_reached', { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+    it 'names a weekly goal by its week and an annual goal by its year' do
+      weekly = present('goal_reached', data.merge('kind' => 'weekly', 'period_start' => '2026-07-06'))
+      annual = present('goal_reached', data.merge('kind' => 'annual', 'period_start' => '2026-01-01'))
 
-      expect(row.path).to eq('/goals')
+      expect(weekly.title).to eq('Meta semanal batida! 🎯')
+      expect(weekly.body).to eq('Você bateu a meta de 06/jul a 12/jul com R$ 1.200,00.')
+      expect(annual.title).to eq('Meta anual batida! 🎯')
+      expect(annual.body).to eq('Você bateu a meta de 2026 com R$ 1.200,00.')
+    end
+
+    it 'links to the outcome of the goal period with no inline action' do
+      row = present('goal_reached', data)
+
+      expect(row.path).to eq('/goals/1/outcomes/2026-07-01')
       expect(row.inline_action).to be_nil
     end
   end
@@ -146,7 +161,8 @@ RSpec.describe Notifications::Presenters do
       'maintenance_due' => { 'maintenance_id' => 1, 'status' => 'overdue', 'category' => 'oil_change',
                              'km_until' => -412, 'interval_km' => 5_000 },
       'tank_low'        => { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 },
-      'goal_reached'    => { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 },
+      'goal_reached'    => { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
+                             'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 },
       'weekly_summary'  => { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 },
       'log_reminder'    => { 'date' => '2026-07-14' }
     }
@@ -176,9 +192,10 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'falls back to the row path when the kind has no inline action' do
-      row = present('goal_reached', { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+      row = present('goal_reached', { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
+                                      'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 })
 
-      expect(row.destination('inline')).to eq('/goals')
+      expect(row.destination('inline')).to eq('/goals/1/outcomes/2026-07-01')
     end
 
     it 'uses the row path when not tapped inline' do

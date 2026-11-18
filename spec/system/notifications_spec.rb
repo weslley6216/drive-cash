@@ -112,8 +112,12 @@ RSpec.describe 'Notifications', type: :system, js: true do
   end
 
   it 'refreshes the bell badge after going back on a phone' do
+    goal = create(:goal, user: current_user, kind: 'monthly', metric: 'earnings', target_amount: 1_000,
+                         period_start: Date.new(2026, 10, 1), period_end: Date.new(2026, 10, 31))
+    create(:earning, user: current_user, date: Date.new(2026, 10, 10), amount: 1_200)
     create(:notification, user: current_user, kind: 'goal_reached',
-                          data: { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+                          data: { 'goal_id' => goal.id, 'period_start' => '2026-10-01', 'kind' => 'monthly',
+                                  'metric' => 'earnings', 'target' => 1_000.0, 'current' => 1_200.0 })
     create(:notification, user: current_user, kind: 'weekly_summary',
                           data: { 'week_start' => '2026-11-02', 'profit' => 500.0, 'trips' => 10 })
 
@@ -121,8 +125,8 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(find(:link, I18n.t('notifications.index.title'))).to have_text('2')
 
     click_on I18n.t('notifications.index.title')
-    click_on I18n.t('notifications.kinds.goal_reached.title')
-    expect(page).to have_current_path(goals_path)
+    click_on I18n.t('notifications.kinds.goal_reached.title.monthly')
+    expect(page).to have_current_path(goal_outcome_path(goal, '2026-10-01'))
     page.go_back
     page.go_back
 

@@ -1,0 +1,59 @@
+pt-BR:
+  goals:
+    periods:
+      short:
+        weekly: "%{start} a %{end}"
+        monthly: "%{month}"
+        annual: "%{year}"
+      full:
+        weekly: "%{start} a %{end} · %{year}"
+        monthly: "%{month_year}"
+        annual: "%{year}"
+    outcomes:
+      show:
+        title: "Meta batida"
+        back: "Voltar para as notificações"
+        view_goals: "Ver metas"
+        view_all_goals: "Ver todas as metas"
+        desktop_subtitle: "%{period} · %{kind} de %{metric}"
+        kinds:
+          weekly: "Meta semanal"
+          monthly: "Meta mensal"
+          annual: "Meta anual"
+        metrics:
+          profit: "lucro líquido"
+          earnings: "ganhos"
+        hero:
+          kicker: "%{kind} · %{metric}"
+          heading: "Meta de %{period} batida!"
+          made_before: "Você fez "
+          made_after: " de %{metric} em %{period}."
+          above: "+%{surplus} acima da meta · %{percent}%%"
+          target: "Meta"
+          achieved: "Alcançado"
+          hit_on: "Batida em"
+          days_before_end:
+            zero: "no último dia"
+            one: "%{count} dia antes do fim"
+            other: "%{count} dias antes do fim"
+        journey:
+          title: "Como você chegou lá"
+          worked_days: "Dias rodados"
+          per_day:
+            profit: "Lucro / dia"
+            earnings: "Ganho / dia"
+          best_day: "Melhor dia"
+          streak:
+            weekly:
+              other: "%{count} semanas seguidas batendo a meta"
+            monthly:
+              other: "%{count} meses seguidos batendo a meta"
+            annual:
+              other: "%{count} anos seguidos batendo a meta"
+        next_step:
+          kicker: "Próximo passo"
+          question: "Que tal %{amount} em %{period}?"
+          explanation: "É o seu resultado de %{period} com 5%% a mais, arredondado. Dá %{per_day} por dia no mesmo ritmo de dias."
+          raise: "Subir a meta"
+          keep: "Manter %{amount}"
+          view_next: "Ver meta de %{period}"

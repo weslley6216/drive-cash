@@ -69,7 +69,8 @@ RSpec.describe Notifications::RowComponent, type: :component do
 
   it 'renders no inline action for goal_reached' do
     notification = create(:notification, user: user, kind: 'goal_reached',
-                                         data: { 'goal_id' => 1, 'month' => '2026-07-01', 'current' => 1_200.0 })
+                                         data: { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
+                                                 'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 })
 
     html = render_row(notification)
 

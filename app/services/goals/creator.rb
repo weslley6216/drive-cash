@@ -5,12 +5,6 @@ module Goals
       def self.failure(goal:) = new(success?: false, goal: goal)
     end
 
-    PERIOD_BUILDERS = {
-      'weekly'  => ->(date) { [date.beginning_of_week, date.end_of_week] },
-      'monthly' => ->(date) { [date.beginning_of_month, date.end_of_month] },
-      'annual'  => ->(date) { [Date.new(date.year, 1, 1), Date.new(date.year, 12, 31)] }
-    }.freeze
-
     def initialize(attrs, user:, date: Date.current)
       @attrs = attrs
       @user = user
@@ -47,7 +41,7 @@ module Goals
     end
 
     def fill_period!(goal)
-      goal.period_start, goal.period_end = PERIOD_BUILDERS.fetch(goal.kind).call(@date)
+      goal.period_start, goal.period_end = Goal::PERIOD_BUILDERS.fetch(goal.kind).call(@date)
     end
   end
 end

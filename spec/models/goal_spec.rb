@@ -136,4 +136,45 @@ RSpec.describe Goal, type: :model do
       expect(goal.errors[:user]).to be_present
     end
   end
+
+  describe '#next_period' do
+    it 'returns the month after a monthly goal' do
+      goal = build(:goal, kind: 'monthly', period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
+
+      expect(goal.next_period).to eq(Date.new(2026, 7, 1)..Date.new(2026, 7, 31))
+    end
+
+    it 'returns the monday to sunday week after a weekly goal' do
+      goal = build(:goal, kind: 'weekly', period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
+
+      expect(goal.next_period).to eq(Date.new(2026, 7, 13)..Date.new(2026, 7, 19))
+    end
+
+    it 'returns the year after an annual goal' do
+      goal = build(:goal, kind: 'annual', period_start: Date.new(2026, 1, 1), period_end: Date.new(2026, 12, 31))
+
+      expect(goal.next_period).to eq(Date.new(2027, 1, 1)..Date.new(2027, 12, 31))
+    end
+  end
+
+  describe '#celebrate!' do
+    it 'stamps the first celebration and reports it' do
+      travel_to Time.zone.local(2026, 7, 1, 9, 0)
+      goal = create(:goal)
+
+      first_visit = goal.celebrate!
+
+      expect(first_visit).to be(true)
+      expect(goal.reload.celebrated_at).to eq(Time.zone.local(2026, 7, 1, 9, 0))
+    end
+
+    it 'keeps the first stamp and reports no celebration on a later visit' do
+      goal = create(:goal, celebrated_at: Time.zone.local(2026, 7, 1, 9, 0))
+
+      later_visit = goal.celebrate!
+
+      expect(later_visit).to be(false)
+      expect(goal.reload.celebrated_at).to eq(Time.zone.local(2026, 7, 1, 9, 0))
+    end
+  end
 end

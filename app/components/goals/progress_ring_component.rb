@@ -7,7 +7,7 @@ module Goals
       @stroke = stroke
     end
 
-    def view_template
+    def view_template(&center)
       radius = (@size - @stroke) / 2.0
       circumference = (2 * Math::PI * radius).round(4)
       offset = (circumference - (@percent / 100.0) * circumference).round(4)
@@ -22,9 +22,13 @@ module Goals
           )
         end
         div(class: 'absolute inset-0 flex flex-col items-center justify-center') do
-          span(class: 'text-2xl font-bold text-slate-800') do
-            plain @percent.round.to_s
-            span(class: 'text-sm font-medium text-slate-500') { '%' }
+          if center
+            yield
+          else
+            span(class: 'text-2xl font-bold text-slate-800') do
+              plain @percent.round.to_s
+              span(class: 'text-sm font-medium text-slate-500') { '%' }
+            end
           end
         end
       end

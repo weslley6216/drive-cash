@@ -40,7 +40,9 @@ Rails.application.routes.draw do
 
   resource :analysis, only: :show, controller: 'analysis'
   get '/history', to: 'history#index', as: :history
-  resources :goals, only: %i[index new create edit update destroy]
+  resources :goals, only: %i[index new create edit update destroy] do
+    resources :outcomes, only: :show, param: :period_start, module: :goals
+  end
   resources :exports, only: %i[index create show] do
     collection { get :preview }
     member do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_180808) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_122637) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_180808) do
   end
 
   create_table "goals", force: :cascade do |t|
+    t.datetime "celebrated_at"
     t.datetime "created_at", null: false
     t.string "kind", null: false
     t.string "metric", default: "profit", null: false
