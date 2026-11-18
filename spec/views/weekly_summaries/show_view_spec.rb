@@ -70,6 +70,14 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
     expect(render_view(summary)).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06', count: 2)
   end
 
+  it 'styles the desktop CTA as the blue topbar button' do
+    expect(render_view(summary)).to have_css("a.bg-blue-600.rounded-lg[href='/history?week=2026-07-06']")
+  end
+
+  it 'keeps the desktop analysis link inline inside its paragraph' do
+    expect(render_view(summary)).to have_css("p.hidden a[href='/analysis?month=7&year=2026']", text: 'Análise de julho →')
+  end
+
   it 'links the analysis of the month of the monday as a secondary link' do
     page_html = render_view(summary.with(week: Calendars::Week.containing(Date.new(2026, 6, 29))))
 

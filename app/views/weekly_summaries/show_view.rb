@@ -10,11 +10,11 @@ module WeeklySummaries
     def view_template
       render LayoutComponent.new(title: t('weekly_summaries.show.title'), bottom_nav: :home, sidebar_nav: :home) do
         render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
-          screen.with_content do
+          screen.with_header do
+            mobile_header
             desktop_header
-            body_section
           end
+          screen.with_content { body_section }
         end
       end
     end
@@ -44,8 +44,8 @@ module WeeklySummaries
         end
         div(class: 'flex items-center gap-3') do
           render WeekNavComponent.new(week: @summary.week, size: 'w-10 h-10')
-          cta_link(class: 'bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold ' \
-                          'flex items-center gap-2')
+          cta_link('bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold ' \
+                   'flex items-center gap-2')
         end
       end
     end
@@ -56,12 +56,12 @@ module WeeklySummaries
           render HeroComponent.new(summary: @summary)
           render GoalComponent.new(progress: @summary.goal) if @summary.goal
         end
-        div(class: 'col-span-12 lg:col-span-7 space-y-4 lg:space-y-5') do
+        div(class: 'col-span-12 lg:col-span-7 flex flex-col gap-4 lg:gap-5') do
           render DailyBarsComponent.new(week: @summary.week, daily_profits: @summary.daily_profits,
                                         best_day_index: @summary.best_day_index, empty_days: @summary.empty_days,
                                         blank_week: @summary.blank_week)
           render TopCategoriesComponent.new(categories: @summary.top_categories, total: @summary.expenses_total)
-          analysis_link('hidden lg:block text-sm font-medium text-blue-600 hover:underline')
+          p(class: 'hidden lg:block text-sm') { analysis_link('font-medium text-blue-600 hover:underline') }
         end
       end
       mobile_footer

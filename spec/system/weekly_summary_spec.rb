@@ -57,6 +57,8 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
 
     visit weekly_summary_path('2026-07-06')
 
+    expect(box(find_link('Ver resultado da meta'))['width']).to be < 200
+
     click_on 'Ver resultado da meta'
 
     expect(page).to have_current_path("/goals/#{goal.id}/outcomes/2026-07-06")
@@ -100,6 +102,16 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the 16px prototype gap between the last card and the history CTA on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    last_card = find('#screen-content .rounded-xl', text: 'Onde foi o dinheiro')
+    cta = find_link('Ver lançamentos da semana')
+
+    expect(box(cta)['y'] - box(last_card)['bottom']).to be_within(0.5).of(16)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'lays the hero and the goal on five columns beside the bars on a desktop screen' do
     goal
     emulate_desktop_screen
@@ -111,7 +123,10 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     goal_card = find('#screen-content .rounded-xl', text: 'Meta da semana')
     grid = hero.find(:xpath, '../..')
     track = find('[data-weekday="0"]').find(:xpath, '..')
+    topbar = find('#screen-header h1', text: 'Sua semana').find(:xpath, '../..')
 
+    expect(box(topbar)['y']).to eq(0)
+    expect(box(hero)['y'] - box(topbar)['bottom']).to be_within(1).of(32)
     expect(box(hero)['width']).to be_within(2).of(((box(grid)['width'] * 5) - 140) / 12)
     expect(box(goal_card)['y']).to be > box(hero)['bottom']
     expect(box(bars)['x']).to be > box(hero)['right']

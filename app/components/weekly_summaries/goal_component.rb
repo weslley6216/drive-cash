@@ -35,7 +35,7 @@ module WeeklySummaries
 
     def outcome_link
       link_to(helpers.goal_outcome_path(@progress.goal, @progress.goal.period_start),
-              class: 'mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1') do
+              class: 'mt-3 w-fit text-xs font-semibold text-blue-600 flex items-center gap-1') do
         plain t('weekly_summaries.show.goal.link')
         render PhlexIcons::Lucide::ArrowRight.new(class: 'w-[13px] h-[13px]')
       end
