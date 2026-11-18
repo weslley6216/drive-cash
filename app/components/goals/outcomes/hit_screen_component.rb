@@ -23,7 +23,7 @@ module Goals
       private
 
       def body_section
-        div(class: 'max-w-5xl grid grid-cols-12 gap-4 lg:gap-5 items-start pb-10') do
+        div(class: 'max-w-5xl grid grid-cols-12 gap-4 lg:gap-5 items-start lg:pb-10') do
           div(class: 'col-span-12 lg:col-span-7') { render Goals::Outcomes::HeroComponent.new(outcome: @outcome) }
           div(class: 'col-span-12 lg:col-span-5 flex flex-col gap-4 lg:gap-5') do
             div(class: 'lg:order-2') { render Goals::Outcomes::JourneyComponent.new(outcome: @outcome) }
@@ -35,7 +35,7 @@ module Goals
 
       def view_all_goals_link
         link_to(helpers.goals_path,
-                class: 'lg:hidden w-full py-2 text-sm font-medium text-blue-600 flex items-center ' \
+                class: 'lg:hidden w-full mt-4 py-2 text-sm font-medium text-blue-600 flex items-center ' \
                        'justify-center gap-1.5') do
           plain t('goals.outcomes.show.view_all_goals')
           render PhlexIcons::Lucide::ArrowRight.new(class: 'w-[14px] h-[14px]')

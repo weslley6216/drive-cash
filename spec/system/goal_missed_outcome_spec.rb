@@ -46,6 +46,15 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the footer link one card gap below the next step on a phone' do
+    visit goal_outcome_path(goal, '2026-07-06')
+
+    next_step = find('div.bg-blue-50', text: /Próximo passo/i)
+    footer = find('a', text: 'Ver lançamentos da semana')
+
+    expect(box(footer)['top'] - box(next_step)['bottom']).to eq(16)
+  end
+
   it 'adjusts the next week goal to the recent average on a phone' do
     visit goal_outcome_path(goal, '2026-07-06')
 
