@@ -101,7 +101,7 @@ RSpec.describe 'Home', type: :system, js: true do
     visit root_path
 
     expect(page).to have_text(I18n.t('empty_states.home.title'))
-    expect(page).to have_link(I18n.t('empty_states.home.cta'))
+    expect(page).to have_link(I18n.t('empty_states.home.cta'), href: new_record_path(type: 'earning'))
     expect(page).to have_link(I18n.t('empty_states.home.secondary'), href: chat_root_path)
     expect(page).to have_no_link(I18n.t('filter_component.all_chip'))
     expect(page).to fit_the_phone_width

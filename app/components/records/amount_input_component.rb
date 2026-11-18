@@ -23,7 +23,7 @@ module Records
             inputmode:    'numeric',
             placeholder:  '0,00',
             autocomplete: 'off',
-            class:        "text-6xl h-[60px] lg:h-10 font-bold tracking-tight bg-transparent text-center w-48 focus:outline-none placeholder:opacity-40 #{DESKTOP_VALUE} " \
+            class:        "text-6xl h-[60px] lg:h-10 font-bold tracking-tight bg-transparent text-center w-[var(--amount-width,12rem)] min-w-0 focus:outline-none placeholder:opacity-40 #{DESKTOP_VALUE} " \
                           "#{THEME_TEXT.fetch(@theme)} #{THEME_PLACEHOLDER.fetch(@theme)}",
             data:         { record_form_target: 'amountDisplay', action: 'input->record-form#formatAmount' }
           )

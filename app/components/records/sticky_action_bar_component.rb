@@ -5,16 +5,18 @@ module Records
       emerald: { bg: 'bg-emerald-600', shadow: 'shadow-emerald-600/20', label_key: 'records.new_view.save_earning' }
     }.freeze
 
-    def initialize(theme:)
+    def initialize(theme:, form: nil)
       @theme = theme.to_sym
+      @form = form
     end
 
-    def view_template
+    def view_template(&block)
       style = THEMES.fetch(@theme)
       div(class: 'px-5 pt-3 pb-6 border-t border-slate-100 bg-white sticky bottom-0 lg:static lg:px-6 lg:py-4 lg:flex lg:items-center lg:justify-end lg:gap-3') do
-        link_to(t('records.new_view.cancel'), root_path, class: 'hidden lg:inline px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900')
+        yield if block_given?
         button(
           type:  'submit',
+          form:  @form,
           class: 'w-full rounded-xl py-3.5 text-base font-semibold text-white flex items-center justify-center gap-2 shadow-lg cursor-pointer ' \
                  "lg:w-auto lg:rounded-lg lg:px-5 lg:py-2 lg:text-sm lg:shadow-none #{style[:bg]} #{style[:shadow]}",
           data:  { record_form_target: 'submit' }

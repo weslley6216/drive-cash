@@ -115,9 +115,8 @@ module Dashboard
             title:           t('empty_states.home.title'),
             description:     t('empty_states.home.description'),
             cta_label:       t('empty_states.home.cta'),
-            cta_path:        new_earning_path,
+            cta_path:        new_record_path(type: 'earning'),
             cta_icon:        PhlexIcons::Lucide::Plus,
-            cta_data:        { turbo_frame: 'modal' },
             secondary_label: t('empty_states.home.secondary'),
             secondary_path:  helpers.chat_root_path
           )
