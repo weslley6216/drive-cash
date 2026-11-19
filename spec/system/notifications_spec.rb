@@ -159,7 +159,7 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to have_current_path(edit_notification_preferences_path)
   end
 
-  it 'shows the active bell without the badge after the mark-all action and the preferences on a desktop screen' do
+  it 'shows the active bell without the badge next to the mark-all action and the preferences on a desktop screen' do
     create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-10' })
     emulate_desktop_screen
 
