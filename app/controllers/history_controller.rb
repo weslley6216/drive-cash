@@ -7,6 +7,7 @@ class HistoryController < ApplicationController
                                      focus_day: @focus_day, week: @week, page: @page, user: current_user).call
 
     render History::IndexView.new(feed: @feed, year: @year, month: @month, query: @query,
-                                  slice: @slice, periods: @periods, week: @week)
+                                  slice: @slice, periods: @periods, week: @week,
+                                  unread_count: current_user.unread_notifications_count)
   end
 end

@@ -117,6 +117,22 @@ RSpec.describe 'History', type: :system, js: true do
     expect(page).to have_no_link(I18n.t('history.index.load_more'))
   end
 
+  it 'ends the topbar with the bell after the period pill, the new record button and a divider on a desktop screen' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit history_path(year: 2026, month: 5)
+
+    topbar = find('header', text: I18n.t('history.index.title'))
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_text('2 lançamentos · maio 2026')
+    expect(topbar).to have_button('Maio 2026')
+    expect(topbar).to have_link(I18n.t('history.index.new_record'), href: new_record_path)
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
+
   it 'filters the period from the single month and year pill on a desktop screen' do
     create(:earning, user: current_user, date: Date.new(2026, 4, 8), amount: 50, platform: 'ifood', trips_count: 1)
     emulate_desktop_screen
