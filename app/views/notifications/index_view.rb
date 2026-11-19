@@ -19,9 +19,11 @@ module Notifications
       render LayoutComponent.new(title: t('notifications.index.title'), bottom_nav: :more, sidebar_nav: :more,
                                  turbo_cache: false) do
         render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
+          screen.with_header do
+            mobile_header
+            desktop_topbar
+          end
           screen.with_content do
-            desktop_header
             @groups.empty? ? empty_state : groups_list
           end
         end
@@ -48,13 +50,14 @@ module Notifications
       end
     end
 
-    def desktop_header
-      div(class: 'hidden lg:flex items-center justify-between mb-6') do
-        div do
-          h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.index.title') }
-          p(class: 'text-sm text-slate-500 mt-1') { t('notifications.index.unread_count', count: @unread_count) }
-        end
-        div(class: 'flex items-center gap-2') do
+    def desktop_topbar
+      render DesktopTopbarComponent.new(
+        title:        t('notifications.index.title'),
+        subtitle:     t('notifications.index.unread_count', count: @unread_count),
+        unread_count: @unread_count,
+        bell_active:  true
+      ) do |topbar|
+        topbar.with_actions do
           unless @groups.empty?
             header_action(css: HEADER_ACTION_DESKTOP_CLASSES, icon_class: 'w-[15px] h-[15px] text-slate-500')
           end
