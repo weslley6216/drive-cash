@@ -148,8 +148,8 @@ RSpec.describe 'Analysis', type: :request do
     it 'renders the prototype topbar with the white desktop bar and the export shortcut' do
       get analysis_path
 
-      expect(response.body).to include('px-5 pt-2 pb-3 sm:px-6 sm:pt-6 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
-      expect(response.body).to include('text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight')
+      expect(response.body).to include('<header class="hidden lg:flex -mx-8 bg-white border-b border-slate-200 px-8 py-4 items-center justify-between gap-6">')
+      expect(response.body).to include('<h1 class="text-2xl font-bold text-slate-900 tracking-tight">Análise</h1>')
       expect(response.body).to include(%(href="#{exports_path}"))
       expect(response.body).to include(I18n.t('analysis.show_view.export'))
     end

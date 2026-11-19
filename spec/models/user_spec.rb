@@ -359,4 +359,16 @@ RSpec.describe User, type: :model do
       expect(user.visible_notifications).to contain_exactly(fresh_read, old_unread)
     end
   end
+
+  describe '#unread_notifications_count' do
+    it 'counts only the visible unread notifications' do
+      user = create(:user, notification_preferences: { 'tank_low' => false })
+      create(:notification, user: user)
+      create(:notification, user: user, read_at: Time.current)
+      create(:notification, user: user, dismissed_at: Time.current)
+      create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
+
+      expect(user.unread_notifications_count).to eq(1)
+    end
+  end
 end

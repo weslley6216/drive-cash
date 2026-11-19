@@ -131,13 +131,28 @@ RSpec.describe 'Analysis', type: :system, js: true do
 
     visit analysis_path
 
-    topbar = find('h1', text: I18n.t('analysis.show_view.title')).find(:xpath, 'ancestor::div[contains(@class, "lg:bg-white")][1]')
+    topbar = find('header', text: I18n.t('analysis.show_view.title'))
     categories = find('h3', text: I18n.t('analysis.show_view.categories.title')).find(:xpath, '..')
     platforms = find('#platform_breakdown section')
 
     expect(topbar.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
     expect(page).to have_link(I18n.t('analysis.show_view.export'), href: exports_path)
     expect(platforms.evaluate_script('this.getBoundingClientRect().height')).to eq(categories.evaluate_script('this.getBoundingClientRect().height'))
+  end
+
+  it 'ends the topbar with the bell after the period pill, the export shortcut and a divider on a desktop screen' do
+    emulate_desktop_screen
+
+    visit analysis_path(year: 2026, month: 5)
+
+    topbar = find('header', text: I18n.t('analysis.show_view.title'))
+    bell = topbar.find('a[aria-label="Notificações"]')
+
+    expect(topbar).to have_button('Maio 2026')
+    expect(topbar).to have_link(I18n.t('analysis.show_view.export'), href: exports_path)
+    expect(bell).to have_no_css('span')
+    expect(bell.evaluate_script('this === this.parentElement.lastElementChild')).to be(true)
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
   end
 
   it 'opens the history filtered by the insight category and month from the insight link on a desktop screen' do

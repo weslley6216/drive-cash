@@ -9,7 +9,8 @@ class GoalsController < ApplicationController
       progress:     service.call,
       filters:      @filters,
       past_monthly: service.past_goals('monthly'),
-      suggestion:   Goals::RealisticTarget.call(user: current_user, date: filter_reference_date)
+      suggestion:   Goals::RealisticTarget.call(user: current_user, date: filter_reference_date),
+      unread_count: current_user.unread_notifications_count
     )
   end
 

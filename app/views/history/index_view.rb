@@ -4,13 +4,14 @@ module History
     include TopbarStyles
     include WeekRangeLabel
 
-    def initialize(feed:, year:, month:, query:, slice:, periods:, week: nil)
+    def initialize(feed:, year:, month:, query:, slice:, periods:, unread_count:, week: nil)
       @feed = feed
       @year = year
       @month = month
       @query = query
       @slice = slice
       @periods = periods
+      @unread_count = unread_count
       @week = week
     end
 
@@ -37,37 +38,47 @@ module History
     private
 
     def static_header
-      div(class: "#{PHONE_BAR} #{DESKTOP_BAR}") do
-        div(class: 'flex items-start justify-between gap-3 lg:items-center lg:gap-6') do
-          div(class: 'min-w-0') do
-            h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate lg:leading-8 lg:text-slate-900 lg:tracking-tight') do
-              t('history.index.title')
-            end
-            p(class: 'text-sm text-slate-500 mt-0.5 lg:hidden') { phone_subtitle }
-            p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') do
-              t('history.index.count_subtitle', count: @feed[:total_count], period: period_label)
-            end
-          end
-          div(class: 'flex items-center gap-3 flex-shrink-0') do
-            render FilterComponent.new(
-              selected_year:  @year,
-              selected_month: @month,
-              periods:        @periods,
-              variant:        :popover,
-              action_path:    history_path,
-              trigger_icon:   PhlexIcons::Lucide::Calendar,
-              label:          (t('filter_component.last_twelve_months') if @slice.twelve_months?)
-            ) unless @week
-            new_record_link
-          end
+      phone_header
+      render DesktopTopbarComponent.new(
+        title:        t('history.index.title'),
+        subtitle:     t('history.index.count_subtitle', count: @feed[:total_count], period: period_label),
+        unread_count: @unread_count
+      ) do |topbar|
+        topbar.with_actions do
+          period_filter unless @week
+          new_record_link
         end
       end
+    end
+
+    def phone_header
+      div(class: "#{PHONE_BAR} lg:hidden") do
+        div(class: 'flex items-start justify-between gap-3') do
+          div(class: 'min-w-0') do
+            h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate') { t('history.index.title') }
+            p(class: 'text-sm text-slate-500 mt-0.5') { phone_subtitle }
+          end
+          period_filter unless @week
+        end
+      end
+    end
+
+    def period_filter
+      render FilterComponent.new(
+        selected_year:  @year,
+        selected_month: @month,
+        periods:        @periods,
+        variant:        :popover,
+        action_path:    history_path,
+        trigger_icon:   PhlexIcons::Lucide::Calendar,
+        label:          (t('filter_component.last_twelve_months') if @slice.twelve_months?)
+      )
     end
 
     def new_record_link
       link_to(helpers.new_record_path,
               data:  { turbo_frame: '_top' },
-              class: 'hidden lg:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold') do
+              class: 'flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold') do
         render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4', 'stroke-width': '2.4')
         plain t('history.index.new_record')
       end

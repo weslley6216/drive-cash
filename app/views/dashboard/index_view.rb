@@ -32,31 +32,40 @@ module Dashboard
     private
 
     def topbar_section
-      div(class: "#{first_use? ? PHONE_BAR : PHONE_BAR_ABOVE_CHIPS} flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 #{DESKTOP_BAR}") do
+      phone_header
+      render DesktopTopbarComponent.new(
+        title:        t('.greeting', name: @first_name),
+        subtitle:     t('.subtitle_period', year: @filters[:year]),
+        unread_count: @unread_count
+      ) do |topbar|
+        topbar.with_actions do
+          period_filter(:compact) unless first_use?
+          new_record_link
+        end
+      end
+    end
+
+    def phone_header
+      div(class: "#{first_use? ? PHONE_BAR : PHONE_BAR_ABOVE_CHIPS} lg:hidden") do
         div(class: 'flex items-center justify-between') do
           div do
-            p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden') { t('.eyebrow') }
-            h1(class: 'text-2xl font-bold text-slate-800 mt-0.5 lg:mt-0 lg:text-slate-900 lg:tracking-tight') do
-              t('.greeting', name: @first_name)
-            end
-            p(class: 'hidden lg:block text-sm text-slate-500 mt-0.5') { t('.subtitle_period', year: @filters[:year]) }
+            p(class: 'text-xs font-medium text-slate-500 uppercase tracking-wider') { t('.eyebrow') }
+            h1(class: 'text-2xl font-bold text-slate-800 mt-0.5') { t('.greeting', name: @first_name) }
           end
-          div(class: 'flex items-center gap-2 lg:hidden') do
+          div(class: 'flex items-center gap-2') do
             bell_button
             avatar_link
           end
         end
+      end
+    end
 
-        div(class: 'hidden lg:flex items-center gap-3') do
-          period_filter(:compact) unless first_use?
-          link_to(new_record_path,
-                  data:  { turbo_frame: '_top' },
-                  class: new_record_button_classes) do
-            render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4')
-            plain t('.new_record')
-          end
-          div(class: 'hidden lg:flex items-center') { bell_button }
-        end
+    def new_record_link
+      link_to(new_record_path,
+              data:  { turbo_frame: '_top' },
+              class: 'flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold') do
+        render PhlexIcons::Lucide::Plus.new(class: 'w-4 h-4', 'stroke-width': '2.4')
+        plain t('.new_record')
       end
     end
 
@@ -71,11 +80,6 @@ module Dashboard
 
     def first_use?
       empty? && @filters[:available_years].to_a.size <= 1
-    end
-
-    def new_record_button_classes
-      'hidden lg:inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 ' \
-      'text-white rounded-lg px-4 py-2 text-sm font-semibold'
     end
 
     def bell_button

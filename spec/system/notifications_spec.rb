@@ -159,6 +159,24 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to have_current_path(edit_notification_preferences_path)
   end
 
+  it 'shows the active bell without the badge next to the mark-all action and the preferences on a desktop screen' do
+    create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-10' })
+    emulate_desktop_screen
+
+    visit notifications_path
+
+    topbar = find('header', text: I18n.t('notifications.index.title'))
+    bell = topbar.find('a[href="/notifications"]')
+
+    expect(topbar).to have_button(I18n.t('notifications.index.read_all'))
+    expect(topbar).to have_link(I18n.t('notifications.index.preferences'))
+    expect(bell[:'aria-current']).to eq('page')
+    expect(bell[:'aria-label']).to start_with('Notificações, ')
+    expect(bell).to have_no_css('span.bg-red-500')
+    expect(bell.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(239, 246, 255)')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
+
   it 'opens the refueling form over the center on a desktop screen' do
     emulate_desktop_screen
     create(:refueling, vehicle: @vehicle, full_tank: true, vendor: 'Posto Orense', date: Date.current - 1)

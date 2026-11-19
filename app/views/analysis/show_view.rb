@@ -10,9 +10,10 @@ module Analysis
       margin:   PhlexIcons::Lucide::Gauge
     }.freeze
 
-    def initialize(insights:, filters:)
+    def initialize(insights:, filters:, unread_count:)
       @insights = insights
       @filters = filters
+      @unread_count = unread_count
     end
 
     def view_template
@@ -32,7 +33,25 @@ module Analysis
     private
 
     def pinned_topbar
-      div(class: "#{PHONE_BAR} #{DESKTOP_BAR}") { topbar }
+      phone_topbar
+      render DesktopTopbarComponent.new(title: t('.title'), subtitle: subtitle, unread_count: @unread_count) do |topbar|
+        topbar.with_actions do
+          period_filter
+          export_link
+        end
+      end
+    end
+
+    def phone_topbar
+      div(class: "#{PHONE_BAR} lg:hidden") do
+        div(class: 'flex items-start justify-between gap-3') do
+          div(class: 'min-w-0') do
+            h1(class: 'text-2xl font-bold text-slate-800 leading-tight') { t('.title') }
+            p(class: 'text-sm text-slate-500 mt-0.5') { subtitle }
+          end
+          period_filter
+        end
+      end
     end
 
     def content_sections
@@ -113,28 +132,18 @@ module Analysis
       I18n.t('date.month_names')[@filters[:month]]
     end
 
-    def topbar
-      div(class: 'flex items-start justify-between gap-3 lg:items-center lg:gap-6') do
-        div(class: 'min-w-0') do
-          h1(class: 'text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight') { t('.title') }
-          p(class: 'text-sm text-slate-500 mt-0.5') { subtitle }
-        end
-
-        div(class: 'flex items-center gap-3 flex-shrink-0') do
-          render FilterComponent.new(
-            selected_year:  @filters[:year],
-            selected_month: @filters[:month],
-            periods:        @filters[:periods],
-            variant:        :popover,
-            action_path:    helpers.analysis_path
-          )
-          export_link
-        end
-      end
+    def period_filter
+      render FilterComponent.new(
+        selected_year:  @filters[:year],
+        selected_month: @filters[:month],
+        periods:        @filters[:periods],
+        variant:        :popover,
+        action_path:    helpers.analysis_path
+      )
     end
 
     def export_link
-      a(href: helpers.exports_path, class: 'hidden lg:flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 ' \
+      a(href: helpers.exports_path, class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 ' \
                                            'text-sm font-medium text-slate-700 hover:bg-slate-50') do
         render PhlexIcons::Lucide::Download.new(class: 'w-3.5 h-3.5 text-slate-500')
         plain t('.export')

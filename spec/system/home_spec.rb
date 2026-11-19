@@ -84,7 +84,7 @@ RSpec.describe 'Home', type: :system, js: true do
     visit root_path
 
     cards = all('#stats_grid > *').map { |card| box(card) }
-    topbar = find('h1', text: 'Olá, Weslley').find(:xpath, 'ancestor::div[contains(@class, "lg:bg-white")][1]')
+    topbar = find('header', text: 'Olá, Weslley')
 
     expect(cards.size).to eq(4)
     expect(cards.map { |card| card['y'].round }.uniq.size).to eq(1)
@@ -92,6 +92,36 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to have_css('#today_card', visible: true)
     expect(box(topbar)['top'].round).to eq(0)
     expect(topbar).to stay_pinned_while_the_content_scrolls
+  end
+
+  it 'ends the white topbar with the bell after a divider and keeps the notifications out of the sidebar on a desktop screen' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit root_path
+
+    topbar = find('header', text: 'Olá, Weslley')
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link(I18n.t('dashboard.index_view.new_record'), href: new_record_path)
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this === this.parentElement.lastElementChild')).to be(true)
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+    expect(box(bell)['width']).to eq(40)
+    expect(page).to have_no_css('#sidebar-nav a[href="/notifications"]')
+    expect(page).to have_no_css('a.rounded-full[href="/notifications"]')
+  end
+
+  it 'keeps the round bell with the blue badge in the phone header and hides the desktop topbar on a phone' do
+    create(:notification, user: current_user)
+
+    visit root_path
+
+    bell = find('#screen-header').find(:link, 'Notificações')
+
+    expect(bell).to have_css('span.bg-blue-600', text: '1')
+    expect(page).to have_no_css('header', text: 'Olá, Weslley')
+    expect(page).to fit_the_phone_width
   end
 
   it 'shows the first-use empty state without the period filter on a phone' do

@@ -39,6 +39,8 @@ class User < ApplicationRecord
 
   def visible_notifications = notifications.visible.retained.where.not(kind: notification_settings.disabled_kinds)
 
+  def unread_notifications_count = visible_notifications.unread.count
+
   def changing_credentials?
     will_save_change_to_email_address? || will_save_change_to_password_digest?
   end

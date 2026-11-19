@@ -1,0 +1,6 @@
+pt-BR:
+  desktop_bell_component:
+    label: "Notificações"
+    label_unread:
+      one: "Notificações, %{count} não lida"
+      other: "Notificações, %{count} não lidas"

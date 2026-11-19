@@ -126,6 +126,20 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(page).to have_link(I18n.t('goals.index.new_goal'), href: new_goal_path)
   end
 
+  it 'ends the topbar with the bell after the new goal link and a divider on a desktop screen' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit goals_path
+
+    topbar = find('header', text: I18n.t('goals.index.title'))
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link(I18n.t('goals.index.new_goal'), href: new_goal_path)
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
+
   it 'opens the outcome of a missed and of a hit past goal from Metas anteriores on a phone' do
     missed = create(:goal, user: current_user, kind: 'monthly', target_amount: 1_000,
                            period_start: Date.new(2026, 3, 1), period_end: Date.new(2026, 3, 31))

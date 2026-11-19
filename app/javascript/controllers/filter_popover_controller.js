@@ -11,6 +11,7 @@ export default class extends Controller {
 
     try {
       if (!sessionStorage.getItem(REOPEN_KEY)) return
+      if (this.element.offsetParent === null) return
 
       sessionStorage.removeItem(REOPEN_KEY)
       this.panelTarget.classList.remove("hidden")

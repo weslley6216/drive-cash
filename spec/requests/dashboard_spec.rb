@@ -56,8 +56,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(I18n.t('dashboard.index_view.greeting', name: current_user.first_name))
       expect(response.body).to include(I18n.t('dashboard.index_view.subtitle_period', year: 2025))
       expect(response.body).to include(I18n.t('dashboard.index_view.new_record'))
-      expect(response.body).to match(%r{<a data-turbo-frame="_top" class="hidden lg:inline-flex[^>]*href="/records/new"})
-      expect(response.body).to include('hidden lg:inline-flex')
+      expect(response.body).to match(%r{<a data-turbo-frame="_top" class="flex items-center gap-2 bg-blue-600[^>]*href="/records/new"})
       expect(response.body).to include('feed-loading-region')
       expect(response.body).to include('<div class="feed-loading-region flex-1 flex flex-col min-h-0"><div class="feed-loading-overlay">')
       expect(response.body).to include(I18n.t('sidebar_nav_component.account_hint'))
@@ -68,9 +67,9 @@ RSpec.describe 'Dashboard', type: :request do
     it 'renders the prototype header: brand eyebrow on phones, white topbar on desktops' do
       get root_path, params: { year: 2025 }
 
-      expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider lg:hidden">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
-      expect(response.body).to include('px-5 pt-2 pb-3 sm:px-6 sm:pt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:-mx-8 lg:px-8 lg:py-4 lg:bg-white lg:border-b lg:border-slate-200')
-      expect(response.body).to include(%(<p class="hidden lg:block text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
+      expect(response.body).to include(%(<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">#{I18n.t('dashboard.index_view.eyebrow')}</p>))
+      expect(response.body).to include('<header class="hidden lg:flex -mx-8 bg-white border-b border-slate-200 px-8 py-4 items-center justify-between gap-6">')
+      expect(response.body).to include(%(<p class="text-sm text-slate-500 mt-0.5">#{I18n.t('dashboard.index_view.subtitle_period', year: 2025)}</p>))
       expect(response.body.scan('w-9 h-9 rounded-full bg-blue-600 text-white').size).to eq(1)
     end
 
@@ -138,7 +137,8 @@ RSpec.describe 'Dashboard', type: :request do
       get root_path
 
       expect(response.body.scan('href="/notifications"').size).to eq(2)
-      expect(response.body.scan(NotificationBellComponent::BADGE_CLASSES).size).to eq(2)
+      expect(response.body.scan(NotificationBellComponent::BADGE_CLASSES).size).to eq(1)
+      expect(response.body).to include('aria-label="Notificações, 1 não lida"')
     end
 
     it 'does not count dismissed notifications in the bell badge' do
