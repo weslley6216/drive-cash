@@ -10,7 +10,7 @@ RSpec.describe Goals::IndexView, type: :component do
 
   context 'when user has no goals' do
     let(:progress) { { weekly: nil, monthly: nil, annual: nil, achievements: [] } }
-    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters, unread_count: 0)) }
 
     it 'renders the empty CTA' do
       expect(html).to include(I18n.t('empty_states.goals.title'))
@@ -36,7 +36,7 @@ RSpec.describe Goals::IndexView, type: :component do
     end
 
     it 'renders the suggestion card below the empty block' do
-      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200')))
+      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200'), unread_count: 0))
 
       expect(output).to include(I18n.t('goals.index.suggestion.label'))
       expect(output).to include('R$ 6.200,00')
@@ -60,7 +60,7 @@ RSpec.describe Goals::IndexView, type: :component do
         achievements: []
       }
     end
-    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters, unread_count: 0)) }
 
     it 'uses 12-column grid layout for cards' do
       expect(html).to include('grid-cols-12')
@@ -75,7 +75,7 @@ RSpec.describe Goals::IndexView, type: :component do
     end
 
     it 'omits the suggestion card when a goal exists' do
-      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200')))
+      output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200'), unread_count: 0))
 
       expect(output).not_to include(I18n.t('goals.index.suggestion.label'))
     end
@@ -106,7 +106,7 @@ RSpec.describe Goals::IndexView, type: :component do
         achievements: []
       }
     end
-    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters, unread_count: 0)) }
 
     it 'renders weekly label and percentage' do
       expect(html).to include(I18n.t('goals.index.weekly.label'))
@@ -157,7 +157,7 @@ RSpec.describe Goals::IndexView, type: :component do
         achievements: []
       }
     end
-    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters)) }
+    let(:html) { view_context.render(described_class.new(progress: progress, filters: filters, unread_count: 0)) }
 
     it 'hides the weekly edit link' do
       expect(html).not_to include(view_context.edit_goal_path(weekly_goal))
@@ -174,7 +174,7 @@ RSpec.describe Goals::IndexView, type: :component do
     end
     let(:progress) { { weekly: nil, monthly: nil, annual: nil, achievements: [] } }
     let(:html) do
-      view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: past_monthly))
+      view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: past_monthly, unread_count: 0))
     end
 
     it 'renders the missed chip with percentage' do
@@ -187,7 +187,7 @@ RSpec.describe Goals::IndexView, type: :component do
                                period_start: Date.new(2026, 4, 1), period_end: Date.new(2026, 4, 30))
       rows = past_monthly + [{ goal: hit_goal, current: 4200, target: 4000, percent: 105, achieved: true }]
 
-      rendered = view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: rows))
+      rendered = view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: rows, unread_count: 0))
 
       expect(rendered).to include(%(href="/goals/#{missed_goal.id}/outcomes/2026-05-01"))
       expect(rendered).to include(%(href="/goals/#{hit_goal.id}/outcomes/2026-04-01"))

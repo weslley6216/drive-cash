@@ -3,8 +3,9 @@ module Goals
     include CardStyles
     include TopbarStyles
 
-    def initialize(progress:, filters: {}, past_monthly: [], suggestion: nil)
+    def initialize(progress:, unread_count:, filters: {}, past_monthly: [], suggestion: nil)
       @progress = progress
+      @unread_count = unread_count
       @filters = filters
       @past_monthly = past_monthly
       @suggestion = suggestion
@@ -51,23 +52,33 @@ module Goals
     end
 
     def header_section
-      div(class: "#{PHONE_BAR} flex items-start justify-between gap-3 lg:items-center lg:gap-6 #{DESKTOP_BAR}") do
+      phone_header
+      render DesktopTopbarComponent.new(title: t('goals.index.title'), subtitle: subtitle_text, unread_count: @unread_count) do |topbar|
+        topbar.with_actions { new_goal_link }
+      end
+    end
+
+    def phone_header
+      div(class: "#{PHONE_BAR} flex items-start justify-between gap-3 lg:hidden") do
         div(class: 'min-w-0') do
-          h1(class: 'text-2xl font-bold text-slate-800 leading-tight lg:leading-8 lg:text-slate-900 lg:tracking-tight') { t('goals.index.title') }
+          h1(class: 'text-2xl font-bold text-slate-800 leading-tight') { t('goals.index.title') }
           p(class: 'text-sm text-slate-500 mt-0.5') { subtitle_text }
         end
         new_goal_button
-        link_to(t('goals.index.new_goal'), helpers.new_goal_path,
-                data:  { turbo_frame: 'modal' },
-                class: 'hidden lg:inline text-sm font-medium text-blue-600 hover:underline')
       end
+    end
+
+    def new_goal_link
+      link_to(t('goals.index.new_goal'), helpers.new_goal_path,
+              data:  { turbo_frame: 'modal' },
+              class: 'text-sm font-medium text-blue-600 hover:underline')
     end
 
     def new_goal_button
       link_to(helpers.new_goal_path,
               data:  { turbo_frame: 'modal', new_goal_button: true },
               aria:  { label: t('goals.index.new_goal_aria') },
-              class: 'relative lg:hidden w-9 h-9 flex-shrink-0 rounded-full bg-white border border-slate-200 shadow-sm ' \
+              class: 'relative w-9 h-9 flex-shrink-0 rounded-full bg-white border border-slate-200 shadow-sm ' \
                           'flex items-center justify-center text-slate-600') do
         span(class: 'absolute -inset-[5px]')
         render PhlexIcons::Lucide::Plus.new(class: 'w-[18px] h-[18px]')
