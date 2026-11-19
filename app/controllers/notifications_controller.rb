@@ -5,7 +5,7 @@ class NotificationsController < ApplicationController
     Notifications::Sweeper.new(user: current_user).call
     render Notifications::IndexView.new(
       groups:       Notifications::Grouping.new(current_user.visible_notifications.recent).call,
-      unread_count: current_user.visible_notifications.unread.count
+      unread_count: current_user.unread_notifications_count
     )
   end
 
