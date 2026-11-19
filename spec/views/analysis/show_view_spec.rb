@@ -14,19 +14,19 @@ RSpec.describe Analysis::ShowView, type: :component do
   let(:filters) { { year: 2026, month: nil, periods: { 2026 => [5] } } }
 
   it 'wraps page content in turbo_frame page so filter updates do not reload nav' do
-    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters, unread_count: 0))
 
     expect(html).to include('id="page"')
   end
 
   it 'feeds the period popover with the months of the calendar' do
-    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters, unread_count: 0))
 
     expect(html).to include('href="/analysis?month=5&year=2026"')
   end
 
   it 'renders em dash for per_km when value is nil' do
-    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters, unread_count: 0))
 
     expect(html).to include('—')
   end
@@ -34,13 +34,13 @@ RSpec.describe Analysis::ShowView, type: :component do
   it 'renders formatted per_km value when present' do
     insights_with_km = base_insights.deep_merge(metrics: { per_km: 1.5 })
 
-    html = view_context.render(described_class.new(insights: insights_with_km, filters: filters))
+    html = view_context.render(described_class.new(insights: insights_with_km, filters: filters, unread_count: 0))
 
     expect(html).to include('1,50')
   end
 
   it 'renders the per km card as the hero ahead of the other metrics' do
-    html = view_context.render(described_class.new(insights: base_insights, filters: filters))
+    html = view_context.render(described_class.new(insights: base_insights, filters: filters, unread_count: 0))
 
     expect(html.index('Lucro por km rodado')).to be < html.index('R$ / dia')
     expect(html).to include('lg:grid-cols-[1.4fr_1fr_1fr_1fr]')
@@ -49,7 +49,7 @@ RSpec.describe Analysis::ShowView, type: :component do
   it 'renders the margin as money under the "Sobra a cada R$ 100" label' do
     insights_with_margin = base_insights.deep_merge(metrics: { margin: 56.1 })
 
-    html = view_context.render(described_class.new(insights: insights_with_margin, filters: filters))
+    html = view_context.render(described_class.new(insights: insights_with_margin, filters: filters, unread_count: 0))
 
     expect(html).to include('Sobra a cada R$ 100')
     expect(html).to include('R$ 56,10')
@@ -62,7 +62,7 @@ RSpec.describe Analysis::ShowView, type: :component do
       platforms_total: 1500
     )
 
-    html = view_context.render(described_class.new(insights: insights, filters: filters))
+    html = view_context.render(described_class.new(insights: insights, filters: filters, unread_count: 0))
 
     expect(html).to include('1.500')
   end
@@ -74,7 +74,7 @@ RSpec.describe Analysis::ShowView, type: :component do
     it 'links the empty state to the last month with data' do
       insights = empty_insights.merge(last_month_with_data: Date.new(2026, 6, 1))
 
-      html = view_context.render(described_class.new(insights: insights, filters: july))
+      html = view_context.render(described_class.new(insights: insights, filters: july, unread_count: 0))
 
       expect(html).to include('Ver junho, o último mês com dados →')
       expect(html).to include(%(href="/analysis?month=6&amp;year=2026"))
@@ -83,21 +83,21 @@ RSpec.describe Analysis::ShowView, type: :component do
     it 'adds the year to the shortcut when the last month with data is from another year' do
       insights = empty_insights.merge(last_month_with_data: Date.new(2025, 12, 1))
 
-      html = view_context.render(described_class.new(insights: insights, filters: july))
+      html = view_context.render(described_class.new(insights: insights, filters: july, unread_count: 0))
 
       expect(html).to include('Ver dezembro de 2025, o último mês com dados →')
       expect(html).to include(%(href="/analysis?month=12&amp;year=2025"))
     end
 
     it 'omits the shortcut when there is no earlier month with data' do
-      html = view_context.render(described_class.new(insights: empty_insights, filters: july))
+      html = view_context.render(described_class.new(insights: empty_insights, filters: july, unread_count: 0))
 
       expect(html).to include('Sem dados em julho')
       expect(html).not_to include('o último mês com dados')
     end
 
     it 'renders the charts when the service says the period has data' do
-      html = view_context.render(described_class.new(insights: base_insights, filters: july))
+      html = view_context.render(described_class.new(insights: base_insights, filters: july, unread_count: 0))
 
       expect(html).not_to include('Sem dados em julho')
       expect(html).to include('Lucro por km rodado')
