@@ -23,8 +23,8 @@ RSpec.describe Chat::PreviewQueue do
   let(:batch) { described_class.from_result(shopee.merge(queued: [ipiranga])) }
 
   describe '.from_result' do
-    it 'puts the result preview at the head followed by the queued previews' do
-      expect(batch.head).to eq(shopee)
+    it 'puts the result preview, without the opening text already shown with it, at the head followed by the queued previews' do
+      expect(batch.head).to eq(shopee.except(:text_before))
       expect(batch.advance.head).to eq(ipiranga)
     end
 
@@ -67,7 +67,7 @@ RSpec.describe Chat::PreviewQueue do
     it 'restores the same previews and batch size from a serialized session hash' do
       restored = described_class.from_session(JSON.parse(batch.to_session_hash.to_json))
 
-      expect(restored.head).to eq(shopee)
+      expect(restored.head).to eq(batch.head)
       expect(restored.advance.head).to eq(ipiranga)
       expect(restored.batch_size).to eq(2)
     end

@@ -1,6 +1,6 @@
 module Chat
   PreviewQueue = Data.define(:previews, :batch_size) do
-    PREVIEW_KEYS = %i[type action params summary content text_before].freeze
+    PREVIEW_KEYS = %i[type action params summary content].freeze
 
     def self.from_result(result)
       return new(previews: [], batch_size: 0) unless result[:type] == :preview
