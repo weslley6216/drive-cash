@@ -19,7 +19,7 @@ class ChatController < ApplicationController
   end
 
   def confirm
-    return respond_with_duplicate_submit unless consume_confirm_nonce(params[:confirm_nonce])
+    return respond_with_duplicate_submit unless consume_preview_nonce(params[:confirm_nonce])
 
     tool = Ai::Tools::Registry.find(params[:record_action])
     record_params = Chat::Payload.permit(params[:record], tool&.permitted_keys || [])
@@ -28,6 +28,8 @@ class ChatController < ApplicationController
   end
 
   def cancel_preview
+    return respond_with_duplicate_submit unless consume_preview_nonce(params[:confirm_nonce])
+
     record_preview_cancellation
     respond_with_cancel_result
   end

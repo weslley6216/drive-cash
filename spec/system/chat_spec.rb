@@ -68,4 +68,23 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page.evaluate_script("document.querySelector('textarea[name=message]').readOnly")).to be(false)
     expect(page.evaluate_script('document.activeElement.name')).to eq('message')
   end
+
+  it 'cancels the first card of a batch and shows the next card on a phone' do
+    allow(Llm::Client).to receive(:chat).and_return({
+      type:        :tool_use,
+      tool_name:   'create_earning',
+      tool_input:  { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' },
+      extra_calls: [{ name: 'create_expense', input: { 'amount' => 60, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }]
+    })
+    visit chat_root_path
+    fill_in 'message', with: 'registra as corridas e o abastecimento de hoje'
+    find('button[type="submit"]').click
+
+    click_button I18n.t('chat.message.btn_cancel')
+
+    expect(page).to have_text('Ipiranga')
+    expect(page).to have_no_text(I18n.t('chat.confirm.duplicate_submit'))
+    expect(page).to have_button(I18n.t('chat.message.btn_cancel'), count: 1)
+    expect(page).to fit_the_phone_width
+  end
 end

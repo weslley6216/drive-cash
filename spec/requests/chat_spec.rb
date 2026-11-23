@@ -5,6 +5,10 @@ RSpec.describe 'Chats', type: :request do
 
   before { login_as(current_user) }
 
+  def current_nonce
+    response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
+  end
+
   describe 'GET /chat' do
     context 'when the history is empty' do
       it 'renders the initial empty state page' do
@@ -172,11 +176,26 @@ RSpec.describe 'Chats', type: :request do
   end
 
   describe 'POST /chat/confirm' do
+    let(:parser_mock) { instance_double(Ai::ParserService) }
+
+    before do
+      allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
+      allow(parser_mock).to receive(:call).and_return({
+        type:    :preview,
+        action:  'create_expense',
+        summary: 'Despesa de R$ 45,00 em 22/04/2026',
+        params:  { 'amount' => 45, 'category' => 'fuel', 'date' => '2026-04-22' }
+      })
+    end
+
+    def post_confirm(params)
+      post chat_message_path, params: { message: 'registra pra mim' }, as: :turbo_stream
+      post chat_confirm_path, params: params.merge(confirm_nonce: current_nonce), as: :turbo_stream
+    end
+
     context 'when persisting a confirmed expense' do
       it 'associates the expense to current_user' do
-        post chat_confirm_path,
-             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } })
 
         expect(Expense.last.user).to eq(current_user)
       end
@@ -184,9 +203,7 @@ RSpec.describe 'Chats', type: :request do
 
     context 'when persisting a confirmed earning' do
       it 'associates the earning to current_user' do
-        post chat_confirm_path,
-             params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22' } },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22' } })
 
         expect(Earning.last.user).to eq(current_user)
       end
@@ -196,7 +213,7 @@ RSpec.describe 'Chats', type: :request do
       let(:params) { { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22' } } }
 
       it 'saves the expense and renders the expense chips' do
-        post chat_confirm_path, params: params, as: :turbo_stream
+        post_confirm(params)
 
         expect(response.body).to include(I18n.t('chat.confirm.success_expense'))
         expect(response.body).to include(I18n.t('chat.confirm.btn_expenses'))
@@ -205,9 +222,7 @@ RSpec.describe 'Chats', type: :request do
 
     context 'when the confirmed record carries a key outside the tool whitelist' do
       it 'persists the record and ignores the unexpected key' do
-        post chat_confirm_path,
-             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', installment_count: 99 } },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', installment_count: 99 } })
 
         expect(Expense.last).to be_present
         expect(Expense.last.installment_count).to be_nil
@@ -231,7 +246,7 @@ RSpec.describe 'Chats', type: :request do
 
       it 'persists installments and renders success chips' do
         expect {
-          post chat_confirm_path, params: params, as: :turbo_stream
+          post_confirm(params)
         }.to change(Expense, :count).by(3)
 
         expect(response.body).to include(I18n.t('chat.confirm.success_expense'))
@@ -255,7 +270,7 @@ RSpec.describe 'Chats', type: :request do
       end
 
       it 'returns an error turbo message' do
-        post chat_confirm_path, params: params, as: :turbo_stream
+        post_confirm(params)
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
       end
@@ -266,7 +281,7 @@ RSpec.describe 'Chats', type: :request do
 
       it 'saves the earning and renders the dashboard chips' do
         expect {
-          post chat_confirm_path, params: params, as: :turbo_stream
+          post_confirm(params)
         }.to change(Earning, :count).by(1)
 
         expect(response.body).to include(I18n.t('chat.confirm.success_earning'))
@@ -278,7 +293,7 @@ RSpec.describe 'Chats', type: :request do
       let(:invalid_params) { { record_action: 'create_expense', record: { amount: nil } } }
 
       it 'returns the view with validation errors' do
-        post chat_confirm_path, params: invalid_params, as: :turbo_stream
+        post_confirm(invalid_params)
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
       end
@@ -286,12 +301,10 @@ RSpec.describe 'Chats', type: :request do
 
     context 'when confirming an earning with invalid data (non-expense branch)' do
       it 'returns the view with validation errors without calling ExpenseFromChat' do
-        post chat_confirm_path,
-             params: {
-               record_action: 'create_earning',
-               record:        { amount: '', platform: 'uber', date: '2026-04-22' }
-             },
-             as:     :turbo_stream
+        post_confirm({
+          record_action: 'create_earning',
+          record:        { amount: '', platform: 'uber', date: '2026-04-22' }
+        })
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
       end
@@ -299,9 +312,7 @@ RSpec.describe 'Chats', type: :request do
 
     context 'when confirming with an unknown action' do
       it 'renders a failure message via turbo stream' do
-        post chat_confirm_path,
-             params: { record_action: 'unknown_action', record: {} },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'unknown_action', record: {} })
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include(I18n.t('chat.errors.unknown_action'))
@@ -312,9 +323,7 @@ RSpec.describe 'Chats', type: :request do
       let(:other) { create(:user) }
 
       it 'persists the expense owned by current_user' do
-        post chat_confirm_path,
-             params: { record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', user_id: other.id } },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'create_expense', record: { amount: 45, category: 'fuel', date: '2026-04-22', user_id: other.id } })
 
         expect(Expense.last.user).to eq(current_user)
       end
@@ -324,9 +333,7 @@ RSpec.describe 'Chats', type: :request do
       let(:other) { create(:user) }
 
       it 'persists the earning owned by current_user' do
-        post chat_confirm_path,
-             params: { record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22', user_id: other.id } },
-             as:     :turbo_stream
+        post_confirm({ record_action: 'create_earning', record: { amount: 200, platform: 'uber', date: '2026-04-22', user_id: other.id } })
 
         expect(Earning.last.user).to eq(current_user)
       end
@@ -349,7 +356,7 @@ RSpec.describe 'Chats', type: :request do
 
       it 'does not persist any expense and renders the error' do
         expect {
-          post chat_confirm_path, params: params, as: :turbo_stream
+          post_confirm(params)
         }.not_to change(Expense, :count)
 
         expect(response.body).to include(I18n.t('chat.confirm.error_prefix'))
@@ -373,10 +380,6 @@ RSpec.describe 'Chats', type: :request do
     end
 
     before { allow(Llm::Client).to receive(:chat).and_return(batch_response) }
-
-    def current_nonce
-      response.body.match(/name="confirm_nonce" value="([^"]+)"/)&.[](1)
-    end
 
     def finished_text?(body)
       I18n.t('chat.history.queue_finished').any? { |phrase| body.include?(phrase) }
@@ -473,7 +476,7 @@ RSpec.describe 'Chats', type: :request do
     it 'presents the next item on cancel without a new LLM call' do
       post chat_message_path, params: { message: batch_message }, as: :turbo_stream
 
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: current_nonce }, as: :turbo_stream
 
       expect(response.body).to include('Ipiranga')
       expect(Llm::Client).to have_received(:chat).once
@@ -484,7 +487,7 @@ RSpec.describe 'Chats', type: :request do
       post chat_confirm_path,
            params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: current_nonce },
            as:     :turbo_stream
-      post chat_cancel_preview_path, params: { action_name: 'create_expense' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: current_nonce }, as: :turbo_stream
       after_cancel = response.body
 
       post chat_confirm_path,
@@ -501,21 +504,76 @@ RSpec.describe 'Chats', type: :request do
       allow(Llm::Client).to receive(:chat).and_return({ type: :tool_use, tool_name: 'create_earning', tool_input: uber_input })
       post chat_message_path, params: { message: 'fiz R$ 80 no Uber hoje' }, as: :turbo_stream
 
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: current_nonce }, as: :turbo_stream
 
       expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
       expect(finished_text?(response.body)).to be(false)
       expect(Llm::Client).to have_received(:chat).once
     end
 
-    it 'does not present the discarded items on cancel after a new message' do
+    it 'ignores a repeated cancel after the auto-continuation and keeps the next item pending' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      first_nonce = current_nonce
+      post chat_cancel_preview_path, params: { confirm_nonce: first_nonce }, as: :turbo_stream
+      history_after_cancel = session[:chat_history]
+      queue_after_cancel = session[:preview_queue]
+
+      post chat_cancel_preview_path, params: { confirm_nonce: first_nonce }, as: :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+      expect(session[:chat_history]).to eq(history_after_cancel)
+      expect(session[:preview_queue]).to eq(queue_after_cancel)
+    end
+
+    it 'ignores a cancel of a card that was already confirmed' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      shopee_nonce = current_nonce
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: shopee_nonce },
+           as:     :turbo_stream
+      history_after_confirm = session[:chat_history]
+      queue_after_confirm = session[:preview_queue]
+
+      post chat_cancel_preview_path, params: { confirm_nonce: shopee_nonce }, as: :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+      expect(session[:chat_history]).to eq(history_after_confirm)
+      expect(session[:preview_queue]).to eq(queue_after_confirm)
+    end
+
+    it 'ignores a confirm of a card that was already cancelled' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      shopee_nonce = current_nonce
+      post chat_cancel_preview_path, params: { confirm_nonce: shopee_nonce }, as: :turbo_stream
+
+      expect {
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: shopee_nonce },
+             as:     :turbo_stream
+      }.not_to change(Earning, :count)
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+    end
+
+    it 'rejects a cancel without a nonce and keeps the card pending' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      queue_before_cancel = session[:preview_queue]
+
+      post chat_cancel_preview_path, as: :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+      expect(session[:preview_queue]).to eq(queue_before_cancel)
+    end
+
+    it 'rejects the cancel of a card discarded by a new message' do
       allow(Llm::Client).to receive(:chat).and_return(batch_response, { type: :text, content: 'Beleza, me conta de novo.' })
       post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      discarded_nonce = current_nonce
       post chat_message_path, params: { message: 'pera, errei os valores' }, as: :turbo_stream
 
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: discarded_nonce }, as: :turbo_stream
 
-      expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
       expect(response.body).not_to include('Ipiranga')
       expect(Llm::Client).to have_received(:chat).twice
     end
@@ -530,7 +588,7 @@ RSpec.describe 'Chats', type: :request do
       post chat_confirm_path,
            params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: current_nonce },
            as:     :turbo_stream
-      post chat_cancel_preview_path, params: { action_name: 'create_expense' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: current_nonce }, as: :turbo_stream
 
       post chat_message_path, params: { message: 'valeu' }, as: :turbo_stream
 
@@ -554,7 +612,7 @@ RSpec.describe 'Chats', type: :request do
       })
       post chat_message_path, params: { message: batch_message }, as: :turbo_stream
 
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+      post chat_cancel_preview_path, params: { confirm_nonce: current_nonce }, as: :turbo_stream
 
       expect(response.body).to include('Ipiranga')
       expect(Llm::Client).to have_received(:chat).once
@@ -645,6 +703,18 @@ RSpec.describe 'Chats', type: :request do
       expect {
         post chat_confirm_path,
              params: { record_action: 'create_earning', record: earning_input, confirm_nonce: nonce },
+             as:     :turbo_stream
+      }.not_to change(Earning, :count)
+
+      expect(response.body).to include(I18n.t('chat.confirm.duplicate_submit'))
+    end
+
+    it 'rejects a confirm without a nonce' do
+      post chat_message_path, params: { message: 'ganhei 80 no Uber' }, as: :turbo_stream
+
+      expect {
+        post chat_confirm_path,
+             params: { record_action: 'create_earning', record: earning_input },
              as:     :turbo_stream
       }.not_to change(Earning, :count)
 

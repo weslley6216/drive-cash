@@ -58,7 +58,7 @@ module Chat
       button(
         type:  'button',
         class: 'px-3 py-1.5 text-slate-500 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer',
-        data:  { action: 'click->chat#cancelPreview', action_name: result[:action] }
+        data:  { action: 'click->chat#cancelPreview', nonce: result[:nonce] }
       ) { t('chat.message.btn_cancel') }
     end
   end
