@@ -22,12 +22,10 @@ RSpec.describe Ai::Tools::Registry do
   }.freeze
 
   describe '.declarations' do
-    it 'exposes 5 tool declarations (4 create + 1 query)' do
+    it 'exposes create_records to the LLM in place of the earning and expense tools' do
       names = described_class.declarations.map { |declaration| declaration[:name] }
 
-      expect(names).to contain_exactly(
-        'create_earning', 'create_expense', 'create_goal', 'update_maintenance', 'query'
-      )
+      expect(names).to contain_exactly('create_records', 'create_goal', 'update_maintenance', 'query')
     end
 
     it 'embeds the kind enum inside the query declaration' do

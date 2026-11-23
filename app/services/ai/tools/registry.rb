@@ -85,7 +85,11 @@ module Ai
       ].freeze
 
       def self.all = TOOLS
-      def self.declarations = TOOLS.map(&:declaration)
+      def self.declarations
+        TOOLS.reject { |tool| CreateRecords::ACTIONS.include?(tool.name) }
+          .map(&:declaration)
+          .prepend(CreateRecords.declaration)
+      end
       def self.find(name) = TOOLS.find { |tool| tool.name == name }
       def self.query_kind(kind) = QUERY_KINDS[kind.to_s]
     end
