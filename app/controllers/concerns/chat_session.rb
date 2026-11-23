@@ -4,15 +4,10 @@ module ChatSession
   private
 
   HISTORY_LIMIT = 12
-  MAX_CONTINUATION_DEPTH = 5
   private_constant :HISTORY_LIMIT
 
   def chat_history
     (session[:chat_history] || []).map(&:symbolize_keys)
-  end
-
-  def llm_history
-    chat_history.map { |message| message[:type].to_s == 'user_action' ? message.merge(role: 'user') : message }
   end
 
   def add_to_history(message)
@@ -23,25 +18,8 @@ module ChatSession
 
   def clear_history
     session.delete(:chat_history)
-    session.delete(:continuation_depth)
     session.delete(:confirm_nonce)
-    session.delete(:handled_signatures)
-  end
-
-  def continuation_depth
-    session[:continuation_depth].to_i
-  end
-
-  def increment_continuation_depth
-    session[:continuation_depth] = continuation_depth + 1
-  end
-
-  def reset_continuation_depth
-    session.delete(:continuation_depth)
-  end
-
-  def continuation_depth_exceeded?
-    continuation_depth >= MAX_CONTINUATION_DEPTH
+    session.delete(:preview_queue)
   end
 
   def set_confirm_nonce(nonce)
@@ -124,17 +102,11 @@ module ChatSession
     end
   end
 
-  def respond_with_cancel_continuation
-    respond_to do |format|
-      format.turbo_stream { auto_continue_and_render_cancel }
-    end
-  end
-
   def finalize_chat_confirm_success(action:, record:, record_params:)
     i18n_key = Ai::Tools::Registry.find(action).confirm_key
 
     add_to_history(Chat::Message.from_result(
-      { type: :user_action, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
+      { type: :text, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
       fallback_content: t(i18n_key)
     ))
 
@@ -151,64 +123,24 @@ module ChatSession
     Ai::Tools::Registry.find(action).summary_presenter.new(record_params).call
   end
 
-  def last_preview
-    chat_history.reverse_each.find { |message| message[:action].present? }
+  def record_preview_cancellation
+    summary = preview_queue.head&.dig(:summary)
+    content = summary.present? ? t('chat.history.record_cancelled', summary: summary) : t('chat.history.preview_cancelled')
+
+    add_to_history(Chat::Message.from_result(
+      { type: :text, content: content },
+      fallback_content: t('chat.history.preview_cancelled')
+    ))
   end
 
-  def last_preview_summary
-    last_preview&.dig(:summary)
-  end
-
-  def record_handled_signature(action:, params:)
-    signatures = session[:handled_signatures] || []
-    signatures << Chat::PreviewSignature.from(action: action, params: params).to_session_hash
-    session[:handled_signatures] = signatures
-  end
-
-  def record_cancelled_signature
-    preview = last_preview
-    return if preview.blank?
-
-    record_handled_signature(action: preview[:action], params: preview[:params])
-  end
-
-  def handled_signatures
-    (session[:handled_signatures] || []).map do |entry|
-      Chat::PreviewSignature.from(action: entry['action'], params: entry['params'])
+  def respond_with_cancel_result
+    respond_to do |format|
+      format.turbo_stream do
+        render Chat::MessageView.new(
+          user_text: nil,
+          result:    advance_preview_queue || { type: :text, content: t('chat.history.preview_cancelled') }
+        )
+      end
     end
-  end
-
-  def reset_handled_signatures
-    session.delete(:handled_signatures)
-  end
-
-  def dedup_continuation(continuation)
-    return continuation unless continuation[:type] == :preview
-
-    candidate = Chat::PreviewSignature.from(action: continuation[:action], params: continuation[:params])
-    return continuation unless handled_signatures.any? { |signature| signature.matches?(candidate) }
-
-    { type: :text, content: t('chat.history.nothing_pending') }
-  end
-
-  def auto_continue_and_render_cancel
-    if continuation_depth_exceeded?
-      render Chat::MessageView.new(
-        user_text: nil,
-        result:    { type: :text, content: t('chat.history.preview_cancelled') }
-      )
-      return
-    end
-
-    increment_continuation_depth
-    continuation = Ai::ParserService.new(messages: llm_history, today: Date.current, user: current_user).call
-    continuation = dedup_continuation(continuation)
-    continuation = attach_nonce_if_preview(continuation)
-
-    if continuation[:type] == :preview
-      add_to_history(Chat::Message.from_result(continuation, fallback_content: t('chat.history.preview_sent')))
-    end
-
-    render Chat::MessageView.new(user_text: nil, result: continuation)
   end
 end

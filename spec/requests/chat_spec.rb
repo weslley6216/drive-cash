@@ -358,105 +358,6 @@ RSpec.describe 'Chats', type: :request do
     end
   end
 
-  describe 'POST /chat/cancel' do
-    let(:parser_mock) { instance_double(Ai::ParserService) }
-
-    before { allow(Ai::ParserService).to receive(:new).and_return(parser_mock) }
-
-    it 'sends the cancelled record identity into the history' do
-      histories = []
-      allow(parser_mock).to receive(:call).and_return(
-        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026',
-          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
-        { type: :text, content: 'Beleza, mais alguma coisa?' }
-      )
-      allow(Ai::ParserService).to receive(:new) do |messages:, **|
-        histories << messages.map { |message| message[:content].to_s }
-        parser_mock
-      end
-
-      post chat_message_path, params: { message: 'ganhei 80 no Uber hoje' }, as: :turbo_stream
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-
-      cancel_history = histories.last.join("\n")
-      expect(cancel_history).to include(
-        I18n.t('chat.history.record_cancelled', summary: 'Receita de R$ 80,00 via Uber em 02/07/2026')
-      )
-    end
-
-    it 'hands the cancellation to the assistant as the user turn' do
-      sent_messages = []
-      allow(parser_mock).to receive(:call).and_return(
-        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
-          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-07-02' } },
-        { type: :text, content: 'Beleza, mais alguma coisa?' }
-      )
-      allow(Ai::ParserService).to receive(:new) do |messages:, **|
-        sent_messages << messages
-        parser_mock
-      end
-
-      post chat_message_path, params: { message: 'ganhei 80 no Uber hoje' }, as: :turbo_stream
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-
-      expect(sent_messages.last.last.slice(:role, :content)).to eq(
-        role: 'user', content: I18n.t('chat.history.record_cancelled', summary: 'Receita de R$ 80,00 via Uber')
-      )
-      expect(sent_messages.last[-2][:role]).to eq('assistant')
-    end
-
-    it 'adds cancelled history entry and re-invokes ParserService for continuation' do
-      allow(parser_mock).to receive(:call).and_return(
-        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 80,00 via Uber',
-          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
-        { type: :preview, action: 'create_earning', summary: 'Receita de R$ 45,00 via iFood',
-          params: { 'amount' => 45, 'platform' => 'ifood', 'date' => '2026-06-24' } }
-      )
-
-      post chat_message_path, params: { message: 'Uber 80 e iFood 45 hoje' }, as: :turbo_stream
-
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('iFood')
-    end
-
-    it 'does not re-propose the cancelled record as the continuation' do
-      shopee_preview = { type: :preview, action: 'create_earning', summary: 'Receita de R$ 120,00 via Shopee',
-                         params: { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' } }
-      allow(parser_mock).to receive(:call).and_return(shopee_preview, shopee_preview)
-
-      post chat_message_path, params: { message: 'rota de R$ 120 pelo Shopee e abasteci R$ 60 no Ipiranga hoje' }, as: :turbo_stream
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-
-      expect(response.body).not_to include(I18n.t('chat.message.understood'))
-      expect(response.body).to include(I18n.t('chat.history.nothing_pending'))
-    end
-
-    it 'renders cancelled message when depth exceeded' do
-      allow(parser_mock).to receive(:call).and_return(
-        { type: :preview, action: 'create_earning', summary: 'Receita',
-          params: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-06-24' } },
-        { type: :text, content: 'Texto 1' },
-        { type: :text, content: 'Texto 2' },
-        { type: :text, content: 'Texto 3' },
-        { type: :text, content: 'Texto 4' },
-        { type: :text, content: 'Texto 5' }
-      )
-
-      post chat_message_path, params: { message: 'x' }, as: :turbo_stream
-
-      ChatSession::MAX_CONTINUATION_DEPTH.times do
-        post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-      end
-
-      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
-    end
-  end
-
   describe 'preview queue' do
     let(:shopee_input) { { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' } }
     let(:ipiranga_input) { { 'amount' => 60, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }
@@ -568,6 +469,79 @@ RSpec.describe 'Chats', type: :request do
       expect(response.body).not_to include('Ipiranga')
       expect(Llm::Client).to have_received(:chat).twice
     end
+
+    it 'presents the next item on cancel without a new LLM call' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response.body).to include('Ipiranga')
+      expect(Llm::Client).to have_received(:chat).once
+    end
+
+    it 'never presents a handled item again across confirm and cancel' do
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: current_nonce },
+           as:     :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_expense' }, as: :turbo_stream
+      after_cancel = response.body
+
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: uber_input, confirm_nonce: current_nonce },
+           as:     :turbo_stream
+
+      expect(after_cancel).to include('Uber')
+      expect(after_cancel).not_to include('Ipiranga')
+      expect(finished_text?(response.body)).to be(true)
+      expect(Llm::Client).to have_received(:chat).once
+    end
+
+    it 'answers a single-item cancel with the cancelled message' do
+      allow(Llm::Client).to receive(:chat).and_return({ type: :tool_use, tool_name: 'create_earning', tool_input: uber_input })
+      post chat_message_path, params: { message: 'fiz R$ 80 no Uber hoje' }, as: :turbo_stream
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
+      expect(finished_text?(response.body)).to be(false)
+      expect(Llm::Client).to have_received(:chat).once
+    end
+
+    it 'does not present the discarded items on cancel after a new message' do
+      allow(Llm::Client).to receive(:chat).and_return(batch_response, { type: :text, content: 'Beleza, me conta de novo.' })
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      post chat_message_path, params: { message: 'pera, errei os valores' }, as: :turbo_stream
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response.body).to include(I18n.t('chat.history.preview_cancelled'))
+      expect(response.body).not_to include('Ipiranga')
+      expect(Llm::Client).to have_received(:chat).twice
+    end
+
+    it 'hands the handled items to the LLM on the next user message' do
+      sent_histories = []
+      allow(Llm::Client).to receive(:chat) do |messages:, **|
+        sent_histories << messages.map { |message| message[:content].to_s }
+        sent_histories.one? ? batch_response : { type: :text, content: 'Show, valeu!' }
+      end
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+      post chat_confirm_path,
+           params: { record_action: 'create_earning', record: shopee_input, confirm_nonce: current_nonce },
+           as:     :turbo_stream
+      post chat_cancel_preview_path, params: { action_name: 'create_expense' }, as: :turbo_stream
+
+      post chat_message_path, params: { message: 'valeu' }, as: :turbo_stream
+
+      history = sent_histories.last.join("\n")
+      expect(history).to include(
+        I18n.t('chat.history.record_confirmed', summary: Chat::Summaries::Earning.new(shopee_input).call)
+      )
+      expect(history).to include(
+        I18n.t('chat.history.record_cancelled', summary: Chat::Summaries::Expense.new(ipiranga_input).call)
+      )
+    end
   end
 
   describe 'global loading overlay suppression' do
@@ -604,6 +578,21 @@ RSpec.describe 'Chats', type: :request do
 
       expect(session[:chat_history]).to be_nil
       expect(response).to redirect_to(chat_root_path)
+    end
+
+    it 'drops the pending preview queue' do
+      allow(Llm::Client).to receive(:chat).and_return({
+        type:        :tool_use,
+        tool_name:   'create_earning',
+        tool_input:  { 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' },
+        extra_calls: [{ name: 'create_earning', input: { 'amount' => 80, 'platform' => 'uber', 'date' => '2026-11-16' } }]
+      })
+      post chat_message_path, params: { message: 'Shopee 120 e Uber 80 hoje' }, as: :turbo_stream
+      expect(session[:preview_queue]).to be_present
+
+      delete chat_clear_path
+
+      expect(session[:preview_queue]).to be_nil
     end
   end
 

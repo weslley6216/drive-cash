@@ -11,7 +11,6 @@ pt-BR:
         - "Pronto, era isso da sua mensagem. Manda o próximo quando quiser!"
         - "Tudo certo por aqui. Tem mais alguma corrida ou gasto pra lançar?"
         - "Feito! Não ficou nada pendente do que você mandou."
-      nothing_pending: "Beleza! Por aqui não ficou nada pendente. Quer registrar mais alguma coisa?"
       preview_cancelled: "Cancelei o registro. Pode continuar com o que precisar."
     confirm:
       success_earning: "✅ Receita registrada com sucesso!"

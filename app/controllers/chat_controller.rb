@@ -11,7 +11,7 @@ class ChatController < ApplicationController
 
     add_to_history(Chat::Message.from_user(user_text))
 
-    result = Ai::ParserService.new(messages: llm_history, today: Date.current, user: current_user).call
+    result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
     result = start_preview_queue(result)
     add_to_history(Chat::Message.from_result(result, fallback_content: t('chat.history.preview_sent')))
 
@@ -28,16 +28,8 @@ class ChatController < ApplicationController
   end
 
   def cancel_preview
-    record_cancelled_signature
-    summary = last_preview_summary
-    content = summary.present? ? t('chat.history.record_cancelled', summary: summary) : t('chat.history.preview_cancelled')
-
-    add_to_history(Chat::Message.from_result(
-      { type: :user_action, content: content },
-      fallback_content: t('chat.history.preview_cancelled')
-    ))
-
-    respond_with_cancel_continuation
+    record_preview_cancellation
+    respond_with_cancel_result
   end
 
   def clear
