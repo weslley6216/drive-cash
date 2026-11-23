@@ -42,10 +42,6 @@ module Ai
     private
 
     def process_response(response)
-      if response[:extra_calls].present?
-        Rails.logger.warn "[ParserService] LLM returned #{response[:extra_calls].size} extra tool_call(s), ignoring: #{response[:extra_calls].map { |call| call[:name] }.inspect}"
-      end
-
       case response[:type]
       when :tool_use then dispatch_tool(response)
       when :text then { type: :text, content: response[:content].presence || I18n.t('chat.message.not_understood') }
@@ -56,14 +52,26 @@ module Ai
     end
 
     def dispatch_tool(response)
-      tool = Ai::Tools::Registry.find(response[:tool_name])
+      calls = Ai::Tools::CreateRecords.expand(
+        [{ name: response[:tool_name], input: response[:tool_input] }, *Array(response[:extra_calls])]
+      )
+      return { type: :text, content: I18n.t('chat.message.fallback') } if calls.empty?
+
+      tool = Ai::Tools::Registry.find(calls.first[:name])
       return { type: :text, content: I18n.t('chat.message.fallback') } unless tool
 
       if tool.query?
-        dispatch_query(response[:tool_input])
+        warn_ignored_extras(calls.drop(1))
+        dispatch_query(calls.first[:input])
       else
-        build_preview(tool, response[:tool_input], text_before: response[:text_before])
+        build_batch_preview(calls, text_before: response[:text_before])
       end
+    end
+
+    def warn_ignored_extras(calls)
+      return if calls.empty?
+
+      Rails.logger.warn "[ParserService] Ignoring #{calls.size} extra tool_call(s) after a query: #{calls.map { |call| call[:name] }.inspect}"
     end
 
     def dispatch_query(tool_input)
@@ -83,15 +91,30 @@ module Ai
       { type: :text, content: I18n.t('chat.errors.api_error') }
     end
 
-    def build_preview(tool, tool_input, text_before: nil)
-      params = parse_params(tool_input)
-      return missing_amount_result(tool.name) if invalid_amount?(tool, params)
+    def build_batch_preview(calls, text_before:)
+      previews = calls.filter_map { |call| preview_for_call(call) }
+      return { type: :text, content: I18n.t('chat.errors.missing_amount') } if previews.empty?
 
-      result = preview_for(tool, params)
-      result[:text_before] = text_before if text_before.present?
-      result
+      previews.first[:text_before] = text_before if text_before.present?
+      previews.first[:queued] = previews.drop(1) if previews.size > 1
+      previews.first
     rescue JSON::ParserError
       { type: :text, content: I18n.t('chat.message.fallback') }
+    end
+
+    def preview_for_call(call)
+      tool = Ai::Tools::Registry.find(call[:name])
+      return discard_call(call[:name]) if tool.nil? || tool.query?
+
+      params = tool.normalize(parse_params(call[:input]))
+      return discard_invalid_amount(tool.name) if invalid_amount?(tool, params)
+
+      preview_for(tool, params)
+    end
+
+    def discard_call(name)
+      Rails.logger.warn "[ParserService] Discarding #{name} from a multi-create batch"
+      nil
     end
 
     def parse_params(tool_input)
@@ -104,9 +127,9 @@ module Ai
       params['amount'].to_f <= 0
     end
 
-    def missing_amount_result(tool_name)
+    def discard_invalid_amount(tool_name)
       Rails.logger.warn "[ParserService] Rejected #{tool_name} with invalid amount"
-      { type: :text, content: I18n.t('chat.errors.missing_amount') }
+      nil
     end
 
     def preview_for(tool, params)

@@ -320,6 +320,54 @@ RSpec.describe Llm::Adapters::Groq do
           )
         )
       end
+
+      it 'normalizes the schema of the objects inside an array property' do
+        allow(response_mock).to receive(:status).and_return(200)
+        allow(response_mock).to receive(:body).and_return({})
+        array_tool = {
+          name:       'batch_tool',
+          parameters: {
+            type:       'OBJECT',
+            properties: {
+              items: {
+                type:  'ARRAY',
+                items: {
+                  type:       'OBJECT',
+                  properties: { amount: { type: 'NUMBER' }, notes: { type: 'STRING' } },
+                  required:   ['amount']
+                }
+              }
+            },
+            required:   ['items']
+          }
+        }
+
+        adapter.chat(messages: messages, tools: [array_tool])
+
+        expect(connection_mock).to have_received(:post).with(
+          'chat/completions',
+          hash_including(tools: [{
+            type:     'function',
+            function: {
+              name:       'batch_tool',
+              parameters: {
+                type:       'object',
+                properties: {
+                  items: {
+                    type:  'array',
+                    items: {
+                      type:       'object',
+                      properties: { amount: { type: 'number' }, notes: { type: ['string', 'null'] } },
+                      required:   ['amount']
+                    }
+                  }
+                },
+                required:   ['items']
+              }
+            }
+          }])
+        )
+      end
     end
 
     context 'when a tool call sends null for an optional field' do

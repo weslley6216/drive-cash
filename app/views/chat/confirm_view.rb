@@ -42,9 +42,6 @@ module Chat
       when :text
         raw turbo_stream.append('chat_messages') { text_bubble(@continuation[:content]) }
       when :preview
-        if @continuation[:text_before].present?
-          raw turbo_stream.append('chat_messages') { text_bubble(@continuation[:text_before]) }
-        end
         raw turbo_stream.append('chat_messages') { preview_card(@continuation) }
       end
     end

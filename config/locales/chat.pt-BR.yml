@@ -6,7 +6,11 @@ pt-BR:
       preview_sent_detail: "Registro apresentado ao usuário para confirmação: %{summary}"
       record_confirmed: "✅ Registrado: %{summary}"
       record_cancelled: "Cancelei o registro: %{summary}"
-      nothing_pending: "Beleza! Por aqui não ficou nada pendente. Quer registrar mais alguma coisa?"
+      queue_finished:
+        - "Fechou, tudo anotado! Quer registrar mais alguma coisa?"
+        - "Pronto, era isso da sua mensagem. Manda o próximo quando quiser!"
+        - "Tudo certo por aqui. Tem mais alguma corrida ou gasto pra lançar?"
+        - "Feito! Não ficou nada pendente do que você mandou."
       preview_cancelled: "Cancelei o registro. Pode continuar com o que precisar."
     confirm:
       success_earning: "✅ Receita registrada com sucesso!"
