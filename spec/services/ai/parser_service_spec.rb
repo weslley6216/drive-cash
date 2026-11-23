@@ -44,6 +44,26 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when the LLM names a fuel vendor without the word posto' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:       :tool_use,
+          tool_name:  'create_records',
+          tool_input: { 'records' => [
+            { 'action' => 'create_expense', 'amount' => 45, 'category' => 'fuel', 'vendor' => 'Ipiranga',
+              'description' => 'Gasolina', 'date' => '2026-11-23' }
+          ] }
+        })
+      end
+
+      it 'presents the card with the vendor prefixed by Posto' do
+        result = service.call
+
+        expect(result[:params]['vendor']).to eq('Posto Ipiranga')
+        expect(result[:summary]).to include('Posto Ipiranga')
+      end
+    end
+
     context 'when the LLM returns the create_earning tool' do
       before do
         allow(client).to receive(:chat).and_return({
@@ -303,7 +323,7 @@ RSpec.describe Ai::ParserService do
         result = service.call
 
         expect(result[:action]).to eq('create_earning')
-        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Ipiranga'])
+        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Posto Ipiranga'])
       end
     end
 
@@ -379,7 +399,7 @@ RSpec.describe Ai::ParserService do
 
         expect(result[:action]).to eq('create_earning')
         expect(result[:text_before]).to eq('Show, anotei os dois!')
-        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Ipiranga'])
+        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Posto Ipiranga'])
       end
     end
 

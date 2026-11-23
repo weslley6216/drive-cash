@@ -539,7 +539,7 @@ RSpec.describe 'Chats', type: :request do
         I18n.t('chat.history.record_confirmed', summary: Chat::Summaries::Earning.new(shopee_input).call)
       )
       expect(history).to include(
-        I18n.t('chat.history.record_cancelled', summary: Chat::Summaries::Expense.new(ipiranga_input).call)
+        I18n.t('chat.history.record_cancelled', summary: Chat::Summaries::Expense.new(ipiranga_input.merge('vendor' => 'Posto Ipiranga')).call)
       )
     end
 
