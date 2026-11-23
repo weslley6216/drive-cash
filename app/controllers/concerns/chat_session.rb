@@ -64,6 +64,36 @@ module ChatSession
     result.merge(nonce: nonce)
   end
 
+  def preview_queue
+    Chat::PreviewQueue.from_session(session[:preview_queue])
+  end
+
+  def start_preview_queue(result)
+    store_preview_queue(Chat::PreviewQueue.from_result(result))
+    session.delete(:confirm_nonce)
+    attach_nonce_if_preview(result)
+  end
+
+  def advance_preview_queue
+    queue = preview_queue.advance
+    store_preview_queue(queue)
+
+    next_result = next_queue_result(queue)
+    add_to_history(Chat::Message.from_result(next_result, fallback_content: t('chat.history.preview_sent'))) if next_result
+    next_result
+  end
+
+  def store_preview_queue(queue)
+    queue.empty? ? session.delete(:preview_queue) : session[:preview_queue] = queue.to_session_hash
+  end
+
+  def next_queue_result(queue)
+    return attach_nonce_if_preview(queue.head) if queue.head
+    return { type: :text, content: t('chat.history.queue_finished').sample } if queue.batch?
+
+    nil
+  end
+
   def respond_with_message(user_text:, result:)
     respond_to do |format|
       format.turbo_stream { render Chat::MessageView.new(user_text: user_text, result: result) }
@@ -85,8 +115,9 @@ module ChatSession
           finalize_chat_confirm_success(action: result.action, record: result.record, record_params: record_params)
         else
           render Chat::ConfirmView.new(
-            success: false,
-            message: "#{t('chat.confirm.error_prefix')} #{result.errors.join(', ')}"
+            success:      false,
+            message:      "#{t('chat.confirm.error_prefix')} #{result.errors.join(', ')}",
+            continuation: advance_preview_queue
           )
         end
       end
@@ -101,14 +132,19 @@ module ChatSession
 
   def finalize_chat_confirm_success(action:, record:, record_params:)
     i18n_key = Ai::Tools::Registry.find(action).confirm_key
-    record_handled_signature(action: action, params: record_params)
 
     add_to_history(Chat::Message.from_result(
       { type: :user_action, content: t('chat.history.record_confirmed', summary: confirm_summary(action, record_params)) },
       fallback_content: t(i18n_key)
     ))
 
-    auto_continue_and_render_confirm(action: action, record: record, i18n_key: i18n_key)
+    render Chat::ConfirmView.new(
+      success:      true,
+      message:      t(i18n_key),
+      action:       action,
+      date:         record.respond_to?(:date) ? record.date : nil,
+      continuation: advance_preview_queue
+    )
   end
 
   def confirm_summary(action, record_params)
@@ -153,34 +189,6 @@ module ChatSession
     return continuation unless handled_signatures.any? { |signature| signature.matches?(candidate) }
 
     { type: :text, content: t('chat.history.nothing_pending') }
-  end
-
-  def auto_continue_and_render_confirm(action:, record:, i18n_key:)
-    if continuation_depth_exceeded?
-      render Chat::ConfirmView.new(
-        success: true,
-        message: t(i18n_key),
-        action:  action,
-        date:    record.respond_to?(:date) ? record.date : nil
-      )
-      return
-    end
-
-    increment_continuation_depth
-    continuation = Ai::ParserService.new(messages: llm_history, today: Date.current, user: current_user).call
-    continuation = dedup_continuation(continuation)
-    continuation = attach_nonce_if_preview(continuation)
-
-    fallback = continuation[:type] == :preview ? t('chat.history.preview_sent') : continuation[:content].to_s
-    add_to_history(Chat::Message.from_result(continuation, fallback_content: fallback)) if continuation[:type].in?(%i[text preview])
-
-    render Chat::ConfirmView.new(
-      success:      true,
-      message:      t(i18n_key),
-      action:       action,
-      date:         record.respond_to?(:date) ? record.date : nil,
-      continuation: continuation[:type].in?(%i[text preview]) ? continuation : nil
-    )
   end
 
   def auto_continue_and_render_cancel
