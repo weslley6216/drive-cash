@@ -26,9 +26,8 @@ module ChatSession
     session[:confirm_nonce] = nonce
   end
 
-  def consume_confirm_nonce(provided_nonce)
+  def consume_preview_nonce(provided_nonce)
     stored = session[:confirm_nonce]
-    return true if stored.blank? && provided_nonce.blank?
     return false if stored.blank? || provided_nonce.blank?
     return false unless ActiveSupport::SecurityUtils.secure_compare(stored, provided_nonce)
     session.delete(:confirm_nonce)
