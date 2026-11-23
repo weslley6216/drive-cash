@@ -38,6 +38,10 @@ RSpec.describe Ai::ParserService do
         expect(result[:summary]).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
         expect(result[:summary]).to include('21/04/2026')
       end
+
+      it 'does not queue anything for a single tool call' do
+        expect(service.call).not_to have_key(:queued)
+      end
     end
 
     context 'when the LLM returns the create_earning tool' do
@@ -251,17 +255,109 @@ RSpec.describe Ai::ParserService do
         allow(client).to receive(:chat).and_return({
           type:        :tool_use,
           tool_name:   'create_earning',
-          tool_input:  { 'amount' => 245.0, 'platform' => 'shopee', 'date' => '2026-06-23' },
-          extra_calls: [{ name: 'create_expense', input: { 'amount' => 45.0, 'category' => 'fuel', 'date' => '2026-06-23' } }]
+          tool_input:  { 'amount' => 120.0, 'platform' => 'shopee', 'date' => '2026-11-16' },
+          text_before: 'Bora registrar os dois!',
+          extra_calls: [
+            { name: 'create_expense', input: { 'amount' => 60.0, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }
+          ]
         })
       end
 
-      it 'returns only the first call as preview, ignoring extra_calls' do
+      it 'returns the first call as the preview and queues the remaining ones in order' do
         result = service.call
 
-        expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_earning')
-        expect(result).not_to have_key(:extra_calls)
+        expect(result[:queued].map { |preview| preview[:action] }).to eq(['create_expense'])
+      end
+
+      it 'builds each queued preview with its own summary' do
+        queued = service.call[:queued].first
+
+        expect(queued[:type]).to eq(:preview)
+        expect(queued[:summary]).to include('R$ 60,00')
+        expect(queued[:content]).to include(queued[:summary])
+      end
+
+      it 'keeps text_before only on the first preview' do
+        result = service.call
+
+        expect(result[:text_before]).to eq('Bora registrar os dois!')
+        expect(result[:queued].first).not_to have_key(:text_before)
+      end
+    end
+
+    context 'when one call of a multi-create batch has an invalid amount' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_expense',
+          tool_input:  { 'amount' => 0, 'category' => 'fuel', 'vendor' => 'Shell', 'date' => '2026-11-16' },
+          extra_calls: [
+            { name: 'create_earning', input: { 'amount' => 120.0, 'platform' => 'shopee', 'date' => '2026-11-16' } },
+            { name: 'create_expense', input: { 'amount' => 60.0, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }
+          ]
+        })
+      end
+
+      it 'drops the invalid call and keeps the valid ones in order' do
+        result = service.call
+
+        expect(result[:action]).to eq('create_earning')
+        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Ipiranga'])
+      end
+    end
+
+    context 'when every call of a multi-create batch has an invalid amount' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_expense',
+          tool_input:  { 'amount' => 0, 'category' => 'fuel', 'vendor' => 'Shell', 'date' => '2026-11-16' },
+          extra_calls: [{ name: 'create_earning', input: { 'amount' => -5, 'platform' => 'uber', 'date' => '2026-11-16' } }]
+        })
+      end
+
+      it 'returns the missing amount message' do
+        expect(service.call).to eq(type: :text, content: I18n.t('chat.errors.missing_amount'))
+      end
+    end
+
+    context 'when a multi-create batch carries calls that are not creates' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_earning',
+          tool_input:  { 'amount' => 120.0, 'platform' => 'shopee', 'date' => '2026-11-16' },
+          extra_calls: [
+            { name: 'query', input: { 'type' => 'summary' } },
+            { name: 'delete_everything', input: {} },
+            { name: 'create_expense', input: { 'amount' => 60.0, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }
+          ]
+        })
+      end
+
+      it 'discards the query and the unknown call and queues only the creates' do
+        expect(service.call[:queued].map { |preview| preview[:action] }).to eq(['create_expense'])
+      end
+    end
+
+    context 'when the first call of a batch is a query' do
+      let(:kind) { Ai::Tools::Registry::QUERY_KINDS.fetch('summary') }
+
+      before do
+        allow(kind.reader).to receive(:new).and_return(instance_double('reader', call: :reader_output))
+        allow(kind.answer_presenter).to receive(:new).with(:reader_output)
+          .and_return(instance_double('presenter', call: 'Lucro: R$ 1.000,00'))
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'query',
+          tool_input:  { 'type' => 'summary' },
+          extra_calls: [{ name: 'create_expense', input: { 'amount' => 60.0, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' } }]
+        })
+      end
+
+      it 'answers the query and ignores the remaining calls' do
+        expect(service.call).to eq(type: :answer, content: 'Lucro: R$ 1.000,00')
       end
     end
 
