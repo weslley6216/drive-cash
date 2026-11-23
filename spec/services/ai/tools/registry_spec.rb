@@ -55,6 +55,18 @@ RSpec.describe Ai::Tools::Registry do
       expect(tool.permitted_keys).to eq(Ai::ChatExpenseParams::PERMITTED_KEYS)
     end
 
+    it 'normalizes create_expense params through the fuel vendor rule' do
+      params = { 'category' => 'fuel', 'vendor' => 'Ipiranga' }
+
+      expect(described_class.find('create_expense').normalize(params)['vendor']).to eq('Posto Ipiranga')
+    end
+
+    it 'keeps the params of a tool without a normalizer' do
+      params = { 'category' => 'fuel', 'vendor' => 'Ipiranga', 'amount' => 45 }
+
+      expect(described_class.find('create_earning').normalize(params)).to eq(params)
+    end
+
     it 'resolves create_earning wiring' do
       tool = described_class.find('create_earning')
 

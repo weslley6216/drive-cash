@@ -3,21 +3,25 @@ module Ai
     class Registry
       Tool = Data.define(
         :name, :declaration, :kind,
-        :persister, :summary_presenter, :confirm_key, :requires_amount, :permitted_keys
+        :persister, :summary_presenter, :confirm_key, :requires_amount, :permitted_keys, :params_normalizer
       ) do
         def query? = kind == :query
 
-        def self.create_tool(name:, declaration:, persister:, summary_presenter:, confirm_key:, permitted_keys:, requires_amount: false)
+        def normalize(params) = params_normalizer ? params_normalizer.call(params) : params
+
+        def self.create_tool(name:, declaration:, persister:, summary_presenter:, confirm_key:, permitted_keys:,
+                             requires_amount: false, params_normalizer: nil)
           new(
             name:, declaration:, kind: :create,
-            persister:, summary_presenter:, confirm_key:, requires_amount:, permitted_keys:
+            persister:, summary_presenter:, confirm_key:, requires_amount:, permitted_keys:, params_normalizer:
           )
         end
 
         def self.query_tool(declaration:)
           new(
             name: 'query', declaration:, kind: :query,
-            persister: nil, summary_presenter: nil, confirm_key: nil, requires_amount: false, permitted_keys: []
+            persister: nil, summary_presenter: nil, confirm_key: nil, requires_amount: false, permitted_keys: [],
+            params_normalizer: nil
           )
         end
       end
@@ -61,7 +65,8 @@ module Ai
           summary_presenter: Chat::Summaries::Expense,
           confirm_key:       'chat.confirm.success_expense',
           requires_amount:   true,
-          permitted_keys:    Ai::ChatExpenseParams::PERMITTED_KEYS
+          permitted_keys:    Ai::ChatExpenseParams::PERMITTED_KEYS,
+          params_normalizer: Ai::FuelVendorName
         ),
         Tool.create_tool(
           name:              'create_goal',

@@ -106,7 +106,7 @@ module Ai
       tool = Ai::Tools::Registry.find(call[:name])
       return discard_call(call[:name]) if tool.nil? || tool.query?
 
-      params = Ai::FuelVendorName.call(parse_params(call[:input]))
+      params = tool.normalize(parse_params(call[:input]))
       return discard_invalid_amount(tool.name) if invalid_amount?(tool, params)
 
       preview_for(tool, params)
