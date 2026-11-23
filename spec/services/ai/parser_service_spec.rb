@@ -361,6 +361,38 @@ RSpec.describe Ai::ParserService do
       end
     end
 
+    context 'when the LLM registers every record in a single create_records call' do
+      before do
+        allow(client).to receive(:chat).and_return({
+          type:        :tool_use,
+          tool_name:   'create_records',
+          tool_input:  { 'records' => [
+            { 'action' => 'create_earning', 'amount' => 120, 'platform' => 'shopee', 'date' => '2026-11-16' },
+            { 'action' => 'create_expense', 'amount' => 60, 'category' => 'fuel', 'vendor' => 'Ipiranga', 'date' => '2026-11-16' }
+          ] },
+          text_before: 'Show, anotei os dois!'
+        })
+      end
+
+      it 'presents the first record and queues the others in order' do
+        result = service.call
+
+        expect(result[:action]).to eq('create_earning')
+        expect(result[:text_before]).to eq('Show, anotei os dois!')
+        expect(result[:queued].map { |preview| preview[:params]['vendor'] }).to eq(['Ipiranga'])
+      end
+    end
+
+    context 'when a create_records call carries no records' do
+      before do
+        allow(client).to receive(:chat).and_return({ type: :tool_use, tool_name: 'create_records', tool_input: { 'records' => [] } })
+      end
+
+      it 'returns the fallback message' do
+        expect(service.call).to eq(type: :text, content: I18n.t('chat.message.fallback'))
+      end
+    end
+
     context 'when LLM response includes text_before' do
       it 'includes text_before in the preview result' do
         allow(client).to receive(:chat).and_return({

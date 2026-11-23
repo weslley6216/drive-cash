@@ -542,6 +542,23 @@ RSpec.describe 'Chats', type: :request do
         I18n.t('chat.history.record_cancelled', summary: Chat::Summaries::Expense.new(ipiranga_input).call)
       )
     end
+
+    it 'queues every record of a single create_records call' do
+      allow(Llm::Client).to receive(:chat).and_return({
+        type:       :tool_use,
+        tool_name:  'create_records',
+        tool_input: { 'records' => [
+          shopee_input.merge('action' => 'create_earning'),
+          ipiranga_input.merge('action' => 'create_expense')
+        ] }
+      })
+      post chat_message_path, params: { message: batch_message }, as: :turbo_stream
+
+      post chat_cancel_preview_path, params: { action_name: 'create_earning' }, as: :turbo_stream
+
+      expect(response.body).to include('Ipiranga')
+      expect(Llm::Client).to have_received(:chat).once
+    end
   end
 
   describe 'global loading overlay suppression' do

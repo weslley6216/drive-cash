@@ -52,7 +52,11 @@ module Ai
     end
 
     def dispatch_tool(response)
-      calls = [{ name: response[:tool_name], input: response[:tool_input] }, *Array(response[:extra_calls])]
+      calls = Ai::Tools::CreateRecords.expand(
+        [{ name: response[:tool_name], input: response[:tool_input] }, *Array(response[:extra_calls])]
+      )
+      return { type: :text, content: I18n.t('chat.message.fallback') } if calls.empty?
+
       tool = Ai::Tools::Registry.find(calls.first[:name])
       return { type: :text, content: I18n.t('chat.message.fallback') } unless tool
 
