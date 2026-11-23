@@ -45,7 +45,7 @@ export default class extends Controller {
   }
 
   cancelPreview(e) {
-    const actionName = e.target.dataset.actionName
+    const nonce = e.target.dataset.nonce
     const card = e.target.closest(".flex.items-start")
 
     if (card) card.remove()
@@ -58,7 +58,7 @@ export default class extends Controller {
         'X-CSRF-Token': csrfToken,
         'Accept': 'text/vnd.turbo-stream.html'
       },
-      body: new URLSearchParams({ action_name: actionName })
+      body: new URLSearchParams({ confirm_nonce: nonce })
     }).then(res => res.text()).then(html => {
       Turbo.renderStreamMessage(html)
     })
