@@ -48,6 +48,17 @@ RSpec.describe Ai::Tools::CreateRecords do
       expect(described_class.expand(calls).first[:input]).to eq({ 'amount' => 100, 'platform' => 'uber', 'date' => '2026-11-23' })
     end
 
+    it 'keeps only the records whose action is an earning or an expense' do
+      calls = [{ name: 'create_records', input: { 'records' => [
+        { 'action' => 'create_goal', 'amount' => 500, 'date' => '2026-11-23' },
+        { 'action' => 'create_earning', 'amount' => 100, 'platform' => 'uber', 'date' => '2026-11-23' }
+      ] } }]
+
+      expect(described_class.expand(calls)).to eq([
+        { name: 'create_earning', input: { 'amount' => 100, 'platform' => 'uber', 'date' => '2026-11-23' } }
+      ])
+    end
+
     it 'keeps the other tool calls as they are' do
       calls = [{ name: 'create_goal', input: { 'kind' => 'weekly', 'target_amount' => 500 } }]
 

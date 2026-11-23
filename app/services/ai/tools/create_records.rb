@@ -37,7 +37,7 @@ module Ai
         calls.flat_map do |call|
           next [call] unless call[:name] == 'create_records'
 
-          Array(call[:input]['records']).map do |record|
+          Array(call[:input]['records']).select { |record| ACTIONS.include?(record['action']) }.map do |record|
             { name: record['action'], input: record.except('action').compact }
           end
         end
