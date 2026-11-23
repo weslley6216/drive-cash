@@ -38,15 +38,25 @@ module Llm
 
       def normalize_schema(tool)
         adapted = tool.deep_dup
-        adapted.dig(:parameters, :type)&.then { |type| adapted[:parameters][:type] = type.downcase }
-        required = adapted.dig(:parameters, :required) || []
-        adapted.dig(:parameters, :properties)&.each do |name, property|
-          next unless property[:type]
-
-          downcased = property[:type].to_s.downcase
-          property[:type] = required.include?(name.to_s) ? downcased : [downcased, 'null']
-        end
+        adapted[:parameters] = normalize_object(adapted[:parameters]) if adapted[:parameters]
         adapted
+      end
+
+      def normalize_object(object)
+        object[:type] = object[:type].to_s.downcase if object[:type]
+        required = object[:required] || []
+        object[:properties]&.each do |name, property|
+          normalize_property(property, required: required.include?(name.to_s))
+        end
+        object
+      end
+
+      def normalize_property(property, required:)
+        return unless property[:type]
+
+        downcased = property[:type].to_s.downcase
+        normalize_object(property[:items]) if downcased == 'array' && property[:items]
+        property[:type] = required ? downcased : [downcased, 'null']
       end
 
       def handle_error!(response)
