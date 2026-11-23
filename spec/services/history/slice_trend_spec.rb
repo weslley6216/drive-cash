@@ -3,8 +3,6 @@ require 'rails_helper'
 RSpec.describe History::SliceTrend do
   let(:user) { create(:user) }
 
-  def trend_for(slice, month: 5) = described_class.new(slice: slice, user: user, year: 2026, month: month).call
-
   before { travel_to Time.zone.local(2026, 6, 10, 10, 0) }
 
   it 'totals the slice in each of the six months ending at the selected one and compares the last two' do
@@ -16,7 +14,8 @@ RSpec.describe History::SliceTrend do
     create(:expense, user: user, date: Date.new(2026, 5, 20), amount: 70, category: 'fuel', vendor: 'Shell')
     create(:expense, user: create(:user), date: Date.new(2026, 5, 20), amount: 300, category: 'fuel', vendor: 'Posto Orense')
 
-    trend = trend_for(History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }))
+    trend = described_class.new(slice: History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }), user: user,
+                                year: 2026, month: 5).call
 
     expect(trend[:kind]).to eq(:expenses)
     expect(trend[:months]).to eq([
@@ -30,7 +29,7 @@ RSpec.describe History::SliceTrend do
   it 'flags the current month as in progress and has no change without a previous total' do
     create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 32.5, platform: 'uber')
 
-    trend = trend_for(History::Slice.new(platforms: %w[uber]), month: 6)
+    trend = described_class.new(slice: History::Slice.new(platforms: %w[uber]), user: user, year: 2026, month: 6).call
 
     expect(trend[:kind]).to eq(:earnings)
     expect(trend[:months].last).to eq(year: 2026, month: 6, total: 32.5)
@@ -39,7 +38,7 @@ RSpec.describe History::SliceTrend do
   end
 
   it 'has no band for a slice of more than one series or for the whole year' do
-    expect(trend_for(History::Slice.new(categories: %w[fuel car_wash]))).to be_nil
-    expect(trend_for(History::Slice.new(categories: %w[fuel]), month: nil)).to be_nil
+    expect(described_class.new(slice: History::Slice.new(categories: %w[fuel car_wash]), user: user, year: 2026, month: 5).call).to be_nil
+    expect(described_class.new(slice: History::Slice.new(categories: %w[fuel]), user: user, year: 2026, month: nil).call).to be_nil
   end
 end

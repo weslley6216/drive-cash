@@ -17,10 +17,6 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     login_as(current_user)
   end
 
-  def next_week_goal
-    Goal.find_by(user: current_user, kind: 'weekly', period_start: Date.new(2026, 7, 13))
-  end
-
   it 'opens the missed outcome from the goal missed notification without confetti on a phone' do
     create(:notification, user: current_user, kind: 'goal_missed',
                           data: { 'goal_id' => goal.id, 'period_start' => '2026-07-06', 'kind' => 'weekly',
@@ -61,7 +57,7 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     click_on 'Ajustar para R$ 990'
 
     expect(page).to have_link('Ver meta de 13/jul a 19/jul')
-    expect(next_week_goal.target_amount).to eq(990)
+    expect(Goal.find_by(user: current_user, kind: 'weekly', period_start: Date.new(2026, 7, 13)).target_amount).to eq(990)
     expect(page).to fit_the_phone_width
   end
 
@@ -71,7 +67,7 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     click_on 'Manter a meta'
 
     expect(page).to have_link('Ver meta de 13/jul a 19/jul')
-    expect(next_week_goal.target_amount).to eq(1_100)
+    expect(Goal.find_by(user: current_user, kind: 'weekly', period_start: Date.new(2026, 7, 13)).target_amount).to eq(1_100)
   end
 
   it 'opens the entries of the week from the footer on a phone' do

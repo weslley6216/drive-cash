@@ -49,6 +49,22 @@ end
 
 ---
 
+## Sem `def` em arquivo de spec
+
+O spec é a documentação da funcionalidade: lê-se de cima a baixo sem saltar para um helper. Nenhum
+`def`/`define_method` em `*_spec.rb` — nem helper de render, nem builder de dado, nem componente-host
+com `def view_template`.
+
+- **Arrange literal**: `create(...)`/`build_stubbed(...)` com os valores no próprio `it`, ou `let`/`before`.
+- **Variação de cenário**: `context` com `let` sobrescrito (`let(:window) { twelve_months.merge(count: 0) }`), não método parametrizado.
+- **Slot de componente**: o bloco vai direto no `render` — `view_context.render(described_class.new) { |screen| screen.with_content { screen.p { 'Corpo' } } }`.
+- **Leitura da página** inline no Assert; quando a expressão cresce, vira uma linha de Act (`html = view_context.render(...)`) antes do `expect`.
+- **Vocabulário compartilhado de verdade** (login, matcher customizado) mora em `spec/support/`, com nome do domínio e **sem `expect` dentro**.
+
+Guardado por `spec/conventions/helper_discipline_spec.rb` (portado do Zubio).
+
+---
+
 ## Sem `allow_any_instance_of` / `expect_any_instance_of`
 
 Mock frouxo esconde qual objeto colabora e quebra com `verify_partial_doubles`. Mocke a **classe ou
@@ -117,6 +133,7 @@ O `build` evita ir ao banco à toa (validações e métodos de instância não p
 
 - `let!`; comentário de qualquer tipo no spec; nome de exemplo referenciando AC.
 - `allow_any_instance_of`/`expect_any_instance_of`.
+- `def`/`define_method` em arquivo de spec; `expect` dentro de `spec/support/`.
 - Teste só-negativo sem par positivo discriminante.
 - Variável de bloco de uma letra (`|r|`, `|g|`, `|i|`).
 - Factory para value object; `.new` cru para model/service.
@@ -129,6 +146,7 @@ O `build` evita ir ao banco à toa (validações e métodos de instância não p
 - [ ] Sem `let!`; Arrange via `let`/`before`/`create` no `it`.
 - [ ] AAA com **linha vazia** entre fases quando as três estão no `it`; sem comentários.
 - [ ] Sem `allow_any_instance_of`/`expect_any_instance_of`; mock de classe/instância específica.
+- [ ] Sem `def` no arquivo de spec; helper compartilhado só em `spec/support/` e sem `expect`.
 - [ ] Nome do exemplo descreve comportamento, sem referência a AC.
 - [ ] Todo teste só-negativo tem par positivo discriminante (ou é exceção legítima).
 - [ ] Value object com `.new`; demais camadas com FactoryBot; factory mínima.

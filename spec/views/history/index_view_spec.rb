@@ -88,20 +88,22 @@ RSpec.describe History::IndexView, type: :component do
     let(:earning) { build_stubbed(:earning, date: Date.new(2026, 5, 22), amount: 50, platform: 'uber') }
     let(:group) { { date: earning.date, items: [earning], earnings_total: 50, expenses_total: 0 } }
 
-    def render_page(next_page:)
-      view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 2, next_page: next_page),
-                                              year: 2026, month: 5, query: nil, slice: History::Slice.new, periods: { 2026 => [5] },
-                                              unread_count: 0))
-    end
-
     it 'puts the load more link inside the feed frame pointing at the next page' do
-      link = Capybara.string(render_page(next_page: 2)).find('turbo-frame#history-feed a', text: I18n.t('history.index.load_more'))
+      html = view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 2, next_page: 2),
+                                                     year: 2026, month: 5, query: nil, slice: History::Slice.new,
+                                                     periods: { 2026 => [5] }, unread_count: 0))
+
+      link = Capybara.string(html).find('turbo-frame#history-feed a', text: I18n.t('history.index.load_more'))
 
       expect(link[:href]).to eq('/history?month=5&page=2&year=2026')
     end
 
     it 'leaves the load more link out on the last page' do
-      expect(render_page(next_page: nil)).not_to include(I18n.t('history.index.load_more'))
+      html = view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 2, next_page: nil),
+                                                     year: 2026, month: 5, query: nil, slice: History::Slice.new,
+                                                     periods: { 2026 => [5] }, unread_count: 0))
+
+      expect(html).not_to include(I18n.t('history.index.load_more'))
     end
 
     it 'carries the slice in the load more link' do
@@ -115,34 +117,44 @@ RSpec.describe History::IndexView, type: :component do
   end
 
   context 'when a search finds nothing' do
-    def render_with(query:, slice:)
-      view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: query, slice: slice, periods: { 2025 => [3] }, unread_count: 0))
-    end
-
     it 'echoes the search term' do
-      expect(render_with(query: 'posto ipiranga', slice: History::Slice.new))
-        .to include(CGI.escapeHTML(I18n.t('empty_states.history.description_query', query: 'posto ipiranga')))
+      html = view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: 'posto ipiranga',
+                                                     slice: History::Slice.new, periods: { 2025 => [3] }, unread_count: 0))
+
+      expect(html).to include(CGI.escapeHTML(I18n.t('empty_states.history.description_query', query: 'posto ipiranga')))
     end
 
     it 'echoes the search term and the active preset' do
       expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: I18n.t('history.index.filters.expenses'))
 
-      expect(render_with(query: 'posto', slice: History::Slice.preset('expenses'))).to include(CGI.escapeHTML(expected))
+      html = view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: 'posto',
+                                                     slice: History::Slice.preset('expenses'), periods: { 2025 => [3] }, unread_count: 0))
+
+      expect(html).to include(CGI.escapeHTML(expected))
     end
 
     it 'hides the period summary' do
-      expect(render_with(query: 'posto', slice: History::Slice.new)).not_to include(I18n.t('history.index.summary.net'))
+      html = view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: 'posto',
+                                                     slice: History::Slice.new, periods: { 2025 => [3] }, unread_count: 0))
+
+      expect(html).not_to include(I18n.t('history.index.summary.net'))
     end
 
     it 'echoes the search term and the slice sentence' do
       slice = History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] })
       expected = I18n.t('empty_states.history.description_query_filter', query: 'posto', filter: 'Combustível (Posto Orense)')
 
-      expect(render_with(query: 'posto', slice: slice)).to include(CGI.escapeHTML(expected))
+      html = view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: 'posto',
+                                                     slice: slice, periods: { 2025 => [3] }, unread_count: 0))
+
+      expect(html).to include(CGI.escapeHTML(expected))
     end
 
     it 'keeps the generic message when only a preset is active' do
-      expect(render_with(query: nil, slice: History::Slice.preset('unpaid'))).to include(I18n.t('empty_states.history.description'))
+      html = view_context.render(described_class.new(feed: feed, year: 2025, month: nil, query: nil,
+                                                     slice: History::Slice.preset('unpaid'), periods: { 2025 => [3] }, unread_count: 0))
+
+      expect(html).to include(I18n.t('empty_states.history.description'))
     end
   end
 
@@ -151,43 +163,45 @@ RSpec.describe History::IndexView, type: :component do
     let(:group) { { date: expense.date, items: [expense], earnings_total: 0, expenses_total: 60 } }
     let(:slice_summary) { { kind: :expenses, total: 60, count: 1, average: 60, pending: 0, category: 'fuel' } }
 
-    def render_slice(**overrides)
-      view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 1, slice_summary: slice_summary, trend: nil, **overrides),
+    let(:trend) { nil }
+    let(:html) do
+      view_context.render(described_class.new(feed: feed.merge(groups: [group], total_count: 1, slice_summary: slice_summary, trend: trend),
                                               year: 2026, month: 5, query: nil, slice: History::Slice.new(categories: %w[fuel]),
                                               periods: { 2026 => [5] }, unread_count: 0))
     end
 
     it 'counts the slice records in the phone subtitle' do
-      expect(Capybara.string(render_slice).find('.lg\:hidden p', match: :first).text).to eq('1 lançamento · maio 2026')
+      expect(Capybara.string(html).find('.lg\:hidden p', match: :first).text).to eq('1 lançamento · maio 2026')
     end
 
     it 'swaps the period tiles for the slice tiles' do
-      html = render_slice
-
       expect(html).to include(I18n.t('history.index.slice_summary.spent'))
       expect(html).not_to include(I18n.t('history.index.summary.net'))
     end
 
-    it 'keeps the three totals for a mixed slice' do
-      expect(render_slice(slice_summary: { kind: :mixed, earnings: 50, expenses: 60, net: -10 })).to include(I18n.t('history.index.summary.net'))
+    context 'when the slice mixes earnings and expenses' do
+      let(:slice_summary) { { kind: :mixed, earnings: 50, expenses: 60, net: -10 } }
+
+      it 'keeps the three totals for a mixed slice' do
+        expect(html).to include(I18n.t('history.index.summary.net'))
+      end
     end
 
-    it 'adds the six month band when the feed brings one' do
-      trend = { kind: :expenses, months: (1..6).map { |month| { year: 2026, month: month, total: 10 } }, change: nil, in_progress: false }
+    context 'when the feed brings the six month band' do
+      let(:trend) { { kind: :expenses, months: (1..6).map { |month| { year: 2026, month: month, total: 10 } }, change: nil, in_progress: false } }
 
-      expect(Capybara.string(render_slice(trend: trend))).to have_css('[data-slice-summary="trend"]')
+      it 'adds the six month band when the feed brings one' do
+        expect(Capybara.string(html)).to have_css('[data-slice-summary="trend"]')
+      end
     end
   end
 
   context 'when a slice has nothing in the period' do
     let(:slice) { History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }) }
 
-    def render_empty(month:)
-      view_context.render(described_class.new(feed: feed, year: 2026, month: month, query: nil, slice: slice, periods: { 2026 => [5] }, unread_count: 0))
-    end
-
     it 'names the month and the slice and offers to clear the filters' do
-      page = Capybara.string(render_empty(month: 6))
+      page = Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: 6, query: nil, slice: slice,
+                                                                     periods: { 2026 => [5] }, unread_count: 0)))
 
       expect(page).to have_text(I18n.t('empty_states.history.slice.title_month', month: 'junho'))
       expect(page).to have_text(I18n.t('empty_states.history.slice.description', slice: 'Combustível (Posto Orense)', period: 'junho de 2026'))
@@ -195,15 +209,22 @@ RSpec.describe History::IndexView, type: :component do
     end
 
     it 'names the year when no month is picked' do
-      expect(render_empty(month: nil)).to include(I18n.t('empty_states.history.slice.title_year', year: 2026))
+      html = view_context.render(described_class.new(feed: feed, year: 2026, month: nil, query: nil, slice: slice,
+                                                     periods: { 2026 => [5] }, unread_count: 0))
+
+      expect(html).to include(I18n.t('empty_states.history.slice.title_year', year: 2026))
     end
 
     it 'shows the period instead of the record count in the phone subtitle' do
-      expect(Capybara.string(render_empty(month: 6)).find('.lg\:hidden p', match: :first).text).to eq('Junho 2026')
+      page = Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: 6, query: nil, slice: slice,
+                                                                     periods: { 2026 => [5] }, unread_count: 0)))
+
+      expect(page.find('.lg\:hidden p', match: :first).text).to eq('Junho 2026')
     end
 
     it 'offers the last twelve months of a single series before clearing the filters' do
-      page = Capybara.string(render_empty(month: 6))
+      page = Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: 6, query: nil, slice: slice,
+                                                                     periods: { 2026 => [5] }, unread_count: 0)))
 
       expect(page).to have_link(I18n.t('empty_states.history.slice.cta_twelve_months'),
                                 href: '/history?categories%5B%5D=fuel&range=12m&types%5B%5D=expenses&vendors%5Bfuel%5D%5B%5D=Posto+Orense')
@@ -233,34 +254,34 @@ RSpec.describe History::IndexView, type: :component do
 
     before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
 
-    def render_year(data)
-      feed = { twelve_months: data, total_count: data[:count], groups: [], next_page: nil, facets: facets }
-      Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: nil, query: nil, slice: slice, periods: { 2026 => [5] }, unread_count: 0)))
+    let(:window) { twelve_months }
+    let(:page) do
+      feed = { twelve_months: window, total_count: window[:count], groups: [], next_page: nil, facets: facets }
+      Capybara.string(view_context.render(described_class.new(feed: feed, year: 2026, month: nil, query: nil, slice: slice,
+                                                              periods: { 2026 => [5] }, unread_count: 0)))
     end
 
     it 'counts the window in the subtitle and labels the period pill as the last twelve months' do
-      page = render_year(twelve_months)
-
       expect(page.find('.lg\:hidden p', match: :first).text).to eq('1 lançamento · últimos 12 meses')
       expect(page).to have_button(text: I18n.t('filter_component.last_twelve_months'))
     end
 
     it 'swaps the tiles and the day list for the twelve month card and the month rows' do
-      page = render_year(twelve_months)
-
       expect(page).to have_css('[data-twelve-months="card"]')
       expect(page).to have_css('[data-month-row="phone"]', count: 1)
       expect(page).to have_no_css('[data-slice-summary="tiles"]')
     end
 
-    it 'offers to clear the filters when the window has nothing' do
-      page = render_year(twelve_months.merge(count: 0, total: 0, rows: []))
+    context 'when the window has nothing' do
+      let(:window) { twelve_months.merge(count: 0, total: 0, rows: []) }
 
-      expect(page.find('.lg\:hidden p', match: :first).text).to eq('Últimos 12 meses')
-      expect(page).to have_text(I18n.t('empty_states.history.twelve_months.title'))
-      expect(page).to have_text(I18n.t('empty_states.history.twelve_months.description', slice: 'Seguro'))
-      expect(page).to have_link(I18n.t('empty_states.history.cta'), href: '/history?year=2026')
-      expect(page).to have_no_css('[data-twelve-months="card"]')
+      it 'offers to clear the filters when the window has nothing' do
+        expect(page.find('.lg\:hidden p', match: :first).text).to eq('Últimos 12 meses')
+        expect(page).to have_text(I18n.t('empty_states.history.twelve_months.title'))
+        expect(page).to have_text(I18n.t('empty_states.history.twelve_months.description', slice: 'Seguro'))
+        expect(page).to have_link(I18n.t('empty_states.history.cta'), href: '/history?year=2026')
+        expect(page).to have_no_css('[data-twelve-months="card"]')
+      end
     end
   end
 end

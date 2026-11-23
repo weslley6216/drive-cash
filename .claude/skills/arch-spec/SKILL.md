@@ -26,6 +26,7 @@ todo spec, de qualquer camada.
 |-------|---------|
 | **Sem `let!`** | usar `let` + referência explícita, `before { create(...) }` ou `create` dentro do `it` |
 | **AAA com linha vazia** | linha em branco entre Arrange/Act/Assert quando as três fases estão no `it`; se arrange/act estão em `let`, o `it` só tem o Assert |
+| **Sem `def` em arquivo de spec** | o spec se lê como documentação, de cima a baixo, sem saltar para helper. Arrange literal no `it` (ou `let`/`before`/factory), leitura da página inline no Assert; variação de cenário é `context` + `let` sobrescrito; slot de componente recebe o bloco direto no `render`, sem componente-host. Vocabulário compartilhado (login, matcher) em `spec/support/`, **sem `expect` dentro**. Guardado por `spec/conventions/helper_discipline_spec.rb` |
 | **Nunca comentários** | nada de `# Arrange`, nem qualquer outro comentário no spec |
 | **Sem `*_any_instance_of`** | proibido `allow_any_instance_of`/`expect_any_instance_of`; mockar classe/instância específica (`allow(MyClass).to receive(...)`) ou testar o comportamento resultante |
 | **Sem referência a ACs** | o nome do exemplo descreve o comportamento e faz sentido sozinho |

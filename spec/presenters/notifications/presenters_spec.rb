@@ -1,10 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Notifications::Presenters do
-  def present(kind, data)
-    described_class.present(build_stubbed(:notification, kind: kind, data: data))
-  end
-
   describe 'maintenance_due' do
     let(:data) do
       { 'maintenance_id' => 1, 'status' => 'overdue', 'category' => 'oil_change',
@@ -12,36 +8,55 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'renders the overdue title with the catalog label and a gender-neutral wording' do
-      row = present('maintenance_due', data)
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Manutenção vencida: Troca de óleo')
     end
 
     it 'renders the overdue body with the absolute km past the interval' do
-      row = present('maintenance_due', data)
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.body).to eq('Passou 412 km do intervalo. Agende pra evitar dano ao motor.')
     end
 
     it 'renders the soon title and body with a delimited interval' do
-      row = present('maintenance_due', data.merge('status' => 'soon', 'km_until' => 600,
-                                                  'interval_km' => 10_000, 'category' => 'tire_rotation'))
+      notification = build_stubbed(:notification, kind: 'maintenance_due',
+                                                  data: data.merge('status' => 'soon', 'km_until' => 600,
+                                                                   'interval_km' => 10_000, 'category' => 'tire_rotation'))
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Rodízio de pneus em breve')
       expect(row.body).to eq('Faltam ~600 km pro intervalo de 10.000 km.')
     end
 
     it 'paints overdue as danger and soon as warning' do
-      expect(present('maintenance_due', data).palette_key).to eq(:danger)
-      expect(present('maintenance_due', data.merge('status' => 'soon')).palette_key).to eq(:warning)
+      overdue_notification = build_stubbed(:notification, kind: 'maintenance_due', data: data)
+      soon_notification = build_stubbed(:notification, kind: 'maintenance_due', data: data.merge('status' => 'soon'))
+
+      overdue = described_class.present(overdue_notification)
+      soon = described_class.present(soon_notification)
+
+      expect(overdue.palette_key).to eq(:danger)
+      expect(soon.palette_key).to eq(:warning)
     end
 
     it 'uses the wrench icon' do
-      expect(present('maintenance_due', data).icon).to eq(PhlexIcons::Lucide::Wrench)
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: data)
+
+      row = described_class.present(notification)
+
+      expect(row.icon).to eq(PhlexIcons::Lucide::Wrench)
     end
 
     it 'links to the vehicle highlighted on the overdue item, with an inline mark-done action in the modal frame' do
-      row = present('maintenance_due', data)
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/vehicle?highlight=maintenance_1')
       expect(row.frame).to eq('_top')
@@ -58,7 +73,9 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'titles the row by the goal kind and names the period with the reached amount in BRL' do
-      row = present('goal_reached', data)
+      notification = build_stubbed(:notification, kind: 'goal_reached', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Meta mensal batida! 🎯')
       expect(row.body).to eq('Você bateu a meta de julho com R$ 1.200,00.')
@@ -67,8 +84,13 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'names a weekly goal by its week and an annual goal by its year' do
-      weekly = present('goal_reached', data.merge('kind' => 'weekly', 'period_start' => '2026-07-06'))
-      annual = present('goal_reached', data.merge('kind' => 'annual', 'period_start' => '2026-01-01'))
+      weekly_notification = build_stubbed(:notification, kind: 'goal_reached',
+                                                         data: data.merge('kind' => 'weekly', 'period_start' => '2026-07-06'))
+      annual_notification = build_stubbed(:notification, kind: 'goal_reached',
+                                                         data: data.merge('kind' => 'annual', 'period_start' => '2026-01-01'))
+
+      weekly = described_class.present(weekly_notification)
+      annual = described_class.present(annual_notification)
 
       expect(weekly.title).to eq('Meta semanal batida! 🎯')
       expect(weekly.body).to eq('Você bateu a meta de 06/jul a 12/jul com R$ 1.200,00.')
@@ -77,7 +99,9 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'links to the outcome of the goal period with no inline action' do
-      row = present('goal_reached', data)
+      notification = build_stubbed(:notification, kind: 'goal_reached', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/goals/1/outcomes/2026-07-01')
       expect(row.inline_action).to be_nil
@@ -91,7 +115,9 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'tells a near miss of the week with the percent and the amounts in BRL' do
-      row = present('goal_missed', data)
+      notification = build_stubbed(:notification, kind: 'goal_missed', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Meta da semana: faltou pouco')
       expect(row.body).to eq('Você chegou a 90% (R$ 990,00 de R$ 1.100,00).')
@@ -100,23 +126,31 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'closes a goal under eighty percent without the near miss wording' do
-      row = present('goal_missed', data.merge('current' => 700.0))
+      notification = build_stubbed(:notification, kind: 'goal_missed', data: data.merge('current' => 700.0))
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Meta da semana encerrada')
       expect(row.body).to eq('Você chegou a 63% (R$ 700,00 de R$ 1.100,00).')
     end
 
     it 'names a monthly goal by its month and an annual goal by its year' do
-      monthly = present('goal_missed', data.merge('kind' => 'monthly', 'period_start' => '2026-07-01'))
-      annual = present('goal_missed', data.merge('kind' => 'annual', 'period_start' => '2026-01-01',
-                                                 'current' => 500.0))
+      monthly_notification = build_stubbed(:notification, kind: 'goal_missed',
+                                                          data: data.merge('kind' => 'monthly', 'period_start' => '2026-07-01'))
+      annual_notification = build_stubbed(:notification, kind: 'goal_missed',
+                                                         data: data.merge('kind' => 'annual', 'period_start' => '2026-01-01', 'current' => 500.0))
+
+      monthly = described_class.present(monthly_notification)
+      annual = described_class.present(annual_notification)
 
       expect(monthly.title).to eq('Meta de julho: faltou pouco')
       expect(annual.title).to eq('Meta de 2026 encerrada')
     end
 
     it 'links to the outcome of the goal period with no inline action' do
-      row = present('goal_missed', data)
+      notification = build_stubbed(:notification, kind: 'goal_missed', data: data)
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/goals/1/outcomes/2026-07-06')
       expect(row.inline_action).to be_nil
@@ -125,7 +159,10 @@ RSpec.describe Notifications::Presenters do
 
   describe 'tank_low' do
     it 'renders the static copy with the danger palette' do
-      row = present('tank_low', { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
+      notification = build_stubbed(:notification, kind: 'tank_low',
+                                                  data: { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Tanque no vermelho')
       expect(row.body).to eq('Você rodou além do último tanque. Registre um abastecimento.')
@@ -134,7 +171,10 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'links to the vehicle with the tank card highlighted, keeping the inline refuel action in the modal frame' do
-      row = present('tank_low', { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
+      notification = build_stubbed(:notification, kind: 'tank_low',
+                                                  data: { 'status' => 'negative', 'balance' => -80.0, 'last_fill_id' => 1 })
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/vehicle?highlight=vehicle_tank')
       expect(row.frame).to eq('_top')
@@ -146,7 +186,10 @@ RSpec.describe Notifications::Presenters do
 
   describe 'weekly_summary' do
     it 'renders profit in BRL and pluralised trips' do
-      row = present('weekly_summary', { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 })
+      notification = build_stubbed(:notification, kind: 'weekly_summary',
+                                                  data: { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 })
+
+      row = described_class.present(notification)
 
       expect(row.body).to eq('Líquido de R$ 987,40 · 32 corridas.')
       expect(row.palette_key).to eq(:info)
@@ -154,7 +197,10 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'links to the summary screen of the week' do
-      row = present('weekly_summary', { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 })
+      notification = build_stubbed(:notification, kind: 'weekly_summary',
+                                                  data: { 'week_start' => '2026-07-06', 'profit' => 987.4, 'trips' => 32 })
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/weekly_summaries/2026-07-06')
     end
@@ -162,7 +208,9 @@ RSpec.describe Notifications::Presenters do
 
   describe 'log_reminder' do
     it 'renders the static copy with the neutral palette' do
-      row = present('log_reminder', { 'date' => '2026-07-14' })
+      notification = build_stubbed(:notification, kind: 'log_reminder', data: { 'date' => '2026-07-14' })
+
+      row = described_class.present(notification)
 
       expect(row.title).to eq('Registre o seu dia')
       expect(row.palette_key).to eq(:neutral)
@@ -170,7 +218,9 @@ RSpec.describe Notifications::Presenters do
     end
 
     it 'links to the history focused on the empty day before the reminder' do
-      row = present('log_reminder', { 'date' => '2026-07-14' })
+      notification = build_stubbed(:notification, kind: 'log_reminder', data: { 'date' => '2026-07-14' })
+
+      row = described_class.present(notification)
 
       expect(row.path).to eq('/history?focus_day=2026-07-13&highlight=day-2026-07-13')
       expect(row.frame).to eq('_top')
@@ -179,7 +229,9 @@ RSpec.describe Notifications::Presenters do
     it 'offers an inline Lançar ontem to a new record on the empty day when the reminder is from today' do
       travel_to Date.new(2026, 7, 14)
 
-      row = present('log_reminder', { 'date' => '2026-07-14' })
+      notification = build_stubbed(:notification, kind: 'log_reminder', data: { 'date' => '2026-07-14' })
+
+      row = described_class.present(notification)
 
       expect(row.inline_action.label).to eq('Lançar ontem')
       expect(row.inline_action.path).to eq('/records/new?date=2026-07-13')
@@ -189,7 +241,9 @@ RSpec.describe Notifications::Presenters do
     it 'offers an inline action with the empty day when the reminder is older' do
       travel_to Date.new(2026, 7, 20)
 
-      row = present('log_reminder', { 'date' => '2026-07-14' })
+      notification = build_stubbed(:notification, kind: 'log_reminder', data: { 'date' => '2026-07-14' })
+
+      row = described_class.present(notification)
 
       expect(row.inline_action.label).to eq('Lançar 13/07')
     end
@@ -210,7 +264,9 @@ RSpec.describe Notifications::Presenters do
 
     Notifications::Registry::KINDS.each do |kind|
       it "opens a show screen in the top frame when tapping a #{kind} row" do
-        row = present(kind, sample_data.fetch(kind))
+        notification = build_stubbed(:notification, kind: kind, data: sample_data.fetch(kind))
+
+        row = described_class.present(notification)
 
         expect(row.frame).to eq('_top')
         expect(row.path).not_to match(%r{/(new|edit)(\?|/|\z)})
@@ -226,22 +282,31 @@ RSpec.describe Notifications::Presenters do
 
   describe '#destination' do
     it 'uses the inline path when tapped inline' do
-      row = present('maintenance_due', { 'maintenance_id' => 1, 'status' => 'overdue', 'category' => 'oil_change',
-                                         'km_until' => -412, 'interval_km' => 5_000 })
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: { 'maintenance_id' => 1, 'status' => 'overdue',
+                                                                                   'category' => 'oil_change', 'km_until' => -412,
+                                                                                   'interval_km' => 5_000 })
+
+      row = described_class.present(notification)
 
       expect(row.destination('inline')).to eq('/maintenances/1/mark_done/new')
     end
 
     it 'falls back to the row path when the kind has no inline action' do
-      row = present('goal_reached', { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
-                                      'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 })
+      notification = build_stubbed(:notification, kind: 'goal_reached', data: { 'goal_id' => 1, 'period_start' => '2026-07-01',
+                                                                                'kind' => 'monthly', 'metric' => 'profit',
+                                                                                'target' => 1_000.0, 'current' => 1_200.0 })
+
+      row = described_class.present(notification)
 
       expect(row.destination('inline')).to eq('/goals/1/outcomes/2026-07-01')
     end
 
     it 'uses the row path when not tapped inline' do
-      row = present('maintenance_due', { 'maintenance_id' => 1, 'status' => 'overdue', 'category' => 'oil_change',
-                                         'km_until' => -412, 'interval_km' => 5_000 })
+      notification = build_stubbed(:notification, kind: 'maintenance_due', data: { 'maintenance_id' => 1, 'status' => 'overdue',
+                                                                                   'category' => 'oil_change', 'km_until' => -412,
+                                                                                   'interval_km' => 5_000 })
+
+      row = described_class.present(notification)
 
       expect(row.destination(nil)).to eq('/vehicle?highlight=maintenance_1')
     end

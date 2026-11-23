@@ -1,15 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Vehicles::TankBalanceService do
-  def fuel_expense(user, amount, date)
-    create(:expense, user: user, category: 'fuel', amount: amount, date: date)
-  end
-
   it 'accumulates refueling credits minus standalone fuel expenses since the anchor' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
-    3.times { |offset| fuel_expense(user, 45, Date.new(2026, 6, 8 + offset)) }
+    3.times { |offset| create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 8 + offset)) }
 
     result = described_class.new(user: user).call
 
@@ -21,7 +17,7 @@ RSpec.describe Vehicles::TankBalanceService do
   it 'excludes fuel expenses that produced a refueling from the debit' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
-    fill_expense = fuel_expense(user, 260, Date.new(2026, 6, 7))
+    fill_expense = create(:expense, user: user, category: 'fuel', amount: 260, date: Date.new(2026, 6, 7))
     create(:refueling, vehicle: vehicle, expense: fill_expense, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
 
     result = described_class.new(user: user).call
@@ -33,7 +29,7 @@ RSpec.describe Vehicles::TankBalanceService do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
-    fuel_expense(user, 300, Date.new(2026, 6, 9))
+    create(:expense, user: user, category: 'fuel', amount: 300, date: Date.new(2026, 6, 9))
 
     result = described_class.new(user: user).call
 
@@ -45,7 +41,7 @@ RSpec.describe Vehicles::TankBalanceService do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
-    fuel_expense(user, 45, Date.new(2026, 6, 10))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 10))
 
     moves = described_class.new(user: user).call[:moves]
 
@@ -57,9 +53,9 @@ RSpec.describe Vehicles::TankBalanceService do
   it 'limits moves to entries since the anchor date' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
-    fuel_expense(user, 999, Date.new(2024, 6, 1))
+    create(:expense, user: user, category: 'fuel', amount: 999, date: Date.new(2024, 6, 1))
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
-    fuel_expense(user, 45, Date.new(2025, 12, 20))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2025, 12, 20))
 
     moves = described_class.new(user: user).call[:moves]
 
@@ -70,9 +66,9 @@ RSpec.describe Vehicles::TankBalanceService do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 200, full_tank: true, date: Date.new(2025, 12, 19))
-    fuel_expense(user, 45, Date.new(2025, 12, 20))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2025, 12, 20))
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 1, 5))
-    fuel_expense(user, 30, Date.new(2026, 1, 8))
+    create(:expense, user: user, category: 'fuel', amount: 30, date: Date.new(2026, 1, 8))
 
     result = described_class.new(user: user).call
 
@@ -84,7 +80,7 @@ RSpec.describe Vehicles::TankBalanceService do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 1))
-    fuel_expense(user, 100, Date.new(2026, 6, 5))
+    create(:expense, user: user, category: 'fuel', amount: 100, date: Date.new(2026, 6, 5))
     create(:refueling, vehicle: vehicle, total_amount: 50, full_tank: false, date: Date.new(2026, 6, 6))
 
     result = described_class.new(user: user).call
@@ -97,9 +93,9 @@ RSpec.describe Vehicles::TankBalanceService do
     user = create(:user)
     vehicle = create(:vehicle, user: user)
     create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2025, 12, 19))
-    fuel_expense(user, 1000, Date.new(2024, 6, 1))
-    fuel_expense(user, 500, Date.new(2025, 12, 18))
-    fuel_expense(user, 45, Date.new(2025, 12, 20))
+    create(:expense, user: user, category: 'fuel', amount: 1000, date: Date.new(2024, 6, 1))
+    create(:expense, user: user, category: 'fuel', amount: 500, date: Date.new(2025, 12, 18))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2025, 12, 20))
 
     result = described_class.new(user: user).call
 

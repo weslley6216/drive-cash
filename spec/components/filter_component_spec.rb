@@ -5,12 +5,10 @@ RSpec.describe FilterComponent, type: :component do
 
   before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
 
-  def render_filter(**options)
-    view_context.render(described_class.new(selected_year: 2026, selected_month: nil, available_years: available_years, **options))
-  end
-
   context 'when variant: :compact' do
-    let(:html) { render_filter(selected_month: 2, action_path: '/history') }
+    let(:html) do
+      view_context.render(described_class.new(selected_year: 2026, available_years: available_years, selected_month: 2, action_path: '/history'))
+    end
 
     it 'renders the year and month selects as prototype filter pills' do
       expect(html).to include('rounded-lg py-2 text-sm font-medium text-slate-700')
@@ -29,7 +27,7 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'offers every month of a past year in the month select' do
-      past = render_filter(selected_year: 2025)
+      past = view_context.render(described_class.new(selected_month: nil, available_years: available_years, selected_year: 2025))
 
       expect(past).to include('value="12">Dezembro</option>')
     end
@@ -47,7 +45,9 @@ RSpec.describe FilterComponent, type: :component do
   end
 
   context 'when variant: :chips' do
-    let(:html) { render_filter(variant: :chips, selected_month: 3) }
+    let(:html) do
+      view_context.render(described_class.new(selected_year: 2026, available_years: available_years, variant: :chips, selected_month: 3))
+    end
 
     it 'renders a funnel year pill and one chip per elapsed month on phones' do
       expect(html).to include('absolute left-3 w-3.5 h-3.5 text-slate-700')
@@ -71,7 +71,8 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'lists every month for a past year' do
-      past = render_filter(variant: :chips, selected_year: 2025)
+      past = view_context.render(described_class.new(selected_month: nil, available_years: available_years, variant: :chips,
+                                                     selected_year: 2025))
 
       expect(past).to include('href="/?month=12&year=2025"')
     end
@@ -79,7 +80,10 @@ RSpec.describe FilterComponent, type: :component do
 
   context 'when variant: :popover' do
     let(:periods) { { 2025 => [3, 11], 2026 => [1, 2, 5] } }
-    let(:html) { render_filter(variant: :popover, selected_month: 2, periods: periods, action_path: '/analysis') }
+    let(:html) do
+      view_context.render(described_class.new(selected_year: 2026, available_years: available_years, variant: :popover, selected_month: 2,
+                                              periods: periods, action_path: '/analysis'))
+    end
 
     it 'renders a funnel button that toggles a hidden panel kept open across year switches' do
       expect(html).to include('data-controller="filter-popover"')
@@ -95,7 +99,9 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'shows the given trigger icon on the phone trigger' do
-      calendar = render_filter(variant: :popover, periods: periods, action_path: '/history', trigger_icon: PhlexIcons::Lucide::Calendar)
+      calendar = view_context.render(described_class.new(selected_year: 2026, selected_month: nil, available_years: available_years,
+                                                         variant: :popover, periods: periods, action_path: '/history',
+                                                         trigger_icon: PhlexIcons::Lucide::Calendar))
       trigger = Capybara.string(calendar).find('button.lg\:hidden')
 
       expect(trigger.native.inner_html).to include(PhlexIcons::Lucide::Calendar.new(class: 'w-[18px] h-[18px]').call)
@@ -122,7 +128,8 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'points the next arrow at the following year of the calendar with every month selected' do
-      first_year = render_filter(variant: :popover, selected_year: 2025, periods: periods, action_path: '/analysis')
+      first_year = view_context.render(described_class.new(selected_month: nil, available_years: available_years, variant: :popover,
+                                                           selected_year: 2025, periods: periods, action_path: '/analysis'))
 
       expect(first_year).to include('href="/analysis?year=2026"')
       expect(first_year).to include(%(aria-label="#{I18n.t('filter_component.next_year')}"))
@@ -138,14 +145,17 @@ RSpec.describe FilterComponent, type: :component do
     end
 
     it 'labels the desktop pill with the whole year and highlights every month when no month is selected' do
-      annual = render_filter(variant: :popover, periods: periods, action_path: '/analysis')
+      annual = view_context.render(described_class.new(selected_year: 2026, selected_month: nil, available_years: available_years,
+                                                       variant: :popover, periods: periods, action_path: '/analysis'))
 
       expect(annual).to include(I18n.t('filter_component.year_all_months', year: 2026))
       expect(annual).to include("bg-blue-50 text-blue-700 font-semibold\">#{I18n.t('filter_component.all_months')}</a>")
     end
 
     it 'labels the desktop pill with the given label instead of the period' do
-      labelled = render_filter(variant: :popover, periods: periods, action_path: '/history', label: 'Últimos 12 meses')
+      labelled = view_context.render(described_class.new(selected_year: 2026, selected_month: nil, available_years: available_years,
+                                                         variant: :popover, periods: periods, action_path: '/history',
+                                                         label: 'Últimos 12 meses'))
 
       expect(labelled).to include('<span>Últimos 12 meses</span>')
     end

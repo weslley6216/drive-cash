@@ -3,8 +3,6 @@ require 'rails_helper'
 RSpec.describe History::SliceSummary do
   let(:user) { create(:user) }
 
-  def summary_for(slice) = described_class.new(slice: slice, user: user, year: 2026, month: 5).call
-
   before do
     create(:earning, user: user, date: Date.new(2026, 5, 22), amount: 32.5, platform: 'uber')
     create(:earning, user: user, date: Date.new(2026, 5, 21), amount: 18, platform: 'uber')
@@ -17,25 +15,27 @@ RSpec.describe History::SliceSummary do
   end
 
   it 'sums, counts and averages an expense slice of the period, naming its single category' do
-    summary = summary_for(History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }))
+    summary = described_class.new(slice: History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }), user: user,
+                                  year: 2026, month: 5).call
 
     expect(summary).to eq(kind: :expenses, total: 125, count: 2, average: 62.5, pending: 0, category: 'fuel')
   end
 
   it 'sums the unpaid expenses of the slice as pending and names no category for two of them' do
-    summary = summary_for(History::Slice.new(categories: %w[fuel car_wash]))
+    summary = described_class.new(slice: History::Slice.new(categories: %w[fuel car_wash]), user: user, year: 2026, month: 5).call
 
     expect(summary).to eq(kind: :expenses, total: 160, count: 3, average: 53.33, pending: 35, category: nil)
   end
 
   it 'sums, counts and averages an earning slice' do
-    summary = summary_for(History::Slice.new(platforms: %w[uber]))
+    summary = described_class.new(slice: History::Slice.new(platforms: %w[uber]), user: user, year: 2026, month: 5).call
 
     expect(summary).to eq(kind: :earnings, total: 50.5, count: 2, average: 25.25, pending: 0, category: nil)
   end
 
   it 'keeps the three totals for a slice that mixes earnings and expenses, netting only the paid expenses' do
-    summary = summary_for(History::Slice.new(platforms: %w[uber], categories: %w[fuel car_wash]))
+    summary = described_class.new(slice: History::Slice.new(platforms: %w[uber], categories: %w[fuel car_wash]), user: user, year: 2026,
+                                  month: 5).call
 
     expect(summary).to eq(kind: :mixed, earnings: 50.5, expenses: 160, net: -74.5)
   end

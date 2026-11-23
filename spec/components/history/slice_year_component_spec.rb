@@ -12,13 +12,9 @@ RSpec.describe History::SliceYearComponent, type: :component do
       shift: { year: 2026, month: 1, from: 189.9, to: 214.3, change: 12.8 }, highlighted: [7, 8, 9, 10, 11] }
   end
   let(:slice) { History::Slice.new(categories: %w[insurance], range: '12m') }
-  let(:page) { render_year }
+  let(:page) { Capybara.string(view_context.render(described_class.new(year: year, slice: slice, query: nil))) }
 
   before { travel_to Time.zone.local(2026, 5, 22, 10, 0) }
-
-  def render_year(overrides = {})
-    Capybara.string(view_context.render(described_class.new(year: year.merge(overrides), slice: slice, query: nil)))
-  end
 
   it 'titles the card by the series and shows the window total in red' do
     expect(page).to have_text('Seguro · por mês')
@@ -43,7 +39,8 @@ RSpec.describe History::SliceYearComponent, type: :component do
   end
 
   it 'signs a fall with a minus' do
-    falling = render_year(shift: { year: 2026, month: 3, from: 200, to: 180, change: -10.0 })
+    falling = Capybara.string(view_context.render(described_class.new(year: year.merge(shift: { year: 2026, month: 3, from: 200, to: 180,
+                                                                                                change: -10.0 }), slice: slice, query: nil)))
 
     expect(falling.find('[data-twelve-months="adjustment"]')).to have_text('Reajuste −10,0% em mar')
   end
@@ -55,7 +52,8 @@ RSpec.describe History::SliceYearComponent, type: :component do
   end
 
   it 'shows no badge without a raise and paints an earning series green' do
-    earning = render_year(kind: :earnings, series: 'uber', shift: nil, highlighted: [11])
+    earning = Capybara.string(view_context.render(described_class.new(year: year.merge(kind: :earnings, series: 'uber', shift: nil,
+                                                                                       highlighted: [11]), slice: slice, query: nil)))
 
     expect(earning).to have_no_css('[data-twelve-months="adjustment"]')
     expect(earning).to have_text('Uber · por mês')

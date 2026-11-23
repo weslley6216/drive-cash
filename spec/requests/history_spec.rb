@@ -5,9 +5,7 @@ RSpec.describe 'History', type: :request do
 
   before { login_as(current_user) }
 
-  def feed_text
-    Nokogiri::HTML(response.body).at_css('#history-feed').text
-  end
+  let(:feed_text) { Nokogiri::HTML(response.body).at_css('#history-feed').text }
 
   describe 'GET /history' do
     it 'returns 200' do

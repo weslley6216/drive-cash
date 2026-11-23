@@ -3,14 +3,8 @@ require 'rails_helper'
 RSpec.describe Auth::PasswordFieldComponent, type: :component do
   let(:form) { ActionView::Helpers::FormBuilder.new(:user, User.new, view_context, {}) }
 
-  def render_field(**options, &)
-    view_context.render(
-      described_class.new(form: form, attribute: :password, label: 'Senha', autocomplete: 'new-password', **options), &
-    )
-  end
-
   it 'renders a lock icon, the password input and a 44px eye toggle' do
-    html = render_field
+    html = view_context.render(described_class.new(form: form, attribute: :password, label: 'Senha', autocomplete: 'new-password'))
 
     expect(html).to include(PhlexIcons::Lucide::Lock.new(class: 'w-[18px] h-[18px]').call)
     expect(html).to include('type="password"')
@@ -21,13 +15,17 @@ RSpec.describe Auth::PasswordFieldComponent, type: :component do
   end
 
   it 'shows the hint below the field' do
-    html = render_field(hint: 'Mínimo de 8 caracteres.')
+    html = view_context.render(described_class.new(form: form, attribute: :password, label: 'Senha', autocomplete: 'new-password',
+                                                   hint: 'Mínimo de 8 caracteres.'))
 
     expect(html).to include('<p class="text-xs text-slate-500 mt-1.5">Mínimo de 8 caracteres.</p>')
   end
 
   it 'replaces the hint with the red error and red border when an error is given' do
-    html = render_field(hint: 'Mínimo de 8 caracteres.', error: 'As senhas não são iguais.')
+    html = view_context.render(
+      described_class.new(form: form, attribute: :password, label: 'Senha', autocomplete: 'new-password', hint: 'Mínimo de 8 caracteres.',
+                          error: 'As senhas não são iguais.')
+    )
 
     expect(html).to include('border-red-300 ring-2 ring-red-100 focus:ring-red-200')
     expect(html).to include('As senhas não são iguais.')
@@ -35,7 +33,9 @@ RSpec.describe Auth::PasswordFieldComponent, type: :component do
   end
 
   it 'puts the given block on the label row' do
-    html = render_field { 'Esqueci a senha' }
+    field = described_class.new(form: form, attribute: :password, label: 'Senha', autocomplete: 'new-password')
+
+    html = view_context.render(field) { 'Esqueci a senha' }
 
     expect(html).to include('flex items-center justify-between mb-1.5')
     expect(html).to include('Esqueci a senha')

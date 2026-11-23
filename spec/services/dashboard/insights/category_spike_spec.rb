@@ -3,43 +3,69 @@ require 'rails_helper'
 RSpec.describe Dashboard::Insights::CategorySpike do
   let(:user) { create(:user) }
 
-  def build_context(year:, month:, categories:)
-    Dashboard::Insights::Context.new(
-      user:           user,
-      year:           year,
-      month:          month,
-      previous_year:  month ? year : year - 1,
-      previous_month: month ? month - 1 : nil,
-      current_stats:  {},
-      previous_stats: {},
-      categories:     categories,
-      platforms:      []
-    )
-  end
-
   describe '#call' do
     it 'returns nil when there are no categories' do
-      context = build_context(year: 2025, month: 6, categories: [])
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2025,
+        previous_month: 5,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [],
+        platforms:      []
+      )
 
       expect(described_class.new(context).call).to be_nil
     end
 
     it 'returns nil when previous period has no spending for the top category' do
-      context = build_context(year: 2025, month: 6, categories: [{ id: 'fuel', label: 'Combustível', amount: 200 }])
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2025,
+        previous_month: 5,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [{ id: 'fuel', label: 'Combustível', amount: 200 }],
+        platforms:      []
+      )
 
       expect(described_class.new(context).call).to be_nil
     end
 
     it 'returns nil when the increase is at or below the threshold' do
       create(:expense, user: user, date: Date.new(2025, 5, 1), amount: 200, category: 'fuel', paid: true)
-      context = build_context(year: 2025, month: 6, categories: [{ id: 'fuel', label: 'Combustível', amount: 220 }])
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2025,
+        previous_month: 5,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [{ id: 'fuel', label: 'Combustível', amount: 220 }],
+        platforms:      []
+      )
 
       expect(described_class.new(context).call).to be_nil
     end
 
     it 'returns a payload with type, severity and raw values when above threshold (monthly)' do
       create(:expense, user: user, date: Date.new(2025, 5, 1), amount: 100, category: 'fuel', paid: true)
-      context = build_context(year: 2025, month: 6, categories: [{ id: 'fuel', label: 'Combustível', amount: 220 }])
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2025,
+        previous_month: 5,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [{ id: 'fuel', label: 'Combustível', amount: 220 }],
+        platforms:      []
+      )
 
       result = described_class.new(context).call
 
@@ -56,7 +82,17 @@ RSpec.describe Dashboard::Insights::CategorySpike do
 
     it 'sets mode :annual when month is nil and uses paid expenses across the year' do
       create(:expense, user: user, date: Date.new(2024, 3, 1), amount: 100, category: 'fuel', paid: true)
-      context = build_context(year: 2025, month: nil, categories: [{ id: 'fuel', label: 'Combustível', amount: 220 }])
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          nil,
+        previous_year:  2024,
+        previous_month: nil,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [{ id: 'fuel', label: 'Combustível', amount: 220 }],
+        platforms:      []
+      )
 
       result = described_class.new(context).call
 

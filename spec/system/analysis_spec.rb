@@ -18,10 +18,6 @@ RSpec.describe 'Analysis', type: :system, js: true do
     login_as(current_user)
   end
 
-  def card_box(label)
-    find('span', text: label, exact_text: true).evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
-  end
-
   it 'starts the analysis title below the iOS status bar on a phone' do
     visit analysis_path
 
@@ -56,10 +52,10 @@ RSpec.describe 'Analysis', type: :system, js: true do
   it 'puts the per km hero on top, two compact cards side by side and Sobra across the row on a phone' do
     visit analysis_path
 
-    hero = card_box(I18n.t('analysis.show_view.metrics.per_km_hero'))
-    per_day = card_box(I18n.t('analysis.show_view.metrics.per_day'))
-    per_trip = card_box(I18n.t('analysis.show_view.metrics.per_trip'))
-    margin = card_box(I18n.t('analysis.show_view.metrics.margin'))
+    hero, per_day, per_trip, margin = %w[per_km_hero per_day per_trip margin].map do |metric|
+      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}"), exact_text: true)
+        .evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
+    end
 
     expect(page).to have_text('R$ 0,96')
     expect(per_day['y'].round).to eq(per_trip['y'].round)
@@ -75,10 +71,10 @@ RSpec.describe 'Analysis', type: :system, js: true do
 
     visit analysis_path
 
-    hero = card_box(I18n.t('analysis.show_view.metrics.per_km_hero'))
-    per_day = card_box(I18n.t('analysis.show_view.metrics.per_day'))
-    per_trip = card_box(I18n.t('analysis.show_view.metrics.per_trip'))
-    margin = card_box(I18n.t('analysis.show_view.metrics.margin'))
+    hero, per_day, per_trip, margin = %w[per_km_hero per_day per_trip margin].map do |metric|
+      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}"), exact_text: true)
+        .evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
+    end
 
     expect([hero['y'], per_day['y'], per_trip['y'], margin['y']].map(&:round).uniq.size).to eq(1)
     expect(hero['width']).to be > per_day['width']

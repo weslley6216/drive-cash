@@ -3,10 +3,6 @@ require 'rails_helper'
 RSpec.describe 'Profiles', type: :request do
   let(:user) { create(:user, name: 'Weslley Souza', email_address: 'weslley@gmail.com', phone: '(11) 98765-4321') }
 
-  def elevate_session
-    user.sessions.last.reauthenticate!
-  end
-
   describe 'GET /profile/edit' do
     it 'redirects to login when unauthenticated' do
       get edit_profile_path
@@ -36,7 +32,7 @@ RSpec.describe 'Profiles', type: :request do
       end
 
       it 'renders editable email and password fields when the session is elevated' do
-        elevate_session
+        user.sessions.last.reauthenticate!
 
         get edit_profile_path
 
@@ -108,7 +104,7 @@ RSpec.describe 'Profiles', type: :request do
     end
 
     context 'with an elevated session' do
-      before { elevate_session }
+      before { user.sessions.last.reauthenticate! }
 
       it 'changes the email' do
         patch profile_path, params: { user: { email_address: 'novo@gmail.com' } }

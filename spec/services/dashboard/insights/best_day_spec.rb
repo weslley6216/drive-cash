@@ -3,29 +3,35 @@ require 'rails_helper'
 RSpec.describe Dashboard::Insights::BestDay do
   let(:user) { create(:user) }
 
-  def build_context(year:, month:)
-    Dashboard::Insights::Context.new(
-      user:           user,
-      year:           year,
-      month:          month,
-      previous_year:  year - 1,
-      previous_month: month,
-      current_stats:  {},
-      previous_stats: {},
-      categories:     [],
-      platforms:      []
-    )
-  end
-
   describe '#call' do
     it 'returns nil when month is nil' do
-      context = build_context(year: 2025, month: nil)
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          nil,
+        previous_year:  2024,
+        previous_month: nil,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [],
+        platforms:      []
+      )
 
       expect(described_class.new(context).call).to be_nil
     end
 
     it 'returns nil when there are no earnings in the month' do
-      context = build_context(year: 2025, month: 6)
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2024,
+        previous_month: 6,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [],
+        platforms:      []
+      )
 
       expect(described_class.new(context).call).to be_nil
     end
@@ -33,7 +39,17 @@ RSpec.describe Dashboard::Insights::BestDay do
     it 'returns the highest-grossing date and its amount as payload' do
       create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 500, trips_count: 1)
       create(:earning, user: user, date: Date.new(2025, 6, 15), amount: 200, trips_count: 1)
-      context = build_context(year: 2025, month: 6)
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2024,
+        previous_month: 6,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [],
+        platforms:      []
+      )
 
       result = described_class.new(context).call
 
@@ -47,7 +63,17 @@ RSpec.describe Dashboard::Insights::BestDay do
       create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 100, trips_count: 1)
       create(:earning, user: user, date: Date.new(2025, 6, 10), amount: 250, trips_count: 1)
       create(:earning, user: user, date: Date.new(2025, 6, 15), amount: 300, trips_count: 1)
-      context = build_context(year: 2025, month: 6)
+      context = Dashboard::Insights::Context.new(
+        user:           user,
+        year:           2025,
+        month:          6,
+        previous_year:  2024,
+        previous_month: 6,
+        current_stats:  {},
+        previous_stats: {},
+        categories:     [],
+        platforms:      []
+      )
 
       result = described_class.new(context).call
 

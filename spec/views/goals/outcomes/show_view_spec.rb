@@ -24,12 +24,8 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
     )
   end
 
-  def render_view(outcome_data = outcome, confetti: false)
-    view_context.render(described_class.new(outcome: outcome_data, confetti: confetti))
-  end
-
   it 'celebrates the hit goal with the result, the surplus and the hit day' do
-    html = render_view
+    html = view_context.render(described_class.new(outcome: outcome, confetti: false))
 
     expect(html).to include('Meta mensal · lucro líquido')
     expect(html).to include('Meta de junho batida!')
@@ -39,13 +35,13 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   end
 
   it 'tells a goal hit on its last day' do
-    html = render_view(outcome.with(days_before_end: 0))
+    html = view_context.render(described_class.new(outcome: outcome.with(days_before_end: 0), confetti: false))
 
     expect(html).to include('no último dia')
   end
 
   it 'heads the screen with the period and links back to the notifications and over to the goals' do
-    html = render_view
+    html = view_context.render(described_class.new(outcome: outcome, confetti: false))
 
     expect(html).to include('Meta batida').and include('Junho · 2026')
     expect(html).to include('Junho · 2026 · meta mensal de lucro líquido')
@@ -54,7 +50,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   end
 
   it 'explains how the goal was reached with the worked days, the pace and the best day' do
-    html = render_view
+    html = view_context.render(described_class.new(outcome: outcome, confetti: false))
 
     expect(html).to include('Como você chegou lá')
     expect(html).to include('Dias rodados').and include('21')
@@ -63,13 +59,13 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   end
 
   it 'shows the streak line from two periods in a row' do
-    html = render_view
+    html = view_context.render(described_class.new(outcome: outcome, confetti: false))
 
     expect(html).to include('2 meses seguidos batendo a meta')
   end
 
   it 'leaves the streak line out for a single period' do
-    html = render_view(outcome.with(streak: 1))
+    html = view_context.render(described_class.new(outcome: outcome.with(streak: 1), confetti: false))
 
     expect(html).not_to include('seguidos batendo a meta')
   end
@@ -78,8 +74,9 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
     weekly_goal = build_stubbed(:goal, kind: 'weekly', metric: 'profit', target_amount: 6_000,
                                        period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
 
-    html = render_view(outcome.with(goal: weekly_goal, streak: 3,
-                                    next_period: Date.new(2026, 7, 13)..Date.new(2026, 7, 19)))
+    weekly_outcome = outcome.with(goal: weekly_goal, streak: 3, next_period: Date.new(2026, 7, 13)..Date.new(2026, 7, 19))
+
+    html = view_context.render(described_class.new(outcome: weekly_outcome, confetti: false))
 
     expect(html).to include('3 semanas seguidas batendo a meta')
   end
@@ -88,13 +85,13 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
     earnings_goal = build_stubbed(:goal, kind: 'monthly', metric: 'earnings', target_amount: 6_000,
                                          period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
 
-    html = render_view(outcome.with(goal: earnings_goal))
+    html = view_context.render(described_class.new(outcome: outcome.with(goal: earnings_goal), confetti: false))
 
     expect(html).to include('Meta mensal · ganhos').and include('Ganho / dia')
   end
 
   it 'suggests the next target with the per day pace in the same worked days' do
-    html = render_view
+    html = view_context.render(described_class.new(outcome: outcome, confetti: false))
 
     expect(html).to include('Que tal R$ 6.500,00 em julho?')
     expect(html).to include('É o seu resultado de junho com 5% a mais, arredondado. ' \
@@ -102,7 +99,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   end
 
   it 'posts raise and keep to the goals create with the next period' do
-    page_html = Capybara.string(render_view)
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome, confetti: false)))
 
     expect(page_html).to have_css('form[action="/goals"][method="post"]', count: 2)
     expect(page_html).to have_button('Subir a meta')
@@ -118,7 +115,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   it 'shows only the link to the next goal when it already exists' do
     july = build_stubbed(:goal, kind: 'monthly', period_start: Date.new(2026, 7, 1), period_end: Date.new(2026, 7, 31))
 
-    page_html = Capybara.string(render_view(outcome.with(next_goal: july)))
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome.with(next_goal: july), confetti: false)))
 
     expect(page_html).to have_link('Ver meta de julho', href: '/goals?month=7&year=2026')
     expect(page_html).to have_no_button('Subir a meta')
@@ -131,22 +128,23 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
     next_week = build_stubbed(:goal, kind: 'weekly', period_start: Date.new(2026, 7, 13),
                                      period_end: Date.new(2026, 7, 19))
 
-    page_html = Capybara.string(render_view(outcome.with(goal: weekly_goal, next_goal: next_week,
-                                                         next_period: Date.new(2026, 7, 13)..Date.new(2026, 7, 19))))
+    weekly_outcome = outcome.with(goal: weekly_goal, next_goal: next_week, next_period: Date.new(2026, 7, 13)..Date.new(2026, 7, 19))
+
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: weekly_outcome, confetti: false)))
 
     expect(page_html).to have_link('Ver meta de 13/jul a 19/jul', href: '/goals')
   end
 
   it 'leaves the next step out when the next period has ended' do
-    html = render_view(outcome.with(next_period: nil))
+    html = view_context.render(described_class.new(outcome: outcome.with(next_period: nil), confetti: false))
 
     expect(html).not_to include('Próximo passo')
-    expect(render_view).to include('Próximo passo')
+    expect(view_context.render(described_class.new(outcome: outcome, confetti: false))).to include('Próximo passo')
   end
 
   it 'throws the confetti only when asked to' do
-    expect(render_view(confetti: true)).to include('dc-confetti')
-    expect(render_view(confetti: false)).not_to include('dc-confetti')
+    expect(view_context.render(described_class.new(outcome: outcome, confetti: true))).to include('dc-confetti')
+    expect(view_context.render(described_class.new(outcome: outcome, confetti: false))).not_to include('dc-confetti')
   end
 
   it 'renders the missed screen for a missed outcome' do
@@ -160,10 +158,10 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
       per_work_day: BigDecimal('275')
     )
 
-    html = render_view(missed)
+    html = view_context.render(described_class.new(outcome: missed, confetti: false))
 
     expect(html).to include('Resultado da meta').and include('Não foi dessa vez, mas foi perto')
     expect(html).not_to include('Meta batida')
-    expect(render_view).to include('Meta batida')
+    expect(view_context.render(described_class.new(outcome: outcome, confetti: false))).to include('Meta batida')
   end
 end

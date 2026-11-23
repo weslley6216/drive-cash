@@ -58,18 +58,8 @@ RSpec.describe Goals::ProgressRingComponent, type: :component do
   end
 
   context 'with content in the center' do
-    let(:ring_with_content) do
-      Class.new(ApplicationComponent) do
-        def view_template
-          render Goals::ProgressRingComponent.new(percent: 102) do
-            span(class: 'trophy') { 'troféu' }
-          end
-        end
-      end
-    end
-
     it 'renders the given content in place of the percent label' do
-      output = view_context.render(ring_with_content.new)
+      output = view_context.render(described_class.new(percent: 102)) { |ring| ring.span(class: 'trophy') { 'troféu' } }
 
       expect(output).to include('<span class="trophy">troféu</span>')
       expect(output).not_to include('>100<span')

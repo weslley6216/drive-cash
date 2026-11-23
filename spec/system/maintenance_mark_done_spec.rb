@@ -15,19 +15,9 @@ RSpec.describe 'Maintenance mark done', type: :system, js: true do
     login_as(current_user)
   end
 
-  def open_mark_done(maintenance)
-    visit vehicle_path
-    within("##{dom_id(maintenance)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
-    expect(page).to have_text(I18n.t('maintenances.mark_done.title', item: 'Troca de óleo'))
-  end
-
-  def panel_box
-    find('h2', text: I18n.t('maintenances.mark_done.title', item: 'Troca de óleo'))
-      .evaluate_script("this.closest('.shadow-2xl').getBoundingClientRect().toJSON()")
-  end
-
   it 'blocks saving below the last km and announces the odometer advance on a phone' do
-    open_mark_done(@oil)
+    visit vehicle_path
+    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
 
     fill_in 'Km do serviço', with: '154900'
 
@@ -42,9 +32,11 @@ RSpec.describe 'Maintenance mark done', type: :system, js: true do
   end
 
   it 'marks an overdue item done on a phone with the service km and undoes it from the toast' do
-    open_mark_done(@oil)
+    visit vehicle_path
+    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
 
-    box = panel_box
+    box = find('h2', text: I18n.t('maintenances.mark_done.title', item: 'Troca de óleo'))
+      .evaluate_script("this.closest('.shadow-2xl').getBoundingClientRect().toJSON()")
     expect(box['bottom']).to be_within(1).of(844)
     expect(box['width']).to be_within(1).of(390)
     expect(page).to fit_the_phone_width
@@ -76,9 +68,11 @@ RSpec.describe 'Maintenance mark done', type: :system, js: true do
 
   it 'opens the mark done form as a centered modal on a desktop screen' do
     emulate_desktop_screen
-    open_mark_done(@oil)
+    visit vehicle_path
+    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
 
-    box = panel_box
+    box = find('h2', text: I18n.t('maintenances.mark_done.title', item: 'Troca de óleo'))
+      .evaluate_script("this.closest('.shadow-2xl').getBoundingClientRect().toJSON()")
     expect(box['width']).to be_within(1).of(460)
     expect(box['x']).to be_within(1).of((1280 - 460) / 2.0)
     expect(box['y']).to be > 0

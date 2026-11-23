@@ -15,19 +15,17 @@ RSpec.describe 'History filters', type: :system, js: true do
     login_as(current_user)
   end
 
-  def panel = find('[data-history-filter-panel-target="panel"]')
-
-  def mark(label) = panel.check(label, allow_label_click: true)
+  let(:panel) { find('[data-history-filter-panel-target="panel"]') }
 
   it 'narrows the history down to one station from the side panel, counting live, on a phone' do
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
 
-    mark I18n.t('history.index.panel.expenses')
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
     expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 4))
-    mark 'Combustível'
+    panel.check('Combustível', allow_label_click: true)
     expect(panel).to have_button(I18n.t('history.index.panel.submit', count: 3))
-    mark 'Posto Orense'
+    panel.check('Posto Orense', allow_label_click: true)
     expect(page).to fit_the_phone_width
 
     panel.click_button I18n.t('history.index.panel.submit', count: 2)
@@ -44,9 +42,9 @@ RSpec.describe 'History filters', type: :system, js: true do
   it 'locks the submit when the marked combination has no records on a phone' do
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
-    mark I18n.t('history.index.panel.expenses')
-    mark I18n.t('history.index.panel.unpaid_only')
-    mark 'Combustível'
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+    panel.check(I18n.t('history.index.panel.unpaid_only'), allow_label_click: true)
+    panel.check('Combustível', allow_label_click: true)
 
     expect(panel).to have_button(I18n.t('history.index.panel.submit_none'), disabled: true)
     expect(page).to fit_the_phone_width
@@ -55,13 +53,13 @@ RSpec.describe 'History filters', type: :system, js: true do
   it 'discards the marks when the panel closes and clears them without closing on a phone' do
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
-    mark I18n.t('history.index.panel.earnings')
+    panel.check(I18n.t('history.index.panel.earnings'), allow_label_click: true)
     panel.find("button[aria-label='#{I18n.t('history.index.panel.close')}']").click
     click_button I18n.t('history.index.filters.button')
 
     expect(panel).to have_unchecked_field(I18n.t('history.index.panel.earnings'), visible: :all)
 
-    mark I18n.t('history.index.panel.earnings')
+    panel.check(I18n.t('history.index.panel.earnings'), allow_label_click: true)
     panel.click_button I18n.t('history.index.panel.clear')
 
     expect(panel).to have_unchecked_field(I18n.t('history.index.panel.earnings'), visible: :all)
@@ -103,13 +101,13 @@ RSpec.describe 'History filters', type: :system, js: true do
   it 'sums up the stations in the group subtitle and collapses them to the marked names on a phone' do
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
-    mark I18n.t('history.index.panel.expenses')
-    mark 'Combustível'
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+    panel.check('Combustível', allow_label_click: true)
     vendors = panel.find('[data-level="vendors"]')
 
     expect(vendors).to have_text(I18n.t('history.index.panel.vendors_all', categories: 'Combustível'))
 
-    mark 'Posto Orense'
+    panel.check('Posto Orense', allow_label_click: true)
     expect(vendors).to have_text(I18n.t('history.index.panel.vendors_marked', count: 1))
     vendors.find('button', text: I18n.t('history.index.panel.vendors')).click
 
@@ -121,9 +119,9 @@ RSpec.describe 'History filters', type: :system, js: true do
   it 'forgets the stations and their count once expenses are unmarked on a phone' do
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
-    mark I18n.t('history.index.panel.expenses')
-    mark 'Combustível'
-    mark 'Posto Orense'
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+    panel.check('Combustível', allow_label_click: true)
+    panel.check('Posto Orense', allow_label_click: true)
 
     panel.uncheck(I18n.t('history.index.panel.expenses'), allow_label_click: true)
 
@@ -138,8 +136,8 @@ RSpec.describe 'History filters', type: :system, js: true do
 
     visit history_path(year: 2026, month: 5)
     click_button I18n.t('history.index.filters.button')
-    mark I18n.t('history.index.panel.expenses')
-    mark 'Combustível'
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+    panel.check('Combustível', allow_label_click: true)
     panel.fill_in placeholder: I18n.t('history.index.panel.vendor_search'), with: 'ipi'
 
     expect(panel).to have_css('label', text: 'Ipiranga')
@@ -154,10 +152,10 @@ RSpec.describe 'History filters', type: :system, js: true do
 
     expect(box(panel.find('[data-history-filter-panel-target="sheet"]'))['width'].round).to eq(820)
 
-    mark I18n.t('history.index.panel.earnings')
-    mark 'Uber'
-    mark I18n.t('history.index.panel.expenses')
-    mark 'Lavagem'
+    panel.check(I18n.t('history.index.panel.earnings'), allow_label_click: true)
+    panel.check('Uber', allow_label_click: true)
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
+    panel.check('Lavagem', allow_label_click: true)
 
     expect(panel).to have_text(I18n.t('history.index.panel.platforms_and_categories').upcase)
 
@@ -176,7 +174,7 @@ RSpec.describe 'History filters', type: :system, js: true do
     expect(panel).to have_text(I18n.t('history.index.panel.empty_types'))
     expect(panel).to have_text(I18n.t('history.index.panel.empty_vendors_type'))
 
-    mark I18n.t('history.index.panel.expenses')
+    panel.check(I18n.t('history.index.panel.expenses'), allow_label_click: true)
     sheet = panel.find('[data-history-filter-panel-target="sheet"]')
 
     expect(panel).to have_css('label', text: 'Combustível')

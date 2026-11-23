@@ -5,30 +5,6 @@ RSpec.describe Backups::SheetWriter do
   let(:spreadsheet_id) { '1AbC' }
   let(:rows) { { earnings: [['2026-01-02', 'iFood', 50.0, 1, nil, '2026-01-02 10:00:00']] } }
 
-  def sheet(title, sheet_id, charts: [], banded_ranges: [])
-    Google::Apis::SheetsV4::Sheet.new(
-      properties:    Google::Apis::SheetsV4::SheetProperties.new(sheet_id: sheet_id, title: title),
-      charts:        charts,
-      banded_ranges: banded_ranges
-    )
-  end
-
-  def spreadsheet(sheets)
-    Google::Apis::SheetsV4::Spreadsheet.new(sheets: sheets)
-  end
-
-  def add_sheet_reply(title, sheet_id)
-    Google::Apis::SheetsV4::Response.new(
-      add_sheet: Google::Apis::SheetsV4::AddSheetResponse.new(
-        properties: Google::Apis::SheetsV4::SheetProperties.new(sheet_id: sheet_id, title: title)
-      )
-    )
-  end
-
-  def full_spreadsheet
-    spreadsheet(Backups::Tabs::ALL.each_with_index.map { |tab, offset| sheet(tab.title, offset + 100) })
-  end
-
   let(:writer) { described_class.new(client: client, spreadsheet_id: spreadsheet_id, rows: rows, summary_month_count: 0) }
 
   before do
@@ -40,7 +16,13 @@ RSpec.describe Backups::SheetWriter do
 
   describe '#call' do
     context 'when every tab already exists' do
-      before { allow(client).to receive(:get_spreadsheet).and_return(full_spreadsheet) }
+      before do
+        sheets = Backups::Tabs::ALL.each_with_index.map do |tab, offset|
+          Google::Apis::SheetsV4::Sheet.new(properties: Google::Apis::SheetsV4::SheetProperties.new(sheet_id: offset + 100,
+                                                                                                    title:    tab.title))
+        end
+        allow(client).to receive(:get_spreadsheet).and_return(Google::Apis::SheetsV4::Spreadsheet.new(sheets: sheets))
+      end
 
       it 'reads only the fields it needs from the spreadsheet' do
         writer.call
@@ -120,10 +102,18 @@ RSpec.describe Backups::SheetWriter do
 
     context 'when a tab is missing' do
       before do
-        allow(client).to receive(:get_spreadsheet).and_return(spreadsheet([sheet('Resumo', 100)]))
+        summary_sheet = Google::Apis::SheetsV4::Sheet.new(properties: Google::Apis::SheetsV4::SheetProperties.new(sheet_id: 100,
+                                                                                                                  title:    'Resumo'))
+        allow(client).to receive(:get_spreadsheet).and_return(Google::Apis::SheetsV4::Spreadsheet.new(sheets: [summary_sheet]))
         allow(client).to receive(:batch_update_spreadsheet).and_return(
           Google::Apis::SheetsV4::BatchUpdateSpreadsheetResponse.new(
-            replies: Backups::Tabs::ALL.drop(1).each_with_index.map { |tab, offset| add_sheet_reply(tab.title, offset + 200) }
+            replies: Backups::Tabs::ALL.drop(1).each_with_index.map do |tab, offset|
+              Google::Apis::SheetsV4::Response.new(
+                add_sheet: Google::Apis::SheetsV4::AddSheetResponse.new(
+                  properties: Google::Apis::SheetsV4::SheetProperties.new(sheet_id: offset + 200, title: tab.title)
+                )
+              )
+            end
           ),
           Google::Apis::SheetsV4::BatchUpdateSpreadsheetResponse.new(replies: [])
         )
@@ -146,13 +136,14 @@ RSpec.describe Backups::SheetWriter do
 
     context 'when the tabs already carry banding and a chart' do
       before do
-        allow(client).to receive(:get_spreadsheet).and_return(
-          spreadsheet(Backups::Tabs::ALL.each_with_index.map do |tab, offset|
-            sheet(tab.title, offset + 100,
-                  charts:        tab.key == :summary ? [Google::Apis::SheetsV4::EmbeddedChart.new(chart_id: 9)] : [],
-                  banded_ranges: [Google::Apis::SheetsV4::BandedRange.new(banded_range_id: offset)])
-          end)
-        )
+        sheets = Backups::Tabs::ALL.each_with_index.map do |tab, offset|
+          Google::Apis::SheetsV4::Sheet.new(
+            properties:    Google::Apis::SheetsV4::SheetProperties.new(sheet_id: offset + 100, title: tab.title),
+            charts:        tab.key == :summary ? [Google::Apis::SheetsV4::EmbeddedChart.new(chart_id: 9)] : [],
+            banded_ranges: [Google::Apis::SheetsV4::BandedRange.new(banded_range_id: offset)]
+          )
+        end
+        allow(client).to receive(:get_spreadsheet).and_return(Google::Apis::SheetsV4::Spreadsheet.new(sheets: sheets))
       end
 
       it 'requests no banding again and refreshes the chart it found' do
@@ -171,7 +162,13 @@ RSpec.describe Backups::SheetWriter do
         allow(client).to receive(:get_spreadsheet).and_return(Google::Apis::SheetsV4::Spreadsheet.new(sheets: nil))
         allow(client).to receive(:batch_update_spreadsheet).and_return(
           Google::Apis::SheetsV4::BatchUpdateSpreadsheetResponse.new(
-            replies: Backups::Tabs::ALL.each_with_index.map { |tab, offset| add_sheet_reply(tab.title, offset + 300) }
+            replies: Backups::Tabs::ALL.each_with_index.map do |tab, offset|
+              Google::Apis::SheetsV4::Response.new(
+                add_sheet: Google::Apis::SheetsV4::AddSheetResponse.new(
+                  properties: Google::Apis::SheetsV4::SheetProperties.new(sheet_id: offset + 300, title: tab.title)
+                )
+              )
+            end
           ),
           Google::Apis::SheetsV4::BatchUpdateSpreadsheetResponse.new(replies: [])
         )

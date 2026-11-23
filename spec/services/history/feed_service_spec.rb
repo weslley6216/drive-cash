@@ -133,12 +133,8 @@ RSpec.describe History::FeedService do
     context 'with pagination' do
       before { stub_const('History::FeedService::PER_PAGE', 2) }
 
-      def create_five_days
-        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
-      end
-
       it 'loads one page of the newest records and points to the next page' do
-        create_five_days
+        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
 
         result = described_class.new(year: 2025, user: user).call
 
@@ -147,7 +143,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'accumulates the previous pages when a later page is requested' do
-        create_five_days
+        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
 
         result = described_class.new(year: 2025, page: 2, user: user).call
 
@@ -156,7 +152,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'has no next page once every record is loaded' do
-        create_five_days
+        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
 
         result = described_class.new(year: 2025, page: 3, user: user).call
 
@@ -179,7 +175,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'counts every record of the filter in the period, not only the loaded page' do
-        create_five_days
+        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
         create(:expense, user: user, date: Date.new(2025, 6, 3), amount: 80, category: 'fuel', paid: true)
 
         result = described_class.new(year: 2025, slice: History::Slice.preset('earnings'), user: user).call
@@ -197,7 +193,7 @@ RSpec.describe History::FeedService do
       end
 
       it 'computes the summary from all matching items, not from the loaded page' do
-        create_five_days
+        5.times { |offset| create(:earning, user: user, date: Date.new(2025, 6, 1) + offset, amount: 50, platform: 'uber') }
 
         result = described_class.new(year: 2025, user: user).call
 

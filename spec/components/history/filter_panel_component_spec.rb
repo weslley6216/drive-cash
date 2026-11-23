@@ -15,11 +15,8 @@ RSpec.describe History::FilterPanelComponent, type: :component do
     }
   end
 
-  def render_panel(slice: History::Slice.new, query: nil)
-    Capybara.string(view_context.render(described_class.new(slice: slice, facets: facets, year: 2026, month: 5, query: query)))
-  end
-
-  let(:page) { render_panel }
+  let(:page) { Capybara.string(view_context.render(described_class.new(slice: History::Slice.new, facets: facets, year: 2026, month: 5,
+                                                                       query: nil))) }
 
   it 'starts hidden as the panel target with a GET form to the history' do
     panel = page.find('[data-history-filter-panel-target="panel"]')
@@ -31,7 +28,9 @@ RSpec.describe History::FilterPanelComponent, type: :component do
   end
 
   it 'keeps the period and the search in hidden fields' do
-    hidden = render_panel(query: 'posto').all('input[type="hidden"]', visible: false).map { |input| [input[:name], input[:value]] }
+    html = view_context.render(described_class.new(slice: History::Slice.new, facets: facets, year: 2026, month: 5, query: 'posto'))
+
+    hidden = Capybara.string(html).all('input[type="hidden"]', visible: false).map { |input| [input[:name], input[:value]] }
 
     expect(hidden).to contain_exactly(%w[year 2026], %w[month 5], %w[q posto])
   end
@@ -96,7 +95,9 @@ RSpec.describe History::FilterPanelComponent, type: :component do
   end
 
   it 'checks what the current slice marks' do
-    marked = render_panel(slice: History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }, unpaid: '1'))
+    slice = History::Slice.new(categories: %w[fuel], vendors: { 'fuel' => ['Posto Orense'] }, unpaid: '1')
+
+    marked = Capybara.string(view_context.render(described_class.new(slice: slice, facets: facets, year: 2026, month: 5, query: nil)))
 
     expect(marked).to have_checked_field('types[]', with: 'expenses')
     expect(marked).to have_checked_field('unpaid')

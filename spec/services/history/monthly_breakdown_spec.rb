@@ -3,11 +3,9 @@ require 'rails_helper'
 RSpec.describe History::MonthlyBreakdown do
   let(:window) { (0..11).map { |offset| date = Date.new(2025, 6, 1) >> offset; [date.year, date.month] } }
 
-  def breakdown(totals) = described_class.new(window: window, totals: totals).call
-
   context 'with an insurance bill raised in january' do
     let(:totals) { window.each_with_index.to_h { |key, index| [key, { total: index < 7 ? 189.9 : 214.3, count: 1 }] } }
-    let(:result) { breakdown(totals) }
+    let(:result) { described_class.new(window: window, totals: totals).call }
 
     it 'sums the window and averages it over the twelve months' do
       expect(result[:total]).to eq(2400.8)
@@ -29,7 +27,7 @@ RSpec.describe History::MonthlyBreakdown do
 
   context 'with gaps and a late start' do
     let(:totals) { { [2026, 2] => { total: 120.0, count: 2 }, [2026, 4] => { total: 90.0, count: 1 }, [2026, 5] => { total: 95.0, count: 3 } } }
-    let(:result) { breakdown(totals) }
+    let(:result) { described_class.new(window: window, totals: totals).call }
 
     it 'zero fills the bars and averages from the first logged month to the end of the window' do
       expect(result[:months].map { |month| month[:total] }).to eq([0, 0, 0, 0, 0, 0, 0, 0, 120.0, 0, 90.0, 95.0])
@@ -48,7 +46,7 @@ RSpec.describe History::MonthlyBreakdown do
     end
   end
 
-  it 'returns a zeroed breakdown for an empty window' do
-    expect(breakdown({})).to include(total: 0, average: 0, rows: [], shift: nil, highlighted: [11])
+  it 'returns a zeroed described_class.new(window: window, totals: ).call for an empty window' do
+    expect(described_class.new(window: window, totals: {}).call).to include(total: 0, average: 0, rows: [], shift: nil, highlighted: [11])
   end
 end

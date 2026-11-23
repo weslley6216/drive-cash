@@ -2,27 +2,22 @@ require 'rails_helper'
 
 RSpec.describe Goals::TrackRecord do
   let(:user) { create(:user) }
-  let(:goal) { weekly_goal(Date.new(2026, 7, 6)) }
-
-  def weekly_goal(monday, metric: 'earnings', owner: user)
-    create(:goal, user: owner, kind: 'weekly', metric: metric, target_amount: 1_000,
-                  period_start: monday, period_end: monday + 6)
-  end
-
-  def earn(date, amount)
-    create(:earning, user: user, date: date, amount: amount)
+  let(:goal) do
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000,
+                  period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
   end
 
   it 'counts the hits among the four goals of the same kind before this one' do
     [Date.new(2026, 6, 1), Date.new(2026, 6, 8), Date.new(2026, 6, 15), Date.new(2026, 6, 29)].each do |monday|
-      weekly_goal(monday)
+      create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: monday, period_end: monday + 6)
     end
-    weekly_goal(Date.new(2026, 5, 25))
-    earn(Date.new(2026, 6, 2), 1_200)
-    earn(Date.new(2026, 6, 9), 1_000)
-    earn(Date.new(2026, 6, 16), 300)
-    earn(Date.new(2026, 6, 30), 1_500)
-    earn(Date.new(2026, 5, 26), 2_000)
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 5, 25),
+           period_end: Date.new(2026, 5, 31))
+    create(:earning, user: user, date: Date.new(2026, 6, 2), amount: 1_200)
+    create(:earning, user: user, date: Date.new(2026, 6, 9), amount: 1_000)
+    create(:earning, user: user, date: Date.new(2026, 6, 16), amount: 300)
+    create(:earning, user: user, date: Date.new(2026, 6, 30), amount: 1_500)
+    create(:earning, user: user, date: Date.new(2026, 5, 26), amount: 2_000)
 
     record = described_class.new(goal: goal).call
 
@@ -30,11 +25,13 @@ RSpec.describe Goals::TrackRecord do
   end
 
   it 'judges each previous goal by its own metric and calls half hit favorable' do
-    weekly_goal(Date.new(2026, 6, 22), metric: 'profit')
-    weekly_goal(Date.new(2026, 6, 29))
-    earn(Date.new(2026, 6, 23), 1_200)
+    create(:goal, user: user, kind: 'weekly', metric: 'profit', target_amount: 1_000, period_start: Date.new(2026, 6, 22),
+           period_end: Date.new(2026, 6, 28))
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 6, 29),
+           period_end: Date.new(2026, 7, 5))
+    create(:earning, user: user, date: Date.new(2026, 6, 23), amount: 1_200)
     create(:expense, user: user, date: Date.new(2026, 6, 24), amount: 300, paid: true)
-    earn(Date.new(2026, 6, 30), 1_000)
+    create(:earning, user: user, date: Date.new(2026, 6, 30), amount: 1_000)
 
     record = described_class.new(goal: goal).call
 
@@ -42,8 +39,9 @@ RSpec.describe Goals::TrackRecord do
   end
 
   it 'reports nothing with a single previous goal' do
-    weekly_goal(Date.new(2026, 6, 29))
-    earn(Date.new(2026, 6, 30), 1_500)
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 6, 29),
+           period_end: Date.new(2026, 7, 5))
+    create(:earning, user: user, date: Date.new(2026, 6, 30), amount: 1_500)
 
     record = described_class.new(goal: goal).call
 
@@ -51,8 +49,10 @@ RSpec.describe Goals::TrackRecord do
   end
 
   it 'reports nothing when fewer than half of the previous goals were hit' do
-    [Date.new(2026, 6, 15), Date.new(2026, 6, 22), Date.new(2026, 6, 29)].each { |monday| weekly_goal(monday) }
-    earn(Date.new(2026, 6, 30), 1_500)
+    [Date.new(2026, 6, 15), Date.new(2026, 6, 22), Date.new(2026, 6, 29)].each do |monday|
+      create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: monday, period_end: monday + 6)
+    end
+    create(:earning, user: user, date: Date.new(2026, 6, 30), amount: 1_500)
 
     record = described_class.new(goal: goal).call
 
@@ -60,12 +60,15 @@ RSpec.describe Goals::TrackRecord do
   end
 
   it 'ignores goals of another kind and of another user' do
-    weekly_goal(Date.new(2026, 6, 22))
-    weekly_goal(Date.new(2026, 6, 29))
-    weekly_goal(Date.new(2026, 6, 15), owner: create(:user))
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 6, 22),
+           period_end: Date.new(2026, 6, 28))
+    create(:goal, user: user, kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 6, 29),
+           period_end: Date.new(2026, 7, 5))
+    create(:goal, user: create(:user), kind: 'weekly', metric: 'earnings', target_amount: 1_000, period_start: Date.new(2026, 6, 15),
+           period_end: Date.new(2026, 6, 21))
     create(:goal, user: user, kind: 'monthly', metric: 'earnings', target_amount: 100,
                   period_start: Date.new(2026, 6, 1), period_end: Date.new(2026, 6, 30))
-    earn(Date.new(2026, 6, 23), 1_000)
+    create(:earning, user: user, date: Date.new(2026, 6, 23), amount: 1_000)
 
     record = described_class.new(goal: goal).call
 

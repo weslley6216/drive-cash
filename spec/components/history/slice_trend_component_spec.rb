@@ -7,11 +7,8 @@ RSpec.describe History::SliceTrendComponent, type: :component do
   end
   let(:trend) { { kind: :expenses, months: months, change: 25.0, in_progress: false } }
 
-  def render_trend(overrides = {})
-    Capybara.string(view_context.render(described_class.new(trend: trend.merge(overrides), slice: History::Slice.new(categories: %w[fuel]), query: nil)))
-  end
-
-  let(:page) { render_trend }
+  let(:page) { Capybara.string(view_context.render(described_class.new(trend: trend, slice: History::Slice.new(categories: %w[fuel]),
+                                                                       query: nil))) }
 
   it 'titles the band by the slice kind' do
     expect(page).to have_text(I18n.t('history.index.slice_summary.trend_title.expenses'))
@@ -38,7 +35,8 @@ RSpec.describe History::SliceTrendComponent, type: :component do
   end
 
   it 'shows a fall in slate, the earning bars in green and flags the month in progress' do
-    falling = render_trend(kind: :earnings, change: -2.4, in_progress: true)
+    falling = Capybara.string(view_context.render(described_class.new(trend: trend.merge(kind: :earnings, change: -2.4, in_progress: true),
+                                                                      slice: History::Slice.new(categories: %w[fuel]), query: nil)))
 
     expect(falling.find('[data-trend-change]').text).to eq('−2%')
     expect(falling.find('[data-trend-change]')[:class]).to include('text-slate-700')
@@ -47,7 +45,9 @@ RSpec.describe History::SliceTrendComponent, type: :component do
   end
 
   it 'leaves the comparison out when the previous month had nothing' do
-    expect(render_trend(change: nil)).to have_no_css('[data-trend-change]')
+    expect(Capybara.string(view_context.render(described_class.new(trend: trend.merge(change: nil),
+                                                                   slice: History::Slice.new(categories: %w[fuel]),
+                                                                   query: nil)))).to have_no_css('[data-trend-change]')
   end
 
   it 'puts the mode toggle in the header on phones only' do

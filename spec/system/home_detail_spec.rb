@@ -11,10 +11,6 @@ RSpec.describe 'Home detail modal', type: :system, js: true do
     login_as(current_user)
   end
 
-  def modal_card
-    find('turbo-frame#modal [data-controller="modal"] > div')
-  end
-
   it 'opens the annual earnings, drills into a month and comes back through the footer arrow on a phone' do
     visit root_path
 
@@ -69,7 +65,7 @@ RSpec.describe 'Home detail modal', type: :system, js: true do
     visit root_path
     find('#stats_grid a', text: /\A#{I18n.t('dashboard.index_view.stats.earnings.title')}/i).click
 
-    card = box(modal_card)
+    card = box(find('turbo-frame#modal [data-controller="modal"] > div'))
 
     expect(card['x'] + (card['width'] / 2)).to be_within(1).of(640)
     expect(card['width']).to eq(380)

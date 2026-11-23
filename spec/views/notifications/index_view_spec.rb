@@ -8,10 +8,6 @@ RSpec.describe Notifications::IndexView, type: :component do
   end
   let(:document) { Nokogiri::HTML(html) }
 
-  def desktop_icon_path(action)
-    document.css("form[action=\"#{action}\"] button.border svg path").first['d']
-  end
-
   before do
     allow(Current).to receive(:user).and_return(user)
   end
@@ -26,7 +22,7 @@ RSpec.describe Notifications::IndexView, type: :component do
     end
 
     it 'marks the desktop button with the check icon' do
-      expect(desktop_icon_path('/notifications/read_all')).to eq('M20 6 9 17l-5-5')
+      expect(document.css('form[action="/notifications/read_all"] button.border svg path').first['d']).to eq('M20 6 9 17l-5-5')
     end
   end
 
@@ -40,7 +36,7 @@ RSpec.describe Notifications::IndexView, type: :component do
     end
 
     it 'marks the desktop button with the trash icon' do
-      expect(desktop_icon_path('/notifications/clear')).to eq('M10 11v6')
+      expect(document.css('form[action="/notifications/clear"] button.border svg path').first['d']).to eq('M10 11v6')
     end
 
     it 'sends the clear as a DELETE' do

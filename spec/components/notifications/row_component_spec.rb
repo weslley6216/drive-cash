@@ -3,15 +3,10 @@ require 'rails_helper'
 RSpec.describe Notifications::RowComponent, type: :component do
   let(:user) { create(:user) }
 
-  def render_row(notification, bucket: :today, last: false)
-    row = Notifications::Presenters.present(notification)
-    view_context.render(described_class.new(row: row, bucket: bucket, last: last))
-  end
-
   it 'highlights an unread row with a blue tint, bold title and a dot' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include('bg-blue-50/40')
     expect(html).to include('font-bold')
@@ -22,7 +17,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
     notification = create(:notification, user: user, kind: 'tank_low',
                                          data: { 'status' => 'negative' }, read_at: Time.current)
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).not_to include('bg-blue-50/40')
     expect(html).not_to include('w-2 h-2 rounded-full bg-blue-600')
@@ -32,7 +27,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'paints the icon tile with the palette of the notification kind' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include('bg-red-50')
     expect(html).to include('text-red-600')
@@ -41,7 +36,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'links the whole row to open with a patch method' do
     notification = create(:notification, user: user)
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include("href=\"/notifications/#{notification.id}/open\"")
     expect(html).to include('data-turbo-method="patch"')
@@ -51,7 +46,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'targets the modal frame for tank_low' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include('data-turbo-frame="modal"')
   end
@@ -63,8 +58,11 @@ RSpec.describe Notifications::RowComponent, type: :component do
                                                     'interval_km' => 5_000 })
     tank_low = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    expect(render_row(maintenance_due)).to include('Marcar como feita').and include('via=inline')
-    expect(render_row(tank_low)).to include('Abastecer').and include('via=inline')
+    maintenance_html = view_context.render(described_class.new(row: Notifications::Presenters.present(maintenance_due), bucket: :today))
+    tank_html = view_context.render(described_class.new(row: Notifications::Presenters.present(tank_low), bucket: :today))
+
+    expect(maintenance_html).to include('Marcar como feita').and include('via=inline')
+    expect(tank_html).to include('Abastecer').and include('via=inline')
   end
 
   it 'renders no inline action for goal_reached' do
@@ -72,7 +70,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
                                          data: { 'goal_id' => 1, 'period_start' => '2026-07-01', 'kind' => 'monthly',
                                                  'metric' => 'profit', 'target' => 1_000.0, 'current' => 1_200.0 })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).not_to include('via=inline')
   end
@@ -80,7 +78,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'renders the remove action in the ⋯ menu' do
     notification = create(:notification, user: user)
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include("action=\"/notifications/#{notification.id}\"")
     expect(html).to include('name="_method" value="delete"')
@@ -90,7 +88,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'offers to mute the notification kind from the menu' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include(I18n.t('notifications.menu.mute'))
     expect(html).to include('action="/notification_preferences"')
@@ -101,7 +99,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'shows no destination label' do
     notification = create(:notification, user: user, kind: 'tank_low', data: { 'status' => 'negative' })
 
-    html = render_row(notification)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).not_to include('Ver ')
     expect(html).to include('Tanque no vermelho')
@@ -110,7 +108,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'formats the timestamp as a clock time in the today bucket' do
     notification = create(:notification, user: user, created_at: Time.zone.local(2026, 7, 14, 9, 12))
 
-    html = render_row(notification, bucket: :today)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :today))
 
     expect(html).to include('09:12')
   end
@@ -118,7 +116,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'formats the timestamp as weekday and time in the week bucket' do
     notification = create(:notification, user: user, created_at: Time.zone.local(2026, 7, 8, 18, 5))
 
-    html = render_row(notification, bucket: :week)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :week))
 
     expect(html).to include('qua · 18:05')
   end
@@ -126,7 +124,7 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'formats the timestamp as day and short month in the earlier bucket' do
     notification = create(:notification, user: user, created_at: Time.zone.local(2026, 7, 4, 8, 0))
 
-    html = render_row(notification, bucket: :earlier)
+    html = view_context.render(described_class.new(row: Notifications::Presenters.present(notification), bucket: :earlier))
 
     expect(html).to include('04/jul')
   end
@@ -134,7 +132,12 @@ RSpec.describe Notifications::RowComponent, type: :component do
   it 'draws a bottom border on every row but the last' do
     notification = create(:notification, user: user)
 
-    expect(render_row(notification, last: false)).to include('border-b border-slate-100')
-    expect(render_row(notification, last: true)).not_to include('border-b border-slate-100')
+    row = Notifications::Presenters.present(notification)
+
+    middle_html = view_context.render(described_class.new(row: row, bucket: :today))
+    last_html = view_context.render(described_class.new(row: row, bucket: :today, last: true))
+
+    expect(middle_html).to include('border-b border-slate-100')
+    expect(last_html).not_to include('border-b border-slate-100')
   end
 end

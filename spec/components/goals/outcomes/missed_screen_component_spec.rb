@@ -27,12 +27,8 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
 
   before { travel_to Time.zone.local(2026, 7, 13, 9, 0) }
 
-  def render_screen(outcome_data = outcome)
-    view_context.render(described_class.new(outcome: outcome_data))
-  end
-
   it 'heads the screen as the goal result with the period and links back to the notifications' do
-    html = render_screen
+    html = view_context.render(described_class.new(outcome: outcome))
 
     expect(html).to include('Resultado da meta').and include('06/jul a 12/jul · 2026')
     expect(html).to include('06/jul a 12/jul · 2026 · meta semanal de lucro líquido')
@@ -40,7 +36,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'tells how close the result came with the amber ring and the shortfall' do
-    html = render_screen
+    html = view_context.render(described_class.new(outcome: outcome))
 
     expect(html).to include('stroke="#f59e0b"').and include('>90<span').and include('da meta')
     expect(html).to include('Meta semanal · lucro líquido')
@@ -51,14 +47,14 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'drops the near wording under eighty percent' do
-    html = render_screen(outcome.with(near: false, percent: 63))
+    html = view_context.render(described_class.new(outcome: outcome.with(near: false, percent: 63)))
 
     expect(html).to include('Não foi dessa vez')
     expect(html).not_to include('mas foi perto')
   end
 
   it 'shows no confetti and no red, only the amber tone' do
-    html = render_screen
+    html = view_context.render(described_class.new(outcome: outcome))
 
     expect(html).to include('text-amber-700')
     expect(html).not_to include('dc-confetti')
@@ -66,7 +62,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'tells what went well with the pace and the track record' do
-    html = render_screen
+    html = view_context.render(described_class.new(outcome: outcome))
 
     expect(html).to include('O que foi bem')
     expect(html).to include('Dias rodados').and include('Lucro / dia').and include('R$ 247,50')
@@ -75,14 +71,14 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'leaves the track record line out when it is not favorable' do
-    html = render_screen(outcome.with(track_record: nil))
+    html = view_context.render(described_class.new(outcome: outcome.with(track_record: nil)))
 
     expect(html).not_to include('Você bateu')
-    expect(render_screen).to include('Você bateu')
+    expect(view_context.render(described_class.new(outcome: outcome))).to include('Você bateu')
   end
 
   it 'keeps the target within reach for this week with the per day pace' do
-    html = render_screen
+    html = view_context.render(described_class.new(outcome: outcome))
 
     expect(html).to include('R$ 1.100,00 continua ao seu alcance')
     expect(html).to include('Para esta semana: R$ 275,00 por dia em 4 dias de trabalho. ' \
@@ -90,13 +86,13 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'names the next period when it is not the current one' do
-    html = render_screen(outcome.with(next_period: Date.new(2026, 7, 20)..Date.new(2026, 7, 26)))
+    html = view_context.render(described_class.new(outcome: outcome.with(next_period: Date.new(2026, 7, 20)..Date.new(2026, 7, 26))))
 
     expect(html).to include('Para 20/jul a 26/jul:')
   end
 
   it 'posts keep and adjust to the goals create with the next period' do
-    page_html = Capybara.string(render_screen)
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome)))
 
     expect(page_html).to have_css('form[action="/goals"][method="post"]', count: 2)
     expect(page_html).to have_button('Manter a meta')
@@ -110,7 +106,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'keeps a single keep button without an adjustment' do
-    page_html = Capybara.string(render_screen(outcome.with(adjusted_target: nil)))
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome.with(adjusted_target: nil))))
 
     expect(page_html).to have_css('div.grid-cols-1 button', text: 'Manter a meta')
     expect(page_html).to have_no_button(/Ajustar para/)
@@ -120,7 +116,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
     next_week = build_stubbed(:goal, kind: 'weekly', period_start: Date.new(2026, 7, 13),
                                      period_end: Date.new(2026, 7, 19))
 
-    page_html = Capybara.string(render_screen(outcome.with(next_goal: next_week)))
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome.with(next_goal: next_week))))
 
     expect(page_html).to have_link('Ver meta de 13/jul a 19/jul', href: '/goals')
     expect(page_html).to have_no_button('Manter a meta')
@@ -128,14 +124,14 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   end
 
   it 'leaves the next step out when the next period has ended' do
-    html = render_screen(outcome.with(next_period: nil))
+    html = view_context.render(described_class.new(outcome: outcome.with(next_period: nil)))
 
     expect(html).not_to include('Próximo passo')
-    expect(render_screen).to include('Próximo passo')
+    expect(view_context.render(described_class.new(outcome: outcome))).to include('Próximo passo')
   end
 
   it 'links to the entries of the week from the top bar and the footer' do
-    page_html = Capybara.string(render_screen)
+    page_html = Capybara.string(view_context.render(described_class.new(outcome: outcome)))
 
     expect(page_html).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06', count: 2)
   end
@@ -146,8 +142,8 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
     annual_goal = build_stubbed(:goal, kind: 'annual', metric: 'profit', target_amount: 1_100,
                                        period_start: Date.new(2026, 1, 1), period_end: Date.new(2026, 12, 31))
 
-    monthly_html = Capybara.string(render_screen(outcome.with(goal: monthly_goal, next_period: nil)))
-    annual_html = Capybara.string(render_screen(outcome.with(goal: annual_goal, next_period: nil)))
+    monthly_html = Capybara.string(view_context.render(described_class.new(outcome: outcome.with(goal: monthly_goal, next_period: nil))))
+    annual_html = Capybara.string(view_context.render(described_class.new(outcome: outcome.with(goal: annual_goal, next_period: nil))))
 
     expect(monthly_html).to have_link('Ver lançamentos do mês', href: '/history?month=6&year=2026', count: 2)
     expect(monthly_html).to have_text('Em junho você fez')
@@ -158,7 +154,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
     earnings_goal = build_stubbed(:goal, kind: 'weekly', metric: 'earnings', target_amount: 1_100,
                                          period_start: Date.new(2026, 7, 6), period_end: Date.new(2026, 7, 12))
 
-    html = render_screen(outcome.with(goal: earnings_goal))
+    html = view_context.render(described_class.new(outcome: outcome.with(goal: earnings_goal)))
 
     expect(html).to include('Meta semanal · ganhos').and include('Ganho / dia')
   end
