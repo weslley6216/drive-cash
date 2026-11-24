@@ -14,6 +14,15 @@ RSpec.describe Chat::EarningPersister do
       expect(result.action).to eq('create_earning')
     end
 
+    it 'persists the trips count confirmed on the card' do
+      user = create(:user)
+      payload = { 'amount' => 490, 'platform' => 'shopee', 'date' => '2026-11-24', 'trips_count' => '2' }
+
+      result = described_class.new.persist(payload, user: user)
+
+      expect(result.record.reload.trips_count).to eq(2)
+    end
+
     it 'returns success with a plain Hash' do
       user = create(:user)
       payload = { 'amount' => 200, 'platform' => 'uber', 'date' => '2026-04-22' }

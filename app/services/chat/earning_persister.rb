@@ -1,6 +1,6 @@
 module Chat
   class EarningPersister
-    ATTRIBUTE_KEYS = %i[date amount platform notes].freeze
+    ATTRIBUTE_KEYS = %i[date amount platform notes trips_count].freeze
 
     def persist(payload, user:)
       record = user.earnings.new(Payload.permit(payload, ATTRIBUTE_KEYS))
