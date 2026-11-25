@@ -151,6 +151,24 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page).to have_css('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui · R$ 320')
   end
 
+  it 'lists each summary figure on a single line inside the card on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    fill_in 'message', with: 'Quanto lucrei esse mês?'
+    find('button[type="submit"]').click
+
+    stats = box(find('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui · R$ 320'))
+    ['+R$ 1.680,00', '−R$ 440,00', 'Qui · R$ 320'].each do |figure|
+      value = box(find('#chat_messages p', exact_text: figure))
+      expect(value['height']).to be_within(1).of(20)
+      expect(value['right']).to be <= stats['right']
+    end
+    expect(page).to fit_the_phone_width
+  end
+
   it 'draws the station comparison as bars on a phone' do
     parser = instance_double(Ai::ParserService)
     allow(Ai::ParserService).to receive(:new).and_return(parser)
@@ -184,6 +202,8 @@ RSpec.describe 'Chat', type: :system, js: true do
 
     stats = find('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui · R$ 320')
     expect(box(stats)['right']).to be <= box(find('[data-controller="chat speech"]'))['right']
+    expect(box(find('#chat_messages p', exact_text: '+R$ 1.680,00'))['top'])
+      .to eq(box(find('#chat_messages p', exact_text: 'Qui · R$ 320'))['top'])
   end
 
   it 'sends a ready-made question when its chip is tapped on a phone' do

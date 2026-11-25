@@ -15,12 +15,12 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     expect(html).to include('Esse mês você lucrou <strong>R$ 1.240,00</strong> — 12% acima do mês anterior.')
   end
 
-  it 'lines up income, expenses and the best day side by side in their tones' do
-    expect(html).to include('rounded-xl bg-slate-50 border border-slate-200 p-3 flex gap-3')
+  it 'lists income, expenses and the best day in their tones, split by dividers' do
+    expect(html).to include(described_class::STATS)
     expect(html).to include('text-emerald-700">+R$ 1.680,00</p>')
     expect(html).to include('text-red-700">−R$ 440,00</p>')
     expect(html).to include('Melhor dia').and include('text-slate-800">Qui · R$ 320</p>')
-    expect(html.scan('w-px bg-slate-200').size).to eq(2)
+    expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(3)
   end
 
   context 'when the profit fell against the previous month' do
@@ -45,7 +45,7 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     it 'tells the year profit without comparison or best day' do
       expect(html).to include('Esse ano você lucrou <strong>R$ 1.240,00</strong>.')
       expect(html).not_to include('Melhor dia')
-      expect(html.scan('w-px bg-slate-200').size).to eq(1)
+      expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(2)
     end
   end
 

@@ -1,13 +1,16 @@
 module Chat
   module AnswerCards
     class SummaryComponent < ApplicationComponent
+      STATS = 'rounded-xl bg-slate-50 border border-slate-200 px-3 py-1 divide-y divide-slate-200 ' \
+              'sm:flex sm:py-3 sm:divide-y-0 sm:divide-x'.freeze
+
       def initialize(card:)
         @card = card
       end
 
       def view_template
         p { render_lead }
-        div(class: 'rounded-xl bg-slate-50 border border-slate-200 p-3 flex gap-3') { render_stats }
+        div(class: STATS) { render_stats }
       end
 
       private
@@ -23,7 +26,6 @@ module Chat
         render AnswerCards::AnswerStatComponent.new(
           label: t('chat.answer_card.summary.earnings'), value: "+#{format_currency(@card[:earnings])}", tone: :emerald
         )
-        div(class: 'w-px bg-slate-200')
         render AnswerCards::AnswerStatComponent.new(
           label: t('chat.answer_card.summary.expenses'), value: "−#{format_currency(@card[:expenses])}", tone: :red
         )
@@ -33,7 +35,6 @@ module Chat
       def render_best_day
         return unless @card[:best_day_on]
 
-        div(class: 'w-px bg-slate-200')
         render AnswerCards::AnswerStatComponent.new(
           label: t('chat.answer_card.summary.best_day'), value: best_day_value, tone: :slate
         )
