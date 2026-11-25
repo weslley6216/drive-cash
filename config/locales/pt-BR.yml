@@ -385,6 +385,7 @@ pt-BR:
         route: "Consumo"
       route: "Rota"
       fuel_expense: "Combustível"
+      fuel_expense_desktop: "Despesa de combustível"
       today: "Hoje"
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."

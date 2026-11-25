@@ -2,9 +2,10 @@ module Vehicles
   class TankMoveRowComponent < ApplicationComponent
     include TankMoveLabels
 
-    def initialize(move:, border: true)
+    def initialize(move:, border: true, variant: :mobile)
       @move = move
       @border = border
+      @variant = variant
     end
 
     def view_template
@@ -17,7 +18,13 @@ module Vehicles
 
     private
 
+    def desktop?
+      @variant == :desktop
+    end
+
     def row_classes
+      return 'flex items-center gap-3 px-4 py-3.5' if desktop?
+
       base = 'flex items-center gap-3 px-4 py-3'
       @border ? "#{base} border-b border-slate-100" : base
     end
@@ -32,9 +39,15 @@ module Vehicles
 
     def info_block
       div(class: 'flex-1 min-w-0') do
-        p(class: 'text-sm font-semibold text-slate-800 truncate') { label }
-        p(class: 'text-xs text-slate-500 truncate') { "#{date_label} · #{sub_label}" }
+        p(class: "text-sm font-semibold #{desktop? ? 'text-slate-900' : 'text-slate-800'} truncate") { label }
+        p(class: 'text-xs text-slate-500 truncate') { "#{date_label} · #{row_sub_label}" }
       end
+    end
+
+    def row_sub_label
+      return t('vehicle.moves.fuel_expense_desktop') if desktop? && !credit?
+
+      sub_label
     end
 
     def amount_block
