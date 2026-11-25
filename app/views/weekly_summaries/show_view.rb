@@ -8,7 +8,7 @@ module WeeklySummaries
     end
 
     def view_template
-      render LayoutComponent.new(title: t('weekly_summaries.show.title'), bottom_nav: :home, sidebar_nav: :home) do
+      render LayoutComponent.new(title: t('weekly_summaries.show.title'), bottom_nav: :analysis, sidebar_nav: :analysis) do
         render ScreenComponent.new do |screen|
           screen.with_header do
             mobile_header

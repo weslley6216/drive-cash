@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["tab", "icon"]
+  static targets = ["tab", "part"]
+  static values = { key: String }
 
   connect() {
     this.boundUpdate = this.update.bind(this)
@@ -14,14 +15,12 @@ export default class extends Controller {
   }
 
   update() {
-    const currentPath = window.location.pathname
+    const active = document.head.querySelector(`meta[name="nav-active-${this.keyValue}"]`)?.content
     this.tabTargets.forEach((tab) => {
-      const tabPath = new URL(tab.href, window.location.origin).pathname
-      this._toggle(tab, tabPath === currentPath)
+      this._toggle(tab, tab.dataset.navId === active)
     })
-    this.iconTargets.forEach((icon) => {
-      const tabPath = new URL(icon.closest("a").href, window.location.origin).pathname
-      this._toggle(icon, tabPath === currentPath)
+    this.partTargets.forEach((part) => {
+      this._toggle(part, part.closest("[data-nav-id]")?.dataset.navId === active)
     })
   }
 
