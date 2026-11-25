@@ -1,7 +1,7 @@
 module Vehicles
   class TankBalanceService
     MOVES_LIMIT = 8
-    EMPTY = { balance: 0, full: nil, status_key: :empty, last_fill: nil, moves: [], active: false }.freeze
+    EMPTY = { balance: 0, full: nil, status_key: :empty, last_fill: nil, moves: [], active: false, consumed: nil }.freeze
 
     def initialize(user:)
       @user = user
@@ -26,11 +26,19 @@ module Vehicles
         status_key: TankStatus.for(balance, full),
         last_fill:  last_fill,
         moves:      build_moves(refuelings, debit_expenses),
-        active:     true
+        active:     true,
+        consumed:   consumed_since(last_fill, debit_expenses)
       }
     end
 
     private
+
+    def consumed_since(last_fill, debit_expenses)
+      return nil unless last_fill
+
+      debits_since_fill = debit_expenses.select { |expense| expense.date >= last_fill.date }
+      { amount: debits_since_fill.sum(&:amount), routes: debits_since_fill.size }
+    end
 
     def compute_balance(refuelings, debit_expenses)
       credits = refuelings.sum(&:total_amount)

@@ -150,4 +150,47 @@ RSpec.describe Vehicles::TankBalanceService do
 
     expect(result[:moves].first).to include(kind: :credit, full_tank: false)
   end
+
+  it 'sums and counts the route debits since the last full tank, counting the fill day' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 200, full_tank: true, date: Date.new(2026, 6, 1))
+    create(:expense, user: user, category: 'fuel', amount: 80, date: Date.new(2026, 6, 3))
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 7))
+    2.times { |offset| create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 8 + offset)) }
+
+    result = described_class.new(user: user).call
+
+    expect(result[:consumed]).to eq(amount: 135, routes: 3)
+  end
+
+  it 'reports zero routes consumed right after a full tank' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, full_tank: true, date: Date.new(2026, 6, 7))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:consumed]).to eq(amount: 0, routes: 0)
+  end
+
+  it 'leaves the consumption out when no refueling filled the tank' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 100, full_tank: false, date: Date.new(2026, 6, 7))
+    create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 8))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:consumed]).to be_nil
+  end
+
+  it 'returns no consumption without a vehicle' do
+    user = create(:user)
+
+    result = described_class.new(user: user).call
+
+    expect(result).to include(consumed: nil)
+  end
 end
