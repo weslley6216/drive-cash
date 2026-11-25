@@ -52,6 +52,27 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'keeps the analysis as the way back while walking to the previous week on a phone' do
+    visit weekly_summary_path('2026-07-13', return_to: '/analysis?month=7&year=2026')
+
+    find("a[aria-label='Semana anterior']").click
+
+    expect(page).to have_current_path(weekly_summary_path('2026-07-06', return_to: '/analysis?month=7&year=2026'))
+    expect(page).to fit_the_phone_width
+
+    find("a[aria-label='#{I18n.t('weekly_summaries.show.back')}']").click
+
+    expect(page).to have_current_path('/analysis?month=7&year=2026')
+  end
+
+  it 'goes back to the notification center when the week opened without an origin on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    find("a[aria-label='#{I18n.t('weekly_summaries.show.back')}']").click
+
+    expect(page).to have_current_path(notifications_path)
+  end
+
   it 'opens the goal outcome from the goal block and goes back to the week on a phone' do
     goal
 
