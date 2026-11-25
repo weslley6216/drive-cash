@@ -131,4 +131,36 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
     expect(computed('[data-speech-target="phaseDot"]', 'animationName')).to eq('none')
     expect(page).to have_css('[data-speech-target="wave"] .bg-violet-600')
   end
+
+  it 'pins the panel to the bottom of the chat column and cancels with Esc on a desktop' do
+    emulate_desktop_screen
+    visit chat_root_path
+    find('button[aria-label="Falar"]').click
+    hear('abasteci 80')
+
+    panel = find('[role="dialog"]')
+    wait_for_sheet_transition
+
+    expect(box(panel)['width'].round).to eq(672)
+    expect(box(panel)['left'].round).to eq(304)
+    expect(box(panel)['bottom'].round).to eq(800)
+
+    page.send_keys(:escape)
+
+    expect(page).to have_no_css('[role="dialog"]')
+    expect(page).to have_no_css('#chat_messages .bg-blue-600')
+  end
+
+  it 'sends what was heard with Enter on a desktop' do
+    emulate_desktop_screen
+    visit chat_root_path
+    find('button[aria-label="Falar"]').click
+    hear('abasteci 80 no Orense')
+
+    page.send_keys(:enter)
+
+    expect(received_messages.pop(timeout: 5)).to eq('abasteci 80 no Orense')
+    expect(page).to have_css('#chat_messages .bg-blue-600 .text-white\/80')
+    expect(page).to have_css('#chat_messages .bg-blue-600', count: 1)
+  end
 end

@@ -40,6 +40,16 @@ module SpeechRecognitionFake
   def fail_hearing(error)
     page.execute_script("window.__speech.onerror({ error: '#{error}' }); window.__speech.onend()")
   end
+
+  def wait_for_sheet_transition
+    page.evaluate_async_script(<<~JS)
+      const callback = arguments[arguments.length - 1]
+      const sheet = document.querySelector('[data-speech-target="sheet"]')
+      const done = () => callback(true)
+      sheet.addEventListener('transitionend', done, { once: true })
+      setTimeout(done, 500)
+    JS
+  end
 end
 
 RSpec.configure do |config|
