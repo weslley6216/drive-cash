@@ -8,7 +8,8 @@ const TOGGLE_INACTIVE = ['text-slate-500']
 export default class extends Controller {
   static values = {
     type: String, activeVendor: String, selectedCategory: String,
-    months: Array, dayNames: Array, today: String, todayLabel: String, yesterdayLabel: String
+    months: Array, dayNames: Array, today: String, todayLabel: String, yesterdayLabel: String,
+    tankBalance: Number
   }
   static targets = [
     'typeInput', 'earningFields', 'expenseFields',
@@ -16,7 +17,8 @@ export default class extends Controller {
     'earningToggle', 'expenseToggle', 'amountTheme',
     'amountDisplay', 'amountInput',
     'vendorInput', 'vendorHint', 'vendorSuggest', 'vendorSuggestLabel',
-    'dateRelative', 'dateText'
+    'dateRelative', 'dateText',
+    'tankDebit', 'tankAfter'
   ]
 
   connect() {
@@ -24,10 +26,12 @@ export default class extends Controller {
     this.initAmountDisplay()
     this._syncCategoryFromDom()
     this.refreshVendorUi()
+    this.refreshTankUi()
     this._onCategoryChange = (event) => {
       if (event.target.type === 'radio' && event.target.name === 'record[category]') {
         this.selectedCategoryValue = event.target.value
         this.refreshVendorUi()
+        this.refreshTankUi()
       }
     }
     this.element.addEventListener('change', this._onCategoryChange)
@@ -52,11 +56,13 @@ export default class extends Controller {
     node.querySelectorAll('input[type="radio"]').forEach(el => { el.checked = false })
     if (node === this.expenseFieldsTarget) this.selectedCategoryValue = ''
     this.refreshVendorUi()
+    this.refreshTankUi()
   }
 
   categoryChanged() {
     this.maybePrefillVendor()
     this.refreshVendorUi()
+    this.refreshTankUi()
   }
 
   clearVendor() {
@@ -102,6 +108,18 @@ export default class extends Controller {
 
   get isFuel() {
     return this.selectedCategoryValue === 'fuel'
+  }
+
+  refreshTankUi() {
+    if (!this.hasTankDebitTarget) return
+
+    this.tankDebitTarget.classList.toggle('hidden', !this.isFuel)
+    if (this.hasTankAfterTarget) {
+      const amount = parseFloat(this.amountInputTarget?.value || 0)
+      const after = this.tankBalanceValue - amount
+      const sign = after < 0 ? '-' : ''
+      this.tankAfterTarget.textContent = `${sign}R$ ${Math.abs(after).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    }
   }
 
   refreshDate(event) {
@@ -217,6 +235,7 @@ export default class extends Controller {
     if (this.hasAmountInputTarget) {
       this.amountInputTarget.value = value.toFixed(2)
     }
+    this.refreshTankUi()
   }
 
   incrementTrips(event) {
