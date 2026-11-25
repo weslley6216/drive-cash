@@ -74,7 +74,7 @@ pt-BR:
         earnings: "Receitas"
         expenses: "Despesas"
         best_day: "Melhor dia"
-        best_day_value: "%{day} · %{value}"
+        best_day_detail: "%{weekday}, %{date}"
       vendor_efficiency:
         lead_before: "O"
         lead_after: "tem te rendido mais: %{winner_kml} km/L contra %{runner_up_kml} do %{runner_up}."

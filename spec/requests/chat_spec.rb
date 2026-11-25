@@ -109,7 +109,7 @@ RSpec.describe 'Chats', type: :request do
         get chat_root_path
 
         expect(response.body).to include('Lucro do mês')
-        expect(response.body).to include('−R$ 440,00').and include('Qui · R$ 320')
+        expect(response.body).to include('−R$ 440,00').and include('Qui, 12/11')
         expect(response.body).not_to include('profit: 1240.0')
       end
     end
@@ -143,7 +143,7 @@ RSpec.describe 'Chats', type: :request do
         post chat_message_path, params: { message: 'Lucro do mês' }, as: :turbo_stream
 
         expect(response.body).to include('px-4 py-3 rounded-2xl rounded-tl-sm max-w-[82%]')
-        expect(response.body).to include('+R$ 1.680,00').and include('Qui · R$ 320')
+        expect(response.body).to include('+R$ 1.680,00').and include('Qui, 12/11')
         expect(response.body).not_to include('profit: 1240.0')
       end
     end

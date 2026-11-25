@@ -1,8 +1,7 @@
 module Chat
   module AnswerCards
     class SummaryComponent < ApplicationComponent
-      STATS = 'rounded-xl bg-slate-50 border border-slate-200 px-3 py-1 divide-y divide-slate-200 ' \
-              'sm:flex sm:py-3 sm:divide-y-0 sm:divide-x'.freeze
+      STATS = 'rounded-xl bg-slate-50 border border-slate-200 px-3 divide-y divide-slate-200'.freeze
 
       def initialize(card:)
         @card = card
@@ -24,10 +23,12 @@ module Chat
 
       def render_stats
         render AnswerCards::AnswerStatComponent.new(
-          label: t('chat.answer_card.summary.earnings'), value: "+#{format_currency(@card[:earnings])}", tone: :emerald
+          label: t('chat.answer_card.summary.earnings'), value: "+#{format_currency(@card[:earnings])}",
+          icon: PhlexIcons::Lucide::ArrowDownLeft, tone: :emerald
         )
         render AnswerCards::AnswerStatComponent.new(
-          label: t('chat.answer_card.summary.expenses'), value: "−#{format_currency(@card[:expenses])}", tone: :red
+          label: t('chat.answer_card.summary.expenses'), value: "−#{format_currency(@card[:expenses])}",
+          icon: PhlexIcons::Lucide::ArrowUpRight, tone: :red
         )
         render_best_day
       end
@@ -36,13 +37,14 @@ module Chat
         return unless @card[:best_day_on]
 
         render AnswerCards::AnswerStatComponent.new(
-          label: t('chat.answer_card.summary.best_day'), value: best_day_value, tone: :slate
+          label: t('chat.answer_card.summary.best_day'), detail: best_day_detail,
+          value: format_currency(@card[:best_day_amount]), icon: PhlexIcons::Lucide::Trophy, tone: :violet
         )
       end
 
-      def best_day_value
-        day = I18n.l(Date.iso8601(@card[:best_day_on]), format: '%a').capitalize
-        t('chat.answer_card.summary.best_day_value', day: day, value: format_currency_short(@card[:best_day_amount]))
+      def best_day_detail
+        date = Date.iso8601(@card[:best_day_on])
+        t('chat.answer_card.summary.best_day_detail', weekday: I18n.l(date, format: '%a').capitalize, date: I18n.l(date, format: '%d/%m'))
       end
 
       def lead

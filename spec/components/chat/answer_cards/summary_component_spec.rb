@@ -15,11 +15,11 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     expect(html).to include('Esse mês você lucrou <strong>R$ 1.240,00</strong> — 12% acima do mês anterior.')
   end
 
-  it 'lists income, expenses and the best day in their tones, split by dividers' do
+  it 'lists income, expenses and the best day as rows in their tones' do
     expect(html).to include(described_class::STATS)
     expect(html).to include('text-emerald-700">+R$ 1.680,00</p>')
     expect(html).to include('text-red-700">−R$ 440,00</p>')
-    expect(html).to include('Melhor dia').and include('text-slate-800">Qui · R$ 320</p>')
+    expect(html).to include('Melhor dia').and include('Qui, 12/11').and include('text-slate-800">R$ 320,00</p>')
     expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(3)
   end
 
