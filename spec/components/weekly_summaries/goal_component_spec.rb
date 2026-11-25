@@ -26,6 +26,6 @@ RSpec.describe WeeklySummaries::GoalComponent, type: :component do
   it 'links to the outcome of the goal' do
     html = Capybara.string(view_context.render(described_class.new(progress: progress)))
 
-    expect(html).to have_link('Ver resultado da meta', href: "/goals/#{goal.id}/outcomes/2026-07-06")
+    expect(html).to have_link('Ver resultado da meta', href: "/goals/#{goal.id}/outcomes/2026-07-06?return_to=%2F")
   end
 end

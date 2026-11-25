@@ -133,7 +133,7 @@ RSpec.describe 'Goals', type: :system, js: true do
     expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
   end
 
-  it 'opens the outcome of a missed and of a hit past goal from Metas anteriores on a phone' do
+  it 'opens the outcome of a missed and of a hit past goal from Metas anteriores and goes back to them on a phone' do
     missed = create(:goal, user: current_user, kind: 'monthly', target_amount: 1_000,
                     period_start: Date.new(2026, 3, 1), period_end: Date.new(2026, 3, 31))
     hit = create(:goal, user: current_user, kind: 'monthly', target_amount: 1_000,
@@ -144,15 +144,19 @@ RSpec.describe 'Goals', type: :system, js: true do
     visit goals_path
     find('a', text: 'Março 2026').click
 
-    expect(page).to have_current_path("/goals/#{missed.id}/outcomes/2026-03-01")
+    expect(page).to have_current_path("/goals/#{missed.id}/outcomes/2026-03-01", ignore_query: true)
     expect(page).to have_text('Não foi dessa vez')
     expect(page).to fit_the_phone_width
 
-    visit goals_path
+    click_on I18n.t('goals.outcomes.show.back')
     find('a', text: 'Abril 2026').click
 
-    expect(page).to have_current_path("/goals/#{hit.id}/outcomes/2026-04-01")
+    expect(page).to have_current_path("/goals/#{hit.id}/outcomes/2026-04-01", ignore_query: true)
     expect(page).to have_text('Meta de abril batida!')
     expect(page).to fit_the_phone_width
+
+    click_on I18n.t('goals.outcomes.show.back')
+
+    expect(page).to have_current_path(goals_path)
   end
 end

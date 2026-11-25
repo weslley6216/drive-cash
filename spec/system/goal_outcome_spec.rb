@@ -34,6 +34,19 @@ RSpec.describe 'Goal outcome', type: :system, js: true do
     expect(page).to have_no_css('.dc-confetti', visible: :all)
   end
 
+  it 'goes back to the notifications from the outcome opened by a goal notification on a phone' do
+    create(:notification, user: current_user, kind: 'goal_reached',
+                          data: { 'goal_id' => goal.id, 'period_start' => '2026-06-01', 'kind' => 'monthly',
+                                  'metric' => 'profit', 'target' => 6_000.0, 'current' => 6_120.0 })
+
+    visit notifications_path
+    click_on 'Meta mensal batida! 🎯'
+    click_on I18n.t('goals.outcomes.show.back')
+
+    expect(page).to have_current_path(notifications_path)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'scrolls the hit outcome under a pinned header with the content inset from the edges on a short phone' do
     emulate_short_phone
 
