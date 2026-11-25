@@ -50,7 +50,7 @@ module Vehicles
 
     def header_row
       div(class: 'flex items-start justify-between') do
-        div(class: 'flex items-center gap-2.5') do
+        div(class: "flex items-center #{desktop? ? 'gap-2.5' : 'gap-2'}") do
           div(class: "#{desktop? ? 'w-10 h-10 rounded-xl' : 'w-8 h-8 rounded-lg'} bg-slate-100 text-slate-600 flex items-center justify-center") do
             render PhlexIcons::Lucide::Fuel.new(class: desktop? ? 'w-5 h-5' : 'w-[17px] h-[17px]')
           end
