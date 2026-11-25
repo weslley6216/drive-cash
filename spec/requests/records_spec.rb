@@ -163,6 +163,23 @@ RSpec.describe 'Records', type: :request do
         expect(response.body).to include('data-record-form-target="vendorSuggest"')
         expect(response.body).to include(I18n.t('records.new_view.vendor_from_tank'))
       end
+
+      it 'renders the tank debit card with the raw balance for the Stimulus controller' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).to include(I18n.t('records.new_view.tank_debit.title'))
+        expect(response.body).to include('data-record-form-tank-balance-value="180.5"')
+      end
+    end
+
+    context 'when the user has a vehicle without refuelings' do
+      before { create(:vehicle, user: current_user) }
+
+      it 'does not render the tank debit card' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).not_to include(I18n.t('records.new_view.tank_debit.title'))
+      end
     end
 
     context 'when the user has no vehicle' do
@@ -170,6 +187,12 @@ RSpec.describe 'Records', type: :request do
         get new_record_path, params: { type: 'expense' }
 
         expect(response.body).to include('data-record-form-active-vendor-value=""')
+      end
+
+      it 'does not render the tank debit card' do
+        get new_record_path, params: { type: 'expense' }
+
+        expect(response.body).not_to include(I18n.t('records.new_view.tank_debit.title'))
       end
     end
   end
@@ -263,6 +286,17 @@ RSpec.describe 'Records', type: :request do
         post records_path, params: params
 
         expect(response).to have_http_status(:unprocessable_content)
+      end
+
+      it 'keeps the tank debit card visible after an invalid fuel expense' do
+        vehicle = create(:vehicle, user: current_user)
+        create(:refueling, vehicle: vehicle, total_amount: 260, date: Date.new(2026, 5, 20))
+
+        post records_path, params: { type: 'expense', record: { amount: '', category: 'fuel', date: '2026-05-22' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include(I18n.t('records.new_view.tank_debit.title'))
+        expect(response.body).to include('data-record-form-tank-balance-value="260.0"')
       end
     end
 

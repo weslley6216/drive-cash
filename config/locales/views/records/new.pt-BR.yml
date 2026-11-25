@@ -21,6 +21,9 @@ pt-BR:
       vendor_inherited: "Preenchido do seu último abastecimento"
       vendor_clear: "limpar"
       vendor_from_tank: "do tanque"
+      tank_debit:
+        title: "Debita do tanque ativo"
+        balance: "Saldo"
       description_label: "Descrição (opcional)"
       description_placeholder: "Detalhes adicionais..."
       notes_label: "Descrição (opcional)"

@@ -24,7 +24,8 @@ class RecordsController < ApplicationController
       earning:       earning || Earning.new(date: date),
       expense:       expense || Expense.new(date: date),
       context:       params[:context],
-      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
+      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s,
+      tank:          Vehicles::TankBalanceService.new(user: current_user).call
     )
   end
 end
