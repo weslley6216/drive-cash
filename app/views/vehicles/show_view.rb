@@ -5,15 +5,21 @@ module Vehicles
 
     MOBILE_MAINTENANCE_LIMIT = 5
 
-    def initialize(payload:, vehicle_form: nil)
+    def initialize(payload:, unread_count:, vehicle_form: nil)
       @payload = payload
+      @unread_count = unread_count
       @vehicle_form = vehicle_form
     end
 
     def view_template
       render LayoutComponent.new(title: t('vehicle.title'), bottom_nav: :more, sidebar_nav: :vehicle) do
         render ScreenComponent.new do |screen|
-          screen.with_header { header_mobile } unless @vehicle_form
+          unless @vehicle_form
+            screen.with_header do
+              header_mobile
+              desktop_topbar
+            end
+          end
           screen.with_content do
             if @vehicle_form
               empty_state
@@ -59,6 +65,14 @@ module Vehicles
       return '' unless vehicle
 
       t('vehicle.subtitle', brand: vehicle.brand, vehicle_model: vehicle.vehicle_model, year: vehicle.year)
+    end
+
+    def desktop_subtitle
+      vehicle = @payload[:vehicle]
+      return '' unless vehicle
+      return vehicle_subtitle if vehicle.license_plate.blank?
+
+      t('vehicle.desktop_subtitle', brand: vehicle.brand, vehicle_model: vehicle.vehicle_model, year: vehicle.year, plate: vehicle.license_plate)
     end
 
     def mobile_layout
@@ -165,7 +179,6 @@ module Vehicles
 
     def desktop_layout
       div(class: 'space-y-6') do
-        desktop_topbar
         desktop_row_one
         desktop_row_two
         insight_section
@@ -173,19 +186,30 @@ module Vehicles
     end
 
     def desktop_topbar
-      div(class: 'flex items-start justify-between') do
-        div do
-          h1(class: 'text-2xl font-bold text-slate-900') { t('vehicle.title') }
-          p(class: 'text-sm text-slate-500') { vehicle_subtitle }
+      render DesktopTopbarComponent.new(title: t('vehicle.title'), subtitle: desktop_subtitle, unread_count: @unread_count) do |topbar|
+        topbar.with_actions do
+          edit_button
+          update_km_button
         end
-        div(class: 'flex items-center gap-2') do
-          link_to(t('vehicle.edit'), helpers.edit_vehicle_path,
-                  class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
-                  data:  { turbo_frame: 'modal' })
-          link_to(t('vehicle.maintenances.add_from_catalog'), helpers.new_maintenance_path,
-                  class: 'flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold',
-                  data:  { turbo_frame: 'modal' })
-        end
+      end
+    end
+
+    def edit_button
+      link_to(helpers.edit_vehicle_path,
+              class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+              data:  { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Pencil.new(class: 'w-[15px] h-[15px] text-slate-500')
+        plain t('vehicle.edit')
+      end
+    end
+
+    def update_km_button
+      tone = odometer[:stale] ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700'
+      link_to(helpers.edit_vehicle_path,
+              class: "rounded-lg px-4 py-2 text-sm font-semibold flex items-center gap-2 text-white #{tone}",
+              data:  { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Camera.new(class: 'w-4 h-4')
+        plain t('vehicle.odometer.update')
       end
     end
 

@@ -51,6 +51,22 @@ RSpec.describe 'Vehicle', type: :system, js: true do
     expect(page).to have_no_link(I18n.t('vehicle.back'))
   end
 
+  it 'ends the desktop topbar with the bell after Editar, Atualizar km and a divider' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit vehicle_path
+
+    topbar = find('header', text: I18n.t('vehicle.title'))
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link(I18n.t('vehicle.edit'), href: edit_vehicle_path)
+    expect(topbar).to have_link(I18n.t('vehicle.odometer.update'), href: edit_vehicle_path)
+    expect(topbar).to have_no_link(I18n.t('vehicle.maintenances.add_from_catalog'))
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
+
   it 'scrolls the highlighted maintenance into view inside the screen content on a phone' do
     emulate_short_phone
     target = @others.last

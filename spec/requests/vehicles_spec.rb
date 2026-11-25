@@ -36,6 +36,39 @@ RSpec.describe 'Vehicles', type: :request do
         expect(response.body).to include("href=\"#{refuelings_path}\"")
         expect(response.body).not_to match(/href="#{Regexp.escape(refuelings_path)}"[^>]*turbo-frame="modal"/)
       end
+
+      it 'subtitles the desktop topbar with brand, model, year and plate' do
+        get vehicle_path
+
+        expect(response.body).to include('Honda Civic · 2018 · ABC-1D23')
+      end
+
+      it 'falls back to the subtitle without plate when the vehicle has none' do
+        vehicle.update!(license_plate: nil)
+
+        get vehicle_path
+
+        expect(response.body).to include('Honda Civic · 2018')
+        expect(response.body).not_to include('Honda Civic · 2018 · ')
+      end
+
+      it 'paints the desktop Atualizar km button blue while the odometer is fresh' do
+        get vehicle_path
+
+        topbar = Capybara.string(response.body).find('header', text: I18n.t('vehicle.title'))
+
+        expect(topbar).to have_css("a.bg-blue-600[href='#{edit_vehicle_path}'][data-turbo-frame='modal']", text: I18n.t('vehicle.odometer.update'))
+      end
+
+      it 'paints the desktop Atualizar km button amber when the odometer is stale' do
+        vehicle.update_columns(odometer_updated_at: 10.days.ago)
+
+        get vehicle_path
+
+        topbar = Capybara.string(response.body).find('header', text: I18n.t('vehicle.title'))
+
+        expect(topbar).to have_css("a.bg-amber-500[href='#{edit_vehicle_path}']", text: I18n.t('vehicle.odometer.update'))
+      end
     end
 
     context 'with maintenances, refuelings and insights' do
