@@ -116,6 +116,24 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'leaves the days after today without a tooltip and opens today with no records on a phone' do
+    visit weekly_summary_path('2026-07-13')
+
+    thursday = find('[data-weekday="3"]', visible: :all)
+
+    expect(thursday['aria-hidden']).to eq('true')
+
+    thursday.click
+
+    expect(page).to have_no_css('[data-bar-tooltip-target="tooltip"]', visible: true)
+
+    find('[data-weekday="1"]').click
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /ter, 14\/jul/i)
+    expect(page).to have_css('[data-bar-tooltip-target="noData"]', visible: true, text: 'Sem lançamentos')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'lays the hero and the goal on five columns beside the bars on a desktop screen' do
     goal
     emulate_desktop_screen
