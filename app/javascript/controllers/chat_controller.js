@@ -25,6 +25,13 @@ export default class extends Controller {
     this.disableInput()
   }
 
+  ask({ params: { question } }) {
+    if (this.inputTarget.readOnly) return
+
+    this.inputTarget.value = question
+    this.inputTarget.form.requestSubmit()
+  }
+
   handleEnter(e) {
     if (!e.shiftKey) {
       e.preventDefault()

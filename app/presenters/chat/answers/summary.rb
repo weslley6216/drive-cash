@@ -1,7 +1,7 @@
 module Chat
   module Answers
     class Summary
-      include Formatting
+      Card = Data.define(:year, :month, :profit, :earnings, :expenses, :profit_change, :best_day_on, :best_day_amount)
 
       def initialize(data)
         @data = data
@@ -10,14 +10,16 @@ module Chat
       def call
         return I18n.t('chat.answer.no_data') unless @data
 
-        parts = [
-          I18n.t('chat.answer.profit', value: format_currency(@data[:profit])),
-          I18n.t('chat.answer.earnings', value: format_currency(@data[:earnings])),
-          I18n.t('chat.answer.expenses', value: format_currency(@data[:expenses]))
-        ]
-        parts << I18n.t('chat.answer.margin', value: @data[:margin]) if @data[:margin]
-        parts << I18n.t('chat.answer.per_km', value: format_currency(@data[:per_km])) if @data[:per_km]
-        parts.join(' · ')
+        Card.new(
+          year:            @data[:year],
+          month:           @data[:month],
+          profit:          @data[:profit],
+          earnings:        @data[:earnings],
+          expenses:        @data[:expenses],
+          profit_change:   @data[:profit_change],
+          best_day_on:     @data[:best_day]&.dig(:date)&.iso8601,
+          best_day_amount: @data[:best_day]&.dig(:amount)
+        )
       end
     end
   end

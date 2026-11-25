@@ -4,6 +4,16 @@ RSpec.describe 'Chat', type: :system, js: true do
   let(:current_user) { create(:user) }
   let(:release_answer) { Queue.new }
   let(:received_messages) { Queue.new }
+  let(:summary_answer) do
+    {
+      type:    :answer,
+      content: 'profit: 1240.0, earnings: 1680.0, expenses: 440.0',
+      card:    {
+        kind: 'summary', year: 2026, month: 11, profit: 1240.0, earnings: 1680.0, expenses: 440.0,
+        profit_change: 12.0, best_day_on: '2026-11-12', best_day_amount: 320.0
+      }
+    }
+  end
 
   before { login_as(current_user) }
   after { release_answer << true }
@@ -118,5 +128,112 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page).to have_no_text(I18n.t('chat.confirm.duplicate_submit'))
     expect(page).to have_button(I18n.t('chat.message.btn_cancel'), count: 1)
     expect(page).to fit_the_phone_width
+  end
+
+  it 'draws the month summary as a card inside the Caju bubble on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    fill_in 'message', with: 'Quanto lucrei esse mês?'
+    find('button[type="submit"]').click
+
+    expect(page).to have_text('você lucrou R$ 1.240,00 — 12% acima do mês anterior.')
+    stats = find('#chat_messages .rounded-xl.bg-slate-50')
+    expect(stats).to have_text('+R$ 1.680,00')
+    expect(stats).to have_text('−R$ 440,00')
+    expect(stats).to have_text('Qui, 12/11')
+    expect(stats).to have_text('R$ 320,00')
+    expect(page).to fit_the_phone_width
+
+    visit chat_root_path
+
+    expect(page).to have_css('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui, 12/11')
+  end
+
+  it 'lists each summary figure on a single line with its icon inside the card on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    fill_in 'message', with: 'Quanto lucrei esse mês?'
+    find('button[type="submit"]').click
+
+    stats = find('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui, 12/11')
+    ['+R$ 1.680,00', '−R$ 440,00', 'R$ 320,00'].each do |figure|
+      value = box(find('#chat_messages p', exact_text: figure))
+      expect(value['height']).to be_within(1).of(20)
+      expect(value['right']).to be_within(1).of(box(stats)['right'] - 13)
+    end
+    expect(stats).to have_css('svg', count: 3)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'draws the station comparison as bars on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return({
+      type:    :answer,
+      content: 'winner: Posto Orense, winner_kml: 11.5, runner_up: Geladão, runner_up_kml: 11.0, savings: 28',
+      card:    { kind: 'vendor_efficiency', winner: 'Posto Orense', winner_kml: 11.5, runner_up: 'Geladão', runner_up_kml: 11.0, savings: 28 }
+    })
+    visit chat_root_path
+
+    fill_in 'message', with: 'Qual posto compensa mais?'
+    find('button[type="submit"]').click
+
+    expect(page).to have_text('O Posto Orense tem te rendido mais: 11,5 km/L contra 11,0 do Geladão.')
+    winner_bar = find('#chat_messages div.h-full.rounded-full[style*="#10b981"]')
+    runner_up_bar = find('#chat_messages div.h-full.rounded-full[style*="#94a3b8"]')
+    expect(box(runner_up_bar)['width']).to be < box(winner_bar)['width']
+    expect(page).to have_text('Economia estimada: ~R$ 28/mês abastecendo só no Posto Orense.')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the answer card inside the narrower column on a desktop screen' do
+    emulate_desktop_screen
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    fill_in 'message', with: 'Quanto lucrei esse mês?'
+    find('button[type="submit"]').click
+
+    stats = find('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui, 12/11')
+    expect(box(stats)['right']).to be <= box(find('[data-controller="chat speech"]'))['right']
+    expect(box(find('#chat_messages p', exact_text: '+R$ 1.680,00'))['right'])
+      .to eq(box(find('#chat_messages p', exact_text: 'R$ 320,00'))['right'])
+  end
+
+  it 'sends a ready-made question when its chip is tapped on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new) do |messages:, **|
+      received_messages << messages.last[:content]
+      parser
+    end
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    chip = find('button', text: 'Lucro do mês')
+    expect(box(chip)['height']).to be >= 44
+    chip.click
+
+    expect(received_messages.pop(timeout: 5)).to eq('Lucro do mês')
+    expect(page).to have_css('#chat_messages .bg-blue-600', text: 'Lucro do mês')
+    expect(page).to have_css('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui, 12/11')
+    expect(page).to have_button('Gastei com combustível?')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'hides the ready-made chips on a desktop screen' do
+    emulate_desktop_screen
+
+    visit chat_root_path
+
+    expect(page).to have_css('textarea[name="message"]')
+    expect(page).to have_no_button('Lucro do mês')
   end
 end

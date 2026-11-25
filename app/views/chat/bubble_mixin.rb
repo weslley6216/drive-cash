@@ -15,6 +15,19 @@ module Chat
       end
     end
 
+    def answer_bubble(content, card)
+      card = card&.symbolize_keys
+      component = card && "Chat::AnswerCards::#{card[:kind].to_s.camelize}Component".safe_constantize
+      return text_bubble(content) unless component
+
+      div(class: 'flex items-start gap-2') do
+        sparkles_icon
+        div(class: 'bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-tl-sm max-w-[82%] text-sm text-slate-700 shadow-sm leading-relaxed space-y-2.5') do
+          render component.new(card: card)
+        end
+      end
+    end
+
     def preview_card(result)
       div(class: 'flex items-start gap-2') do
         sparkles_icon

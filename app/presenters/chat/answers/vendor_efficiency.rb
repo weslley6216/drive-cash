@@ -9,6 +9,7 @@ module Chat
 
       def call
         return I18n.t('chat.answer.vendor_efficiency_no_data') unless @data
+        return @data if @data.runner_up
 
         I18n.t('chat.answer.vendor_best',
                vendor:  @data.winner,

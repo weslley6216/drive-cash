@@ -18,7 +18,8 @@ RSpec.describe Ai::Tools::Registry do
     'unpaid_expenses'    => [Ai::Readers::UnpaidExpenses, Chat::Answers::UnpaidExpenses],
     'maintenance_status' => [Ai::Readers::MaintenanceStatus, Chat::Answers::MaintenanceStatus],
     'last_maintenance'   => [Ai::Readers::LastMaintenance, Chat::Answers::LastMaintenance],
-    'history_search'     => [Ai::Readers::HistorySearch, Chat::Answers::HistorySearch]
+    'history_search'     => [Ai::Readers::HistorySearch, Chat::Answers::HistorySearch],
+    'category_total'     => [Ai::Readers::CategoryTotal, Chat::Answers::CategoryTotal]
   }.freeze
 
   describe '.declarations' do

@@ -2,6 +2,16 @@ require 'rails_helper'
 
 RSpec.describe 'Chats', type: :request do
   let(:current_user) { create(:user) }
+  let(:summary_answer) do
+    {
+      type:    :answer,
+      content: 'profit: 1240.0, earnings: 1680.0, expenses: 440.0',
+      card:    {
+        kind: 'summary', year: 2026, month: 11, profit: 1240.0, earnings: 1680.0, expenses: 440.0,
+        profit_change: 12.0, best_day_on: '2026-11-12', best_day_amount: 320.0
+      }
+    }
+  end
 
   before { login_as(current_user) }
 
@@ -13,6 +23,14 @@ RSpec.describe 'Chats', type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).to include('Como posso ajudar?')
         expect(response.body).to include('Pergunte ou registre…')
+      end
+
+      it 'offers the ready-made questions above the message box' do
+        get chat_root_path
+
+        expect(response.body).to include('data-chat-question-param="Lucro do mês"')
+        expect(response.body).to include('data-chat-question-param="Gastei com combustível?"')
+        expect(response.body).to include('data-chat-question-param="Melhor dia"')
       end
     end
 
@@ -83,6 +101,17 @@ RSpec.describe 'Chats', type: :request do
         expect(response.body).not_to include('Entendi o seguinte')
         expect(response.body).not_to include('Confirmar')
       end
+
+      it 'redraws an answer card from the session history' do
+        allow(parser_mock).to receive(:call).and_return(summary_answer)
+        post chat_message_path, params: { message: 'Lucro do mês' }, as: :turbo_stream
+
+        get chat_root_path
+
+        expect(response.body).to include('Lucro do mês')
+        expect(response.body).to include('−R$ 440,00').and include('Qui, 12/11')
+        expect(response.body).not_to include('profit: 1240.0')
+      end
     end
   end
 
@@ -102,6 +131,34 @@ RSpec.describe 'Chats', type: :request do
         post chat_message_path, params: { message: 'qual meu lucro?' }, as: :turbo_stream
 
         expect(response.body).to include('500,00')
+      end
+    end
+
+    context 'when ParserService returns an answer with a summary card' do
+      before do
+        allow(parser_mock).to receive(:call).and_return(summary_answer)
+      end
+
+      it 'renders the card inside the Caju bubble instead of the raw numbers' do
+        post chat_message_path, params: { message: 'Lucro do mês' }, as: :turbo_stream
+
+        expect(response.body).to include('px-4 py-3 rounded-2xl rounded-tl-sm max-w-[82%]')
+        expect(response.body).to include('+R$ 1.680,00').and include('Qui, 12/11')
+        expect(response.body).not_to include('profit: 1240.0')
+      end
+    end
+
+    context 'when ParserService returns an answer whose card has no component' do
+      before do
+        allow(parser_mock).to receive(:call).and_return({
+          type: :answer, content: 'Melhor dia: 12/11 com R$ 320,00', card: { kind: 'best_day', amount: 320.0 }
+        })
+      end
+
+      it 'falls back to the text bubble' do
+        post chat_message_path, params: { message: 'Melhor dia' }, as: :turbo_stream
+
+        expect(response.body).to include('Melhor dia: 12/11 com R$ 320,00')
       end
     end
 

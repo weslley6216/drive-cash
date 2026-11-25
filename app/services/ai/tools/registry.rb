@@ -45,7 +45,8 @@ module Ai
         'unpaid_expenses'    => QueryKind.new(reader: Ai::Readers::UnpaidExpenses, answer_presenter: Chat::Answers::UnpaidExpenses),
         'maintenance_status' => QueryKind.new(reader: Ai::Readers::MaintenanceStatus, answer_presenter: Chat::Answers::MaintenanceStatus),
         'last_maintenance'   => QueryKind.new(reader: Ai::Readers::LastMaintenance, answer_presenter: Chat::Answers::LastMaintenance),
-        'history_search'     => QueryKind.new(reader: Ai::Readers::HistorySearch, answer_presenter: Chat::Answers::HistorySearch)
+        'history_search'     => QueryKind.new(reader: Ai::Readers::HistorySearch, answer_presenter: Chat::Answers::HistorySearch),
+        'category_total'     => QueryKind.new(reader: Ai::Readers::CategoryTotal, answer_presenter: Chat::Answers::CategoryTotal)
       }.freeze
 
       TOOLS = [

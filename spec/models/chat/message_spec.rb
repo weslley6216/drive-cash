@@ -21,5 +21,13 @@ RSpec.describe Chat::Message do
 
       expect(message.to_session_hash).to eq(role: 'assistant', content: 'Anotado', type: :text)
     end
+
+    it 'keeps the answer card in the session hash' do
+      card = { kind: 'summary', profit: 1240.0 }
+
+      message = described_class.from_result({ type: :answer, content: 'profit: 1240.0', card: card }, fallback_content: 'x')
+
+      expect(message.to_session_hash).to eq(role: 'assistant', content: 'profit: 1240.0', type: :answer, card: card)
+    end
   end
 end

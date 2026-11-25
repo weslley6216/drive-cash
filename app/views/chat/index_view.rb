@@ -1,8 +1,10 @@
 module Chat
   class IndexView < ApplicationView
     include Formatting
+    include Chat::BubbleMixin
 
     SCREEN = 'flex-1 flex flex-col min-h-0 px-5 safe-top pb-4 sm:p-6 lg:max-w-2xl lg:mx-auto lg:w-full'.freeze
+    CHIPS = %i[monthly_profit fuel_spending best_day].freeze
 
     def initialize(messages: [])
       @messages = messages
@@ -87,7 +89,7 @@ module Chat
         if from_user?(message)
           user_bubble(message[:content], voice: message[:voice])
         else
-          ai_bubble(message[:summary].presence || message[:content])
+          answer_bubble(message[:summary].presence || message[:content], message[:card])
         end
       end
     end
@@ -109,13 +111,20 @@ module Chat
       end
     end
 
-    def ai_bubble(text)
-      div(class: 'flex items-start gap-2') do
-        div(class: 'w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5') do
-          render PhlexIcons::Lucide::Sparkles.new(class: 'w-4 h-4 text-violet-600')
-        end
-        div(class: 'bg-white border border-slate-200 px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-[80%] text-sm text-slate-700 shadow-sm leading-relaxed') do
-          plain text
+    def question_chips
+      div(class: 'flex gap-2 overflow-x-auto pb-2.5 -mx-1 px-1 lg:hidden') do
+        CHIPS.each do |chip|
+          question = t("chat.index.chips.#{chip}")
+          button(
+            type:  'button',
+            class: 'flex-shrink-0 inline-flex items-center min-h-11 cursor-pointer',
+            data:  { action: 'click->chat#ask', chat_question_param: question }
+          ) do
+            span(class: 'inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700') do
+              render PhlexIcons::Lucide::Sparkles.new(class: 'w-3 h-3')
+              plain question
+            end
+          end
         end
       end
     end
@@ -123,6 +132,7 @@ module Chat
     def input_section
       div(class: 'flex-shrink-0 pt-4 border-t border-slate-200 relative') do
         render Chat::VoiceNoticeComponent.new
+        question_chips
 
         form_with(
           url:  chat_message_path,
