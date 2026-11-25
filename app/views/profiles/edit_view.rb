@@ -2,18 +2,21 @@ module Profiles
   class EditView < ApplicationView
     include TopbarStyles
 
-    def initialize(user:, reauthenticated:)
+    def initialize(user:, reauthenticated:, unread_count:)
       @user = user
       @reauthenticated = reauthenticated
+      @unread_count = unread_count
     end
 
     def view_template
       render LayoutComponent.new(title: t('.title'), sidebar_nav: :more) do
         render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
+          screen.with_header do
+            mobile_header
+            desktop_topbar
+          end
           screen.with_content do
-            form_with(model: @user, url: helpers.profile_path, method: :patch, class: 'contents') do |form|
-              desktop_header
+            form_with(model: @user, url: helpers.profile_path, method: :patch, id: 'profile-form', class: 'contents') do |form|
               fields_card(form)
               mobile_cta
             end
@@ -24,13 +27,9 @@ module Profiles
 
     private
 
-    def desktop_header
-      div(class: 'hidden lg:flex mb-6 items-end justify-between') do
-        div do
-          h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
-          p(class: 'text-sm text-slate-500 mt-1') { t('.desktop_subtitle') }
-        end
-        div(class: 'w-56') { save_button }
+    def desktop_topbar
+      render DesktopTopbarComponent.new(title: t('.heading'), subtitle: t('.desktop_subtitle'), unread_count: @unread_count) do |topbar|
+        topbar.with_actions { div(class: 'w-[220px]') { save_button } }
       end
     end
 
@@ -162,7 +161,7 @@ module Profiles
     end
 
     def save_button
-      button(type: 'submit', class: 'w-full rounded-xl py-3.5 text-sm font-bold text-white flex items-center justify-center gap-2 shadow-sm bg-blue-600 hover:bg-blue-700 cursor-pointer') do
+      button(type: 'submit', form: 'profile-form', class: 'w-full rounded-xl py-3.5 text-sm font-bold text-white flex items-center justify-center gap-2 shadow-sm bg-blue-600 hover:bg-blue-700 cursor-pointer') do
         plain t('.save')
       end
     end
