@@ -74,6 +74,13 @@ pt-BR:
       empty_ex2: "\"Abasteci R$80 de gasolina\""
       placeholder: "Pergunte ou registre…"
       btn_speak: "Falar"
+    voice:
+      dialog_label: "Caju ouvindo"
+      listening: "Ouvindo"
+      understood: "Entendi"
+      hint: "Fale agora, ex.: “abasteci 80 no Orense”"
+      discard: "Descartar"
+      send: "Enviar"
     preview:
       earning: "Receita de %{amount} via %{platform} em %{date}"
       expense: "Despesa de %{amount} (%{category}%{vendor}) em %{date}"
