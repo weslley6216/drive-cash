@@ -7,7 +7,7 @@ module MaintenancePalette
 
   MAINTENANCE_ICONS = {
     'oil_change'    => PhlexIcons::Lucide::Wrench,
-    'oil_filter'    => PhlexIcons::Lucide::Wind,
+    'oil_filter'    => PhlexIcons::Lucide::Wrench,
     'air_filter'    => PhlexIcons::Lucide::Wind,
     'fuel_filter'   => PhlexIcons::Lucide::Wind,
     'tire_rotation' => PhlexIcons::Lucide::Disc,
