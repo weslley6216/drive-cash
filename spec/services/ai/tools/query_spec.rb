@@ -8,7 +8,7 @@ RSpec.describe Ai::Tools::Query do
       expect(declaration[:name]).to eq('query')
     end
 
-    it 'declares type as required enum with the 17 kinds' do
+    it 'declares type as required enum with the 18 kinds' do
       declaration = described_class.declaration
       type_param = declaration[:parameters][:properties][:type]
 
@@ -18,7 +18,7 @@ RSpec.describe Ai::Tools::Query do
         summary vendor_efficiency best_day worst_platform category_spike
         margin_drop per_km per_trip tank_balance last_full_tank
         goal_progress platform_breakdown best_month unpaid_expenses
-        maintenance_status last_maintenance history_search
+        maintenance_status last_maintenance history_search category_total
       ])
     end
 
@@ -37,6 +37,12 @@ RSpec.describe Ai::Tools::Query do
       expect(properties[:term][:type]).to eq('STRING')
       expect(properties[:category][:type]).to eq('STRING')
       expect(declaration[:parameters][:required]).not_to include('year', 'month', 'term', 'category')
+    end
+
+    it 'lists the expense categories in the category description for category_total' do
+      description = described_class.declaration[:parameters][:properties][:category][:description]
+
+      expect(description).to include('category_total').and include(*Expense.categories.keys)
     end
   end
 end

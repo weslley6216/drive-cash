@@ -14,7 +14,7 @@ module Ai
                   summary vendor_efficiency best_day worst_platform category_spike
                   margin_drop per_km per_trip tank_balance last_full_tank
                   goal_progress platform_breakdown best_month unpaid_expenses
-                  maintenance_status last_maintenance history_search
+                  maintenance_status last_maintenance history_search category_total
                 ],
                 description:
                              'summary=resumo (lucro/ganhos/despesas) · ' \
@@ -32,14 +32,18 @@ module Ai
                   'unpaid_expenses=despesas em aberto · ' \
                   'maintenance_status=status das manutenções · ' \
                   'last_maintenance=última manutenção (opcional category) · ' \
-                  'history_search=busca no histórico (exige term)'
+                  'history_search=busca no histórico (exige term) · ' \
+                  'category_total=total gasto numa categoria de despesa (exige category)'
               },
               year:     { type: 'INTEGER', description: 'Ano (padrão: atual)' },
               month:    { type: 'INTEGER', description: 'Mês 1–12 (omitir para o ano todo)' },
               term:     { type: 'STRING', description: 'Termo de busca (usado por history_search)' },
               category: {
                 type:        'STRING',
-                description: 'Categoria de manutenção (usado por last_maintenance): oil_change, oil_filter, air_filter, fuel_filter, tire_rotation, brake_pads, spark_plugs, timing_belt'
+                description: 'Categoria de manutenção (last_maintenance): oil_change, oil_filter, air_filter, ' \
+                  'fuel_filter, tire_rotation, brake_pads, spark_plugs, timing_belt · ' \
+                  'categoria de despesa (category_total): fuel, maintenance, car_wash, toll, parking, ' \
+                  'documentation, insurance, fine, meals, phone, other'
               }
             },
             required:   ['type']

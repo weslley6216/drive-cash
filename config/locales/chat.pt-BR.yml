@@ -60,6 +60,7 @@ pt-BR:
       best_month: "Melhor mês: %{month}/%{year} · %{value} de lucro"
       history_found: "Encontrei %{count} resultado(s) para '%{term}'"
       history_empty: "Não encontrei nada para '%{term}'"
+      category_total: "Gastos com %{category}: %{value}"
     index:
       header: "Caju"
       subtitle: "assistente financeiro"
