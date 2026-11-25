@@ -96,4 +96,20 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
     expect(page).to have_link('Ver lançamentos da semana', href: history_path(week: '2026-07-06'))
     expect(page).to have_text('06/jul a 12/jul · 2026 · meta semanal de lucro líquido')
   end
+
+  it 'ends the desktop topbar with the bell after the entries link and a divider' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit goal_outcome_path(goal, '2026-07-06')
+
+    topbar = find('header', text: 'Resultado da meta')
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link('Ver lançamentos da semana', href: history_path(week: '2026-07-06'))
+    expect(page.evaluate_script('document.elementFromPoint(245, 40).closest("header") !== null')).to be(true)
+    expect(page.evaluate_script('document.elementFromPoint(1275, 40).closest("header") !== null')).to be(true)
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
 end

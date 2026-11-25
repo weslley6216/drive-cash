@@ -1,10 +1,9 @@
 module Vehicles
   class OdometerHeroComponent < ApplicationComponent
-    FRESH_THRESHOLD_DAYS = 7
-
-    def initialize(current_km:, km_this_month:, updated_days_ago: nil, variant: :mobile)
+    def initialize(current_km:, km_this_month:, stale:, updated_days_ago: nil, variant: :mobile)
       @current_km = current_km
       @km_this_month = km_this_month
+      @stale = stale
       @updated_days_ago = updated_days_ago
       @variant = variant
     end
@@ -20,7 +19,7 @@ module Vehicles
     private
 
     def stale?
-      @updated_days_ago.nil? || @updated_days_ago > FRESH_THRESHOLD_DAYS
+      @stale
     end
 
     def container_classes

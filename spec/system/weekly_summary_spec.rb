@@ -140,4 +140,18 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to have_link('Análise de julho →', href: '/analysis?month=7&year=2026')
     expect(page).to have_no_css("[aria-label='#{I18n.t('weekly_summaries.show.back')}']")
   end
+
+  it 'ends the desktop topbar with the bell after the week nav, the CTA and a divider' do
+    emulate_desktop_screen
+
+    visit weekly_summary_path('2026-07-06')
+
+    topbar = find('header', text: 'Sua semana')
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link('Semana anterior', href: '/weekly_summaries/2026-06-29')
+    expect(topbar).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06')
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
 end

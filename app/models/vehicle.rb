@@ -13,10 +13,16 @@ class Vehicle < ApplicationRecord
 
   before_save :stamp_odometer_freshness
 
+  ODOMETER_FRESH_DAYS = 7
+
   def updated_days_ago
     return nil if odometer_updated_at.nil?
 
     (Date.current - odometer_updated_at.to_date).to_i
+  end
+
+  def odometer_stale?
+    updated_days_ago.nil? || updated_days_ago > ODOMETER_FRESH_DAYS
   end
 
   private

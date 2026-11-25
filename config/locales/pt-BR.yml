@@ -290,6 +290,7 @@ pt-BR:
   vehicle:
     title: "Meu veículo"
     subtitle: "%{brand} %{vehicle_model} · %{year}"
+    desktop_subtitle: "%{brand} %{vehicle_model} · %{year} · %{plate}"
     edit: "Editar"
     back: "Voltar"
     odometer:

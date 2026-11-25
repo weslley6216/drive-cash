@@ -4,7 +4,7 @@ module Vehicles
 
     EMPTY_PAYLOAD = {
       vehicle:      nil,
-      odometer:     { current_km: 0, km_this_month: 0, updated_days_ago: nil },
+      odometer:     { current_km: 0, km_this_month: 0, updated_days_ago: nil, stale: true },
       maintenances: [],
       insights:     []
     }.freeze
@@ -24,7 +24,8 @@ module Vehicles
         odometer:     {
           current_km:       vehicle.odometer_km,
           km_this_month:    stats.km_this_month,
-          updated_days_ago: vehicle.updated_days_ago
+          updated_days_ago: vehicle.updated_days_ago,
+          stale:            vehicle.odometer_stale?
         },
         maintenances: build_maintenances(vehicle),
         insights:     build_insights(vehicle)

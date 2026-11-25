@@ -6,7 +6,8 @@ module Goals
       outcome = Goals::Outcome.new(goal: @goal).call
       return redirect_to goals_path unless outcome
 
-      render Goals::Outcomes::ShowView.new(outcome: outcome, confetti: celebrate_real_visit(outcome))
+      render Goals::Outcomes::ShowView.new(outcome: outcome, confetti: celebrate_real_visit(outcome),
+                                           unread_count: current_user.unread_notifications_count)
     end
   end
 end

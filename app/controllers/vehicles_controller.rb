@@ -2,9 +2,9 @@ class VehiclesController < ApplicationController
   def show
     @vehicle = current_user.vehicle
     if @vehicle
-      render Vehicles::ShowView.new(payload: show_payload)
+      render Vehicles::ShowView.new(payload: show_payload, unread_count: current_user.unread_notifications_count)
     else
-      render Vehicles::ShowView.new(payload: show_payload, vehicle_form: current_user.build_vehicle)
+      render Vehicles::ShowView.new(payload: show_payload, unread_count: current_user.unread_notifications_count, vehicle_form: current_user.build_vehicle)
     end
   end
 
@@ -20,7 +20,7 @@ class VehiclesController < ApplicationController
       flash[:notice] = t('vehicle.flash.updated')
       respond_with_modal_refresh(html_redirect: vehicle_path)
     else
-      render Vehicles::ShowView.new(payload: show_payload, vehicle_form: @vehicle), status: :unprocessable_content
+      render Vehicles::ShowView.new(payload: show_payload, unread_count: current_user.unread_notifications_count, vehicle_form: @vehicle), status: :unprocessable_content
     end
   end
 

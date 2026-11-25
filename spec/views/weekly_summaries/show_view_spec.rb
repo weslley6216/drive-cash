@@ -26,7 +26,7 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
 
   before { travel_to Time.zone.local(2026, 7, 20, 10, 0) }
 
-  let(:page_html) { Capybara.string(view_context.render(described_class.new(summary: summary))) }
+  let(:page_html) { Capybara.string(view_context.render(described_class.new(summary: summary, unread_count: 0))) }
 
   it 'formats a week inside one month, with the year on the desktop' do
     expect(page_html).to have_text('6 a 12 de julho')
@@ -36,7 +36,7 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
   it 'formats a week across two months' do
     week = Calendars::Week.containing(Date.new(2026, 6, 29))
 
-    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week))))
+    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week), unread_count: 0)))
 
     expect(week_page).to have_text('29 de junho a 5 de julho')
   end
@@ -44,25 +44,25 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
   it 'formats a week across two years' do
     week = Calendars::Week.containing(Date.new(2025, 12, 29))
 
-    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week))))
+    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week), unread_count: 0)))
 
     expect(week_page).to have_text('29 de dezembro de 2025 a 4 de janeiro de 2026')
   end
 
   it 'navigates between weeks from the phone and the desktop headers' do
     expect(page_html).to have_css("a[aria-label='Semana anterior'][href='/weekly_summaries/2026-06-29']", count: 2)
-    expect(page_html).to have_css('a.w-10.h-10', count: 2)
+    expect(page_html).to have_css('a.w-10.h-10.rounded-full', count: 2)
   end
 
   it 'shows the goal block only with a weekly goal' do
-    goalless_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(goal: nil))))
+    goalless_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(goal: nil), unread_count: 0)))
 
     expect(page_html).to have_text('Meta da semana')
     expect(goalless_page).to have_no_text('Meta da semana')
   end
 
   it 'shows where the money went only with paid expenses' do
-    unpaid_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(top_categories: []))))
+    unpaid_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(top_categories: []), unread_count: 0)))
 
     expect(page_html).to have_text('Onde foi o dinheiro')
     expect(unpaid_page).to have_no_text('Onde foi o dinheiro')
@@ -76,6 +76,14 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
     expect(page_html).to have_css("a.bg-blue-600.rounded-lg[href='/history?week=2026-07-06']")
   end
 
+  it 'puts the week nav and the CTA on the shared topbar before the bell' do
+    topbar = page_html.find('header', text: 'Sua semana')
+
+    expect(topbar).to have_css('a.w-10.h-10.rounded-full', count: 2)
+    expect(topbar).to have_link('Ver lançamentos da semana', href: '/history?week=2026-07-06')
+    expect(topbar).to have_link('Notificações')
+  end
+
   it 'keeps the desktop analysis link inline inside its paragraph' do
     expect(page_html).to have_css("p.hidden a[href='/analysis?month=7&year=2026']", text: 'Análise de julho →')
   end
@@ -83,7 +91,7 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
   it 'links the analysis of the month of the monday as a secondary link' do
     week = Calendars::Week.containing(Date.new(2026, 6, 29))
 
-    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week))))
+    week_page = Capybara.string(view_context.render(described_class.new(summary: summary.with(week: week), unread_count: 0)))
 
     expect(week_page).to have_link('Análise de junho →', href: '/analysis?month=6&year=2026', count: 2)
   end
