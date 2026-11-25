@@ -59,6 +59,13 @@ module Vehicles
           t('vehicle.maintenances.overdue', value: helpers.number_with_delimiter(@km_until.abs, delimiter: '.'))
         end
       end
+      estimated_cost_meta
+    end
+
+    def estimated_cost_meta
+      return if @maintenance.estimated_cost.blank?
+
+      span(class: 'text-slate-400') { " #{t('vehicle.maintenances.estimated_cost', amount: format_currency(@maintenance.estimated_cost))}" }
     end
 
     def edit_link

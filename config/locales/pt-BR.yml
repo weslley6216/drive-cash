@@ -342,7 +342,10 @@ pt-BR:
       km_value: "%{value} km"
       at_km: "aos %{value} km"
       overdue: "venceu há %{value} km"
+      estimated_cost: "· est. %{amount}"
+      estimated_cost_desktop: "· custo est. %{amount}"
       mark_done: "Marcar como feita"
+      mark_done_desktop: "Marcar feita"
       edit: "Editar"
       empty: "Nenhuma manutenção cadastrada"
       status:

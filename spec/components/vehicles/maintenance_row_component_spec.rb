@@ -67,5 +67,26 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
       expect(html).to include(Rails.application.routes.url_helpers.edit_maintenance_path(row.maintenance))
       expect(html).to include('data-turbo-frame="modal"')
     end
+
+    it 'appends the estimated cost to the meta line' do
+      vehicle = create(:vehicle, odometer_km: 160_000)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 158_000, interval_km: 5_000, estimated_cost: 280)
+      row = Vehicles::MaintenanceService.new(user: vehicle.user).call[:maintenances].first
+
+      html = view_context.render(described_class.new(row: row))
+
+      expect(Capybara.string(html)).to have_css('p span.text-slate-400', text: '· est. R$ 280,00')
+    end
+
+    it 'omits the estimated cost when the maintenance has none' do
+      vehicle = create(:vehicle, odometer_km: 160_000)
+      create(:maintenance, vehicle: vehicle, category: 'oil_change', last_done_km: 158_000, interval_km: 5_000, estimated_cost: nil)
+      row = Vehicles::MaintenanceService.new(user: vehicle.user).call[:maintenances].first
+
+      html = view_context.render(described_class.new(row: row))
+
+      expect(html).to include('faltam')
+      expect(html).not_to include('est.')
+    end
   end
 end

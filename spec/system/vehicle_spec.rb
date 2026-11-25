@@ -101,6 +101,13 @@ RSpec.describe 'Vehicle', type: :system, js: true do
       expect(page).to fit_the_phone_width
     end
 
+    it 'shows the estimated cost in the maintenance meta on a phone' do
+      visit vehicle_path
+
+      expect(find_by_id(dom_id(@oil))).to have_text('· est. R$ 280,00')
+      expect(page).to fit_the_phone_width
+    end
+
     it 'heads the maintenances and the tank moves with a subtitle and inline links on a desktop screen' do
       emulate_desktop_screen
 
