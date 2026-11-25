@@ -4,8 +4,8 @@ class RefuelingsController < ApplicationController
   before_action :find_refueling, only: %i[edit update destroy]
 
   def index
-    cadence = Vehicles::TankCadence.new(user: current_user).call
-    render Refuelings::IndexView.new(moves: Refuelings::Moves.call(user: current_user), cadence: cadence)
+    render Refuelings::IndexView.new(cycles: Refuelings::TankCycles.call(moves: Refuelings::Moves.call(user: current_user)),
+                                     vehicle: current_user.vehicle, unread_count: current_user.unread_notifications_count)
   end
 
   def new

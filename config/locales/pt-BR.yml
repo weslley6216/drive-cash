@@ -379,12 +379,20 @@ pt-BR:
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
       page_title: "Movimentação do tanque"
-      page_subtitle: "Créditos e débitos desde o início"
-      empty: "Nenhum lançamento de combustível ainda."
-      cadence:
-        one: "Você abastece em média a cada %{count} dia"
-        other: "Você abastece em média a cada %{count} dias"
-        unknown: "Sem cadência calculada — registre mais um tanque cheio."
+      page_subtitle: "Abastecimentos e consumo por rota"
+      back: "Voltar"
+      desktop_subtitle: "%{subtitle} · %{vehicle}"
+      footnote: "Cada despesa de combustível debita o saldo do tanque aberto. Um novo tanque cheio fecha o anterior."
+      footnote_desktop: "Cada despesa de combustível debita o saldo do tanque aberto. Um novo tanque cheio fecha o anterior; o que sobrou ou faltou aparece no cabeçalho do tanque."
+      empty:
+        title: "Nenhuma movimentação ainda"
+        description: "Registre um abastecimento com tanque cheio. A partir dele, cada despesa de combustível debita o saldo."
+        cta: "Abastecer"
+      table:
+        date: "Data"
+        move: "Movimento"
+        amount: "Valor"
+        balance_after: "Saldo após"
     empty:
       title: "Nenhum veículo cadastrado"
       body: "Cadastre seu carro pra acompanhar km, manutenções e o saldo do tanque."
