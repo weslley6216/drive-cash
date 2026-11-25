@@ -1,8 +1,8 @@
 module WeeklySummaries
   class DailyBarsComponent < ApplicationComponent
-    def initialize(week:, daily_profits:, best_day_index:, empty_days: [], blank_week: false)
+    def initialize(week:, days:, best_day_index:, empty_days: [], blank_week: false)
       @week = week
-      @daily_profits = daily_profits
+      @days = days
       @best_day_index = best_day_index
       @empty_days = empty_days
       @blank_week = blank_week
@@ -25,7 +25,7 @@ module WeeklySummaries
     end
 
     def bar(date, index)
-      value = @daily_profits[index]
+      value = @days[index].profit
       best = index == @best_day_index
 
       div(class: 'flex-1 h-full flex flex-col items-center gap-1.5', data: { weekday: index }) do
@@ -51,7 +51,7 @@ module WeeklySummaries
     end
 
     def best_value
-      @daily_profits[@best_day_index]
+      @days[@best_day_index].profit
     end
 
     def day_sentence
@@ -91,7 +91,7 @@ module WeeklySummaries
     end
 
     def dates
-      @dates ||= @week.range.to_a
+      @dates ||= @days.map(&:date)
     end
   end
 end

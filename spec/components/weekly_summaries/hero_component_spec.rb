@@ -10,7 +10,7 @@ RSpec.describe WeeklySummaries::HeroComponent, type: :component do
       trips:          32,
       days_worked:    5,
       per_km:         1.31,
-      daily_profits:  [300, 0, -150, 0, 600, 0, 0],
+      days:           [],
       best_day_index: 4,
       goal:           nil,
       top_categories: [],

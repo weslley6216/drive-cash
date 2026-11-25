@@ -54,7 +54,7 @@ module WeeklySummaries
           render GoalComponent.new(progress: @summary.goal) if @summary.goal
         end
         div(class: 'col-span-12 lg:col-span-7 flex flex-col gap-4 lg:gap-5') do
-          render DailyBarsComponent.new(week: @summary.week, daily_profits: @summary.daily_profits,
+          render DailyBarsComponent.new(week: @summary.week, days: @summary.days,
                                         best_day_index: @summary.best_day_index, empty_days: @summary.empty_days,
                                         blank_week: @summary.blank_week)
           render TopCategoriesComponent.new(categories: @summary.top_categories, total: @summary.expenses_total)
