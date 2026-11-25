@@ -28,6 +28,29 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'ignores a tap on the mic while the previous message is still waiting for a reply' do
+    release_answer = Queue.new
+    allow(parser).to receive(:call) do
+      release_answer.pop(timeout: 10)
+      { type: :text, content: 'Anotado, chefe!' }
+    end
+    visit chat_root_path
+    fill_in 'message', with: 'abasteci 50'
+    find('button[type="submit"]').click
+    expect(page).to have_css('#chat_typing')
+
+    find('button[aria-label="Falar"]').click
+
+    expect(page).to have_no_css('[role="dialog"]')
+
+    release_answer << true
+
+    expect(page).to have_text('Anotado, chefe!')
+    find('button[aria-label="Falar"]').click
+
+    expect(page).to have_css('[role="dialog"]', visible: true)
+  end
+
   it 'shows the partial transcript live and sends the final one with a microphone bubble on a phone' do
     visit chat_root_path
     find('button[aria-label="Falar"]').click

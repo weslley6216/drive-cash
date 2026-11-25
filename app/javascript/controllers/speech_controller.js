@@ -44,7 +44,7 @@ export default class extends Controller {
   }
 
   open() {
-    if (!this.recognition) return
+    if (!this.recognition || this.inputTarget.readOnly) return
 
     this.state = "listening"
     this.sawError = false
