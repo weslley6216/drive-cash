@@ -30,4 +30,17 @@ RSpec.describe 'Confirm password screen', type: :system, js: true do
     expect(box(card)['top'].round).to eq(151)
     expect(box(card)['width'].round).to eq(384)
   end
+
+  it 'heads the desktop screen with the security topbar ending in the bell without actions' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit new_reauthentication_path
+
+    topbar = find('header', text: I18n.t('reauthentications.new_view.header'))
+
+    expect(topbar).to have_text(I18n.t('reauthentications.new_view.topbar_subtitle'))
+    expect(topbar.find(:link, 'Notificações, 1 não lida')).to have_css('span.bg-red-500', text: '1')
+    expect(topbar).to have_no_css('span.w-px')
+  end
 end
