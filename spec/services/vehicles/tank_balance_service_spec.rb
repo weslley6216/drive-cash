@@ -120,6 +120,27 @@ RSpec.describe Vehicles::TankBalanceService do
     expect(result).to eq(described_class::EMPTY)
   end
 
+  it 'flags the tank inactive when the vehicle has no refuelings' do
+    user = create(:user)
+    create(:vehicle, user: user)
+
+    result = described_class.new(user: user).call
+
+    expect(result[:active]).to be(false)
+  end
+
+  it 'flags the tank active once the vehicle has a refueling, even with a negative balance' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, total_amount: 260, date: Date.new(2026, 6, 7))
+    create(:expense, user: user, category: 'fuel', amount: 300, date: Date.new(2026, 6, 9))
+
+    result = described_class.new(user: user).call
+
+    expect(result[:active]).to be(true)
+    expect(result[:balance]).to eq(-40)
+  end
+
   it 'flags whether each credit filled the tank' do
     user = create(:user)
     vehicle = create(:vehicle, user: user)

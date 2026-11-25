@@ -1,7 +1,8 @@
 module Records
   class ExpenseFieldsComponent < ApplicationComponent
-    def initialize(expense:)
+    def initialize(expense:, tank_balance: nil)
       @expense = expense
+      @tank_balance = tank_balance
     end
 
     def view_template
@@ -11,6 +12,7 @@ module Records
         description_card
       end
       div(class: 'mt-3 space-y-3') do
+        render Records::TankDebitCardComponent.new(balance: @tank_balance, expense: @expense) if @tank_balance
         paid_toggle
         yield if block_given?
       end

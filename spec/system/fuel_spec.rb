@@ -73,4 +73,26 @@ RSpec.describe 'Fuel', type: :system, js: true do
     expect(page).to have_text(I18n.t('records.new_view.vendor_inherited'))
     expect(page).to fit_the_phone_width
   end
+
+  it 'shows the tank balance before and after the typed amount on a phone' do
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', total_amount: 260, full_tank: true, date: Date.current - 1)
+
+    visit new_record_path(type: 'expense')
+    find('label', text: I18n.t('activerecord.attributes.expense.categories.fuel')).click
+    find('[data-record-form-target="amountDisplay"]').set('8000')
+
+    expect(page).to have_text(I18n.t('records.new_view.tank_debit.title'))
+    expect(page).to have_text('Saldo R$ 260,00 → R$ 180,00', normalize_ws: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'hides the tank debit card for a non-fuel category on a phone' do
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', total_amount: 260, full_tank: true, date: Date.current - 1)
+
+    visit new_record_path(type: 'expense')
+    find('label', text: I18n.t('activerecord.attributes.expense.categories.maintenance')).click
+
+    expect(page).to have_no_text(I18n.t('records.new_view.tank_debit.title'))
+    expect(page).to fit_the_phone_width
+  end
 end

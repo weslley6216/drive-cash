@@ -38,9 +38,17 @@ class Expense < ApplicationRecord
     relation = paid_only.for_year(year)
     month ? relation.for_month(month) : relation
   }
+  scope :tank_debits_since, ->(anchor) { category_fuel.where.missing(:refueling).where(date: anchor..) }
 
   def installment?
     installment_series_id.present?
+  end
+
+  def tank_debit?
+    anchor = user.vehicle&.tank_anchor_date
+    return false if anchor.nil?
+
+    user.expenses.tank_debits_since(anchor).exists?(id)
   end
 
   private

@@ -5,12 +5,13 @@ module Records
     INSTALLMENT_INPUT = 'w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all border-slate-300 ' \
                         'text-slate-900 focus:ring-red-500 focus:border-red-500 bg-white'.freeze
 
-    def initialize(type:, earning: nil, expense: nil, context: nil, active_vendor: nil)
+    def initialize(type:, tank:, earning: nil, expense: nil, context: nil, active_vendor: nil)
       @type = type.to_s
       @earning = earning || Earning.new(date: Date.current)
       @expense = expense || Expense.new(date: Date.current)
       @context = context || {}
       @active_vendor = active_vendor.to_s
+      @tank = tank
     end
 
     def view_template
@@ -18,7 +19,8 @@ module Records
         div(class: 'h-full flex flex-col bg-white safe-top sm:pt-0 max-w-[640px] mx-auto w-full lg:max-w-none lg:bg-black/30 lg:items-center lg:justify-center lg:p-8') do
           div(class: 'group/record h-full flex flex-col w-full min-h-0 lg:h-auto lg:max-h-full lg:max-w-2xl lg:bg-white lg:rounded-2xl ' \
                      'lg:shadow-2xl lg:border lg:border-slate-200 lg:overflow-hidden',
-              data:  record_form_data(type: @type, selected_category: @expense.category.to_s, active_vendor: @active_vendor)) do
+              data:  record_form_data(type: @type, selected_category: @expense.category.to_s, active_vendor: @active_vendor,
+                                      tank_balance: tank_balance)) do
             form_with(url: records_path, method: :post, scope: :record, html: { class: 'h-full flex flex-col min-h-0' }) do
               input(type: 'hidden', name: 'context[year]', value: @context[:year])
               input(type: 'hidden', name: 'context[month]', value: @context[:month])
@@ -100,9 +102,11 @@ module Records
 
     def expense_block
       div(class: (expense? ? '' : 'hidden'), data: { record_form_target: 'expenseFields' }) do
-        render Records::ExpenseFieldsComponent.new(expense: @expense) { installment_section }
+        render Records::ExpenseFieldsComponent.new(expense: @expense, tank_balance: tank_balance) { installment_section }
       end
     end
+
+    def tank_balance = (@tank[:balance] if @tank[:active])
 
     def installment_section
       div(

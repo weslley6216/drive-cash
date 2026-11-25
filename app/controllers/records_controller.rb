@@ -1,4 +1,6 @@
 class RecordsController < ApplicationController
+  include RecordCreateNotice
+
   def new
     render new_view(type: params[:type].presence || 'earning', date: Records::RequestedDate.call(params[:date]))
   end
@@ -9,7 +11,7 @@ class RecordsController < ApplicationController
 
     result = send(builder[:create], :record)
     if result.success?
-      redirect_to root_path, notice: t('records.create.success')
+      redirect_to root_path, notice: send(builder[:notice], result)
     else
       render new_view(type: params[:type], builder[:record_key] => result.public_send(builder[:record_key])),
              status: :unprocessable_content
@@ -24,7 +26,8 @@ class RecordsController < ApplicationController
       earning:       earning || Earning.new(date: date),
       expense:       expense || Expense.new(date: date),
       context:       params[:context],
-      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s
+      active_vendor: Vehicles::ActiveTankVendor.new(user: current_user).call.to_s,
+      tank:          Vehicles::TankBalanceService.new(user: current_user).call
     )
   end
 end
