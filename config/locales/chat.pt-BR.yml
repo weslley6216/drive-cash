@@ -91,6 +91,10 @@ pt-BR:
       empty_ex2: "\"Abasteci R$80 de gasolina\""
       placeholder: "Pergunte ou registre…"
       btn_speak: "Falar"
+      chips:
+        monthly_profit: "Lucro do mês"
+        fuel_spending: "Gastei com combustível?"
+        best_day: "Melhor dia"
     voice:
       dialog_label: "Caju ouvindo"
       listening: "Ouvindo"

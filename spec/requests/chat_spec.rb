@@ -24,6 +24,14 @@ RSpec.describe 'Chats', type: :request do
         expect(response.body).to include('Como posso ajudar?')
         expect(response.body).to include('Pergunte ou registre…')
       end
+
+      it 'offers the ready-made questions above the message box' do
+        get chat_root_path
+
+        expect(response.body).to include('data-chat-question-param="Lucro do mês"')
+        expect(response.body).to include('data-chat-question-param="Gastei com combustível?"')
+        expect(response.body).to include('data-chat-question-param="Melhor dia"')
+      end
     end
 
     context 'when a message was spoken' do

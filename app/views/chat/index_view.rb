@@ -4,6 +4,7 @@ module Chat
     include Chat::BubbleMixin
 
     SCREEN = 'flex-1 flex flex-col min-h-0 px-5 safe-top pb-4 sm:p-6 lg:max-w-2xl lg:mx-auto lg:w-full'.freeze
+    CHIPS = %i[monthly_profit fuel_spending best_day].freeze
 
     def initialize(messages: [])
       @messages = messages
@@ -110,9 +111,28 @@ module Chat
       end
     end
 
+    def question_chips
+      div(class: 'flex gap-2 overflow-x-auto pb-2.5 -mx-1 px-1 lg:hidden') do
+        CHIPS.each do |chip|
+          question = t("chat.index.chips.#{chip}")
+          button(
+            type:  'button',
+            class: 'flex-shrink-0 inline-flex items-center min-h-11 cursor-pointer',
+            data:  { action: 'click->chat#ask', chat_question_param: question }
+          ) do
+            span(class: 'inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700') do
+              render PhlexIcons::Lucide::Sparkles.new(class: 'w-3 h-3')
+              plain question
+            end
+          end
+        end
+      end
+    end
+
     def input_section
       div(class: 'flex-shrink-0 pt-4 border-t border-slate-200 relative') do
         render Chat::VoiceNoticeComponent.new
+        question_chips
 
         form_with(
           url:  chat_message_path,

@@ -185,4 +185,33 @@ RSpec.describe 'Chat', type: :system, js: true do
     stats = find('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui · R$ 320')
     expect(box(stats)['right']).to be <= box(find('[data-controller="chat speech"]'))['right']
   end
+
+  it 'sends a ready-made question when its chip is tapped on a phone' do
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new) do |messages:, **|
+      received_messages << messages.last[:content]
+      parser
+    end
+    allow(parser).to receive(:call).and_return(summary_answer)
+    visit chat_root_path
+
+    chip = find('button', text: 'Lucro do mês')
+    expect(box(chip)['height']).to be >= 44
+    chip.click
+
+    expect(received_messages.pop(timeout: 5)).to eq('Lucro do mês')
+    expect(page).to have_css('#chat_messages .bg-blue-600', text: 'Lucro do mês')
+    expect(page).to have_css('#chat_messages .rounded-xl.bg-slate-50', text: 'Qui · R$ 320')
+    expect(page).to have_button('Gastei com combustível?')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'hides the ready-made chips on a desktop screen' do
+    emulate_desktop_screen
+
+    visit chat_root_path
+
+    expect(page).to have_css('textarea[name="message"]')
+    expect(page).to have_no_button('Lucro do mês')
+  end
 end
