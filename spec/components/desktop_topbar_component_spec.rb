@@ -18,6 +18,20 @@ RSpec.describe DesktopTopbarComponent, type: :component do
                             '<p class="text-sm text-slate-500 mt-0.5">Maio de 2026</p></div>')
   end
 
+  it 'puts the back link to the parent screen above the title' do
+    html = view_context.render(described_class.new(title: 'Movimentação do tanque', subtitle: 'Abastecimentos',
+                                                   unread_count: 0, back: { label: 'Meu veículo', path: '/vehicle' }))
+
+    title_block = Nokogiri::HTML5.fragment(html).at_css('header > div.min-w-0')
+    back = title_block.element_children.first
+
+    expect(title_block.element_children.map(&:name)).to eq(%w[a h1 p])
+    expect(back['href']).to eq('/vehicle')
+    expect(back['class']).to eq('flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-1')
+    expect(back.text).to eq('Meu veículo')
+    expect(back.at_css('svg')['class']).to eq('w-3.5 h-3.5')
+  end
+
   it 'lines the actions up on the right with the bell as the last item' do
     actions = Nokogiri::HTML5.fragment(html).at_css('header > div:last-child')
 
