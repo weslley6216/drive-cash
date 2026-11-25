@@ -36,6 +36,7 @@ module Analysis
       phone_topbar
       render DesktopTopbarComponent.new(title: t('.title'), subtitle: subtitle, unread_count: @unread_count) do |topbar|
         topbar.with_actions do
+          week_link
           period_filter
           export_link
         end
@@ -56,6 +57,7 @@ module Analysis
 
     def content_sections
       div(class: 'space-y-4 lg:space-y-6') do
+        render Analysis::WeekEntryComponent.new(week: current_week, href: current_week_path)
         if empty?
           empty_state
         else
@@ -65,6 +67,14 @@ module Analysis
           insights_section
         end
       end
+    end
+
+    def current_week
+      @current_week ||= Calendars::Week.containing(Date.current)
+    end
+
+    def current_week_path
+      @current_week_path ||= helpers.weekly_summary_path(current_week, return_to: helpers.request.fullpath)
     end
 
     def empty?
@@ -140,6 +150,14 @@ module Analysis
         variant:        :popover,
         action_path:    helpers.analysis_path
       )
+    end
+
+    def week_link
+      a(href: current_week_path, data: { turbo_frame: '_top' }, class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-2 ' \
+                                                                        'text-sm font-medium text-slate-700 hover:bg-slate-50') do
+        render PhlexIcons::Lucide::ChartColumn.new(class: 'w-[15px] h-[15px] text-slate-500')
+        plain t('.week_entry.title')
+      end
     end
 
     def export_link

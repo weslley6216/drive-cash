@@ -24,23 +24,19 @@ module WeeklySummaries
 
     def mobile_header
       div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
-        link_to(helpers.notifications_path,
-                class: 'p-1 -ml-1 mt-0.5 text-slate-500',
-                aria:  { label: t('weekly_summaries.show.back') }) do
-          render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
-        end
+        render BackLinkComponent.new(fallback: helpers.notifications_path, label: t('weekly_summaries.show.back'))
         div do
           h1(class: 'text-2xl font-bold text-slate-800') { t('weekly_summaries.show.title') }
           p(class: 'text-sm text-slate-500') { week_range_text(@summary.week) }
         end
-        div(class: 'ml-auto') { render WeekNavComponent.new(week: @summary.week) }
+        div(class: 'ml-auto') { render WeekNavComponent.new(week: @summary.week, return_to: helpers.params[:return_to]) }
       end
     end
 
     def desktop_header
       render DesktopTopbarComponent.new(title: t('weekly_summaries.show.title'), subtitle: week_range_text(@summary.week, with_year: true), unread_count: @unread_count) do |topbar|
         topbar.with_actions do
-          render WeekNavComponent.new(week: @summary.week, size: 'w-10 h-10')
+          render WeekNavComponent.new(week: @summary.week, return_to: helpers.params[:return_to], size: 'w-10 h-10')
           cta_link('bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold ' \
                    'flex items-center gap-2')
         end

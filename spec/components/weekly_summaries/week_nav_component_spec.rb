@@ -10,6 +10,15 @@ RSpec.describe WeeklySummaries::WeekNavComponent, type: :component do
     expect(html).to have_css("a[aria-label='Próxima semana'][href='/weekly_summaries/2026-07-13']")
   end
 
+  it 'carries the return path to both neighbour weeks' do
+    week = Calendars::Week.containing(Date.new(2026, 7, 6))
+
+    html = Capybara.string(view_context.render(described_class.new(week: week, return_to: '/analysis?month=7&year=2026')))
+
+    expect(html).to have_css("a[aria-label='Semana anterior'][href='/weekly_summaries/2026-06-29?return_to=%2Fanalysis%3Fmonth%3D7%26year%3D2026']")
+    expect(html).to have_css("a[aria-label='Próxima semana'][href='/weekly_summaries/2026-07-13?return_to=%2Fanalysis%3Fmonth%3D7%26year%3D2026']")
+  end
+
   it 'disables the next week on the current week' do
     html = Capybara.string(view_context.render(described_class.new(week: Calendars::Week.containing(Date.new(2026, 7, 14)))))
 
