@@ -64,7 +64,7 @@ module Chat
         span(class: 'text-slate-400 font-normal text-base', data: { speech_target: 'hint' }) { t('chat.voice.hint') }
         span(data: { speech_target: 'transcript' })
         span(
-          class: 'hidden inline-block w-[2px] h-[1em] bg-violet-600 ml-0.5 align-[-2px] animate-pulse motion-reduce:animate-none',
+          class: 'hidden w-[2px] h-[1em] bg-violet-600 ml-0.5 align-[-2px] animate-pulse motion-reduce:animate-none',
           data:  { speech_target: 'caret' }
         )
       end

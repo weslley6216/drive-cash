@@ -25,6 +25,7 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
     expect(page).to have_text('Fale agora, ex.: “abasteci 80 no Orense”')
     expect(page).to have_css('[data-speech-target="timer"]', text: '0:00')
     expect(page).to have_css('[data-speech-target="wave"] span', count: 40)
+    expect(page).to have_no_css('[data-speech-target="caret"]', visible: true)
     expect(page).to fit_the_phone_width
   end
 

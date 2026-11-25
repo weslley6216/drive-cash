@@ -69,7 +69,7 @@ export default class extends Controller {
 
     this.transcriptTarget.textContent = text
     this.hintTarget.classList.add("hidden")
-    this.caretTarget.classList.remove("hidden")
+    this.setCaretVisible(true)
     this.wave.voice(true)
 
     if (isFinal) this.understand(text)
@@ -125,7 +125,7 @@ export default class extends Controller {
     this.phaseLabelTarget.textContent = this.phaseLabelTarget.dataset.understoodLabel
     this.sendIconTarget.classList.add("hidden")
     this.checkIconTarget.classList.remove("hidden")
-    this.caretTarget.classList.add("hidden")
+    this.setCaretVisible(false)
     this.inputTarget.value = text
     this.voiceTarget.value = "1"
 
@@ -177,7 +177,7 @@ export default class extends Controller {
   resetPanelUI() {
     this.transcriptTarget.textContent = ""
     this.hintTarget.classList.remove("hidden")
-    this.caretTarget.classList.add("hidden")
+    this.setCaretVisible(false)
     this.phaseDotTarget.classList.remove("bg-emerald-500")
     this.phaseDotTarget.classList.add("bg-violet-500", "animate-pulse")
     this.phaseLabelTarget.classList.remove("text-emerald-600")
@@ -208,5 +208,10 @@ export default class extends Controller {
     try {
       this.recognition.abort()
     } catch (_) {}
+  }
+
+  setCaretVisible(visible) {
+    this.caretTarget.classList.toggle("hidden", !visible)
+    this.caretTarget.classList.toggle("inline-block", visible)
   }
 }
