@@ -277,6 +277,51 @@ RSpec.describe 'Records', type: :request do
 
         expect(response).to redirect_to(root_path)
       end
+
+      it 'keeps the generic notice for a fuel expense without a vehicle' do
+        post records_path, params: valid_params
+
+        expect(flash[:notice]).to eq(I18n.t('records.create.success'))
+      end
+    end
+
+    context 'when a fuel expense debits the active tank' do
+      let(:vehicle) { create(:vehicle, user: current_user) }
+      let(:fuel_record) { { date: '2026-05-22', amount: '80.00', category: 'fuel', vendor: 'Posto Orense', paid: '1' } }
+
+      before { create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 20)) }
+
+      it 'tells the expense was debited from the tank' do
+        post records_path, params: { type: 'expense', record: fuel_record }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:notice]).to eq(I18n.t('records.create.fuel_debited'))
+      end
+
+      it 'tells the debit for a fuel expense split in installments' do
+        post records_path, params: { type: 'expense', record: fuel_record,
+                                     installment: { repeat: '1', period: 'monthly', repetitions: '3' } }
+
+        expect(flash[:notice]).to eq(I18n.t('records.create.fuel_debited'))
+      end
+
+      it 'keeps the generic notice for a fuel expense dated before the first refueling' do
+        post records_path, params: { type: 'expense', record: fuel_record.merge(date: '2026-05-19') }
+
+        expect(flash[:notice]).to eq(I18n.t('records.create.success'))
+      end
+
+      it 'keeps the generic notice when the fuel expense produces a refueling' do
+        post records_path, params: { type: 'expense', record: fuel_record, refueling: { liters: '30', odometer_km: '50000' } }
+
+        expect(flash[:notice]).to eq(I18n.t('records.create.success'))
+      end
+
+      it 'keeps the generic notice for an expense of another category' do
+        post records_path, params: { type: 'expense', record: fuel_record.merge(category: 'maintenance') }
+
+        expect(flash[:notice]).to eq(I18n.t('records.create.success'))
+      end
     end
 
     context 'when type is expense and invalid' do

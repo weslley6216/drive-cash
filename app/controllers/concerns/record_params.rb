@@ -7,8 +7,8 @@ module RecordParams
   REFUELING_ATTRIBUTES = %i[liters odometer_km full_tank].freeze
 
   RECORD_BUILDERS = {
-    'earning' => { create: :create_earning_via_creator, record_key: :earning },
-    'expense' => { create: :create_expense_via_creator, record_key: :expense }
+    'earning' => { create: :create_earning_via_creator, record_key: :earning, notice: :default_create_notice },
+    'expense' => { create: :create_expense_via_creator, record_key: :expense, notice: :expense_create_notice }
   }.freeze
 
   private

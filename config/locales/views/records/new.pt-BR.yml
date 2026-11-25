@@ -47,3 +47,4 @@ pt-BR:
       save_expense: "Salvar despesa"
     create:
       success: "Lançamento registrado com sucesso!"
+      fuel_debited: "Despesa salva · debitada do tanque"
