@@ -13,13 +13,14 @@ module Refuelings
 
     def call
       refueling = @vehicle.refuelings.new(@params)
+      previous_km = @vehicle.odometer_km
 
       Refueling.transaction do
         if refueling.save
           sync_odometer(refueling)
-          Result.new(success?: true, refueling: refueling)
+          Result.new(success?: true, refueling: refueling, odometer_advanced: odometer_advanced?(refueling, previous_km))
         else
-          Result.new(success?: false, refueling: refueling)
+          Result.new(success?: false, refueling: refueling, odometer_advanced: false)
         end
       end
     end

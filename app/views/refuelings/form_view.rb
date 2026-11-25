@@ -1,5 +1,8 @@
 module Refuelings
   class FormView < ApplicationView
+    VENDOR_CHIP_CLASSES = 'inline-flex items-center gap-1.5 rounded-full px-3.5 py-3 text-sm font-medium border ' \
+                          'border-slate-200 bg-white text-slate-700 hover:border-slate-300 transition cursor-pointer'.freeze
+
     def initialize(refueling:)
       @refueling = refueling
       @theme = :red
@@ -40,13 +43,40 @@ module Refuelings
     def render_form
       form_with(model: @refueling, url: form_url, method: form_method, class: 'p-6 space-y-4') do |form|
         date_field(form, :date, label: t('refuelings.form.labels.date'), theme: @theme)
-        text_field(form, :vendor, label: t('refuelings.form.labels.vendor'), theme: @theme, placeholder: t('refuelings.form.placeholders.vendor'))
+        vendor_field_with_chips(form)
         money_field(form, :liters, label: t('refuelings.form.labels.liters'), theme: @theme, required: true)
         money_field(form, :total_amount, label: t('refuelings.form.labels.total_amount'), theme: @theme, required: true)
         odometer_field_with_preview(form)
         toggle_field(form, :full_tank, label: t('refuelings.form.labels.full_tank'), theme: @theme)
         render_actions
       end
+    end
+
+    def vendor_field_with_chips(form)
+      field_wrapper(t('refuelings.form.labels.vendor'), theme: @theme) do
+        div(data: { controller: 'vendor-chips' }) do
+          render form.text_field(:vendor, class:       input_classes(theme: @theme),
+                                          placeholder: t('refuelings.form.placeholders.vendor'),
+                                          data:        { vendor_chips_target: 'input' })
+          vendor_chips_row if recent_vendors.any?
+        end
+      end
+    end
+
+    def vendor_chips_row
+      div(class: 'mt-2.5 flex flex-wrap gap-2') do
+        recent_vendors.each do |vendor|
+          button(type: 'button', class: VENDOR_CHIP_CLASSES,
+                 data: { action: 'click->vendor-chips#select', vendor_chips_vendor_param: vendor }) do
+            render PhlexIcons::Lucide::Fuel.new(class: 'w-3.5 h-3.5 text-slate-400')
+            plain vendor
+          end
+        end
+      end
+    end
+
+    def recent_vendors
+      @recent_vendors ||= Refuelings::RecentVendors.call(vehicle: @refueling.vehicle)
     end
 
     def odometer_field_with_preview(form)

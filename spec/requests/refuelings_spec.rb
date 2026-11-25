@@ -72,6 +72,20 @@ RSpec.describe 'Refuelings', type: :request do
       expect(response.body).to include('value="Posto Orense"')
       expect(response.body).to include('value="160928"')
     end
+
+    it 'shows vendor chips for the recent vendors used on this vehicle' do
+      create(:refueling, vehicle: vehicle, vendor: 'Geladão', date: Date.current)
+
+      get new_refueling_path
+
+      expect(response.body).to include('data-vendor-chips-vendor-param="Geladão"')
+    end
+
+    it 'does not show vendor chips when the vehicle has no refuelings yet' do
+      get new_refueling_path
+
+      expect(response.body).not_to include('data-vendor-chips-vendor-param')
+    end
   end
 
   describe 'POST /refuelings' do
@@ -106,6 +120,22 @@ RSpec.describe 'Refuelings', type: :request do
       post refuelings_path, params: valid_params, as: :turbo_stream
 
       expect(vehicle.reload.odometer_km).to eq(48_230)
+    end
+
+    it 'flashes the odometer-synced notice when the reading advances the odometer' do
+      vehicle.update!(odometer_km: 48_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+
+      post refuelings_path, params: valid_params
+
+      expect(flash[:notice]).to eq(I18n.t('refuelings.flash.odometer_synced', km: '48.230'))
+    end
+
+    it 'flashes the generic notice when the reading does not advance the odometer' do
+      vehicle.update!(odometer_km: 50_000, odometer_updated_at: Time.zone.local(2026, 6, 1))
+
+      post refuelings_path, params: valid_params
+
+      expect(flash[:notice]).to eq(I18n.t('refuelings.flash.created'))
     end
 
     it 'does not recede vehicle odometer when create has a lower km' do

@@ -17,13 +17,23 @@ RSpec.describe Refuelings::Creator do
     end
 
     it 'advances the vehicle odometer within the same transaction' do
-      described_class.call(
+      result = described_class.call(
         vehicle: vehicle,
         params:  { date: Date.new(2026, 6, 22), total_amount: '180', odometer_km: '48230' }
       )
 
       expect(vehicle.reload.odometer_km).to eq(48_230)
       expect(vehicle.odometer_updated_at.to_date).to eq(Date.new(2026, 6, 22))
+      expect(result.odometer_advanced).to be(true)
+    end
+
+    it 'flags the odometer as not advanced when the reading is below the current one' do
+      result = described_class.call(
+        vehicle: vehicle,
+        params:  { date: Date.new(2026, 6, 22), total_amount: '180', odometer_km: '47000' }
+      )
+
+      expect(result.odometer_advanced).to be(false)
     end
 
     it 'returns failure and persists nothing when the refueling is invalid' do
