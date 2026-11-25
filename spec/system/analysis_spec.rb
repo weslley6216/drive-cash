@@ -28,6 +28,22 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'opens the current week from the first card of the analysis filtered on another month on a phone' do
+    visit analysis_path(year: 2026, month: 3)
+
+    entry = find_link(I18n.t('analysis.show_view.week_entry.title'))
+    hero = find('span', text: I18n.t('analysis.show_view.metrics.per_km_hero'), exact_text: true)
+
+    expect(entry).to have_text('Esta semana · 18 a 24 de maio')
+    expect(box(entry)['bottom']).to be <= box(hero)['top']
+    expect(page).to fit_the_phone_width
+
+    entry.click
+
+    expect(page).to have_current_path(weekly_summary_path('2026-05-18', return_to: analysis_path(year: 2026, month: 3)))
+    expect(page).to have_css('h1', text: I18n.t('weekly_summaries.show.title'))
+  end
+
   it 'labels every day of a 31-day month without the numbers touching on a phone' do
     (1..31).each { |day| create(:earning, user: current_user, amount: 100 + day, date: Date.new(2026, 5, day)) }
 
@@ -137,15 +153,21 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(platforms.evaluate_script('this.getBoundingClientRect().height')).to eq(categories.evaluate_script('this.getBoundingClientRect().height'))
   end
 
-  it 'ends the topbar with the bell after the period pill, the export shortcut and a divider on a desktop screen' do
+  it 'ends the topbar with the bell after the week shortcut, the period pill, the export shortcut and a divider on a desktop screen' do
     emulate_desktop_screen
 
     visit analysis_path(year: 2026, month: 5)
 
     topbar = find('header', text: I18n.t('analysis.show_view.title'))
+    week = topbar.find_link(I18n.t('analysis.show_view.week_entry.title'))
+    period = topbar.find_button('Maio 2026')
     bell = topbar.find('a[aria-label="Notificações"]')
 
-    expect(topbar).to have_button('Maio 2026')
+    expect(topbar).to have_link(I18n.t('analysis.show_view.week_entry.title'),
+                                href: weekly_summary_path('2026-05-18', return_to: analysis_path(year: 2026, month: 5)))
+    expect(week['data-turbo-frame']).to eq('_top')
+    expect(box(week)['right']).to be <= box(period)['left']
+    expect(page).to have_link(I18n.t('analysis.show_view.week_entry.title'), count: 1)
     expect(topbar).to have_link(I18n.t('analysis.show_view.export'), href: exports_path)
     expect(bell).to have_no_css('span')
     expect(bell.evaluate_script('this === this.parentElement.lastElementChild')).to be(true)
@@ -224,6 +246,15 @@ RSpec.describe 'Analysis', type: :system, js: true do
     expect(page).to have_text(I18n.t('empty_states.analysis.title', period: 'junho'))
     expect(page).to have_link(I18n.t('empty_states.analysis.cta'))
     expect(page).to have_link('Ver maio, o último mês com dados →', href: analysis_path(year: 2026, month: 5))
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the week card on a month without records on a phone' do
+    visit analysis_path(year: 2026, month: 6)
+
+    expect(page).to have_text(I18n.t('analysis.show_view.empty_chart_title'))
+    expect(page).to have_link(I18n.t('analysis.show_view.week_entry.title'),
+                              href: weekly_summary_path('2026-05-18', return_to: analysis_path(year: 2026, month: 6)))
     expect(page).to fit_the_phone_width
   end
 
