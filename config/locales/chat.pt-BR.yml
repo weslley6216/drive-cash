@@ -72,8 +72,18 @@ pt-BR:
       empty_title: "Como posso ajudar?"
       empty_ex1: "\"Fiz uma corrida de R$45 no Uber hoje\""
       empty_ex2: "\"Abasteci R$80 de gasolina\""
-      placeholder: "Digite sua mensagem..."
+      placeholder: "Pergunte ou registre…"
       btn_speak: "Falar"
+    voice:
+      dialog_label: "Caju ouvindo"
+      listening: "Ouvindo"
+      understood: "Entendi"
+      hint: "Fale agora, ex.: “abasteci 80 no Orense”"
+      discard: "Descartar"
+      send: "Enviar"
+      notice:
+        silence: "Não ouvi nada. Toque no microfone e fale de novo."
+        denied: "Microfone bloqueado. Libere nas configurações do navegador."
     preview:
       earning: "Receita de %{amount} via %{platform} em %{date}"
       expense: "Despesa de %{amount} (%{category}%{vendor}) em %{date}"

@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 const SUPPRESSED_PROGRESS_BAR_DELAY = 2_000_000_000
 
 export default class extends Controller {
-  static targets = ["input", "submit", "messages", "userTemplate", "typingTemplate", "emptyState"]
+  static targets = ["input", "submit", "messages", "userTemplate", "typingTemplate", "emptyState", "voice"]
 
   connect() {
     this.originalProgressBarDelay = Turbo.config.drive.progressBarDelay
@@ -42,6 +42,7 @@ export default class extends Controller {
   clearSentMessage() {
     this.inputTarget.value = ""
     this.inputTarget.style.height = "auto"
+    this.voiceTarget.value = ""
   }
 
   cancelPreview(e) {
@@ -80,6 +81,10 @@ export default class extends Controller {
 
     const userNode = this.userTemplateTarget.content.cloneNode(true)
     userNode.querySelector("[data-message-content]").textContent = message
+    if (this.voiceTarget.value) {
+      userNode.querySelector("[data-message-voice]").classList.remove("hidden")
+      userNode.querySelector("[data-message-voice]").classList.add("inline-flex")
+    }
     this.messagesTarget.appendChild(userNode)
 
     const typingNode = this.typingTemplateTarget.content.cloneNode(true)
