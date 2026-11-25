@@ -14,14 +14,15 @@ module Refuelings
     end
 
     def call
-      return Result.new(success?: true, refueling: nil) unless eligible?
+      return Result.new(success?: true, refueling: nil, odometer_advanced: false) unless eligible?
 
       refueling = build_refueling
+      previous_km = @expense.user.vehicle.odometer_km
       if refueling.save
         sync_odometer(refueling)
-        Result.new(success?: true, refueling: refueling)
+        Result.new(success?: true, refueling: refueling, odometer_advanced: odometer_advanced?(refueling, previous_km))
       else
-        Result.new(success?: false, refueling: refueling)
+        Result.new(success?: false, refueling: refueling, odometer_advanced: false)
       end
     end
 

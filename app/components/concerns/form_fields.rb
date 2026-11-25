@@ -64,12 +64,6 @@ module FormFields
     end
   end
 
-  def text_field(form, attribute, label:, theme: :blue, **options)
-    field_wrapper(label, theme: theme) do
-      render form.text_field(attribute, class: input_classes(theme: theme), **options)
-    end
-  end
-
   def date_field(form, attribute, label:, theme: :blue, **options)
     field_wrapper(label, theme: theme) do
       value = form.object.public_send(attribute) || Time.current.to_date

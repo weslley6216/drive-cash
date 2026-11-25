@@ -305,10 +305,14 @@ pt-BR:
       stale: "Atualize · há %{count} dias"
       stale_unknown: "Atualize o km"
       delta_month: "+%{value} km este mês"
+      delta_month_desktop: "+%{value} km este mês · ~%{daily} km/dia"
     tank:
       title: "Saldo do tanque"
+      subtitle: "debitado automaticamente a cada rota"
       of_full: "de %{value} do último tanque"
+      of_full_desktop: "de %{value} do último tanque cheio"
       refuel: "Abastecer"
+      refuel_desktop: "Registrar abastecimento"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
       last_fill: "Último tanque cheio · %{date} · %{vendor}"
       status:
@@ -329,6 +333,7 @@ pt-BR:
     maintenances:
       title: "Próximas manutenções"
       by_km: "por km rodado"
+      by_km_desktop: "previsão por km rodado"
       add_from_catalog: "Adicionar do catálogo"
       hidden_ok:
         one: "· %{count} em dia oculto"
@@ -356,6 +361,7 @@ pt-BR:
     moves:
       title: "Movimentação do tanque"
       view_all: "Ver tudo →"
+      subtitle_desktop: "abastecimentos e consumo"
       full_tank: "Tanque cheio"
       partial_fill: "Abastecimento"
       balance:
@@ -379,6 +385,7 @@ pt-BR:
       today: "Hoje"
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
+      auto_debit_desktop: "Cada despesa de combustível debita o saldo automaticamente. Sem planilha."
       page_title: "Movimentação do tanque"
       page_subtitle: "Abastecimentos e consumo por rota"
       back: "Voltar"
@@ -402,6 +409,8 @@ pt-BR:
       cheapest:
         title: "%{vendor} é o mais econômico"
         body: "%{kml} km/L em média, contra %{other} do %{other_vendor}. Economia estimada: %{savings}/mês."
+        body_desktop: "%{kml} km/L em média, contra %{other} do %{other_vendor}. Mantendo o %{vendor}, a economia estimada é de %{savings}/mês."
+      see_analysis: "Ver análise →"
     registration:
       title: "Cadastrar veículo"
       submit: "Salvar"

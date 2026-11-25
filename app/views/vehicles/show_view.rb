@@ -78,10 +78,10 @@ module Vehicles
     def mobile_layout
       div(class: 'space-y-4') do
         render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], stale: odometer[:stale])
-        div(id: 'vehicle_tank_section') { highlightable_tank }
+        div(id: 'vehicle_tank_section') { highlightable_tank(variant: :mobile) }
         div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
         moves_section
-        insight_section
+        insight_section(variant: :mobile)
       end
     end
 
@@ -102,17 +102,17 @@ module Vehicles
       end
     end
 
-    def render_tank_card(variant: :mobile)
+    def render_tank_card(variant:)
       render Vehicles::TankBalanceCardComponent.new(balance: tank[:balance], full: tank[:full], last_fill: tank[:last_fill], variant: variant)
     end
 
-    def highlightable_tank
+    def highlightable_tank(variant:)
       div(data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
-        div(id: 'vehicle_tank', class: 'rounded-2xl') { render_tank_card }
+        div(id: 'vehicle_tank', class: 'rounded-2xl') { render_tank_card(variant: variant) }
       end
     end
 
-    def maintenances_section(limit: nil)
+    def maintenances_section(limit:)
       div do
         div(class: 'flex items-center justify-between mb-2 px-1') do
           h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.maintenances.title') }
@@ -122,7 +122,7 @@ module Vehicles
       end
     end
 
-    def maintenances_list(limit:)
+    def maintenances_list(limit:, catalog: true)
       shown = limit ? maintenances.first(limit) : maintenances
       div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
         if maintenances.empty?
@@ -130,7 +130,41 @@ module Vehicles
         else
           shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry) }
         end
-        catalog_button(hidden: maintenances.size - shown.size)
+        catalog_button(hidden: maintenances.size - shown.size) if catalog
+      end
+    end
+
+    def desktop_maintenances_section
+      div do
+        desktop_section_header(t('vehicle.maintenances.title'), t('vehicle.maintenances.by_km_desktop')) do
+          link_to(helpers.new_maintenance_path,
+                  class: 'text-sm font-medium text-blue-600 hover:underline flex items-center gap-1',
+                  data:  { turbo_frame: 'modal' }) do
+            render PhlexIcons::Lucide::CirclePlus.new(class: 'w-[15px] h-[15px]')
+            plain t('vehicle.maintenances.add_from_catalog')
+          end
+        end
+        maintenances_list(limit: nil, catalog: false)
+      end
+    end
+
+    def desktop_moves_section
+      div do
+        desktop_section_header(t('vehicle.moves.title'), t('vehicle.moves.subtitle_desktop')) do
+          link_to(t('vehicle.moves.view_all'), helpers.refuelings_path, class: 'text-sm font-medium text-blue-600 hover:underline')
+        end
+        moves_card
+        p(class: 'text-[11px] text-slate-400 mt-2') { t('vehicle.moves.auto_debit_desktop') }
+      end
+    end
+
+    def desktop_section_header(title, subtitle)
+      div(class: 'flex items-center justify-between mb-3') do
+        div do
+          h2(class: 'text-base font-semibold text-slate-800') { title }
+          p(class: 'text-xs text-slate-500') { subtitle }
+        end
+        yield
       end
     end
 
@@ -170,18 +204,18 @@ module Vehicles
       end
     end
 
-    def insight_section
+    def insight_section(variant:)
       insight = @payload[:insights].first
       return unless insight
 
-      render Vehicles::InsightCardComponent.new(insight: insight)
+      render Vehicles::InsightCardComponent.new(insight: insight, variant: variant)
     end
 
     def desktop_layout
       div(class: 'space-y-6') do
         desktop_row_one
         desktop_row_two
-        insight_section
+        insight_section(variant: :desktop)
       end
     end
 
@@ -218,14 +252,14 @@ module Vehicles
         div(class: 'col-span-12 lg:col-span-5') do
           render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], stale: odometer[:stale], variant: :desktop)
         end
-        div(class: 'col-span-12 lg:col-span-7') { highlightable_tank }
+        div(class: 'col-span-12 lg:col-span-7') { highlightable_tank(variant: :desktop) }
       end
     end
 
     def desktop_row_two
       div(class: 'grid grid-cols-12 gap-5') do
-        div(class: 'col-span-12 lg:col-span-7') { maintenances_section }
-        div(class: 'col-span-12 lg:col-span-5') { moves_section }
+        div(class: 'col-span-12 lg:col-span-7') { desktop_maintenances_section }
+        div(class: 'col-span-12 lg:col-span-5') { desktop_moves_section }
       end
     end
 

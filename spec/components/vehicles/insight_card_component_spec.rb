@@ -33,5 +33,18 @@ RSpec.describe Vehicles::InsightCardComponent, type: :component do
       expect(html).to include('bg-blue-50')
       expect(html).to include('border-blue-200')
     end
+
+    it 'sizes the zap icon at 18px on the mobile card' do
+      html = view_context.render(described_class.new(insight: insight))
+
+      expect(html).to include('w-[18px] h-[18px]')
+    end
+
+    it 'adds the analysis link and the fuller body copy on the desktop card' do
+      html = view_context.render(described_class.new(insight: insight, variant: :desktop))
+
+      expect(html).to include('Mantendo o Posto Orense, a economia estimada é de R$ 28/mês.')
+      expect(html).to include("href=\"/analysis\">#{I18n.t('vehicle.insight.see_analysis')}")
+    end
   end
 end

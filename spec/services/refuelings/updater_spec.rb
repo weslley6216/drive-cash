@@ -14,9 +14,16 @@ RSpec.describe Refuelings::Updater do
     end
 
     it 'advances the vehicle odometer when the updated km is higher' do
-      described_class.call(refueling: refueling, params: { odometer_km: '48500', date: Date.new(2026, 6, 22) })
+      result = described_class.call(refueling: refueling, params: { odometer_km: '48500', date: Date.new(2026, 6, 22) })
 
       expect(vehicle.reload.odometer_km).to eq(48_500)
+      expect(result.odometer_advanced).to be(true)
+    end
+
+    it 'flags the odometer as not advanced when the updated km is not higher' do
+      result = described_class.call(refueling: refueling, params: { odometer_km: '47000', date: Date.new(2026, 6, 22) })
+
+      expect(result.odometer_advanced).to be(false)
     end
 
     it 'returns failure and keeps the odometer when the update is invalid' do

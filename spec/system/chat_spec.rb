@@ -69,6 +69,35 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page.evaluate_script('document.activeElement.name')).to eq('message')
   end
 
+  it 'shows Caju online above the message box and keeps the bubble colors in dark mode on a phone' do
+    emulate_color_scheme('dark')
+    parser = instance_double(Ai::ParserService)
+    allow(Ai::ParserService).to receive(:new).and_return(parser)
+    allow(parser).to receive(:call).and_return({ type: :text, content: 'Anotado, chefe!' })
+
+    visit chat_root_path
+    fill_in 'message', with: 'Oi Caju'
+    find('button[type="submit"]').click
+
+    expect(page).to have_css('h1', text: 'Caju')
+    expect(page).to have_text(I18n.t('chat.index.subtitle'))
+    expect(page).to have_css('#chat_messages .bg-blue-600', text: 'Oi Caju')
+    bot_bubble = find('#chat_messages', text: 'Anotado, chefe!').find('div.bg-white')
+    expect(bot_bubble.evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgb(255, 255, 255)')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'centers the conversation in a narrower column on a desktop screen' do
+    emulate_desktop_screen
+
+    visit chat_root_path
+
+    screen = find('[data-controller="chat speech"]')
+
+    expect(box(screen)['width'].round).to eq(672)
+    expect(page).to have_css('h1', text: 'Caju')
+  end
+
   it 'cancels the first card of a batch and shows the next card on a phone' do
     allow(Llm::Client).to receive(:chat).and_return({
       type:        :tool_use,

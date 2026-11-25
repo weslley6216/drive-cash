@@ -31,18 +31,23 @@ module Vehicles
 
     def odometer_block
       div do
-        p(class: 'text-[11px] font-semibold text-slate-400 uppercase tracking-wider') { t('vehicle.odometer.label') }
+        p(class: "#{@variant == :desktop ? 'text-xs' : 'text-[11px]'} font-semibold text-slate-400 uppercase tracking-wider") { t('vehicle.odometer.label') }
         p(class: km_classes, style: 'font-feature-settings: "tnum"') do
           plain helpers.number_with_delimiter(@current_km, delimiter: '.')
-          span(class: 'text-base font-medium text-slate-400 ml-1.5') { t('vehicle.odometer.unit') }
+          span(class: "#{@variant == :desktop ? 'text-lg' : 'text-base'} font-medium text-slate-400 ml-1.5") { t('vehicle.odometer.unit') }
         end
         div(class: 'flex items-center gap-2 mt-2 flex-wrap') do
           freshness_pill
-          span(class: 'text-xs text-slate-400') do
-            t('vehicle.odometer.delta_month', value: helpers.number_with_delimiter(@km_this_month, delimiter: '.'))
-          end
+          span(class: 'text-xs text-slate-400') { delta_month_text }
         end
       end
+    end
+
+    def delta_month_text
+      value = helpers.number_with_delimiter(@km_this_month, delimiter: '.')
+      return t('vehicle.odometer.delta_month', value: value) unless @variant == :desktop
+
+      t('vehicle.odometer.delta_month_desktop', value: value, daily: (@km_this_month / 30.0).round)
     end
 
     def km_classes

@@ -66,8 +66,8 @@ pt-BR:
       history_found: "Encontrei %{count} resultado(s) para '%{term}'"
       history_empty: "Não encontrei nada para '%{term}'"
     index:
-      header: "Assistente IA"
-      subtitle: "Registre por texto ou voz"
+      header: "Caju"
+      subtitle: "assistente financeiro"
       clear: "Limpar"
       empty_title: "Como posso ajudar?"
       empty_ex1: "\"Fiz uma corrida de R$45 no Uber hoje\""

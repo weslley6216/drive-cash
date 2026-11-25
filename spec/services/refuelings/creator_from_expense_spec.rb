@@ -19,6 +19,22 @@ RSpec.describe Refuelings::CreatorFromExpense do
       expect(result.refueling.total_amount).to eq(expense.amount)
     end
 
+    it 'flags the odometer as advanced when the reading passes the current one' do
+      vehicle.update!(odometer_km: 48_000)
+
+      result = described_class.call(expense: expense, liters: '30', odometer_km: '48230', full_tank: true)
+
+      expect(result.odometer_advanced).to be(true)
+    end
+
+    it 'flags the odometer as not advanced when the reading is below the current one' do
+      vehicle.update!(odometer_km: 48_000)
+
+      result = described_class.call(expense: expense, liters: '30', odometer_km: '47000', full_tank: true)
+
+      expect(result.odometer_advanced).to be(false)
+    end
+
     it 'copies the expense date and vendor' do
       expense.update(date: Date.new(2026, 5, 20), vendor: 'Posto Orense')
 
