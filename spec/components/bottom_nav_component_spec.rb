@@ -50,15 +50,19 @@ RSpec.describe BottomNavComponent, type: :component do
       expect(html).to include('data-turbo-permanent')
     end
 
-    it 'wires nav-active controller with tab targets and active/inactive class data' do
+    it 'wires nav-active controller to the bottom meta with an id on each tab' do
       expect(html).to include('data-controller="nav-active"')
+      expect(html).to include('data-nav-active-key-value="bottom"')
       expect(html.scan('data-nav-active-target="tab"').size).to eq(5)
+      %w[home analysis goals history more].each do |id|
+        expect(html).to include("data-nav-id=\"#{id}\"")
+      end
       expect(html).to include('data-active-classes="text-blue-600"')
       expect(html).to include('data-inactive-classes="text-slate-400"')
     end
 
-    it 'exposes icon targets so the controller can swap stroke thickness' do
-      expect(html.scan('data-nav-active-target="icon"').size).to eq(5)
+    it 'exposes the icons as parts so the controller can swap stroke thickness' do
+      expect(html.scan('data-nav-active-target="part"').size).to eq(5)
       expect(html).to include('data-active-classes="stroke-[2.4]"')
       expect(html).to include('data-inactive-classes="stroke-2"')
     end

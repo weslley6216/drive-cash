@@ -62,11 +62,23 @@ RSpec.describe SidebarNavComponent, type: :component do
       expect(html).to include('data-turbo-permanent')
     end
 
-    it 'wires nav-active controller with tab targets and active/inactive class data' do
+    it 'wires nav-active controller to the sidebar meta with an id on each tab and on the account footer' do
       expect(html).to include('data-controller="nav-active"')
-      expect(html.scan('data-nav-active-target="tab"').size).to eq(5)
+      expect(html).to include('data-nav-active-key-value="sidebar"')
+      expect(html.scan('data-nav-active-target="tab"').size).to eq(6)
+      %w[home analysis goals history vehicle more].each do |id|
+        expect(html).to include("data-nav-id=\"#{id}\"")
+      end
       expect(html).to include('data-active-classes="bg-blue-50 text-blue-700"')
       expect(html).to include('data-inactive-classes="text-slate-600 hover:bg-slate-50"')
+    end
+
+    it 'lets the controller light the account footer with the prototype classes' do
+      expect(html).to include('data-active-classes="bg-blue-50" data-inactive-classes="hover:bg-slate-50"')
+      expect(html.scan('data-nav-active-target="part"').size).to eq(3)
+      expect(html).to include('data-active-classes="text-blue-700" data-inactive-classes="text-slate-800"')
+      expect(html).to include('data-active-classes="text-blue-600/80" data-inactive-classes="text-slate-500"')
+      expect(html).to include('data-active-classes="text-blue-400" data-inactive-classes="text-slate-400"')
     end
 
     it 'sizes the tab icons at 18px so they inherit the tab color' do
@@ -84,6 +96,6 @@ RSpec.describe SidebarNavComponent, type: :component do
   it 'highlights only the analysis tab when active: :analysis' do
     html = view_context.render(described_class.new(active: :analysis))
 
-    expect(html.scan('bg-blue-50').size).to eq(6)
+    expect(html.scan('bg-blue-50').size).to eq(7)
   end
 end

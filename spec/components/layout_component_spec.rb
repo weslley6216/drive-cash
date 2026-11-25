@@ -112,4 +112,24 @@ RSpec.describe LayoutComponent, type: :component do
       expect(html).to include('id="bottom-nav"')
     end
   end
+
+  context 'with sidebar_nav: :goals and bottom_nav: :goals' do
+    let(:html) do
+      view_context.render(LayoutComponent.new(title: 'X', bottom_nav: :goals, sidebar_nav: :goals)) { 'content' }
+    end
+
+    it 'tells each nav which tab is active through a head meta' do
+      expect(html).to include('<meta name="nav-active-sidebar" content="goals">')
+      expect(html).to include('<meta name="nav-active-bottom" content="goals">')
+    end
+  end
+
+  context 'with only sidebar_nav: :more' do
+    let(:html) { view_context.render(LayoutComponent.new(title: 'X', sidebar_nav: :more)) { 'content' } }
+
+    it 'publishes only the sidebar meta' do
+      expect(html).to include('<meta name="nav-active-sidebar" content="more">')
+      expect(html).not_to include('nav-active-bottom')
+    end
+  end
 end

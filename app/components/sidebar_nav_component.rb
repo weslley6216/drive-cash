@@ -9,6 +9,14 @@ class SidebarNavComponent < ApplicationComponent
 
   ACTIVE_TAB = 'bg-blue-50 text-blue-700'.freeze
   INACTIVE_TAB = 'text-slate-600 hover:bg-slate-50'.freeze
+  ACTIVE_FOOTER = 'bg-blue-50'.freeze
+  INACTIVE_FOOTER = 'hover:bg-slate-50'.freeze
+  ACTIVE_FOOTER_NAME = 'text-blue-700'.freeze
+  INACTIVE_FOOTER_NAME = 'text-slate-800'.freeze
+  ACTIVE_FOOTER_HINT = 'text-blue-600/80'.freeze
+  INACTIVE_FOOTER_HINT = 'text-slate-500'.freeze
+  ACTIVE_FOOTER_CHEVRON = 'text-blue-400'.freeze
+  INACTIVE_FOOTER_CHEVRON = 'text-slate-400'.freeze
 
   def initialize(active:)
     @active = active
@@ -18,7 +26,7 @@ class SidebarNavComponent < ApplicationComponent
     nav(
       id:    'sidebar-nav',
       class: 'hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-30',
-      data:  { turbo_permanent: '', controller: 'nav-active' }
+      data:  { turbo_permanent: '', controller: 'nav-active', nav_active_key_value: 'sidebar' }
     ) do
       brand_section
       nav_tabs
@@ -51,7 +59,7 @@ class SidebarNavComponent < ApplicationComponent
     link_to(
       helpers.public_send(tab[:path_method]),
       class: "sidebar-tab w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors #{active ? ACTIVE_TAB : INACTIVE_TAB}",
-      data:  { nav_active_target: 'tab', active_classes: ACTIVE_TAB, inactive_classes: INACTIVE_TAB }
+      data:  { nav_active_target: 'tab', nav_id: tab[:id], active_classes: ACTIVE_TAB, inactive_classes: INACTIVE_TAB }
     ) do
       render tab[:icon].new(class: 'w-[18px] h-[18px]')
       span { I18n.t("sidebar_nav_component.tabs.#{tab[:id]}") }
@@ -63,18 +71,28 @@ class SidebarNavComponent < ApplicationComponent
     div(class: 'p-3 border-t border-slate-100') do
       link_to(
         helpers.account_path,
-        class: "w-full flex items-center gap-3 px-3 py-2 rounded-lg #{active ? 'bg-blue-50' : 'hover:bg-slate-50'}"
+        class: "w-full flex items-center gap-3 px-3 py-2 rounded-lg #{active ? ACTIVE_FOOTER : INACTIVE_FOOTER}",
+        data:  { nav_active_target: 'tab', nav_id: :more, active_classes: ACTIVE_FOOTER, inactive_classes: INACTIVE_FOOTER }
       ) do
         div(class: 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold') do
           plain first_name.first&.upcase
         end
         div(class: 'flex-1 text-left') do
-          p(class: "text-sm font-medium leading-tight #{active ? 'text-blue-700' : 'text-slate-800'}") { first_name }
-          p(class: "text-[11px] #{active ? 'text-blue-600/80' : 'text-slate-500'}") do
+          p(
+            class: "text-sm font-medium leading-tight #{active ? ACTIVE_FOOTER_NAME : INACTIVE_FOOTER_NAME}",
+            data:  { nav_active_target: 'part', active_classes: ACTIVE_FOOTER_NAME, inactive_classes: INACTIVE_FOOTER_NAME }
+          ) { first_name }
+          p(
+            class: "text-[11px] #{active ? ACTIVE_FOOTER_HINT : INACTIVE_FOOTER_HINT}",
+            data:  { nav_active_target: 'part', active_classes: ACTIVE_FOOTER_HINT, inactive_classes: INACTIVE_FOOTER_HINT }
+          ) do
             I18n.t('sidebar_nav_component.account_hint')
           end
         end
-        render PhlexIcons::Lucide::ChevronRight.new(class: "w-3.5 h-3.5 #{active ? 'text-blue-400' : 'text-slate-400'}")
+        render PhlexIcons::Lucide::ChevronRight.new(
+          class: "w-3.5 h-3.5 #{active ? ACTIVE_FOOTER_CHEVRON : INACTIVE_FOOTER_CHEVRON}",
+          data:  { nav_active_target: 'part', active_classes: ACTIVE_FOOTER_CHEVRON, inactive_classes: INACTIVE_FOOTER_CHEVRON }
+        )
       end
     end
   end
