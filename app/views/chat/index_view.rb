@@ -26,7 +26,7 @@ module Chat
     def header_section
       div(class: 'flex items-center justify-between pt-2 sm:pt-0 mb-4 flex-shrink-0') do
         div(class: 'flex items-center gap-2.5') do
-          link_to(root_path, class: 'text-slate-400 hover:text-slate-600 transition-colors p-1') do
+          link_to(root_path, class: 'text-slate-400 hover:text-slate-600 transition-colors p-1 -ml-1') do
             render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-5 h-5')
           end
           header_avatar
