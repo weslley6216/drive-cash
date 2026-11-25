@@ -36,6 +36,13 @@ export default class extends Controller {
     this.recognition.onend = () => this.onend()
   }
 
+  disconnect() {
+    clearTimeout(this.noticeTimeout)
+    this.stopTimer()
+    this.wave.stop()
+    if (this.recognition) this.stopRecognition()
+  }
+
   open() {
     if (!this.recognition) return
 

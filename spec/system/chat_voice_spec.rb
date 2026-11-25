@@ -176,4 +176,15 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
     expect(page).to have_css('#chat_messages .bg-blue-600 .text-white\/80')
     expect(page).to have_css('#chat_messages .bg-blue-600', count: 1)
   end
+
+  it 'stops the microphone when the page navigates away while the panel is still listening' do
+    visit chat_root_path
+    find('button[aria-label="Falar"]').click
+    start_speaking
+
+    page.execute_script("document.querySelector(\"a[href='#{root_path}']\").click()")
+
+    expect(page).to have_current_path(root_path)
+    expect(page.evaluate_script('window.__speech.aborted')).to be(true)
+  end
 end

@@ -9,6 +9,7 @@ module SpeechRecognitionFake
       }
       stop() { this.onend && this.onend() }
       abort() {
+        this.aborted = true
         this.onerror && this.onerror({ error: 'aborted' })
         this.onend && this.onend()
       }
