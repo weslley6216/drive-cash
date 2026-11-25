@@ -137,6 +137,11 @@ export default class extends Controller {
   }
 
   showPanel() {
+    if (this.hideSheet) {
+      this.sheetTarget.removeEventListener("transitionend", this.hideSheet)
+      this.hideSheet = null
+    }
+
     this.backdropTarget.classList.remove("opacity-0", "pointer-events-none")
     this.sheetTarget.classList.remove("invisible")
 
@@ -153,11 +158,11 @@ export default class extends Controller {
     this.wave.stop()
     this.stopTimer()
 
-    const hide = () => this.sheetTarget.classList.add("invisible")
     if (this.reducedMotion) {
-      hide()
+      this.sheetTarget.classList.add("invisible")
     } else {
-      this.sheetTarget.addEventListener("transitionend", hide, { once: true })
+      this.hideSheet = () => this.sheetTarget.classList.add("invisible")
+      this.sheetTarget.addEventListener("transitionend", this.hideSheet, { once: true })
     }
   }
 

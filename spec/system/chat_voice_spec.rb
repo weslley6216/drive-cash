@@ -87,6 +87,19 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
     expect(page).to have_no_css('#chat_messages .bg-blue-600')
   end
 
+  it 'stays open and listening when the mic is tapped again before a cancel finishes closing it' do
+    visit chat_root_path
+    find('button[aria-label="Falar"]').click
+
+    find('[data-speech-target="backdrop"]').click(x: 20, y: 20)
+    find('button[aria-label="Falar"]').click
+    page.execute_script(
+      "document.querySelector('[data-speech-target=\"sheet\"]').dispatchEvent(new Event('transitionend'))"
+    )
+
+    expect(page).to have_css('[role="dialog"][aria-label="Caju ouvindo"]', visible: true)
+  end
+
   it 'closes the panel and warns that nothing was heard for four seconds on a phone' do
     visit chat_root_path
     find('button[aria-label="Falar"]').click
