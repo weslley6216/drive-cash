@@ -1,8 +1,9 @@
 module Goals
   module Outcomes
     class HitScreenComponent < ApplicationComponent
-      def initialize(outcome:)
+      def initialize(outcome:, unread_count:)
         @outcome = outcome
+        @unread_count = unread_count
       end
 
       def title = I18n.t('goals.outcomes.show.title')
@@ -13,7 +14,8 @@ module Goals
             screen.with_header do
               render HeaderComponent.new(title: title, outcome: @outcome,
                                          action_label: t('goals.outcomes.show.view_goals'),
-                                         action_icon: PhlexIcons::Lucide::Target, action_path: helpers.goals_path)
+                                         action_icon: PhlexIcons::Lucide::Target, action_path: helpers.goals_path,
+                                         unread_count: @unread_count)
             end
             screen.with_content { body_section }
           end

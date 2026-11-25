@@ -114,4 +114,18 @@ RSpec.describe 'Goal outcome', type: :system, js: true do
     expect(page).to have_link('Ver metas', href: goals_path)
     expect(page).to have_text('Junho · 2026 · meta mensal de lucro líquido')
   end
+
+  it 'ends the desktop topbar with the bell after Ver metas and a divider' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit goal_outcome_path(goal, '2026-06-01')
+
+    topbar = find('header', text: 'Meta batida')
+    bell = topbar.find(:link, 'Notificações, 1 não lida')
+
+    expect(topbar).to have_link('Ver metas', href: goals_path)
+    expect(bell).to have_css('span.bg-red-500', text: '1')
+    expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
+  end
 end

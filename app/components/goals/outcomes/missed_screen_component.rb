@@ -7,8 +7,9 @@ module Goals
         'annual'  => ->(period) { { year: period.first.year } }
       }.freeze
 
-      def initialize(outcome:)
+      def initialize(outcome:, unread_count:)
         @outcome = outcome
+        @unread_count = unread_count
       end
 
       def title = I18n.t('goals.outcomes.missed.title')
@@ -18,7 +19,8 @@ module Goals
           render ScreenComponent.new do |screen|
             screen.with_header do
               render HeaderComponent.new(title: title, outcome: @outcome, action_label: view_entries_label,
-                                         action_icon: PhlexIcons::Lucide::List, action_path: history_link)
+                                         action_icon: PhlexIcons::Lucide::List, action_path: history_link,
+                                         unread_count: @unread_count)
             end
             screen.with_content { body_section }
           end

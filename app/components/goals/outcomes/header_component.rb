@@ -4,12 +4,13 @@ module Goals
       include TopbarStyles
       include OutcomeLabels
 
-      def initialize(title:, outcome:, action_label:, action_icon:, action_path:)
+      def initialize(title:, outcome:, action_label:, action_icon:, action_path:, unread_count:)
         @title = title
         @outcome = outcome
         @action_label = action_label
         @action_icon = action_icon
         @action_path = action_path
+        @unread_count = unread_count
       end
 
       def view_template
@@ -30,16 +31,16 @@ module Goals
       end
 
       def desktop_header
-        div(class: "#{DESKTOP_BAR} hidden lg:flex items-center justify-between") do
-          div do
-            h1(class: 'text-2xl font-bold text-slate-900 tracking-tight') { @title }
-            p(class: 'text-sm text-slate-500 mt-0.5') { desktop_subtitle }
-          end
-          link_to(@action_path, class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg ' \
+        render DesktopTopbarComponent.new(title: @title, subtitle: desktop_subtitle, unread_count: @unread_count) do |topbar|
+          topbar.with_actions { action_link }
+        end
+      end
+
+      def action_link
+        link_to(@action_path, class: 'flex items-center gap-2 bg-white border border-slate-200 rounded-lg ' \
                                        'px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50') do
-            render @action_icon.new(class: 'w-[15px] h-[15px] text-slate-500')
-            plain " #{@action_label}"
-          end
+          render @action_icon.new(class: 'w-[15px] h-[15px] text-slate-500')
+          plain " #{@action_label}"
         end
       end
 
