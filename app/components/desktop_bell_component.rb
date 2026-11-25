@@ -11,7 +11,8 @@ class DesktopBellComponent < ApplicationComponent
   end
 
   def view_template
-    link_to(notifications_path, class: button_classes, aria: aria_options, data: { turbo_frame: '_top' }) do
+    link_to(@active ? notifications_path : notifications_path(return_to: helpers.request.fullpath),
+            class: button_classes, aria: aria_options, data: { turbo_frame: '_top' }) do
       render PhlexIcons::Lucide::Bell.new(class: 'w-5 h-5')
       span(class: BADGE_CLASSES) { @unread_count.to_s } if @unread_count.positive? && !@active
     end

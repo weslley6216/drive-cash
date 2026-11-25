@@ -37,7 +37,7 @@ RSpec.describe DesktopTopbarComponent, type: :component do
 
     expect(actions['class']).to eq('flex items-center gap-3 flex-shrink-0')
     expect(actions.element_children.map(&:name)).to eq(%w[button span a])
-    expect(actions.element_children.last['href']).to eq('/notifications')
+    expect(actions.element_children.last['href']).to eq('/notifications?return_to=%2F')
   end
 
   it 'separates the actions from the bell with a divider' do

@@ -9,7 +9,7 @@ class NotificationBellComponent < ApplicationComponent
   end
 
   def view_template
-    link_to(notifications_path, class: BUTTON_CLASSES, aria: { label: t('notifications.index.title') },
+    link_to(notifications_path(return_to: helpers.request.fullpath), class: BUTTON_CLASSES, aria: { label: t('notifications.index.title') },
                                 data:  { turbo_frame: '_top' }) do
       render PhlexIcons::Lucide::Bell.new(class: 'w-[18px] h-[18px]')
       span(class: BADGE_CLASSES) { @unread_count.to_s } if @unread_count.positive?
