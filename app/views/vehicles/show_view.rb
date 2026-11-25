@@ -81,7 +81,7 @@ module Vehicles
         div(id: 'vehicle_tank_section') { highlightable_tank }
         div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
         moves_section
-        insight_section
+        insight_section(variant: :mobile)
       end
     end
 
@@ -170,18 +170,18 @@ module Vehicles
       end
     end
 
-    def insight_section
+    def insight_section(variant:)
       insight = @payload[:insights].first
       return unless insight
 
-      render Vehicles::InsightCardComponent.new(insight: insight)
+      render Vehicles::InsightCardComponent.new(insight: insight, variant: variant)
     end
 
     def desktop_layout
       div(class: 'space-y-6') do
         desktop_row_one
         desktop_row_two
-        insight_section
+        insight_section(variant: :desktop)
       end
     end
 

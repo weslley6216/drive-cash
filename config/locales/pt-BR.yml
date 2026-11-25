@@ -402,6 +402,8 @@ pt-BR:
       cheapest:
         title: "%{vendor} é o mais econômico"
         body: "%{kml} km/L em média, contra %{other} do %{other_vendor}. Economia estimada: %{savings}/mês."
+        body_desktop: "%{kml} km/L em média, contra %{other} do %{other_vendor}. Mantendo o %{vendor}, a economia estimada é de %{savings}/mês."
+      see_analysis: "Ver análise →"
     registration:
       title: "Cadastrar veículo"
       submit: "Salvar"
