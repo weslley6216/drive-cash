@@ -49,5 +49,17 @@ RSpec.describe Vehicles::OdometerHeroComponent, type: :component do
       expect(html).to include('lg:text-5xl')
       expect(html).not_to include(I18n.t('vehicle.odometer.update'))
     end
+
+    it 'adds the daily pace to the month delta on the desktop card' do
+      html = view_context.render(described_class.new(current_km: 10, km_this_month: 1180, updated_days_ago: 3, stale: false, variant: :desktop))
+
+      expect(html).to include(I18n.t('vehicle.odometer.delta_month_desktop', value: '1.180', daily: 39))
+    end
+
+    it 'keeps the plain month delta on mobile' do
+      html = view_context.render(described_class.new(current_km: 10, km_this_month: 1180, updated_days_ago: 3, stale: false))
+
+      expect(html).not_to include('km/dia')
+    end
   end
 end

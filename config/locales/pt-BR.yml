@@ -305,6 +305,7 @@ pt-BR:
       stale: "Atualize · há %{count} dias"
       stale_unknown: "Atualize o km"
       delta_month: "+%{value} km este mês"
+      delta_month_desktop: "+%{value} km este mês · ~%{daily} km/dia"
     tank:
       title: "Saldo do tanque"
       of_full: "de %{value} do último tanque"
