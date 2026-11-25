@@ -101,6 +101,24 @@ RSpec.describe 'Vehicle', type: :system, js: true do
       expect(page).to fit_the_phone_width
     end
 
+    it 'heads the maintenances and the tank moves with a subtitle and inline links on a desktop screen' do
+      emulate_desktop_screen
+
+      visit vehicle_path
+
+      maintenances = find('h2', text: I18n.t('vehicle.maintenances.title'))
+      catalog = find(:link, I18n.t('vehicle.maintenances.add_from_catalog'))
+
+      expect(maintenances[:class]).to include('text-base', 'text-slate-800')
+      expect(page).to have_text(I18n.t('vehicle.maintenances.by_km_desktop'))
+      expect(catalog[:class]).to include('text-sm', 'text-blue-600')
+      expect(box(catalog)['bottom']).to be <= box(find_by_id(dom_id(@oil)))['top']
+      expect(page).to have_css('h2.text-base', text: I18n.t('vehicle.moves.title'))
+      expect(page).to have_text(I18n.t('vehicle.moves.subtitle_desktop'))
+      expect(find(:link, I18n.t('vehicle.moves.view_all'))[:class]).to include('text-sm')
+      expect(page).to have_text(I18n.t('vehicle.moves.auto_debit_desktop'))
+    end
+
     it 'renders the tank card with its desktop layout' do
       create(:refueling, vehicle: @vehicle, date: Date.current, vendor: 'Posto Orense', liters: 44.1, total_amount: 260, full_tank: true)
       emulate_desktop_screen

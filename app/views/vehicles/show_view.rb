@@ -112,7 +112,7 @@ module Vehicles
       end
     end
 
-    def maintenances_section(limit: nil)
+    def maintenances_section(limit:)
       div do
         div(class: 'flex items-center justify-between mb-2 px-1') do
           h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.maintenances.title') }
@@ -122,7 +122,7 @@ module Vehicles
       end
     end
 
-    def maintenances_list(limit:)
+    def maintenances_list(limit:, catalog: true)
       shown = limit ? maintenances.first(limit) : maintenances
       div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
         if maintenances.empty?
@@ -130,7 +130,41 @@ module Vehicles
         else
           shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry) }
         end
-        catalog_button(hidden: maintenances.size - shown.size)
+        catalog_button(hidden: maintenances.size - shown.size) if catalog
+      end
+    end
+
+    def desktop_maintenances_section
+      div do
+        desktop_section_header(t('vehicle.maintenances.title'), t('vehicle.maintenances.by_km_desktop')) do
+          link_to(helpers.new_maintenance_path,
+                  class: 'text-sm font-medium text-blue-600 hover:underline flex items-center gap-1',
+                  data:  { turbo_frame: 'modal' }) do
+            render PhlexIcons::Lucide::CirclePlus.new(class: 'w-[15px] h-[15px]')
+            plain t('vehicle.maintenances.add_from_catalog')
+          end
+        end
+        maintenances_list(limit: nil, catalog: false)
+      end
+    end
+
+    def desktop_moves_section
+      div do
+        desktop_section_header(t('vehicle.moves.title'), t('vehicle.moves.subtitle_desktop')) do
+          link_to(t('vehicle.moves.view_all'), helpers.refuelings_path, class: 'text-sm font-medium text-blue-600 hover:underline')
+        end
+        moves_card
+        p(class: 'text-[11px] text-slate-400 mt-2') { t('vehicle.moves.auto_debit_desktop') }
+      end
+    end
+
+    def desktop_section_header(title, subtitle)
+      div(class: 'flex items-center justify-between mb-3') do
+        div do
+          h2(class: 'text-base font-semibold text-slate-800') { title }
+          p(class: 'text-xs text-slate-500') { subtitle }
+        end
+        yield
       end
     end
 
@@ -224,8 +258,8 @@ module Vehicles
 
     def desktop_row_two
       div(class: 'grid grid-cols-12 gap-5') do
-        div(class: 'col-span-12 lg:col-span-7') { maintenances_section }
-        div(class: 'col-span-12 lg:col-span-5') { moves_section }
+        div(class: 'col-span-12 lg:col-span-7') { desktop_maintenances_section }
+        div(class: 'col-span-12 lg:col-span-5') { desktop_moves_section }
       end
     end
 

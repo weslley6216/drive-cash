@@ -333,6 +333,7 @@ pt-BR:
     maintenances:
       title: "Próximas manutenções"
       by_km: "por km rodado"
+      by_km_desktop: "previsão por km rodado"
       add_from_catalog: "Adicionar do catálogo"
       hidden_ok:
         one: "· %{count} em dia oculto"
@@ -360,6 +361,7 @@ pt-BR:
     moves:
       title: "Movimentação do tanque"
       view_all: "Ver tudo →"
+      subtitle_desktop: "abastecimentos e consumo"
       full_tank: "Tanque cheio"
       partial_fill: "Abastecimento"
       balance:
@@ -383,6 +385,7 @@ pt-BR:
       today: "Hoje"
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
+      auto_debit_desktop: "Cada despesa de combustível debita o saldo automaticamente. Sem planilha."
       page_title: "Movimentação do tanque"
       page_subtitle: "Abastecimentos e consumo por rota"
       back: "Voltar"
