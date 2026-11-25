@@ -34,6 +34,8 @@ RSpec.describe 'Chat', type: :system, js: true do
 
     expect(send_button['bottom']).to eq(message_box['bottom'])
     expect(mic['top'] + (mic['height'] / 2)).to be_within(1).of(message_box['top'] + (message_box['height'] / 2))
+    expect(mic['width']).to eq(32)
+    expect(mic['height']).to eq(32)
     expect(page).to fit_the_phone_width
   end
 

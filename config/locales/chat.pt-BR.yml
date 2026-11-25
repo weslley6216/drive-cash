@@ -72,7 +72,7 @@ pt-BR:
       empty_title: "Como posso ajudar?"
       empty_ex1: "\"Fiz uma corrida de R$45 no Uber hoje\""
       empty_ex2: "\"Abasteci R$80 de gasolina\""
-      placeholder: "Digite sua mensagem..."
+      placeholder: "Pergunte ou registre…"
       btn_speak: "Falar"
     preview:
       earning: "Receita de %{amount} via %{platform} em %{date}"

@@ -12,6 +12,34 @@ RSpec.describe 'Chats', type: :request do
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include('Como posso ajudar?')
+        expect(response.body).to include('Pergunte ou registre…')
+      end
+    end
+
+    context 'when a message was spoken' do
+      let(:parser_mock) { instance_double(Ai::ParserService) }
+
+      before do
+        allow(Ai::ParserService).to receive(:new).and_return(parser_mock)
+        allow(parser_mock).to receive(:call).and_return({ type: :text, content: 'Anotado' })
+      end
+
+      it 'keeps the microphone on the spoken bubble after a reload' do
+        post chat_message_path, params: { message: 'abasteci 80', voice: '1' }, as: :turbo_stream
+
+        get chat_root_path
+
+        expect(response.body).to include('abasteci 80')
+        expect(response.body.scan('text-white/80').size).to eq(1)
+      end
+
+      it 'shows a typed bubble without the microphone' do
+        post chat_message_path, params: { message: 'abasteci 80' }, as: :turbo_stream
+
+        get chat_root_path
+
+        expect(response.body).to include('abasteci 80')
+        expect(response.body).not_to include('text-white/80')
       end
     end
 

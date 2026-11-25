@@ -78,7 +78,7 @@ module Chat
     def render_history
       @messages.each do |message|
         if from_user?(message)
-          user_bubble(message[:content])
+          user_bubble(message[:content], voice: message[:voice])
         else
           ai_bubble(message[:summary].presence || message[:content])
         end
@@ -87,9 +87,18 @@ module Chat
 
     def from_user?(message) = message[:role].to_s == 'user'
 
-    def user_bubble(text)
+    def user_bubble(text, voice: false)
       div(class: 'flex justify-end') do
-        div(class: 'bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm leading-relaxed') { plain text }
+        div(class: 'bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm leading-relaxed') do
+          if voice
+            span(class: 'inline-flex items-center gap-1.5') do
+              render PhlexIcons::Lucide::Mic.new(class: 'w-[13px] h-[13px] text-white/80')
+              plain text
+            end
+          else
+            plain text
+          end
+        end
       end
     end
 
@@ -117,15 +126,15 @@ module Chat
                 placeholder:  t('chat.index.placeholder'),
                 rows:         1,
                 autocomplete: 'off',
-                class:        'block w-full px-4 py-3 pr-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
+                class:        'block w-full px-4 py-3 pr-11 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none text-sm bg-white',
                 data:         { chat_target: 'input', speech_target: 'input', action: 'keydown.enter->chat#handleEnter' }
               )
               button(
-                type:  'button',
-                class: 'absolute right-3 bottom-[0.9rem] text-slate-400 hover:text-violet-600 transition-colors cursor-pointer',
-                title: t('chat.index.btn_speak'),
-                data:  { action: 'click->speech#toggle', speech_target: 'mic' }
-              ) { render PhlexIcons::Lucide::Mic.new(class: 'w-4 h-4') }
+                type:       'button',
+                class:      'absolute right-2 bottom-[7px] w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-violet-600 transition-colors cursor-pointer',
+                aria_label: t('chat.index.btn_speak'),
+                data:       { action: 'click->speech#toggle', speech_target: 'mic' }
+              ) { render PhlexIcons::Lucide::Mic.new(class: 'w-[17px] h-[17px]') }
             end
 
             button(

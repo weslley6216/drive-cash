@@ -9,7 +9,7 @@ class ChatController < ApplicationController
     user_text = params[:message].to_s.strip
     return head :bad_request if user_text.blank?
 
-    add_to_history(Chat::Message.from_user(user_text))
+    add_to_history(Chat::Message.from_user(user_text, voice: params[:voice].present?))
 
     result = Ai::ParserService.new(messages: chat_history, today: Date.current, user: current_user).call
     result = start_preview_queue(result)
