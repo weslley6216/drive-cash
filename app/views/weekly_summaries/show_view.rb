@@ -3,8 +3,9 @@ module WeeklySummaries
     include TopbarStyles
     include WeekRangeLabel
 
-    def initialize(summary:)
+    def initialize(summary:, unread_count:)
       @summary = summary
+      @unread_count = unread_count
     end
 
     def view_template
@@ -37,12 +38,8 @@ module WeeklySummaries
     end
 
     def desktop_header
-      div(class: "#{DESKTOP_BAR} hidden lg:flex items-center justify-between") do
-        div do
-          h1(class: 'text-2xl font-bold text-slate-900 tracking-tight') { t('weekly_summaries.show.title') }
-          p(class: 'text-sm text-slate-500 mt-0.5') { week_range_text(@summary.week, with_year: true) }
-        end
-        div(class: 'flex items-center gap-3') do
+      render DesktopTopbarComponent.new(title: t('weekly_summaries.show.title'), subtitle: week_range_text(@summary.week, with_year: true), unread_count: @unread_count) do |topbar|
+        topbar.with_actions do
           render WeekNavComponent.new(week: @summary.week, size: 'w-10 h-10')
           cta_link('bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold ' \
                    'flex items-center gap-2')
