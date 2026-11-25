@@ -179,7 +179,7 @@ RSpec.describe 'Notifications', type: :system, js: true do
     visit notifications_path
     click_on I18n.t('notifications.index.preferences')
 
-    expect(page).to have_current_path(edit_notification_preferences_path)
+    expect(page).to have_current_path(edit_notification_preferences_path, ignore_query: true)
   end
 
   it 'shows the active bell without the badge next to the mark-all action and the preferences on a desktop screen' do

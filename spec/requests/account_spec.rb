@@ -137,7 +137,7 @@ RSpec.describe 'Account', type: :request do
         get account_path
 
         expect(response.body).to include(I18n.t('account.items.notification_preferences.label'))
-        expect(response.body).to include('href="/notification_preferences/edit"')
+        expect(response.body).to include('href="/notification_preferences/edit?return_to=%2Faccount"')
       end
 
       it 'renders the sign out button with red border' do

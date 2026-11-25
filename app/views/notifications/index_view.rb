@@ -63,8 +63,8 @@ module Notifications
     end
 
     def preferences_link(css:)
-      link_to(helpers.edit_notification_preferences_path, class: css,
-                                                          aria:  { label: t('notifications.index.preferences') }) do
+      link_to(helpers.edit_notification_preferences_path(return_to: helpers.request.fullpath), class: css,
+                                                                                               aria:  { label: t('notifications.index.preferences') }) do
         render PhlexIcons::Lucide::Settings.new(class: 'w-[17px] h-[17px]')
       end
     end

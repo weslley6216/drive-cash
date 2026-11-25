@@ -28,13 +28,39 @@ RSpec.describe 'Notification preferences', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'reaches the Avisos screen from Conta on a phone' do
+  it 'reaches the Avisos screen from Conta and goes back to it on a phone' do
     visit account_path
 
     click_on 'Avisos'
 
-    expect(page).to have_current_path(edit_notification_preferences_path)
+    expect(page).to have_current_path(edit_notification_preferences_path, ignore_query: true)
     expect(page).to have_text(I18n.t('notifications.preferences.mobile_subtitle'))
+
+    click_on I18n.t('notifications.preferences.back')
+
+    expect(page).to have_current_path(account_path)
+  end
+
+  it 'goes back to the notifications from the Avisos opened by the gear on a phone' do
+    visit notifications_path
+    click_on I18n.t('notifications.index.preferences')
+    click_on I18n.t('notifications.preferences.back')
+
+    expect(page).to have_current_path(notifications_path)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'walks the chain back from the Avisos to the home on a phone' do
+    visit root_path
+    click_on I18n.t('notifications.index.title')
+    click_on I18n.t('notifications.index.preferences')
+    click_on I18n.t('notifications.preferences.back')
+
+    expect(page).to have_current_path(notifications_path, ignore_query: true)
+
+    click_on I18n.t('notifications.index.back')
+
+    expect(page).to have_current_path(root_path)
   end
 
   it 'shows the breadcrumb on a desktop screen' do

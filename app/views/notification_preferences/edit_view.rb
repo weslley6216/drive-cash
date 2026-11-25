@@ -29,10 +29,7 @@ module NotificationPreferences
 
     def mobile_header
       div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
-        link_to(notifications_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500',
-                                    aria:  { label: t('notifications.preferences.back') }) do
-          render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
-        end
+        render BackLinkComponent.new(fallback: helpers.notifications_path, label: t('notifications.preferences.back'))
         div do
           h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.preferences.title') }
           p(class: 'text-sm text-slate-500') { t('notifications.preferences.mobile_subtitle') }

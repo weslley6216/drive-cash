@@ -8,7 +8,8 @@ class Account::ShowView < ApplicationView
         { icon: PhlexIcons::Lucide::User, key: 'personal_data', path_name: :edit_profile, badge: false },
         { icon: PhlexIcons::Lucide::Wallet, key: 'plan', path_name: :plan, badge: true },
         { icon: PhlexIcons::Lucide::Bell, key: 'notifications', path_name: :notifications, badge: false },
-        { icon: PhlexIcons::Lucide::Settings, key: 'notification_preferences', path_name: :edit_notification_preferences, badge: false }
+        { icon: PhlexIcons::Lucide::Settings, key: 'notification_preferences', path_name: :edit_notification_preferences,
+          badge: false, return_here: true }
       ]
     },
     {
@@ -144,7 +145,7 @@ class Account::ShowView < ApplicationView
 
   def group_item(item, last:)
     link_to(
-      helpers.public_send("#{item[:path_name]}_path"),
+      helpers.public_send("#{item[:path_name]}_path", **(item[:return_here] ? { return_to: helpers.request.fullpath } : {})),
       class: "w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 #{'border-b border-slate-100' unless last}"
     ) do
       div(class: 'w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0') do
