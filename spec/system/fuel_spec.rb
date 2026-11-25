@@ -23,6 +23,23 @@ RSpec.describe 'Fuel', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'fills the chip of the vendor in the field red and moves it to the tapped chip on a phone' do
+    create(:refueling, vehicle: vehicle, vendor: 'Shell Centro', full_tank: true, date: Date.current - 9)
+    create(:refueling, vehicle: vehicle, vendor: 'Geladão', full_tank: true, date: Date.current - 3)
+    visit vehicle_path
+    click_on I18n.t('vehicle.tank.refuel')
+
+    expect(page).to have_css('button[aria-pressed="true"].bg-red-600', text: 'Geladão')
+    expect(page).to have_css('button[aria-pressed="false"].bg-white', text: 'Shell Centro')
+
+    find('button', text: 'Shell Centro').click
+
+    expect(page).to have_field('refueling[vendor]', with: 'Shell Centro')
+    expect(page).to have_css('button[aria-pressed="true"].bg-red-600', text: 'Shell Centro')
+    expect(page).to have_css('button[aria-pressed="false"].bg-white', text: 'Geladão')
+    expect(page).to fit_the_phone_width
+  end
+
   it 'inherits the vendor from the active tank on a phone' do
     vehicle.update!(odometer_km: 160_928)
     create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', full_tank: true, date: Date.current - 1)

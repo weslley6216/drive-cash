@@ -1,7 +1,9 @@
 module Refuelings
   class FormView < ApplicationView
-    VENDOR_CHIP_CLASSES = 'inline-flex items-center gap-1.5 rounded-full px-3.5 py-3 text-sm font-medium border ' \
-                          'border-slate-200 bg-white text-slate-700 hover:border-slate-300 transition cursor-pointer'.freeze
+    VENDOR_CHIP_CLASSES = 'group inline-flex items-center gap-1.5 rounded-full px-3.5 py-3 text-sm font-medium border ' \
+                          'transition cursor-pointer'.freeze
+    VENDOR_CHIP_ON = 'bg-red-600 text-white border-red-600 shadow-sm'.freeze
+    VENDOR_CHIP_OFF = 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'.freeze
 
     def initialize(refueling:)
       @refueling = refueling
@@ -54,10 +56,10 @@ module Refuelings
 
     def vendor_field_with_chips(form)
       field_wrapper(t('refuelings.form.labels.vendor'), theme: @theme) do
-        div(data: { controller: 'vendor-chips' }) do
+        div(data: { controller: 'vendor-chips', vendor_chips_on_class: VENDOR_CHIP_ON, vendor_chips_off_class: VENDOR_CHIP_OFF }) do
           render form.text_field(:vendor, class:       input_classes(theme: @theme),
                                           placeholder: t('refuelings.form.placeholders.vendor'),
-                                          data:        { vendor_chips_target: 'input' })
+                                          data:        { vendor_chips_target: 'input', action: 'input->vendor-chips#sync' })
           vendor_chips_row if recent_vendors.any?
         end
       end
@@ -66,10 +68,13 @@ module Refuelings
     def vendor_chips_row
       div(class: 'mt-2.5 flex flex-wrap gap-2') do
         recent_vendors.each do |vendor|
-          button(type: 'button', class: VENDOR_CHIP_CLASSES,
-                 data: { action: 'click->vendor-chips#select', vendor_chips_vendor_param: vendor }) do
-            render PhlexIcons::Lucide::Fuel.new(class: 'w-3.5 h-3.5 text-slate-400')
+          pressed = vendor == @refueling.vendor
+          button(type: 'button', class: "#{VENDOR_CHIP_CLASSES} #{pressed ? VENDOR_CHIP_ON : VENDOR_CHIP_OFF}",
+                 aria: { pressed: pressed.to_s },
+                 data: { action: 'click->vendor-chips#select', vendor_chips_target: 'chip', vendor_chips_vendor_param: vendor }) do
+            render PhlexIcons::Lucide::Fuel.new(class: 'w-3.5 h-3.5 text-slate-400 group-aria-pressed:text-white/90')
             plain vendor
+            render PhlexIcons::Lucide::Check.new(class: 'w-3.5 h-3.5 hidden group-aria-pressed:inline')
           end
         end
       end
