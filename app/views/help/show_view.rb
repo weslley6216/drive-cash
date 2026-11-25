@@ -2,10 +2,17 @@ module Help
   class ShowView < ApplicationView
     include TopbarStyles
 
+    def initialize(unread_count:)
+      @unread_count = unread_count
+    end
+
     def view_template
       render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-        render ScreenComponent.new(inline_header: true) do |screen|
-          screen.with_header { mobile_header }
+        render ScreenComponent.new do |screen|
+          screen.with_header do
+            mobile_header
+            desktop_topbar
+          end
           screen.with_content do
             div(class: 'pb-10') do
               div(class: 'lg:max-w-4xl lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-6 lg:items-start') do
@@ -26,17 +33,21 @@ module Help
     def faqs = t('.faqs')
 
     def mobile_header
-      header(class: "#{PHONE_BAR} lg:px-1 lg:pt-10 lg:pb-3") do
-        div(class: 'flex items-start gap-2 lg:items-center') do
-          link_to(helpers.account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500 lg:hidden') do
+      header(class: "#{PHONE_BAR} lg:hidden") do
+        div(class: 'flex items-start gap-2') do
+          link_to(helpers.account_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500') do
             render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
           end
           div do
-            h1(class: 'text-xl lg:text-2xl font-bold text-slate-900') { t('.heading') }
-            p(class: 'text-xs lg:text-sm text-slate-500') { t('.subtitle') }
+            h1(class: 'text-xl font-bold text-slate-900') { t('.heading') }
+            p(class: 'text-xs text-slate-500') { t('.subtitle') }
           end
         end
       end
+    end
+
+    def desktop_topbar
+      render DesktopTopbarComponent.new(title: t('.heading'), subtitle: t('.desktop_subtitle'), unread_count: @unread_count)
     end
 
     def faq_section
