@@ -1,8 +1,9 @@
 module WeeklySummaries
   class Builder
     Summary = Data.define(:week, :profit, :earnings_total, :expenses_total, :trips, :days_worked, :per_km,
-                          :daily_profits, :best_day_index, :goal, :top_categories, :empty_days, :blank_week)
+                          :days, :best_day_index, :goal, :top_categories, :empty_days, :blank_week)
     TopCategory = Data.define(:key, :amount)
+    Day = Data.define(:date, :profit, :earnings, :expenses, :trips, :empty, :future)
     GoalProgress = Data.define(:goal, :achieved, :percent, :hit)
 
     def self.for(user:, week_start:)
@@ -26,7 +27,7 @@ module WeeklySummaries
         trips:          trips,
         days_worked:    days_worked,
         per_km:         per_km,
-        daily_profits:  daily_profits,
+        days:           days,
         best_day_index: best_day_index,
         goal:           goal,
         top_categories: top_categories,
@@ -70,15 +71,29 @@ module WeeklySummaries
       km ? profit / km : nil
     end
 
-    def daily_profits
-      @daily_profits ||= range.map { |day| totals.profit_in(day..day) }
+    def days
+      @days ||= range.map do |day|
+        Day.new(
+          date:     day,
+          profit:   totals.profit_in(day..day),
+          earnings: totals.earned_in(day..day),
+          expenses: totals.spent_in(day..day),
+          trips:    trips_by_day.fetch(day, 0),
+          empty:    !recorded_days.include?(day),
+          future:   day > Date.current
+        )
+      end
+    end
+
+    def trips_by_day
+      @trips_by_day ||= earnings.group(:date).sum(:trips_count).transform_keys(&:to_date)
     end
 
     def best_day_index
       best_index = nil
       best_value = nil
 
-      daily_profits.each_with_index do |value, index|
+      days.map(&:profit).each_with_index do |value, index|
         next unless value.positive?
         next if best_value && value <= best_value
 
@@ -118,7 +133,7 @@ module WeeklySummaries
     end
 
     def empty_days
-      range.select { |day| day <= Date.current && !recorded_days.include?(day) }
+      days.reject(&:future).select(&:empty).map(&:date)
     end
 
     def blank_week

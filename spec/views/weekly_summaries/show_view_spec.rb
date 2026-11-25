@@ -15,7 +15,10 @@ RSpec.describe WeeklySummaries::ShowView, type: :component do
       trips:          32,
       days_worked:    5,
       per_km:         1.31,
-      daily_profits:  [300, 0, -150, 0, 600, 0, 0],
+      days:           week.range.zip([300, 0, -150, 0, 600, 0, 0]).map do |date, profit|
+        WeeklySummaries::Builder::Day.new(date: date, profit: profit, earnings: [profit, 0].max, expenses: [-profit, 0].max,
+                                          trips: 0, empty: profit.zero?, future: false)
+      end,
       best_day_index: 4,
       goal:           WeeklySummaries::Builder::GoalProgress.new(goal: goal, achieved: 987.40, percent: 89, hit: false),
       top_categories: [WeeklySummaries::Builder::TopCategory.new(key: 'fuel', amount: 312.0)],

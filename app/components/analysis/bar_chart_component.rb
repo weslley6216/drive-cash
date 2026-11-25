@@ -1,6 +1,7 @@
 module Analysis
   class BarChartComponent < ApplicationComponent
     include CardStyles
+    include BarTooltip
     PLOT_HEIGHT = 'h-[118px] lg:h-[206px]'.freeze
     BAR_WIDTH = { month: 'w-[5px] lg:w-3', day: 'w-[3px] lg:w-1.5' }.freeze
 
@@ -125,9 +126,7 @@ module Analysis
           earn:               brl(bar_row[:earnings]),
           exp:                brl(bar_row[:expenses]),
           muted:              bar_row[:empty].to_s,
-          action:             'mouseenter->bar-tooltip#show mouseleave->bar-tooltip#hide ' \
-                  'focus->bar-tooltip#show blur->bar-tooltip#hide ' \
-                  'click->bar-tooltip#toggle keydown.enter->bar-tooltip#toggle'
+          action:             COLUMN_ACTIONS
         }
       }
     end
@@ -159,19 +158,19 @@ module Analysis
             I18n.t('analysis.show_view.bar_chart.tooltip_no_data')
           end
           div(class: 'space-y-1', data: { bar_tooltip_target: 'values' }) do
-            tooltip_row('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'), 'earnValue')
-            tooltip_row('bg-red-400', I18n.t('analysis.show_view.bar_chart.legend_expenses'), 'expValue')
+            tooltip_row('bg-emerald-400', I18n.t('analysis.show_view.bar_chart.legend_earnings'), 'earn')
+            tooltip_row('bg-red-400', I18n.t('analysis.show_view.bar_chart.legend_expenses'), 'exp')
           end
           div(class: 'absolute left-1/2 bottom-0 w-2 h-2 bg-slate-900', style: 'transform: translate(-50%, 50%) rotate(45deg)')
         end
       end
     end
 
-    def tooltip_row(dot_class, label, value_target)
+    def tooltip_row(dot_class, label, field)
       div(class: 'flex items-center gap-2 text-xs') do
         span(class: "w-1.5 h-1.5 rounded-full #{dot_class}")
         span(class: 'text-slate-300') { label }
-        span(class: 'font-semibold tabular-nums ml-auto', data: { bar_tooltip_target: value_target })
+        span(class: 'font-semibold tabular-nums ml-auto', data: { bar_tooltip_target: 'field', field: field })
       end
     end
 

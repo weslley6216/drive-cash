@@ -116,6 +116,102 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'leaves the days after today without a tooltip and opens today with no records on a phone' do
+    visit weekly_summary_path('2026-07-13')
+
+    thursday = find('[data-weekday="3"]', visible: :all)
+
+    expect(thursday['aria-hidden']).to eq('true')
+
+    thursday.click
+
+    expect(page).to have_no_css('[data-bar-tooltip-target="tooltip"]', visible: true)
+
+    find('[data-weekday="1"]').click
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /ter, 14\/jul/i)
+    expect(page).to have_css('[data-bar-tooltip-target="noData"]', visible: true, text: 'Sem lançamentos')
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'pins the day tooltip on a tap, swaps it on another bar and closes it on a second tap or outside the chart on a phone' do
+    create(:expense, user: current_user, date: Date.new(2026, 7, 11), amount: 40, category: 'fuel', paid: true)
+
+    visit weekly_summary_path('2026-07-06')
+
+    find('[data-weekday="0"]').click
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /seg, 06\/jul/i)
+    expect(page).to have_css('[data-field="net"].text-white', text: 'R$ 200,00')
+    expect(page).to have_css('[data-field="earnings"]', text: 'R$ 200,00')
+    expect(page).to have_css('[data-field="expenses"]', text: 'R$ 0,00')
+    expect(page).to have_css('[data-field="trips"]', text: '8')
+    expect(find('[data-weekday="0"]').evaluate_script('getComputedStyle(this).backgroundColor')).to eq('rgba(15, 23, 42, 0.05)')
+    expect(find('[data-weekday="1"] [data-bar-tooltip-target="fill"]').evaluate_script('this.style.opacity')).to eq('0.4')
+
+    find('[data-weekday="5"]').click
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /sáb, 11\/jul/i)
+    expect(page).to have_css('[data-field="net"].text-red-400', text: '-R$ 40,00')
+
+    find('[data-weekday="5"]').click
+
+    expect(page).to have_no_css('[data-bar-tooltip-target="tooltip"]', visible: true)
+
+    find('[data-weekday="0"]').click
+    find('h3', text: I18n.t('weekly_summaries.show.daily_title')).click
+
+    expect(page).to have_no_css('[data-bar-tooltip-target="tooltip"]', visible: true)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'keeps the monday and sunday tooltips inside the card with the arrow over the bar on a phone' do
+    visit weekly_summary_path('2026-07-06')
+
+    card = find('#screen-content .rounded-xl', text: I18n.t('weekly_summaries.show.daily_title'))
+    monday = find('[data-weekday="0"]')
+
+    monday.click
+    tooltip = find('[data-bar-tooltip-target="tooltip"]', text: /seg, 06\/jul/i)
+    arrow = find('[data-bar-tooltip-target="arrow"]')
+
+    expect(box(tooltip)['x']).to be >= box(card)['x']
+    expect(box(tooltip)['bottom']).to be <= box(monday)['y'] + box(monday)['height']
+    expect(box(arrow)['x'] + (box(arrow)['width'] / 2)).to be_within(1).of(box(monday)['x'] + (box(monday)['width'] / 2))
+
+    find('[data-weekday="6"]').click
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: 'Sem lançamentos')
+    expect(box(find('[data-bar-tooltip-target="tooltip"]'))['right']).to be <= box(card)['right']
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'opens the day tooltip on hover beside the bar when the card sits at the top, to the left from thursday on a desktop screen' do
+    emulate_desktop_screen
+
+    visit weekly_summary_path('2026-07-06')
+
+    monday = find('[data-weekday="0"]')
+    friday = find('[data-weekday="4"]')
+
+    monday.hover
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /seg, 06\/jul/i)
+    expect(box(find('[data-bar-tooltip-target="tooltip"]'))['x']).to be >= box(monday)['right']
+
+    friday.click
+    monday.hover
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /sex, 10\/jul/i)
+    expect(box(find('[data-bar-tooltip-target="tooltip"]'))['right']).to be <= box(friday)['x']
+
+    friday.click
+    monday.execute_script('this.focus()')
+
+    expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /seg, 06\/jul/i)
+    expect(monday['aria-label']).to eq('Seg, 06/jul: líquido R$ 200,00, receitas R$ 200,00, despesas R$ 0,00, 8 corridas')
+  end
+
   it 'lays the hero and the goal on five columns beside the bars on a desktop screen' do
     goal
     emulate_desktop_screen

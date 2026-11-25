@@ -73,15 +73,36 @@ RSpec.describe WeeklySummaries::Builder do
       expect(summary.profit).to eq(0)
     end
 
-    it 'splits profit by weekday from monday to sunday' do
+    it 'breaks the week into days from monday to sunday with profit, earnings, paid expenses and trips' do
       create(:earning, user: user, date: Date.new(2026, 7, 6), amount: 300, trips_count: 10)
       create(:earning, user: user, date: Date.new(2026, 7, 10), amount: 500, trips_count: 12)
       create(:earning, user: user, date: Date.new(2026, 7, 10), amount: 100, trips_count: 3)
       create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 150, paid: true)
+      create(:expense, user: user, date: Date.new(2026, 7, 8), amount: 999, paid: false)
 
       summary = described_class.new(user: user, week: week).call
 
-      expect(summary.daily_profits).to eq([300, 0, -150, 0, 600, 0, 0])
+      expect(summary.days.map(&:date)).to eq(week.range.to_a)
+      expect(summary.days.map(&:profit)).to eq([300, 0, -150, 0, 600, 0, 0])
+      expect(summary.days[4]).to have_attributes(earnings: 600, expenses: 0, trips: 15, empty: false, future: false)
+      expect(summary.days[2]).to have_attributes(earnings: 0, expenses: 150, trips: 0, empty: false)
+      expect(summary.days[1]).to have_attributes(earnings: 0, expenses: 0, trips: 0, empty: true)
+    end
+
+    it 'keeps a day with only a pending expense out of the empty days with zeroed values' do
+      create(:expense, user: user, date: Date.new(2026, 7, 9), amount: 80, paid: false)
+
+      summary = described_class.new(user: user, week: week).call
+
+      expect(summary.days[3]).to have_attributes(profit: 0, earnings: 0, expenses: 0, trips: 0, empty: false)
+    end
+
+    it 'marks the days after today as future in the current week' do
+      travel_to Time.zone.local(2026, 7, 8, 10, 0)
+
+      summary = described_class.new(user: user, week: week).call
+
+      expect(summary.days.map(&:future)).to eq([false, false, false, true, true, true, true])
     end
 
     it 'picks the day with the highest positive profit as best' do
@@ -230,7 +251,7 @@ RSpec.describe WeeklySummaries::Builder do
       expect(summary.expenses_total).to eq(0)
       expect(summary.trips).to eq(0)
       expect(summary.days_worked).to eq(0)
-      expect(summary.daily_profits).to eq([0, 0, 0, 0, 0, 0, 0])
+      expect(summary.days.map(&:profit)).to eq([0, 0, 0, 0, 0, 0, 0])
       expect(summary.best_day_index).to be_nil
       expect(summary.top_categories).to eq([])
       expect(summary.goal).to be_nil
