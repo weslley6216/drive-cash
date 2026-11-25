@@ -2,7 +2,7 @@ module Chat
   class IndexView < ApplicationView
     include Formatting
 
-    SCREEN = 'flex-1 flex flex-col min-h-0 px-5 safe-top pb-4 sm:p-6'.freeze
+    SCREEN = 'flex-1 flex flex-col min-h-0 px-5 safe-top pb-4 sm:p-6 lg:max-w-2xl lg:mx-auto lg:w-full'.freeze
 
     def initialize(messages: [])
       @messages = messages
@@ -25,14 +25,18 @@ module Chat
 
     def header_section
       div(class: 'flex items-center justify-between pt-2 sm:pt-0 mb-4 flex-shrink-0') do
-        div(class: 'flex items-center gap-3') do
+        div(class: 'flex items-center gap-2.5') do
           link_to(root_path, class: 'text-slate-400 hover:text-slate-600 transition-colors p-1') do
             render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-5 h-5')
           end
+          header_avatar
 
           div do
-            h1(class: 'text-lg font-bold text-slate-800') { t('chat.index.header') }
-            p(class: 'text-xs text-slate-500') { t('chat.index.subtitle') }
+            h1(class: 'text-sm font-bold text-slate-800 leading-tight') { t('chat.index.header') }
+            p(class: 'text-[11px] text-emerald-600 font-medium flex items-center gap-1') do
+              span(class: 'w-1.5 h-1.5 rounded-full bg-emerald-500')
+              plain t('chat.index.subtitle')
+            end
           end
         end
 
@@ -41,6 +45,12 @@ module Chat
           data:  { turbo_method: :delete },
           class: 'text-xs text-slate-400 hover:text-red-500 transition-colors'
         ) { t('chat.index.clear') }
+      end
+    end
+
+    def header_avatar
+      div(class: 'w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0') do
+        render PhlexIcons::Lucide::Sparkles.new(class: 'w-[17px] h-[17px] text-violet-600')
       end
     end
 
