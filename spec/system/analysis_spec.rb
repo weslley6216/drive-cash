@@ -114,7 +114,8 @@ RSpec.describe 'Analysis', type: :system, js: true do
     may.execute_script('this.focus()')
 
     expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /mai/i)
-    expect(page).to have_css('[data-bar-tooltip-target="earnValue"]', text: 'R$ 1.000,00')
+    expect(page).to have_css('[data-bar-tooltip-target="field"][data-field="earn"]', text: 'R$ 1.000,00')
+    expect(find('[data-bar-tooltip-target="column"]', text: 'Abr').find('[data-bar-tooltip-target="fill"]', match: :first).evaluate_script('this.style.opacity')).to eq('0.45')
 
     may.execute_script('this.blur()')
 

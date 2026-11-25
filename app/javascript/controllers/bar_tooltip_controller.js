@@ -1,7 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['column', 'tooltip', 'label', 'noData', 'values', 'earnValue', 'expValue', 'fill']
+  static targets = ['column', 'tooltip', 'label', 'noData', 'values', 'field', 'fill']
+  static values = { dimOpacity: { type: Number, default: 0.45 } }
 
   connect() {
     this.active = null
@@ -48,8 +49,7 @@ export default class extends Controller {
     this.valuesTarget.classList.toggle('hidden', muted)
 
     if (!muted) {
-      this.earnValueTarget.textContent = column.dataset.earn
-      this.expValueTarget.textContent = column.dataset.exp
+      this.fieldTargets.forEach((field) => { field.textContent = column.dataset[field.dataset.field] })
     }
 
     this.tooltipTarget.classList.remove('hidden')
@@ -88,7 +88,7 @@ export default class extends Controller {
       const isActive = this.indexFor(column) === index
       column.style.backgroundColor = isActive ? 'rgba(15, 23, 42, 0.05)' : ''
       this.fillsOf(column).forEach((fill) => {
-        fill.style.opacity = isActive ? '1' : '0.45'
+        fill.style.opacity = isActive ? '1' : String(this.dimOpacityValue)
       })
     })
   }

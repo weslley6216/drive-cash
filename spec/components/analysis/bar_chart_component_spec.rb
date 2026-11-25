@@ -139,6 +139,15 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(html).to include('hidden')
   end
 
+  it 'fills the earnings and expenses rows through the generic tooltip fields' do
+    html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
+
+    tooltip = Capybara.string(html).find('[data-bar-tooltip-target="tooltip"]', visible: :all)
+
+    expect(tooltip).to have_css('[data-bar-tooltip-target="field"][data-field="earn"]', visible: :all)
+    expect(tooltip).to have_css('[data-bar-tooltip-target="field"][data-field="exp"]', visible: :all)
+  end
+
   it 'exposes each non-empty column with index and earnings and expenses formatted in BRL' do
     html = view_context.render(Analysis::BarChartComponent.new(bars: daily_bars, month: 6, year: 2025))
 
