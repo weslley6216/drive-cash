@@ -43,11 +43,6 @@ pt-BR:
       maintenance_not_found: "Manutenção não encontrada para essa categoria."
     answer:
       no_data: "Ainda não tenho dados suficientes para responder isso."
-      profit: "Lucro: %{value}"
-      earnings: "Ganhos: %{value}"
-      expenses: "Despesas: %{value}"
-      margin: "Margem: %{value}%%"
-      per_km: "%{value}/km"
       per_km_value: "%{value} por km"
       per_trip_value: "%{value} por corrida"
       vendor_best: "%{vendor} é o mais econômico · %{kml} km/L · economia ~%{savings}/mês"

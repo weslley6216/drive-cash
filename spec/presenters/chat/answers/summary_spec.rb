@@ -2,29 +2,27 @@ require 'rails_helper'
 
 RSpec.describe Chat::Answers::Summary do
   describe '#call' do
-    it 'formats profit, earnings and expenses' do
-      data = { profit: 500.0, earnings: 1000.0, expenses: 500.0 }
+    it 'returns the month numbers as a card payload with the best day as an ISO date' do
+      data = {
+        year: 2026, month: 11, profit: 1240.0, earnings: 1680.0, expenses: 440.0, profit_change: 12.0,
+        best_day: { date: Date.new(2026, 11, 12), amount: 320.0 }
+      }
 
       result = described_class.new(data).call
 
-      expect(result).to include('500,00')
-      expect(result).to include('1.000,00').or include('1000,00')
+      expect(result.to_h).to eq(
+        year: 2026, month: 11, profit: 1240.0, earnings: 1680.0, expenses: 440.0, profit_change: 12.0,
+        best_day_on: '2026-11-12', best_day_amount: 320.0
+      )
     end
 
-    it 'includes margin when present' do
-      data = { profit: 200.0, earnings: 400.0, expenses: 200.0, margin: 50.0 }
+    it 'leaves the best day empty in a yearly summary' do
+      data = { year: 2026, month: nil, profit: 1240.0, earnings: 1680.0, expenses: 440.0, profit_change: nil, best_day: nil }
 
       result = described_class.new(data).call
 
-      expect(result).to include('50')
-    end
-
-    it 'includes per_km when present' do
-      data = { profit: 200.0, earnings: 400.0, expenses: 200.0, per_km: 2.5 }
-
-      result = described_class.new(data).call
-
-      expect(result).to include('2,50')
+      expect(result.best_day_on).to be_nil
+      expect(result.best_day_amount).to be_nil
     end
 
     it 'returns no_data when data is nil' do
