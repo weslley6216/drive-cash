@@ -162,7 +162,7 @@ module Chat
       template(data: { chat_target: 'userTemplate' }) do
         div(class: 'flex justify-end') do
           div(class: 'bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm leading-relaxed') do
-            span(class: 'hidden inline-flex items-center gap-1.5', data: { message_voice: '' }) do
+            span(class: 'hidden items-center gap-1.5', data: { message_voice: '' }) do
               render PhlexIcons::Lucide::Mic.new(class: 'w-[13px] h-[13px] text-white/80')
             end
             span(data: { message_content: '' })

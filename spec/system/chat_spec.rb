@@ -59,6 +59,7 @@ RSpec.describe 'Chat', type: :system, js: true do
     expect(page).to have_field('message', with: '')
     bubble = find('#chat_messages .bg-blue-600', text: message)
     expect(box(bubble)['right']).to be <= Phone::WIDTH
+    expect(page).to have_no_css('[data-message-voice]', visible: true)
     expect(page).to have_no_text(I18n.t('chat.index.empty_title'))
     expect(page).to fit_the_phone_width
     expect(received_messages.pop(timeout: 5)).to eq(message)

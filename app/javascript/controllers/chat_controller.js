@@ -81,7 +81,10 @@ export default class extends Controller {
 
     const userNode = this.userTemplateTarget.content.cloneNode(true)
     userNode.querySelector("[data-message-content]").textContent = message
-    if (this.voiceTarget.value) userNode.querySelector("[data-message-voice]").classList.remove("hidden")
+    if (this.voiceTarget.value) {
+      userNode.querySelector("[data-message-voice]").classList.remove("hidden")
+      userNode.querySelector("[data-message-voice]").classList.add("inline-flex")
+    }
     this.messagesTarget.appendChild(userNode)
 
     const typingNode = this.typingTemplateTarget.content.cloneNode(true)
