@@ -63,7 +63,7 @@ module Vehicles
 
     def mobile_layout
       div(class: 'space-y-4') do
-        render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago])
+        render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], stale: odometer[:stale])
         div(id: 'vehicle_tank_section') { highlightable_tank }
         div(id: 'vehicle_maintenances_section') { maintenances_section(limit: MOBILE_MAINTENANCE_LIMIT) }
         moves_section
@@ -192,7 +192,7 @@ module Vehicles
     def desktop_row_one
       div(class: 'grid grid-cols-12 gap-5') do
         div(class: 'col-span-12 lg:col-span-5') do
-          render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], variant: :desktop)
+          render Vehicles::OdometerHeroComponent.new(current_km: odometer[:current_km], km_this_month: odometer[:km_this_month], updated_days_ago: odometer[:updated_days_ago], stale: odometer[:stale], variant: :desktop)
         end
         div(class: 'col-span-12 lg:col-span-7') { highlightable_tank }
       end
