@@ -33,6 +33,8 @@ class LayoutComponent < ApplicationComponent
       meta(name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#0f172a')
       meta(name: 'turbo-refresh-method', content: 'morph')
       meta(name: 'turbo-refresh-scroll', content: 'preserve')
+      meta(name: 'nav-active-sidebar', content: @sidebar_nav) if sidebar_nav?
+      meta(name: 'nav-active-bottom', content: @bottom_nav) if bottom_nav?
 
       link(rel: 'manifest', href: '/manifest.json')
 
@@ -51,12 +53,20 @@ class LayoutComponent < ApplicationComponent
   def body_section(&block)
     body(class: body_classes) do
       render LoadingOverlayComponent.new unless @auth
-      render SidebarNavComponent.new(active: @sidebar_nav) if @sidebar_nav && !@auth
+      render SidebarNavComponent.new(active: @sidebar_nav) if sidebar_nav?
       div(class: content_wrapper_classes) do
         div(class: container_classes, &block)
       end
-      render BottomNavComponent.new(active: @bottom_nav) if @bottom_nav && !@auth
+      render BottomNavComponent.new(active: @bottom_nav) if bottom_nav?
     end
+  end
+
+  def sidebar_nav?
+    @sidebar_nav && !@auth
+  end
+
+  def bottom_nav?
+    @bottom_nav && !@auth
   end
 
   def body_classes

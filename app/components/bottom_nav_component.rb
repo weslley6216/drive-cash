@@ -15,7 +15,7 @@ class BottomNavComponent < ApplicationComponent
     nav(
       id:    'bottom-nav',
       class: 'flex-none bg-white border-t border-slate-200 px-2 pt-2 pb-bottom-nav-inset z-30 lg:hidden',
-      data:  { turbo_permanent: '', controller: 'nav-active' }
+      data:  { turbo_permanent: '', controller: 'nav-active', nav_active_key_value: 'bottom' }
     ) do
       div(class: 'flex items-stretch justify-around max-w-md mx-auto') do
         TABS.each { |tab| tab_button(tab) }
@@ -32,6 +32,7 @@ class BottomNavComponent < ApplicationComponent
       class: "flex flex-col items-center gap-1 px-2 py-1 rounded-lg #{active ? 'text-blue-600' : 'text-slate-400'}",
       data:  {
         nav_active_target: 'tab',
+        nav_id:            tab[:id],
         active_classes:    'text-blue-600',
         inactive_classes:  'text-slate-400'
       }
@@ -39,7 +40,7 @@ class BottomNavComponent < ApplicationComponent
       render tab[:icon].new(
         class: "w-[22px] h-[22px] #{active ? 'stroke-[2.4]' : 'stroke-2'}",
         data:  {
-          nav_active_target: 'icon',
+          nav_active_target: 'part',
           active_classes:    'stroke-[2.4]',
           inactive_classes:  'stroke-2'
         }
