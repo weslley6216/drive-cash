@@ -71,6 +71,26 @@ RSpec.describe Vehicle, type: :model do
     end
   end
 
+  describe '#odometer_stale?' do
+    it 'is fresh up to seven days after the last odometer update' do
+      vehicle = build(:vehicle, odometer_updated_at: 7.days.ago)
+
+      expect(vehicle.odometer_stale?).to be(false)
+    end
+
+    it 'is stale beyond seven days after the last odometer update' do
+      vehicle = build(:vehicle, odometer_updated_at: 8.days.ago)
+
+      expect(vehicle.odometer_stale?).to be(true)
+    end
+
+    it 'is stale when the odometer was never updated' do
+      vehicle = build(:vehicle, odometer_updated_at: nil)
+
+      expect(vehicle.odometer_stale?).to be(true)
+    end
+  end
+
   describe 'odometer freshness stamping' do
     it 'stamps the timestamp when the odometer advances' do
       vehicle = create(:vehicle, odometer_km: 48_000, odometer_updated_at: 10.days.ago)

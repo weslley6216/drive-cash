@@ -10,7 +10,7 @@ RSpec.describe Vehicles::MaintenanceService do
         result = described_class.new(user: user, date: reference_date).call
 
         expect(result[:vehicle]).to be_nil
-        expect(result[:odometer]).to eq(current_km: 0, km_this_month: 0, updated_days_ago: nil)
+        expect(result[:odometer]).to eq(current_km: 0, km_this_month: 0, updated_days_ago: nil, stale: true)
         expect(result[:maintenances]).to eq([])
         expect(result[:insights]).to eq([])
       end
@@ -30,6 +30,15 @@ RSpec.describe Vehicles::MaintenanceService do
         expect(result[:odometer][:current_km]).to eq(160_928)
         expect(result[:odometer][:km_this_month]).to eq(1840)
         expect(result[:odometer][:updated_days_ago]).to eq(3)
+        expect(result[:odometer][:stale]).to be(false)
+      end
+
+      it 'flags the odometer as stale beyond seven days without an update' do
+        vehicle.update_columns(odometer_updated_at: 10.days.ago)
+
+        result = described_class.new(user: user, date: reference_date).call
+
+        expect(result[:odometer][:stale]).to be(true)
       end
 
       it 'returns maintenances ordered by progress descending with status_key' do
