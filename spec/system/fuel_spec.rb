@@ -40,6 +40,27 @@ RSpec.describe 'Fuel', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'divides the refuel modal header with the light slate line of the prototype on a phone' do
+    create(:refueling, vehicle: vehicle, vendor: 'Geladão', full_tank: true, date: Date.current - 3)
+    visit vehicle_path
+    click_on I18n.t('vehicle.tank.refuel')
+
+    header = find('h2', text: I18n.t('refuelings.form.title_new')).find(:xpath, '..')
+    slate_line = page.evaluate_script(<<~JS)
+      (() => {
+        const probe = document.createElement('div');
+        probe.className = 'border border-slate-200';
+        document.body.append(probe);
+        const color = getComputedStyle(probe).borderTopColor;
+        probe.remove();
+        return color;
+      })()
+    JS
+
+    expect(header.evaluate_script('getComputedStyle(this).borderBottomColor')).to eq(slate_line)
+    expect(page).to fit_the_phone_width
+  end
+
   it 'inherits the vendor from the active tank on a phone' do
     vehicle.update!(odometer_km: 160_928)
     create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', full_tank: true, date: Date.current - 1)
