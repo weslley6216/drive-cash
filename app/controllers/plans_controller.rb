@@ -10,8 +10,8 @@ class PlansController < ApplicationController
   private
 
   def show_view
-    return Plans::SubscriptionView.new(subscription: Plans::Subscription.new(current_user)) if current_user.pro?
+    return Plans::SubscriptionView.new(subscription: Plans::Subscription.new(current_user), unread_count: current_user.unread_notifications_count) if current_user.pro?
 
-    Plans::ShowView.new(comparison: Plans::Comparison.new)
+    Plans::ShowView.new(comparison: Plans::Comparison.new, unread_count: current_user.unread_notifications_count)
   end
 end

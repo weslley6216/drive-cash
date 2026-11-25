@@ -2,18 +2,22 @@ module Plans
   class ShowView < ApplicationView
     include TopbarStyles
 
-    def initialize(comparison:)
+    def initialize(comparison:, unread_count:)
       @comparison = comparison
+      @unread_count = unread_count
     end
 
     def view_template
       render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
-        render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
-          screen.with_content do
-            div(data: { controller:                'plan-billing',
-                        plan_billing_active_class: PriceToggleComponent::ACTIVE_CLASSES,
-                        plan_billing_idle_class:   PriceToggleComponent::IDLE_CLASSES }) do
+        div(class: 'contents', data: { controller:                'plan-billing',
+                                       plan_billing_active_class: PriceToggleComponent::ACTIVE_CLASSES,
+                                       plan_billing_idle_class:   PriceToggleComponent::IDLE_CLASSES }) do
+          render ScreenComponent.new do |screen|
+            screen.with_header do
+              mobile_header
+              desktop_topbar
+            end
+            screen.with_content do
               mobile_layout
               desktop_layout
             end
@@ -61,7 +65,6 @@ module Plans
 
     def desktop_layout
       div(class: 'hidden lg:block') do
-        desktop_header
         div(class: 'max-w-3xl mx-auto') do
           desktop_pitch
           div(class: 'grid grid-cols-2 gap-6 items-start') do
@@ -72,13 +75,9 @@ module Plans
       end
     end
 
-    def desktop_header
-      div(class: 'mb-6 flex items-center justify-between') do
-        div do
-          h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
-          p(class: 'text-sm text-slate-500 mt-1') { t('.desktop_subtitle') }
-        end
-        render PriceToggleComponent.new(discount_percent: @comparison.yearly_discount_percent)
+    def desktop_topbar
+      render DesktopTopbarComponent.new(title: t('.heading'), subtitle: t('.desktop_subtitle'), unread_count: @unread_count) do |topbar|
+        topbar.with_actions { render PriceToggleComponent.new(discount_percent: @comparison.yearly_discount_percent) }
       end
     end
 
