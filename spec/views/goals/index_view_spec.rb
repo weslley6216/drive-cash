@@ -189,8 +189,8 @@ RSpec.describe Goals::IndexView, type: :component do
 
       rendered = view_context.render(described_class.new(progress: progress, filters: filters, past_monthly: rows, unread_count: 0))
 
-      expect(rendered).to include(%(href="/goals/#{missed_goal.id}/outcomes/2026-05-01"))
-      expect(rendered).to include(%(href="/goals/#{hit_goal.id}/outcomes/2026-04-01"))
+      expect(rendered).to include(%(href="/goals/#{missed_goal.id}/outcomes/2026-05-01?return_to=%2F"))
+      expect(rendered).to include(%(href="/goals/#{hit_goal.id}/outcomes/2026-04-01?return_to=%2F"))
     end
   end
 end

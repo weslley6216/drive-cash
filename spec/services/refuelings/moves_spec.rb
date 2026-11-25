@@ -83,6 +83,32 @@ RSpec.describe Refuelings::Moves do
       expect(result.map { |move| move[:date] }).to eq([Date.new(2026, 6, 15), Date.new(2026, 6, 1)])
     end
 
+    it 'lists a fuel expense as newer than the refueling of the same day' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1))
+      create(:expense, user: user, category: 'fuel', amount: 45, date: Date.new(2026, 6, 1))
+
+      result = described_class.call(user: user)
+
+      expect(result.map { |move| move[:kind] }).to eq(%i[debit credit])
+    end
+
+    it 'lists the refuelings of the same day in the order they were registered' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), vendor: 'Posto Orense')
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), vendor: 'Posto Geladão')
+
+      result = described_class.call(user: user)
+
+      expect(result.map { |move| move[:vendor] }).to eq(['Posto Geladão', 'Posto Orense'])
+    end
+
+    it 'exposes whether each credit filled the tank and its odometer reading' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 1), full_tank: false, odometer_km: 10_483)
+
+      result = described_class.call(user: user)
+
+      expect(result.first).to include(full_tank: false, odometer_km: 10_483)
+    end
+
     it 'scopes credits to the user vehicle (does not leak from other users)' do
       vehicle
       other_vehicle = create(:vehicle)

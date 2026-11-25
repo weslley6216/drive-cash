@@ -24,20 +24,25 @@ RSpec.describe 'Refuelings', type: :request do
       expect(response.body).to include('Rota IFood')
     end
 
-    it 'renders cadence when at least two full_tank refuelings exist' do
-      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 1), total_amount: 200)
-      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 11), total_amount: 200)
-
-      get refuelings_path
-
-      expect(response.body).to include(I18n.t('vehicle.moves.cadence', count: 10))
-    end
-
-    it 'renders the empty state when there are no moves' do
+    it 'renders the empty state with the refuel call to action' do
       get refuelings_path
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(I18n.t('vehicle.moves.empty'))
+      expect(response.body).to include(I18n.t('vehicle.moves.empty.title'))
+      expect(response.body).to include(I18n.t('vehicle.moves.empty.description'))
+      expect(response.body).to include(%(href="#{new_refueling_path}"))
+      expect(response.body).to include('data-turbo-frame="modal"')
+    end
+
+    it 'groups the moves under the tank that opened them' do
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 19), total_amount: 254)
+      create(:refueling, vehicle: vehicle, full_tank: true, date: Date.new(2026, 5, 28), total_amount: 250)
+
+      get refuelings_path
+
+      expect(response.body).to include(I18n.t('vehicle.moves.cycle.title', date: '28 mai'))
+      expect(response.body).to include(I18n.t('vehicle.moves.cycle.title', date: '19 mai'))
+      expect(response.body).to include('id="tank_cycle_2026-05-28"')
     end
 
     it 'redirects to vehicle page when user has no vehicle' do

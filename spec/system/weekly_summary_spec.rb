@@ -52,7 +52,7 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
-  it 'opens the goal outcome from the goal block on a phone' do
+  it 'opens the goal outcome from the goal block and goes back to the week on a phone' do
     goal
 
     visit weekly_summary_path('2026-07-06')
@@ -61,8 +61,12 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
 
     click_on 'Ver resultado da meta'
 
-    expect(page).to have_current_path("/goals/#{goal.id}/outcomes/2026-07-06")
+    expect(page).to have_current_path("/goals/#{goal.id}/outcomes/2026-07-06", ignore_query: true)
     expect(page).to fit_the_phone_width
+
+    click_on I18n.t('goals.outcomes.show.back')
+
+    expect(page).to have_current_path('/weekly_summaries/2026-07-06')
   end
 
   it 'opens the entries of the week in the history on a phone' do

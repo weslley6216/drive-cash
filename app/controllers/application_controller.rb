@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include RecordParams
   include RecordSaveResponse
   include ModalRefreshResponse
+  include ReturnNavigation
 
   allow_browser versions: :modern
 

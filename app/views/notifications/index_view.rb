@@ -37,11 +37,7 @@ module Notifications
       div(class: "#{PHONE_BAR} lg:hidden") do
         div(class: 'flex items-start justify-between gap-3') do
           div(class: 'flex items-start gap-2') do
-            link_to(helpers.account_path,
-                    class: 'p-1 -ml-1 mt-0.5 text-slate-500',
-                    aria:  { label: t('notifications.index.back') }) do
-              render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
-            end
+            render BackLinkComponent.new(fallback: helpers.account_path, label: t('notifications.index.back'))
             h1(class: 'text-2xl font-bold text-slate-800') { t('notifications.index.title') }
           end
           preferences_link(css: PREFERENCES_MOBILE_CLASSES)
@@ -67,8 +63,8 @@ module Notifications
     end
 
     def preferences_link(css:)
-      link_to(helpers.edit_notification_preferences_path, class: css,
-                                                          aria:  { label: t('notifications.index.preferences') }) do
+      link_to(helpers.edit_notification_preferences_path(return_to: helpers.request.fullpath), class: css,
+                                                                                               aria:  { label: t('notifications.index.preferences') }) do
         render PhlexIcons::Lucide::Settings.new(class: 'w-[17px] h-[17px]')
       end
     end

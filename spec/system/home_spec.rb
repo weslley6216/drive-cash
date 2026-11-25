@@ -108,8 +108,8 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(bell.evaluate_script('this === this.parentElement.lastElementChild')).to be(true)
     expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
     expect(box(bell)['width']).to eq(40)
-    expect(page).to have_no_css('#sidebar-nav a[href="/notifications"]')
-    expect(page).to have_no_css('a.rounded-full[href="/notifications"]')
+    expect(page).to have_no_css('#sidebar-nav a[href^="/notifications"]')
+    expect(page).to have_no_css('a.rounded-full[href^="/notifications"]')
   end
 
   it 'keeps the round bell with the blue badge in the phone header and hides the desktop topbar on a phone' do

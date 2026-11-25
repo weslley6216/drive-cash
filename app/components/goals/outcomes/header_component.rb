@@ -21,10 +21,7 @@ module Goals
 
       def mobile_header
         div(class: "#{PHONE_BAR} flex items-start gap-2 lg:hidden") do
-          link_to(helpers.notifications_path, class: 'p-1 -ml-1 mt-0.5 text-slate-500',
-                                              aria:  { label: t('goals.outcomes.show.back') }) do
-            render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-[22px] h-[22px]')
-          end
+          render BackLinkComponent.new(fallback: helpers.notifications_path, label: t('goals.outcomes.show.back'))
           div do
             h1(class: 'text-2xl font-bold text-slate-800 leading-tight') { @title }
             p(class: 'text-sm text-slate-500 mt-0.5') { period_label.full }

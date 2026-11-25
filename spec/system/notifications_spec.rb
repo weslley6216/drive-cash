@@ -50,6 +50,29 @@ RSpec.describe 'Notifications', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'goes back home from the notifications opened by the home bell on a phone' do
+    visit root_path
+    click_on I18n.t('notifications.index.title')
+
+    expect(page).to have_current_path(notifications_path, ignore_query: true)
+
+    click_on I18n.t('notifications.index.back')
+
+    expect(page).to have_current_path(root_path)
+    expect(page).to fit_the_phone_width
+  end
+
+  it 'goes back to Mais from the notifications opened by Mais on a phone' do
+    visit account_path
+    click_on I18n.t('account.items.notifications.label')
+
+    expect(page).to have_current_path(notifications_path)
+
+    click_on I18n.t('notifications.index.back')
+
+    expect(page).to have_current_path(account_path)
+  end
+
   it 'lines the notification cards and the mark-all action up with the 20px prototype gutter on a phone' do
     create(:notification, user: current_user, kind: 'log_reminder', data: { 'date' => '2026-11-10' })
 
@@ -156,7 +179,7 @@ RSpec.describe 'Notifications', type: :system, js: true do
     visit notifications_path
     click_on I18n.t('notifications.index.preferences')
 
-    expect(page).to have_current_path(edit_notification_preferences_path)
+    expect(page).to have_current_path(edit_notification_preferences_path, ignore_query: true)
   end
 
   it 'shows the active bell without the badge next to the mark-all action and the preferences on a desktop screen' do

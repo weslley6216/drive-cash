@@ -24,7 +24,7 @@ RSpec.describe 'Notifications', type: :request do
       it 'links to the preferences when empty' do
         get notifications_path
 
-        expect(response.body).to include('href="/notification_preferences/edit"')
+        expect(response.body).to include('href="/notification_preferences/edit?return_to=%2Fnotifications"')
         expect(response.body).to include('aria-label="Preferências"')
       end
 
@@ -59,7 +59,7 @@ RSpec.describe 'Notifications', type: :request do
 
         get notifications_path
 
-        expect(response.body).to include('href="/notification_preferences/edit"')
+        expect(response.body).to include('href="/notification_preferences/edit?return_to=%2Fnotifications"')
         expect(response.body).to include('aria-label="Preferências"')
       end
 

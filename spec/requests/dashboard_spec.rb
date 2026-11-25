@@ -136,7 +136,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       get root_path
 
-      expect(response.body.scan('href="/notifications"').size).to eq(2)
+      expect(response.body.scan('href="/notifications?return_to=%2F"').size).to eq(2)
       expect(response.body.scan(NotificationBellComponent::BADGE_CLASSES).size).to eq(1)
       expect(response.body).to include('aria-label="Notificações, 1 não lida"')
     end

@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe NotificationBellComponent, type: :component do
-  it 'links to the notification center' do
+  it 'links to the notification center carrying the screen it opened from' do
     html = view_context.render(described_class.new(unread_count: 0))
 
-    expect(html).to include('href="/notifications"')
+    expect(html).to include('href="/notifications?return_to=%2F"')
   end
 
   it 'escapes the dashboard page frame with a full-page navigation' do

@@ -44,7 +44,8 @@ module Vehicles
     def build_moves(refuelings, debit_expenses)
       credits = refuelings.map do |refueling|
         { kind: :credit, date: refueling.date, amount: refueling.total_amount,
-          vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter }
+          vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter,
+          full_tank: refueling.full_tank }
       end
       debits = debit_expenses.map do |expense|
         { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }

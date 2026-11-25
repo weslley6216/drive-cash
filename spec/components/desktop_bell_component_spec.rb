@@ -1,11 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe DesktopBellComponent, type: :component do
-  it 'links to the notification center escaping the page frame' do
+  it 'links to the notification center carrying the screen it opened from and escaping the page frame' do
     html = view_context.render(described_class.new(unread_count: 0))
 
-    expect(html).to include('href="/notifications"')
+    expect(html).to include('href="/notifications?return_to=%2F"')
     expect(html).to include('data-turbo-frame="_top"')
+  end
+
+  it 'links the active bell to the notification center without a return to itself' do
+    html = view_context.render(described_class.new(unread_count: 0, active: true))
+
+    expect(html).to include('href="/notifications"')
   end
 
   it 'renders the square slate button with the 20px bell from the prototype' do
