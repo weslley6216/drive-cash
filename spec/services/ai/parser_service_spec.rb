@@ -226,6 +226,21 @@ RSpec.describe Ai::ParserService do
         )
       end
 
+      context 'when the presenter answers with a card payload' do
+        let(:card_class) { Data.define(:profit, :profit_change) }
+        let(:presenter_double) { instance_double('presenter', call: card_class.new(profit: 1000.0, profit_change: nil)) }
+
+        it 'returns the card tagged with the query type and the raw numbers as content' do
+          result = service.call
+
+          expect(result).to eq(
+            type:    :answer,
+            content: 'profit: 1000.0',
+            card:    { profit: 1000.0, profit_change: nil, kind: 'summary' }
+          )
+        end
+      end
+
       context 'when the reader raises an error' do
         before do
           allow(reader_class).to receive(:new).and_raise(StandardError, 'connection refused')

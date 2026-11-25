@@ -84,11 +84,17 @@ module Ai
 
     def build_answer(reader_class, presenter_class, params)
       data = reader_class.new(params, user: @user).call
-      content = presenter_class.new(data).call
-      { type: :answer, content: content }
+      answer = presenter_class.new(data).call
+      return { type: :answer, content: answer } if answer.is_a?(String)
+
+      { type: :answer, content: card_content(answer), card: answer.to_h.merge(kind: params['type']) }
     rescue StandardError => e
       Rails.logger.error "[ParserService] Reader error: #{e.message}"
       { type: :text, content: I18n.t('chat.errors.api_error') }
+    end
+
+    def card_content(answer)
+      answer.to_h.compact.map { |key, value| "#{key}: #{value}" }.join(', ')
     end
 
     def build_batch_preview(calls, text_before:)
