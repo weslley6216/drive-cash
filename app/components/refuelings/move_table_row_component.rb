@@ -24,7 +24,7 @@ module Refuelings
     def move_cell
       span(class: 'flex items-center gap-2.5 min-w-0') do
         icon_block
-        span(class: 'font-medium text-slate-800 truncate') { label }
+        span(class: label_classes) { label }
         span(class: sub_label_classes) { sub_label }
       end
     end
@@ -35,6 +35,10 @@ module Refuelings
         icon = credit? ? PhlexIcons::Lucide::Fuel : PhlexIcons::Lucide::Route
         render icon.new(class: 'w-[14px] h-[14px]')
       end
+    end
+
+    def label_classes
+      credit? ? 'font-medium text-slate-800' : 'font-medium text-slate-800 truncate'
     end
 
     def sub_label_classes

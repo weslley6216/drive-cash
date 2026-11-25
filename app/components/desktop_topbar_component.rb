@@ -35,7 +35,7 @@ class DesktopTopbarComponent < ApplicationComponent
   private
 
   def back_link
-    link_to(@back[:path], class: 'flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-1') do
+    link_to(@back[:path], class: 'flex w-fit items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-1') do
       render PhlexIcons::Lucide::ArrowLeft.new(class: 'w-3.5 h-3.5')
       plain @back[:label]
     end

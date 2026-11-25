@@ -27,7 +27,7 @@ RSpec.describe DesktopTopbarComponent, type: :component do
 
     expect(title_block.element_children.map(&:name)).to eq(%w[a h1 p])
     expect(back['href']).to eq('/vehicle')
-    expect(back['class']).to eq('flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-1')
+    expect(back['class']).to eq('flex w-fit items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-1')
     expect(back.text).to eq('Meu veículo')
     expect(back.at_css('svg')['class']).to eq('w-3.5 h-3.5')
   end

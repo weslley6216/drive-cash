@@ -11,6 +11,7 @@ RSpec.describe Refuelings::MoveTableRowComponent, type: :component do
     expect(row['data-tank-filter-kind']).to eq('route')
     expect(row.element_children.map(&:text)).to eq(['04 jun', 'Rota Mercado LivreCombustível', '−R$ 400,00', '−R$ 1,00'])
     expect(row.element_children.last['class']).to eq('text-right tabular-nums text-red-700 font-semibold')
+    expect(row.at_css('span.font-medium')['class']).to eq('font-medium text-slate-800 truncate')
   end
 
   it 'lays a full tank out with its vendor detail and a plain balance' do
@@ -22,6 +23,7 @@ RSpec.describe Refuelings::MoveTableRowComponent, type: :component do
     expect(row['data-tank-filter-kind']).to eq('fill')
     expect(row.text).to include('Tanque cheio')
     expect(row.text).to include('Posto Orense · 44,1 L · R$ 5,89/L')
+    expect(row.at_css('span.font-medium')['class']).to eq('font-medium text-slate-800')
     expect(row.element_children[2].text).to eq('+R$ 260,00')
     expect(row.element_children.last['class']).to eq('text-right tabular-nums text-slate-600')
     expect(row.element_children.last.text).to eq('R$ 259,00')
