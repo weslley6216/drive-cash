@@ -10,16 +10,20 @@ module Exports
       { key: 'maintenances', icon: PhlexIcons::Lucide::Wrench }
     ].freeze
 
-    def initialize(export:, exports:, summary_view:)
+    def initialize(export:, exports:, summary_view:, unread_count:)
       @export = export
       @exports = exports
       @summary_view = summary_view
+      @unread_count = unread_count
     end
 
     def view_template
       render LayoutComponent.new(title: t('exports.title'), sidebar_nav: :more) do
         render ScreenComponent.new do |screen|
-          screen.with_header { mobile_header }
+          screen.with_header do
+            mobile_header
+            desktop_topbar
+          end
           screen.with_content do
             form_with(model: @export, url: exports_path, method: :post, local: true, id: 'export-form', data: { controller: 'export-period export-pill export-field-sync' }) do
               mobile_layout
@@ -47,7 +51,6 @@ module Exports
 
     def desktop_layout
       div(class: 'hidden lg:block') do
-        desktop_header
         div(class: 'grid grid-cols-[1fr_360px] gap-8 items-start max-w-5xl') do
           div(class: 'space-y-6') do
             desktop_panel(t('exports.period.label')) { period_chips_desktop }
@@ -71,11 +74,8 @@ module Exports
       end
     end
 
-    def desktop_header
-      div(class: 'mb-6') do
-        h1(class: 'text-2xl font-bold text-slate-800') { t('exports.desktop_title') }
-        p(class: 'text-sm text-slate-500 mt-1') { t('exports.desktop_subtitle') }
-      end
+    def desktop_topbar
+      render DesktopTopbarComponent.new(title: t('exports.desktop_title'), subtitle: t('exports.desktop_subtitle'), unread_count: @unread_count)
     end
 
     def why_block

@@ -4,7 +4,8 @@ class ExportsController < ApplicationController
 
   def index
     export = build_export
-    render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export))
+    render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export),
+                                unread_count: current_user.unread_notifications_count)
   end
 
   def create
@@ -14,7 +15,8 @@ class ExportsController < ApplicationController
       ExportJob.perform_later(export.id)
       respond_with_enqueued_export(export)
     else
-      render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export)),
+      render Exports::NewView.new(export: export, exports: current_user.exports.recent, summary_view: summary_view_for(export),
+                                  unread_count: current_user.unread_notifications_count),
              status: :unprocessable_content
     end
   end
