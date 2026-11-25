@@ -103,7 +103,7 @@ module Vehicles
     end
 
     def render_tank_card(variant:)
-      render Vehicles::TankBalanceCardComponent.new(balance: tank[:balance], full: tank[:full], last_fill: tank[:last_fill], variant: variant)
+      render Vehicles::TankBalanceCardComponent.new(balance: tank[:balance], full: tank[:full], last_fill: tank[:last_fill], consumed: tank[:consumed], variant: variant)
     end
 
     def highlightable_tank(variant:)
@@ -159,7 +159,7 @@ module Vehicles
         desktop_section_header(t('vehicle.moves.title'), t('vehicle.moves.subtitle_desktop')) do
           link_to(t('vehicle.moves.view_all'), helpers.refuelings_path, class: 'text-sm font-medium text-blue-600 hover:underline')
         end
-        moves_card
+        moves_card(variant: :desktop)
         p(class: 'text-[11px] text-slate-400 mt-2') { t('vehicle.moves.auto_debit_desktop') }
       end
     end
@@ -197,17 +197,23 @@ module Vehicles
       end
     end
 
-    def moves_card
+    def moves_card(variant: :mobile)
       moves = tank[:moves]
       if moves.empty?
         empty_row(t('vehicle.moves.title'))
       else
-        div(class: 'bg-white rounded-2xl border border-slate-100 overflow-hidden') do
+        div(class: moves_card_classes(variant)) do
           moves.each_with_index do |move, index|
-            render Vehicles::TankMoveRowComponent.new(move: move, border: index < moves.size - 1)
+            render Vehicles::TankMoveRowComponent.new(move: move, border: index < moves.size - 1, variant: variant)
           end
         end
       end
+    end
+
+    def moves_card_classes(variant)
+      return 'bg-white rounded-xl border border-slate-200 divide-y divide-slate-100' if variant == :desktop
+
+      'bg-white rounded-2xl border border-slate-100 overflow-hidden'
     end
 
     def insight_section(variant:)
