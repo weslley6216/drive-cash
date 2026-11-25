@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Chat::AnswerCards::AnswerStatComponent, type: :component do
   it 'draws the icon in a tinted circle, the label and the value in the tone color' do
     html = view_context.render(
-      described_class.new(label: 'Receitas', value: '+R$ 1.680,00', icon: PhlexIcons::Lucide::ArrowDownLeft, tone: :emerald)
+      described_class.new(label: 'Receitas', value: '+R$ 1.680,00', icon: PhlexIcons::Lucide::ArrowUpRight, tone: :emerald)
     )
 
     expect(html).to include(described_class::ROW)

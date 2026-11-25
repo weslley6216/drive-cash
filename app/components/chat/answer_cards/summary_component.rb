@@ -24,11 +24,11 @@ module Chat
       def render_stats
         render AnswerCards::AnswerStatComponent.new(
           label: t('chat.answer_card.summary.earnings'), value: "+#{format_currency(@card[:earnings])}",
-          icon: PhlexIcons::Lucide::ArrowDownLeft, tone: :emerald
+          icon: PhlexIcons::Lucide::ArrowUpRight, tone: :emerald
         )
         render AnswerCards::AnswerStatComponent.new(
           label: t('chat.answer_card.summary.expenses'), value: "−#{format_currency(@card[:expenses])}",
-          icon: PhlexIcons::Lucide::ArrowUpRight, tone: :red
+          icon: PhlexIcons::Lucide::ArrowDownRight, tone: :red
         )
         render_best_day
       end

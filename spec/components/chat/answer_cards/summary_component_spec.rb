@@ -23,6 +23,14 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(3)
   end
 
+  it 'points the income arrow up and the expenses arrow down' do
+    arrow_up = view_context.render(PhlexIcons::Lucide::ArrowUpRight.new(class: 'w-4 h-4'))
+    arrow_down = view_context.render(PhlexIcons::Lucide::ArrowDownRight.new(class: 'w-4 h-4'))
+
+    expect(html).to include("bg-emerald-100 text-emerald-600\">#{arrow_up}")
+    expect(html).to include("bg-red-100 text-red-600\">#{arrow_down}")
+  end
+
   context 'when the profit fell against the previous month' do
     let(:card) { super().merge(profit_change: -8.0) }
 
