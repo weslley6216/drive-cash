@@ -119,4 +119,14 @@ RSpec.describe Vehicles::TankBalanceService do
 
     expect(result).to eq(described_class::EMPTY)
   end
+
+  it 'flags whether each credit filled the tank' do
+    user = create(:user)
+    vehicle = create(:vehicle, user: user)
+    create(:refueling, vehicle: vehicle, date: Date.current - 1, full_tank: false)
+
+    result = described_class.new(user: user).call
+
+    expect(result[:moves].first).to include(kind: :credit, full_tank: false)
+  end
 end

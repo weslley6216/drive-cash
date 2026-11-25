@@ -9,7 +9,7 @@ module Refuelings
     def call
       return [] unless vehicle && anchor
 
-      (credits + debits).sort_by { |move| move[:date] }.reverse
+      (credits + debits).sort_by.with_index { |move, position| [move[:date], move[:kind] == :credit ? 0 : 1, position] }.reverse
     end
 
     private
@@ -25,15 +25,16 @@ module Refuelings
     end
 
     def credits
-      vehicle.refuelings.chronological.map do |refueling|
+      vehicle.refuelings.order(:date, :created_at).map do |refueling|
         { kind: :credit, date: refueling.date, amount: refueling.total_amount,
-          vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter }
+          vendor: refueling.vendor, liters: refueling.liters, price_per_liter: refueling.price_per_liter,
+          full_tank: refueling.full_tank, odometer_km: refueling.odometer_km }
       end
     end
 
     def debits
       user.expenses.where(category: :fuel).where.missing(:refueling)
-        .where('expenses.date >= ?', anchor).chronological.map do |expense|
+        .where('expenses.date >= ?', anchor).order(:date, :created_at).map do |expense|
           { kind: :debit, date: expense.date, amount: -expense.amount, description: expense.description }
         end
     end
