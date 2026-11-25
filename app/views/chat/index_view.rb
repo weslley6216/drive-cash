@@ -1,6 +1,7 @@
 module Chat
   class IndexView < ApplicationView
     include Formatting
+    include Chat::BubbleMixin
 
     SCREEN = 'flex-1 flex flex-col min-h-0 px-5 safe-top pb-4 sm:p-6 lg:max-w-2xl lg:mx-auto lg:w-full'.freeze
 
@@ -87,7 +88,7 @@ module Chat
         if from_user?(message)
           user_bubble(message[:content], voice: message[:voice])
         else
-          ai_bubble(message[:summary].presence || message[:content])
+          answer_bubble(message[:summary].presence || message[:content], message[:card])
         end
       end
     end
@@ -105,17 +106,6 @@ module Chat
           else
             plain text
           end
-        end
-      end
-    end
-
-    def ai_bubble(text)
-      div(class: 'flex items-start gap-2') do
-        div(class: 'w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5') do
-          render PhlexIcons::Lucide::Sparkles.new(class: 'w-4 h-4 text-violet-600')
-        end
-        div(class: 'bg-white border border-slate-200 px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-[80%] text-sm text-slate-700 shadow-sm leading-relaxed') do
-          plain text
         end
       end
     end
