@@ -31,6 +31,18 @@ RSpec.describe 'Plans', type: :system, js: true do
     expect(bell.evaluate_script('this.previousElementSibling.className')).to eq('w-px h-6 bg-slate-200')
   end
 
+  it 'keeps the desktop topbar toggle at the prototype 36px height with the discount badge on a 20px line' do
+    login_as(create(:user))
+    emulate_desktop_screen
+
+    visit plan_path
+
+    topbar = find('header', text: I18n.t('plans.show_view.heading'))
+
+    expect(box(topbar.find(:button, I18n.t('plans.toggle.monthly')))['height']).to eq(36)
+    expect(topbar.find('span', text: '−20%').evaluate_script('getComputedStyle(this).lineHeight')).to eq('20px')
+  end
+
   it 'keeps the subscription header still past the prototype back arrow while the benefits scroll on a phone' do
     login_as(create(:user, :pro))
     emulate_short_phone
