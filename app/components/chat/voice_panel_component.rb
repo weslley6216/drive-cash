@@ -20,7 +20,8 @@ module Chat
     def sheet
       div(
         class: 'fixed bottom-0 left-0 right-0 z-40 flex justify-center lg:px-8 invisible translate-y-[105%] ' \
-               'transition-transform duration-[380ms] ease-[cubic-bezier(.2,.9,.25,1)] motion-reduce:transition-none',
+               'transition-transform duration-[380ms] ease-[cubic-bezier(.2,.9,.25,1)] motion-reduce:transition-none ' \
+               'motion-reduce:duration-0',
         data:  { speech_target: 'sheet' }
       ) do
         div(class: 'w-full max-w-2xl') { panel }

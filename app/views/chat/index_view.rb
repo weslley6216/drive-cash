@@ -10,11 +10,18 @@ module Chat
 
     def view_template
       render LayoutComponent.new(title: "DriveCash — #{t('chat.index.header')}") do
-        div(class: SCREEN, data: { controller: 'chat speech' }) do
+        div(
+          class: SCREEN,
+          data:  {
+            controller: 'chat speech',
+            action:     'keydown.esc@window->speech#cancel keydown.enter@window->speech#sendWithEnter'
+          }
+        ) do
           header_section
           messages_section
           input_section
           ui_templates
+          render Chat::VoicePanelComponent.new
         end
 
         turbo_frame_tag 'modal'
@@ -114,11 +121,15 @@ module Chat
     end
 
     def input_section
-      div(class: 'flex-shrink-0 pt-4 border-t border-slate-200') do
+      div(class: 'flex-shrink-0 pt-4 border-t border-slate-200 relative') do
+        render Chat::VoiceNoticeComponent.new
+
         form_with(
           url:  chat_message_path,
           data: { loading_skip: true, action: 'submit->chat#send turbo:submit-start->chat#clearSentMessage turbo:submit-end->chat#clearInput' }
         ) do
+          input(type: 'hidden', name: 'voice', value: '', data: { chat_target: 'voice', speech_target: 'voice' })
+
           div(class: 'flex gap-2 items-end') do
             div(class: 'flex-1 relative') do
               textarea(
@@ -133,7 +144,7 @@ module Chat
                 type:       'button',
                 class:      'absolute right-2 bottom-[7px] w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-violet-600 transition-colors cursor-pointer',
                 aria_label: t('chat.index.btn_speak'),
-                data:       { action: 'click->speech#toggle', speech_target: 'mic' }
+                data:       { action: 'click->speech#open', speech_target: 'mic' }
               ) { render PhlexIcons::Lucide::Mic.new(class: 'w-[17px] h-[17px]') }
             end
 
@@ -150,7 +161,12 @@ module Chat
     def ui_templates
       template(data: { chat_target: 'userTemplate' }) do
         div(class: 'flex justify-end') do
-          div(class: 'bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm leading-relaxed', data: { message_content: '' })
+          div(class: 'bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-[80%] text-sm leading-relaxed') do
+            span(class: 'hidden inline-flex items-center gap-1.5', data: { message_voice: '' }) do
+              render PhlexIcons::Lucide::Mic.new(class: 'w-[13px] h-[13px] text-white/80')
+            end
+            span(data: { message_content: '' })
+          end
         end
       end
 

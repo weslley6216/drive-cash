@@ -30,7 +30,7 @@ RSpec.describe 'Chats', type: :request do
         get chat_root_path
 
         expect(response.body).to include('abasteci 80')
-        expect(response.body.scan('text-white/80').size).to eq(1)
+        expect(response.body.scan('text-white/80').size).to eq(2)
       end
 
       it 'shows a typed bubble without the microphone' do
@@ -39,7 +39,7 @@ RSpec.describe 'Chats', type: :request do
         get chat_root_path
 
         expect(response.body).to include('abasteci 80')
-        expect(response.body).not_to include('text-white/80')
+        expect(response.body.scan('text-white/80').size).to eq(1)
       end
     end
 
