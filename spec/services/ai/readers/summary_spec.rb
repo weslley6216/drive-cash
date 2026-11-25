@@ -63,6 +63,15 @@ RSpec.describe Ai::Readers::Summary do
       expect(result[:best_day]).to eq(date: Date.new(2026, 6, 12), amount: 350.0)
     end
 
+    it 'leaves the best day empty in a month without earnings' do
+      user = create(:user)
+      create(:expense, user: user, amount: 100, date: Date.new(2026, 6, 10))
+
+      result = described_class.new({ 'year' => 2026, 'month' => 6 }, user: user).call
+
+      expect(result).to include(month: 6, earnings: 0.0, expenses: 100.0, best_day: nil)
+    end
+
     it 'echoes the period and leaves comparison and best day out of a yearly summary' do
       user = create(:user)
       create(:earning, user: user, amount: 500, date: Date.new(2026, 6, 10))

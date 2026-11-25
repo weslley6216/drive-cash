@@ -52,7 +52,9 @@ module Chat
       end
 
       def change
-        key = @card[:profit_change] >= 0 ? :change_up : :change_down
+        return t('chat.answer_card.summary.change_flat') if @card[:profit_change].round.zero?
+
+        key = @card[:profit_change].positive? ? :change_up : :change_down
         t("chat.answer_card.summary.#{key}", pct: number_to_percentage(@card[:profit_change].abs, precision: 0))
       end
 

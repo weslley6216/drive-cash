@@ -39,6 +39,32 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     end
   end
 
+  context 'when the profit matched the previous month' do
+    let(:card) { super().merge(profit_change: 0.0) }
+
+    it 'says it is the same as the previous month' do
+      expect(html).to include('Esse mês você lucrou <strong>R$ 1.240,00</strong> — igual ao mês anterior.')
+    end
+  end
+
+  context 'when the change rounds to zero percent' do
+    let(:card) { super().merge(profit_change: -0.4) }
+
+    it 'says it is the same as the previous month instead of 0% below' do
+      expect(html).to include('— igual ao mês anterior.')
+    end
+  end
+
+  context 'when the month had no earnings' do
+    let(:card) { super().merge(earnings: 0.0, profit: -440.0, best_day_on: nil, best_day_amount: nil) }
+
+    it 'lists income and expenses without the best day' do
+      expect(html).to include('+R$ 0,00').and include('−R$ 440,00')
+      expect(html).not_to include('Melhor dia')
+      expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(2)
+    end
+  end
+
   context 'when the month is not the current one' do
     let(:card) { super().merge(month: 6) }
 

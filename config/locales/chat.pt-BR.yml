@@ -66,6 +66,7 @@ pt-BR:
         lead: "%{period} você lucrou"
         change_up: "— %{pct} acima do mês anterior"
         change_down: "— %{pct} abaixo do mês anterior"
+        change_flat: "— igual ao mês anterior"
         period:
           current_month: "Esse mês"
           month: "Em %{month}"
