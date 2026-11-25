@@ -61,6 +61,27 @@ pt-BR:
       history_found: "Encontrei %{count} resultado(s) para '%{term}'"
       history_empty: "Não encontrei nada para '%{term}'"
       category_total: "Gastos com %{category}: %{value}"
+    answer_card:
+      summary:
+        lead: "%{period} você lucrou"
+        change_up: "— %{pct} acima do mês anterior"
+        change_down: "— %{pct} abaixo do mês anterior"
+        period:
+          current_month: "Esse mês"
+          month: "Em %{month}"
+          current_year: "Esse ano"
+          year: "Em %{year}"
+        earnings: "Receitas"
+        expenses: "Despesas"
+        best_day: "Melhor dia"
+        best_day_value: "%{day} · %{value}"
+      vendor_efficiency:
+        lead_before: "O"
+        lead_after: "tem te rendido mais: %{winner_kml} km/L contra %{runner_up_kml} do %{runner_up}."
+        kml: "%{value} km/L"
+        savings_label: "Economia estimada:"
+        savings_value: "~%{value}/mês"
+        savings_hint: "abastecendo só no %{vendor}."
     index:
       header: "Caju"
       subtitle: "assistente financeiro"
