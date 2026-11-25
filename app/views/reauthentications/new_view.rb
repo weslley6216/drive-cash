@@ -2,7 +2,8 @@ module Reauthentications
   class NewView < ApplicationView
     include TopbarStyles
 
-    def initialize(error: false)
+    def initialize(unread_count:, error: false)
+      @unread_count = unread_count
       @error = error
     end
 
@@ -11,7 +12,7 @@ module Reauthentications
         render ScreenComponent.new do |screen|
           screen.with_header do
             mobile_header
-            desktop_header
+            desktop_topbar
           end
           screen.with_content { card }
         end
@@ -29,11 +30,8 @@ module Reauthentications
       end
     end
 
-    def desktop_header
-      div(class: "hidden lg:block #{DESKTOP_BAR}") do
-        h1(class: 'text-2xl font-bold text-slate-900 tracking-tight') { t('.header') }
-        p(class: 'text-sm text-slate-500 mt-0.5') { t('.topbar_subtitle') }
-      end
+    def desktop_topbar
+      render DesktopTopbarComponent.new(title: t('.header'), subtitle: t('.topbar_subtitle'), unread_count: @unread_count)
     end
 
     def card

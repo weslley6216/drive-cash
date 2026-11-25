@@ -1,6 +1,6 @@
 class ProfilesController < ApplicationController
   def edit
-    render Profiles::EditView.new(user: current_user, reauthenticated: reauthenticated?)
+    render Profiles::EditView.new(user: current_user, reauthenticated: reauthenticated?, unread_count: current_user.unread_notifications_count)
   end
 
   def update
@@ -12,7 +12,7 @@ class ProfilesController < ApplicationController
       current_user.revoke_sessions_except(Current.session) if current_user.saved_change_to_password_digest?
       redirect_to edit_profile_path, notice: t('profiles.flash.saved')
     else
-      render Profiles::EditView.new(user: current_user, reauthenticated: reauthenticated?), status: :unprocessable_content
+      render Profiles::EditView.new(user: current_user, reauthenticated: reauthenticated?, unread_count: current_user.unread_notifications_count), status: :unprocessable_content
     end
   end
 

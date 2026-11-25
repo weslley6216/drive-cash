@@ -22,15 +22,19 @@ class Account::ShowView < ApplicationView
     }
   ].freeze
 
-  def initialize(user:, vehicle:)
+  def initialize(user:, vehicle:, unread_count:)
     @user = user
     @vehicle = vehicle
+    @unread_count = unread_count
   end
 
   def view_template
     render LayoutComponent.new(title: t('.title'), bottom_nav: :more, sidebar_nav: :more) do
       render ScreenComponent.new do |screen|
-        screen.with_header { mobile_header }
+        screen.with_header do
+          mobile_header
+          desktop_topbar
+        end
         screen.with_content do
           mobile_layout
           desktop_layout
@@ -48,6 +52,10 @@ class Account::ShowView < ApplicationView
     end
   end
 
+  def desktop_topbar
+    render DesktopTopbarComponent.new(title: t('.heading'), subtitle: t('.desktop_subtitle'), unread_count: @unread_count)
+  end
+
   def mobile_layout
     div(class: 'lg:hidden pb-10 space-y-5') do
       profile_card_mobile
@@ -59,10 +67,6 @@ class Account::ShowView < ApplicationView
 
   def desktop_layout
     div(class: 'hidden lg:block') do
-      div(class: 'mb-6') do
-        h1(class: 'text-2xl font-bold text-slate-800') { t('.heading') }
-        p(class: 'text-sm text-slate-500 mt-1') { t('.desktop_subtitle') }
-      end
       div(class: 'max-w-3xl space-y-6') do
         profile_card_desktop
         div(class: 'grid grid-cols-2 gap-6') do

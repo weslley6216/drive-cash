@@ -29,7 +29,7 @@ module Plans
              class: "px-4 py-1.5 rounded-full flex items-center gap-1.5 cursor-pointer #{ACTIVE_CLASSES}",
              data:  { plan_billing_target: 'yearlyButton', action: 'click->plan-billing#showYearly' }) do
         plain t('plans.toggle.yearly')
-        span(class: 'text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-px') do
+        span(class: 'text-[10px] leading-5 font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-px') do
           t('plans.toggle.discount', pct: @discount_percent)
         end
       end

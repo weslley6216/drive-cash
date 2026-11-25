@@ -16,4 +16,17 @@ RSpec.describe 'Exports', type: :system, js: true do
     expect(title).to stay_pinned_while_the_content_scrolls
     expect(page).to fit_the_phone_width
   end
+
+  it 'heads the desktop screen with the export topbar ending in the bell without actions' do
+    create(:notification, user: current_user)
+    emulate_desktop_screen
+
+    visit exports_path
+
+    topbar = find('header', text: I18n.t('exports.desktop_title'))
+
+    expect(topbar).to have_text(I18n.t('exports.desktop_subtitle'))
+    expect(topbar.find(:link, 'Notificações, 1 não lida')).to have_css('span.bg-red-500', text: '1')
+    expect(topbar).to have_no_css('span.w-px')
+  end
 end
