@@ -26,6 +26,31 @@ RSpec.describe 'Vehicle', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'goes back to Mais from the arrow left of the title keeping the pencil on the right on a phone' do
+    visit vehicle_path
+
+    back = find(:link, I18n.t('vehicle.back'))
+    title = find('h1', text: I18n.t('vehicle.title'))
+    pencil = find("#screen-header a[href='#{edit_vehicle_path}']")
+
+    expect(box(back)['right']).to be <= box(title)['left']
+    expect(box(pencil)['left']).to be > box(title)['right']
+    expect(page).to fit_the_phone_width
+
+    back.click
+
+    expect(page).to have_current_path(account_path)
+  end
+
+  it 'keeps the phone back out of the desktop screen' do
+    emulate_desktop_screen
+
+    visit vehicle_path
+
+    expect(page).to have_text('Honda Civic · 2018')
+    expect(page).to have_no_link(I18n.t('vehicle.back'))
+  end
+
   it 'scrolls the highlighted maintenance into view inside the screen content on a phone' do
     emulate_short_phone
     target = @others.last

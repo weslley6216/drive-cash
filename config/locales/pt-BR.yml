@@ -291,6 +291,7 @@ pt-BR:
     title: "Meu veículo"
     subtitle: "%{brand} %{vehicle_model} · %{year}"
     edit: "Editar"
+    back: "Voltar"
     odometer:
       label: "Odômetro"
       unit: "km"

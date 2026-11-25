@@ -72,10 +72,13 @@ module Vehicles
     end
 
     def header_mobile
-      div(class: "#{PHONE_BAR} flex items-center justify-between lg:hidden") do
-        div do
-          h1(class: 'text-xl font-bold text-slate-900') { t('vehicle.title') }
-          p(class: 'text-xs text-slate-500') { vehicle_subtitle }
+      div(class: "#{PHONE_BAR} flex items-start justify-between gap-3 lg:hidden") do
+        div(class: 'flex items-start gap-2 min-w-0 flex-1') do
+          render BackLinkComponent.new(fallback: helpers.account_path, label: t('vehicle.back'))
+          div(class: 'min-w-0') do
+            h1(class: 'text-2xl font-bold text-slate-800 leading-tight truncate') { t('vehicle.title') }
+            p(class: 'text-sm text-slate-500 mt-0.5') { vehicle_subtitle }
+          end
         end
         link_to(helpers.edit_vehicle_path,
                 class: 'w-9 h-9 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-600',
