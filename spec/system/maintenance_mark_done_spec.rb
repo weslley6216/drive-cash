@@ -57,6 +57,21 @@ RSpec.describe 'Maintenance mark done', type: :system, js: true do
     expect(@filter.reload.last_done_km).to eq(150_800)
   end
 
+  it 'keeps only the first companion checked by default and lets the user add another one' do
+    air_filter = create(:maintenance, vehicle: @vehicle, category: 'air_filter', last_done_km: 150_500, interval_km: 10_000)
+    visit vehicle_path
+    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
+
+    expect(page).to have_checked_field(I18n.t('vehicle.maintenances.catalog.oil_filter'))
+    expect(page).to have_unchecked_field(I18n.t('vehicle.maintenances.catalog.air_filter'))
+
+    check I18n.t('vehicle.maintenances.catalog.air_filter')
+    click_on 'Salvar'
+
+    expect(air_filter.reload.last_done_km).to eq(@vehicle.odometer_km)
+    expect(@filter.reload.last_done_km).to eq(@vehicle.odometer_km)
+  end
+
   it 'opens the edit form from the pencil on a phone' do
     visit vehicle_path
     within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.edit') }
