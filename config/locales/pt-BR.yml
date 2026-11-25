@@ -356,6 +356,23 @@ pt-BR:
       title: "Movimentação do tanque"
       view_all: "Ver tudo →"
       full_tank: "Tanque cheio"
+      partial_fill: "Abastecimento"
+      balance:
+        label: "Saldo atual"
+        of_full: "de %{amount}"
+        since: "desde %{date}"
+        of_full_since: "de %{amount} · tanque de %{date}"
+      cycle:
+        title: "Tanque de %{date}"
+        current: "Atual"
+        remaining: "resta %{amount}"
+        closed: "fechou em %{amount}"
+        over: "%{amount} além"
+        km_per_liter: "%{value} km/L"
+      filters:
+        all: "Tudo"
+        fill: "Abastecimentos"
+        route: "Consumo"
       route: "Rota"
       fuel_expense: "Combustível"
       today: "Hoje"

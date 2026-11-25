@@ -1,12 +1,14 @@
 module Vehicles
   class TankMoveRowComponent < ApplicationComponent
+    include TankMoveLabels
+
     def initialize(move:, border: true)
       @move = move
       @border = border
     end
 
     def view_template
-      div(class: row_classes) do
+      div(class: row_classes, data: { tank_filter_target: 'row', tank_filter_kind: filter_kind }) do
         icon_block
         info_block
         amount_block
@@ -14,10 +16,6 @@ module Vehicles
     end
 
     private
-
-    def credit?
-      @move[:kind] == :credit
-    end
 
     def row_classes
       base = 'flex items-center gap-3 px-4 py-3'
@@ -39,38 +37,9 @@ module Vehicles
       end
     end
 
-    def label
-      return t('vehicle.moves.full_tank') if credit?
-
-      @move[:description].presence || t('vehicle.moves.route')
-    end
-
-    def sub_label
-      return fill_detail if credit?
-
-      t('vehicle.moves.fuel_expense')
-    end
-
-    def fill_detail
-      parts = [@move[:vendor]].compact
-      parts << "#{helpers.number_with_precision(@move[:liters], precision: 1, separator: ',', delimiter: '.')} L" if @move[:liters]
-      parts << "#{format_currency(@move[:price_per_liter])}/L" if @move[:price_per_liter]
-      parts.join(' · ')
-    end
-
-    def date_label
-      date = @move[:date]
-      return t('vehicle.moves.today') if date == Date.current
-      return t('vehicle.moves.yesterday') if date == Date.current - 1
-
-      helpers.l(date, format: '%d %b')
-    end
-
     def amount_block
-      tone = credit? ? 'text-blue-700' : 'text-red-700'
-      sign = credit? ? '+' : '−'
-      span(class: "text-sm font-semibold tabular-nums whitespace-nowrap #{tone}") do
-        "#{sign}#{format_currency(@move[:amount].abs)}"
+      span(class: "text-sm font-semibold tabular-nums whitespace-nowrap #{amount_tone}") do
+        "#{amount_sign}#{format_currency(@move[:amount].abs)}"
       end
     end
   end

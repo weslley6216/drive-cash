@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
   describe '#view_template' do
     it 'renders a credit (refueling) in blue with a plus sign' do
-      move = { kind: :credit, date: Date.new(2026, 6, 7), amount: 260,
+      move = { kind: :credit, date: Date.new(2026, 6, 7), amount: 260, full_tank: true,
                vendor: 'Posto Orense', liters: 44.1, price_per_liter: 5.89 }
 
       html = view_context.render(described_class.new(move: move))
@@ -32,6 +32,24 @@ RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
 
       expect(html).to include(I18n.t('vehicle.moves.today'))
       expect(html).to include(I18n.t('vehicle.moves.route'))
+    end
+
+    it 'titles a refueling that did not fill the tank as a plain refueling' do
+      move = { kind: :credit, date: Date.new(2026, 6, 2), amount: 100, full_tank: false,
+               vendor: 'Posto Orense', liters: 17, price_per_liter: 5.88 }
+
+      html = view_context.render(described_class.new(move: move))
+
+      expect(html).to include(I18n.t('vehicle.moves.partial_fill'))
+      expect(html).not_to include(I18n.t('vehicle.moves.full_tank'))
+    end
+
+    it 'tags the row with its filter kind' do
+      credit = view_context.render(described_class.new(move: { kind: :credit, date: Date.new(2026, 6, 2), amount: 100, full_tank: true }))
+      debit = view_context.render(described_class.new(move: { kind: :debit, date: Date.new(2026, 6, 2), amount: -45 }))
+
+      expect(credit).to include('data-tank-filter-target="row" data-tank-filter-kind="fill"')
+      expect(debit).to include('data-tank-filter-target="row" data-tank-filter-kind="route"')
     end
   end
 end
