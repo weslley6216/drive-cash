@@ -84,7 +84,7 @@ RSpec.describe 'Maintenance mark done', type: :system, js: true do
   it 'opens the mark done form as a centered modal on a desktop screen' do
     emulate_desktop_screen
     visit vehicle_path
-    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done') }
+    within("##{dom_id(@oil)}") { click_on I18n.t('vehicle.maintenances.mark_done_desktop') }
 
     box = find('h2', text: I18n.t('maintenances.mark_done.title', item: 'Troca de óleo'))
       .evaluate_script("this.closest('.shadow-2xl').getBoundingClientRect().toJSON()")

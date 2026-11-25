@@ -122,16 +122,22 @@ module Vehicles
       end
     end
 
-    def maintenances_list(limit:, catalog: true)
+    def maintenances_list(limit:, catalog: true, variant: :mobile)
       shown = limit ? maintenances.first(limit) : maintenances
-      div(class: 'space-y-2.5', data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
+      div(class: maintenances_list_classes(variant), data: { controller: 'highlight', highlight_active_class: HIGHLIGHT_RING }) do
         if maintenances.empty?
           empty_row(t('vehicle.maintenances.empty'))
         else
-          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry) }
+          shown.each { |entry| render Vehicles::MaintenanceRowComponent.new(row: entry, variant: variant) }
         end
         catalog_button(hidden: maintenances.size - shown.size) if catalog
       end
+    end
+
+    def maintenances_list_classes(variant)
+      return 'space-y-2.5' if variant != :desktop || maintenances.empty?
+
+      'bg-white rounded-xl border border-slate-200 divide-y divide-slate-100'
     end
 
     def desktop_maintenances_section
@@ -144,7 +150,7 @@ module Vehicles
             plain t('vehicle.maintenances.add_from_catalog')
           end
         end
-        maintenances_list(limit: nil, catalog: false)
+        maintenances_list(limit: nil, catalog: false, variant: :desktop)
       end
     end
 
