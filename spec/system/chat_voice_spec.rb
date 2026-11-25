@@ -144,6 +144,7 @@ RSpec.describe 'Chat voice panel', type: :system, js: true do
 
     expect(page).to have_css('[role="status"]', text: 'Não ouvi nada.')
     expect(Ai::ParserService).not_to have_received(:new)
+    expect(page.evaluate_script('window.__speech.aborted')).to be(true)
   end
 
   it 'warns that the microphone is blocked when permission is denied on a phone' do

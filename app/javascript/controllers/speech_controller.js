@@ -78,13 +78,14 @@ export default class extends Controller {
   send() {
     if (this.state !== "listening") return
 
+    this.stopRecognition()
+
     const text = this.transcriptTarget.textContent.trim()
     if (!text) {
       this.fail(DEFAULT_NOTICE)
       return
     }
 
-    this.stopRecognition()
     this.understand(text)
   }
 
