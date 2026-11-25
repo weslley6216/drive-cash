@@ -126,6 +126,32 @@ RSpec.describe 'Vehicle', type: :system, js: true do
       expect(page).to have_text(I18n.t('vehicle.moves.auto_debit_desktop'))
     end
 
+    it 'lists the maintenances as 44px rows in a single divided card with Marcar feita on an ok item on a desktop screen' do
+      emulate_desktop_screen
+      ok_item = @others.first
+
+      visit vehicle_path
+
+      row = find_by_id(dom_id(ok_item))
+      icon = row.find('div.w-11.h-11')
+      name = row.find('p', text: 'Filtro de ar')
+      mark_done = row.find(:link, I18n.t('vehicle.maintenances.mark_done_desktop'), href: new_maintenance_mark_done_path(ok_item))
+
+      expect(box(icon)['width']).to eq(44)
+      expect(box(mark_done)['left']).to be > box(name)['right']
+      expect(row).to have_css("a[href='#{edit_maintenance_path(ok_item)}']", count: 1)
+      expect(row.find(:xpath, '..')[:class]).to include('rounded-xl', 'border-slate-200', 'divide-y')
+    end
+
+    it 'opens the maintenance edit modal from the row block on a desktop screen' do
+      emulate_desktop_screen
+
+      visit vehicle_path
+      find_by_id(dom_id(@oil)).find("a[href='#{edit_maintenance_path(@oil)}']").click
+
+      expect(page).to have_text(I18n.t('maintenances.form.title_edit'))
+    end
+
     it 'renders the tank card with its desktop layout' do
       create(:refueling, vehicle: @vehicle, date: Date.current, vendor: 'Posto Orense', liters: 44.1, total_amount: 260, full_tank: true)
       emulate_desktop_screen
