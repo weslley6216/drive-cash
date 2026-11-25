@@ -13,7 +13,7 @@ module Goals
 
         render LayoutComponent.new(title: screen.title, bottom_nav: :goals, sidebar_nav: :goals,
                                    turbo_cache: false) do
-          div(class: 'relative overflow-hidden flex-1 flex flex-col min-h-0') do
+          div(class: 'relative flex-1 flex flex-col min-h-0') do
             render Goals::Outcomes::ConfettiComponent.new if @confetti
             render screen
           end
