@@ -75,5 +75,21 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
 
       expect(html).to include(I18n.t('vehicle.tank.level_label_empty'))
     end
+
+    it 'wraps the mobile card in the shared card style' do
+      html = view_context.render(described_class.new(balance: 220, full: 260, last_fill: fill))
+
+      expect(html).to include('rounded-xl shadow-sm border')
+      expect(html).not_to include('rounded-2xl')
+    end
+
+    it 'renders the desktop subtitle and the fuller refuel CTA' do
+      html = view_context.render(described_class.new(balance: 220, full: 260, last_fill: fill, variant: :desktop))
+
+      expect(html).to include(I18n.t('vehicle.tank.subtitle'))
+      expect(html).to include(I18n.t('vehicle.tank.refuel_desktop'))
+      expect(html).to include(I18n.t('vehicle.tank.of_full_desktop', value: 'R$ 260,00'))
+      expect(html).to include('rounded-2xl border-2')
+    end
   end
 end

@@ -19,7 +19,21 @@ module Vehicles
     end
 
     def view_template
-      div(class: card_classes) do
+      desktop? ? desktop_card : mobile_card
+    end
+
+    private
+
+    def desktop?
+      @variant == :desktop
+    end
+
+    def danger?
+      %i[empty negative critical].include?(@status_key)
+    end
+
+    def mobile_card
+      div(class: "bg-white rounded-xl shadow-sm border #{@style[:border_class]} p-4") do
         header_row
         balance_row
         progress_bar
@@ -27,27 +41,33 @@ module Vehicles
       end
     end
 
-    private
-
-    def danger?
-      %i[empty negative critical].include?(@status_key)
-    end
-
-    def card_classes
-      "bg-white rounded-2xl border #{@style[:border_class]} p-4"
+    def desktop_card
+      div(class: "bg-white rounded-2xl border-2 #{@style[:border_class]} p-7") do
+        header_row
+        desktop_balance_row
+      end
     end
 
     def header_row
-      div(class: 'flex items-center justify-between mb-2') do
-        div(class: 'flex items-center gap-2') do
-          div(class: 'w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center') do
-            render PhlexIcons::Lucide::Fuel.new(class: 'w-[17px] h-[17px]')
+      div(class: 'flex items-start justify-between') do
+        div(class: 'flex items-center gap-2.5') do
+          div(class: "#{desktop? ? 'w-10 h-10 rounded-xl' : 'w-8 h-8 rounded-lg'} bg-slate-100 text-slate-600 flex items-center justify-center") do
+            render PhlexIcons::Lucide::Fuel.new(class: desktop? ? 'w-5 h-5' : 'w-[17px] h-[17px]')
           end
-          h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.tank.title') }
+          title_block
         end
-        span(class: "text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-1 border #{@style[:chip_class]}") do
+        span(class: "text-[10px] font-bold uppercase tracking-wide rounded-full #{desktop? ? 'px-2.5' : 'px-2'} py-1 border #{@style[:chip_class]}") do
           t("vehicle.tank.status.#{@status_key}")
         end
+      end
+    end
+
+    def title_block
+      return h3(class: 'text-sm font-semibold text-slate-700') { t('vehicle.tank.title') } unless desktop?
+
+      div do
+        h3(class: 'text-base font-semibold text-slate-800') { t('vehicle.tank.title') }
+        p(class: 'text-xs text-slate-500') { t('vehicle.tank.subtitle') }
       end
     end
 
@@ -61,18 +81,38 @@ module Vehicles
       end
     end
 
+    def desktop_balance_row
+      div(class: 'grid grid-cols-12 gap-6 items-end mt-5') do
+        div(class: 'col-span-12 lg:col-span-7') do
+          p(class: "text-5xl font-bold tracking-tight tabular-nums #{@style[:num_class]}") { balance_text }
+          p(class: 'text-sm text-slate-500 mt-1') { t('vehicle.tank.of_full_desktop', value: format_currency(@full || 0)) }
+          div(class: 'h-2.5 bg-slate-100 rounded-full overflow-hidden mt-4') do
+            div(class: "h-full rounded-full #{@style[:bar_class]}", style: "width: #{remain_pct}%")
+          end
+          level_line
+        end
+        div(class: 'col-span-12 lg:col-span-5 flex flex-col gap-2.5') do
+          refuel_button(desktop: true)
+          note_line
+        end
+      end
+    end
+
     def balance_text
       sign = @balance.negative? ? '−' : ''
       "#{sign}#{format_currency(@balance.abs)}"
     end
 
-    def refuel_button
+    def refuel_button(desktop: false)
       tone = danger? ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
-      link_to(helpers.new_refueling_path,
-              class: "flex-shrink-0 flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white #{tone}",
-              data:  { turbo_frame: 'modal' }) do
-        render PhlexIcons::Lucide::Plus.new(class: 'w-[15px] h-[15px]')
-        plain t('vehicle.tank.refuel')
+      classes = if desktop
+                  "flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white #{tone}"
+      else
+                  "flex-shrink-0 flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white #{tone}"
+      end
+      link_to(helpers.new_refueling_path, class: classes, data: { turbo_frame: 'modal' }) do
+        render PhlexIcons::Lucide::Plus.new(class: desktop ? 'w-4 h-4' : 'w-[15px] h-[15px]')
+        plain t("vehicle.tank.refuel#{'_desktop' if desktop}")
       end
     end
 

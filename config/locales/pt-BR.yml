@@ -308,8 +308,11 @@ pt-BR:
       delta_month_desktop: "+%{value} km este mês · ~%{daily} km/dia"
     tank:
       title: "Saldo do tanque"
+      subtitle: "debitado automaticamente a cada rota"
       of_full: "de %{value} do último tanque"
+      of_full_desktop: "de %{value} do último tanque cheio"
       refuel: "Abastecer"
+      refuel_desktop: "Registrar abastecimento"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
       last_fill: "Último tanque cheio · %{date} · %{vendor}"
       status:
