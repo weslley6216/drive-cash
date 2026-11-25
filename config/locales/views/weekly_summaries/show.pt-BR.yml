@@ -31,7 +31,6 @@ pt-BR:
         net_caption: líquido do dia
         earnings: Receitas
         expenses: Despesas
-        trips: Corridas
         aria: "%{label}: líquido %{net}, receitas %{earnings}, despesas %{expenses}, %{trips}"
         aria_trips:
           one: 1 corrida

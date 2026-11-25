@@ -104,7 +104,7 @@ module WeeklySummaries
             div(class: 'space-y-1 pt-1.5 border-t border-white/10') do
               tooltip_dot_row('bg-emerald-400', t('weekly_summaries.show.tooltip.earnings'), 'earnings')
               tooltip_dot_row('bg-red-400', t('weekly_summaries.show.tooltip.expenses'), 'expenses')
-              tooltip_icon_row(t('weekly_summaries.show.tooltip.trips'), 'trips')
+              tooltip_icon_row(t('weekly_summaries.show.trips'), 'trips')
             end
           end
           div(class: 'absolute w-2 h-2 bg-slate-900', data: { bar_tooltip_target: 'arrow' })

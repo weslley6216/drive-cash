@@ -40,9 +40,9 @@ export default class extends Controller {
     if (this.active === index && this.pinned) {
       this.deactivate()
     } else {
+      if (this.dismissOutsideValue && !this.pinned) document.addEventListener('pointerdown', this.dismiss)
       this.pinned = true
       this.activate(index)
-      if (this.dismissOutsideValue) document.addEventListener('pointerdown', this.dismiss)
     }
   }
 
