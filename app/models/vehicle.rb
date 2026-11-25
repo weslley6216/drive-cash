@@ -25,6 +25,10 @@ class Vehicle < ApplicationRecord
     updated_days_ago.nil? || updated_days_ago > ODOMETER_FRESH_DAYS
   end
 
+  def tank_anchor_date
+    refuelings.minimum(:date)
+  end
+
   private
 
   def stamp_odometer_freshness

@@ -204,6 +204,28 @@ RSpec.describe Expense, type: :model do
         expect(result).not_to include(unpaid_jan_2025)
       end
     end
+
+    describe '.tank_debits_since' do
+      it 'keeps standalone fuel expenses dated on or after the anchor' do
+        on_anchor = create(:expense, category: 'fuel', date: Date.new(2026, 5, 20))
+        after_anchor = create(:expense, category: 'fuel', date: Date.new(2026, 5, 22))
+
+        result = described_class.tank_debits_since(Date.new(2026, 5, 20))
+
+        expect(result).to contain_exactly(on_anchor, after_anchor)
+      end
+
+      it 'leaves out fuel expenses before the anchor, other categories and expenses that produced a refueling' do
+        create(:expense, category: 'fuel', date: Date.new(2026, 5, 19))
+        create(:expense, category: 'maintenance', date: Date.new(2026, 5, 22))
+        create(:refueling, expense: create(:expense, category: 'fuel', date: Date.new(2026, 5, 22)))
+        debit = create(:expense, category: 'fuel', date: Date.new(2026, 5, 22))
+
+        result = described_class.tank_debits_since(Date.new(2026, 5, 20))
+
+        expect(result).to contain_exactly(debit)
+      end
+    end
   end
 
   describe 'sanitize_amount' do
@@ -249,6 +271,38 @@ RSpec.describe Expense, type: :model do
       expense = build(:expense)
 
       expect(expense.credit?).to be(false)
+    end
+  end
+
+  describe '#tank_debit?' do
+    let(:user) { create(:user) }
+    let(:vehicle) { create(:vehicle, user: user) }
+
+    it 'is true for a fuel expense dated on or after the first refueling' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 20))
+      expense = create(:expense, user: user, category: 'fuel', date: Date.new(2026, 5, 22))
+
+      expect(expense.tank_debit?).to be(true)
+    end
+
+    it 'is false for a fuel expense dated before the first refueling' do
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 20))
+      expense = create(:expense, user: user, category: 'fuel', date: Date.new(2026, 5, 19))
+
+      expect(expense.tank_debit?).to be(false)
+    end
+
+    it 'is false when the vehicle has no refuelings' do
+      vehicle
+      expense = create(:expense, user: user, category: 'fuel', date: Date.new(2026, 5, 22))
+
+      expect(expense.tank_debit?).to be(false)
+    end
+
+    it 'is false without a vehicle' do
+      expense = create(:expense, user: user, category: 'fuel', date: Date.new(2026, 5, 22))
+
+      expect(expense.tank_debit?).to be(false)
     end
   end
 end

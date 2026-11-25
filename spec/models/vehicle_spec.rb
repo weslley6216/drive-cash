@@ -91,6 +91,22 @@ RSpec.describe Vehicle, type: :model do
     end
   end
 
+  describe '#tank_anchor_date' do
+    it 'returns the date of the earliest refueling' do
+      vehicle = create(:vehicle)
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 6, 7))
+      create(:refueling, vehicle: vehicle, date: Date.new(2026, 5, 20))
+
+      expect(vehicle.tank_anchor_date).to eq(Date.new(2026, 5, 20))
+    end
+
+    it 'returns nil without refuelings' do
+      vehicle = create(:vehicle)
+
+      expect(vehicle.tank_anchor_date).to be_nil
+    end
+  end
+
   describe 'odometer freshness stamping' do
     it 'stamps the timestamp when the odometer advances' do
       vehicle = create(:vehicle, odometer_km: 48_000, odometer_updated_at: 10.days.ago)
