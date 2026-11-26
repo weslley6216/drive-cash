@@ -78,9 +78,9 @@ RSpec.describe WeeklySummaries::DailyBarsComponent, type: :component do
     expect(monday['data-label-text']).to eq('seg, 06/jul')
     expect(monday['data-muted']).to eq('false')
     expect(monday['data-negative']).to eq('false')
-    expect(monday['data-net']).to eq('R$ 182,00')
-    expect(monday['data-earnings']).to eq('R$ 282,00')
-    expect(monday['data-expenses']).to eq('R$ 100,00')
+    expect(monday['data-net']).to eq("R$\u00A0182,00")
+    expect(monday['data-earnings']).to eq("R$\u00A0282,00")
+    expect(monday['data-expenses']).to eq("R$\u00A0100,00")
     expect(monday['data-trips']).to eq('5')
     expect(monday).to have_css('[data-bar-tooltip-target="fill"]')
   end
@@ -92,7 +92,7 @@ RSpec.describe WeeklySummaries::DailyBarsComponent, type: :component do
     expect(monday['tabindex']).to eq('0')
     expect(monday['class']).to include('rounded-md', 'outline-none', 'cursor-pointer')
     expect(monday['data-action']).to eq(BarTooltip::COLUMN_ACTIONS)
-    expect(monday['aria-label']).to eq('Seg, 06/jul: líquido R$ 182,00, receitas R$ 282,00, despesas R$ 100,00, 5 corridas')
+    expect(monday['aria-label']).to eq("Seg, 06/jul: líquido R$\u00A0182,00, receitas R$\u00A0282,00, despesas R$\u00A0100,00, 5 corridas")
   end
 
   it 'marks a day without records as muted and announces it' do
@@ -125,7 +125,7 @@ RSpec.describe WeeklySummaries::DailyBarsComponent, type: :component do
 
     it 'announces the best day and the days without records' do
       expect(html).to include('Sexta foi o melhor dia:')
-      expect(html).to include('R$ 268,00')
+      expect(html).to include("R$\u00A0268,00")
       expect(html).to include('Quarta e domingo sem lançamentos.')
     end
   end
@@ -141,7 +141,7 @@ RSpec.describe WeeklySummaries::DailyBarsComponent, type: :component do
 
     it 'flags only the negative net to tint the tooltip red' do
       expect(page_html).to have_css('[data-weekday="0"][data-negative="true"]')
-      expect(page_html).to have_css('[data-weekday="0"][data-net="-R$ 50,00"]')
+      expect(page_html).to have_css("[data-weekday=\"0\"][data-net=\"-R$\u00A050,00\"]")
       expect(page_html).to have_css('[data-weekday="1"][data-negative="false"]')
     end
   end

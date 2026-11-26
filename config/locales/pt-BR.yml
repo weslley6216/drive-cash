@@ -191,8 +191,8 @@ pt-BR:
     currency:
       format:
         delimiter: "."
-        format: "%u %n"
-        negative_format: "-%u %n"
+        format: "%u\u00A0%n"
+        negative_format: "-%u\u00A0%n"
         precision: 2
         separator: ","
         significant: false

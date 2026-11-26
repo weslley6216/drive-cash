@@ -123,8 +123,8 @@ module Analysis
           bar_tooltip_target: 'column',
           index:              index,
           label_text:         tooltip_label(bar_row),
-          earn:               brl(bar_row[:earnings]),
-          exp:                brl(bar_row[:expenses]),
+          earn:               format_currency(bar_row[:earnings]),
+          exp:                format_currency(bar_row[:expenses]),
           muted:              bar_row[:empty].to_s,
           action:             COLUMN_ACTIONS
         }
@@ -136,8 +136,8 @@ module Analysis
 
       earnings_label = I18n.t('analysis.show_view.bar_chart.legend_earnings')
       expenses_label = I18n.t('analysis.show_view.bar_chart.legend_expenses')
-      "#{tooltip_label(bar_row)}: #{earnings_label} #{brl(bar_row[:earnings])}, " \
-        "#{expenses_label} #{brl(bar_row[:expenses])}"
+      "#{tooltip_label(bar_row)}: #{earnings_label} #{format_currency(bar_row[:earnings])}, " \
+        "#{expenses_label} #{format_currency(bar_row[:expenses])}"
     end
 
     def tooltip_label(bar_row)
@@ -172,10 +172,6 @@ module Analysis
         span(class: 'text-slate-300') { label }
         span(class: 'font-semibold tabular-nums ml-auto', data: { bar_tooltip_target: 'field', field: field })
       end
-    end
-
-    def brl(value)
-      helpers.number_to_currency(value, unit: 'R$ ', format: '%u%n', separator: ',', delimiter: '.', precision: 2)
     end
 
     def bar_share(value)

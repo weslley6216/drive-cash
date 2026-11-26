@@ -10,13 +10,13 @@ RSpec.describe Plans::ProCardComponent, type: :component do
   end
 
   it 'renders the yearly price visible and the monthly price hidden' do
-    expect(html).to include('R$ 11,92')
-    expect(html).to include('R$ 14,90')
+    expect(html).to include("R$\u00A011,92")
+    expect(html).to include("R$\u00A014,90")
     expect(html).to match(/hidden[^>]*data-plan-billing-target="monthlyPrice"/)
   end
 
   it 'states how the yearly plan is charged' do
-    expect(html).to include(I18n.t('plans.pro_card.charged_yearly', price: 'R$ 143,00'))
+    expect(html).to include(I18n.t('plans.pro_card.charged_yearly', price: "R$\u00A0143,00"))
     expect(html).to include(I18n.t('plans.pro_card.charged_monthly'))
   end
 

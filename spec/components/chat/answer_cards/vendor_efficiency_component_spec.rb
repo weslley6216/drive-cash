@@ -18,7 +18,7 @@ RSpec.describe Chat::AnswerCards::VendorEfficiencyComponent, type: :component do
   end
 
   it 'estimates the monthly savings of filling up only at the winner' do
-    expect(html).to include('<p class="text-xs text-slate-500">Economia estimada: <strong class="text-slate-700">~R$ 28/mês</strong> abastecendo só no Posto Orense.</p>')
+    expect(html).to include("<p class=\"text-xs text-slate-500\">Economia estimada: <strong class=\"text-slate-700\">~R$\u00A028/mês</strong> abastecendo só no Posto Orense.</p>")
   end
 
   context 'when there are no savings to estimate' do

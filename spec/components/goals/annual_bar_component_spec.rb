@@ -16,8 +16,8 @@ RSpec.describe Goals::AnnualBarComponent, type: :component do
   end
 
   it 'shows current and target formatted in BRL' do
-    expect(html).to include('R$ 20.000,00')
-    expect(html).to include('R$ 80.000,00')
+    expect(html).to include("R$\u00A020.000,00")
+    expect(html).to include("R$\u00A080.000,00")
   end
 
   it 'shows remaining months derived from days_remaining' do

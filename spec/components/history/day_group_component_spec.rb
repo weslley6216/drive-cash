@@ -17,8 +17,8 @@ RSpec.describe History::DayGroupComponent, type: :component do
   let(:html) { view_context.render(described_class.new(group: group, context: context)) }
 
   it 'renders the rounded day totals with + and − signs and a separator' do
-    expect(html).to include('+R$ 200<')
-    expect(html).to include('−R$ 80<')
+    expect(html).to include("+R$\u00A0200<")
+    expect(html).to include("−R$\u00A080<")
     expect(html).to include('text-slate-300 mx-1.5')
   end
 

@@ -10,7 +10,7 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       expect(html).to include(I18n.t('vehicle.tank.status.ok'))
       expect(html).to include('bg-blue-500')
       expect(html).to include('Posto Orense')
-      expect(html).to include('R$ 220,00')
+      expect(html).to include("R$\u00A0220,00")
     end
 
     it 'renders the mid state with amber styling between 50 and 75 percent' do
@@ -45,7 +45,7 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       html = view_context.render(described_class.new(balance: -40, full: 260, last_fill: fill))
 
       expect(html).to include(I18n.t('vehicle.tank.status.negative'))
-      expect(html).to include('−R$ 40,00')
+      expect(html).to include("−R$\u00A040,00")
     end
 
     it 'falls back to the tank title when the ok state has no recorded fill' do
@@ -67,7 +67,7 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       html = view_context.render(described_class.new(balance: 195, full: 260, last_fill: fill))
 
       expect(html).to include('75%')
-      expect(html).to include('R$ 195,00')
+      expect(html).to include("R$\u00A0195,00")
     end
 
     it 'renders a fallback level label when full is nil' do
@@ -88,7 +88,7 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
 
       expect(html).to include(I18n.t('vehicle.tank.subtitle'))
       expect(html).to include(I18n.t('vehicle.tank.refuel_desktop'))
-      expect(html).to include(I18n.t('vehicle.tank.of_full_desktop', value: 'R$ 260,00'))
+      expect(html).to include(I18n.t('vehicle.tank.of_full_desktop', value: "R$\u00A0260,00"))
       expect(html).to include('rounded-2xl border-2')
     end
 
@@ -97,20 +97,20 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
         html = view_context.render(described_class.new(balance: 125, full: 260, last_fill: fill, consumed: { amount: 135, routes: 3 }, variant: :desktop))
 
         expect(html).to include('<p class="text-xs text-slate-500 leading-relaxed">Último cheio · 07 jun · Posto Orense<br>')
-        expect(html).to include('<span class="text-slate-400">Consumido R$ 135,00 em 3 rotas</span>')
+        expect(html).to include("<span class=\"text-slate-400\">Consumido R$\u00A0135,00 em 3 rotas</span>")
       end
 
       it 'keeps the summary instead of the level warning in a danger state' do
         html = view_context.render(described_class.new(balance: 30, full: 260, last_fill: fill, consumed: { amount: 230, routes: 5 }, variant: :desktop))
 
-        expect(html).to include('Consumido R$ 230,00 em 5 rotas')
+        expect(html).to include("Consumido R$\u00A0230,00 em 5 rotas")
         expect(html).not_to include(I18n.t('vehicle.tank.note.critical'))
       end
 
       it 'counts a single route in the singular' do
         html = view_context.render(described_class.new(balance: 215, full: 260, last_fill: fill, consumed: { amount: 45, routes: 1 }, variant: :desktop))
 
-        expect(html).to include('Consumido R$ 45,00 em 1 rota</span>')
+        expect(html).to include("Consumido R$\u00A045,00 em 1 rota</span>")
       end
 
       it 'drops the consumption line when no route ran since the fill' do

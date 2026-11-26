@@ -28,8 +28,8 @@ RSpec.describe RecentActivityComponent, type: :component do
   end
 
   it 'glues the sign to the amount with a typographic minus for expenses' do
-    expect(html).to include('+R$ 200,00')
-    expect(html).to include("\u2212R$ 80,00")
+    expect(html).to include("+R$\u00A0200,00")
+    expect(html).to include("\u2212R$\u00A080,00")
   end
 
   it 'shows the description before the date on phones and the date in its own column on desktops' do

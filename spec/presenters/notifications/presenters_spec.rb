@@ -78,7 +78,7 @@ RSpec.describe Notifications::Presenters do
       row = described_class.present(notification)
 
       expect(row.title).to eq('Meta mensal batida! 🎯')
-      expect(row.body).to eq('Você bateu a meta de julho com R$ 1.200,00.')
+      expect(row.body).to eq("Você bateu a meta de julho com R$\u00A01.200,00.")
       expect(row.palette_key).to eq(:success)
       expect(row.icon).to eq(PhlexIcons::Lucide::Target)
     end
@@ -93,9 +93,9 @@ RSpec.describe Notifications::Presenters do
       annual = described_class.present(annual_notification)
 
       expect(weekly.title).to eq('Meta semanal batida! 🎯')
-      expect(weekly.body).to eq('Você bateu a meta de 06/jul a 12/jul com R$ 1.200,00.')
+      expect(weekly.body).to eq("Você bateu a meta de 06/jul a 12/jul com R$\u00A01.200,00.")
       expect(annual.title).to eq('Meta anual batida! 🎯')
-      expect(annual.body).to eq('Você bateu a meta de 2026 com R$ 1.200,00.')
+      expect(annual.body).to eq("Você bateu a meta de 2026 com R$\u00A01.200,00.")
     end
 
     it 'links to the outcome of the goal period with no inline action' do
@@ -120,7 +120,7 @@ RSpec.describe Notifications::Presenters do
       row = described_class.present(notification)
 
       expect(row.title).to eq('Meta da semana: faltou pouco')
-      expect(row.body).to eq('Você chegou a 90% (R$ 990,00 de R$ 1.100,00).')
+      expect(row.body).to eq("Você chegou a 90% (R$\u00A0990,00 de R$\u00A01.100,00).")
       expect(row.palette_key).to eq(:attention)
       expect(row.icon).to eq(PhlexIcons::Lucide::Target)
     end
@@ -131,7 +131,7 @@ RSpec.describe Notifications::Presenters do
       row = described_class.present(notification)
 
       expect(row.title).to eq('Meta da semana encerrada')
-      expect(row.body).to eq('Você chegou a 63% (R$ 700,00 de R$ 1.100,00).')
+      expect(row.body).to eq("Você chegou a 63% (R$\u00A0700,00 de R$\u00A01.100,00).")
     end
 
     it 'names a monthly goal by its month and an annual goal by its year' do
@@ -191,7 +191,7 @@ RSpec.describe Notifications::Presenters do
 
       row = described_class.present(notification)
 
-      expect(row.body).to eq('Líquido de R$ 987,40 · 32 corridas.')
+      expect(row.body).to eq("Líquido de R$\u00A0987,40 · 32 corridas.")
       expect(row.palette_key).to eq(:info)
       expect(row.icon).to eq(PhlexIcons::Lucide::ChartColumn)
     end

@@ -33,8 +33,8 @@ RSpec.describe History::TableComponent, type: :component do
   end
 
   it 'signs and colors the amounts' do
-    expect(html).to include('+R$ 32,50')
-    expect(html).to include('−R$ 60,00')
+    expect(html).to include("+R$\u00A032,50")
+    expect(html).to include("−R$\u00A060,00")
   end
 
   it 'links each row to its edit modal' do

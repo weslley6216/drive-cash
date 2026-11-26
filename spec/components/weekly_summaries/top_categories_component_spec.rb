@@ -13,11 +13,11 @@ RSpec.describe WeeklySummaries::TopCategoriesComponent, type: :component do
     html = Capybara.string(view_context.render(described_class.new(categories: categories, total: 525)))
 
     expect(html).to have_text('Onde foi o dinheiro')
-    expect(html).to have_text('R$ 525,00')
+    expect(html).to have_text("R$\u00A0525,00")
     expect(html).to have_text('Combustível')
     expect(html).to have_text('Refeições')
     expect(html).to have_text('Pedágio')
-    expect(html).to have_text('R$ 312,00')
+    expect(html).to have_text("R$\u00A0312,00")
     expect(html).to have_css('span.bg-red-50.text-red-600', count: 3)
   end
 

@@ -12,14 +12,14 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
   before { travel_to Date.new(2026, 11, 25) }
 
   it 'tells the month profit with the change against the previous month' do
-    expect(html).to include('Esse mês você lucrou <strong>R$ 1.240,00</strong> — 12% acima do mês anterior.')
+    expect(html).to include("Esse mês você lucrou <strong>R$\u00A01.240,00</strong> — 12% acima do mês anterior.")
   end
 
   it 'lists income, expenses and the best day as rows in their tones' do
     expect(html).to include(described_class::STATS)
-    expect(html).to include('text-emerald-700">+R$ 1.680,00</p>')
-    expect(html).to include('text-red-700">−R$ 440,00</p>')
-    expect(html).to include('Melhor dia').and include('Qui, 12/11').and include('text-slate-800">R$ 320,00</p>')
+    expect(html).to include("text-emerald-700\">+R$\u00A01.680,00</p>")
+    expect(html).to include("text-red-700\">−R$\u00A0440,00</p>")
+    expect(html).to include('Melhor dia').and include('Qui, 12/11').and include("text-slate-800\">R$\u00A0320,00</p>")
     expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(3)
   end
 
@@ -43,7 +43,7 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     let(:card) { super().merge(profit_change: 0.0) }
 
     it 'says it is the same as the previous month' do
-      expect(html).to include('Esse mês você lucrou <strong>R$ 1.240,00</strong> — igual ao mês anterior.')
+      expect(html).to include("Esse mês você lucrou <strong>R$\u00A01.240,00</strong> — igual ao mês anterior.")
     end
   end
 
@@ -59,7 +59,7 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     let(:card) { super().merge(earnings: 0.0, profit: -440.0, best_day_on: nil, best_day_amount: nil) }
 
     it 'lists income and expenses without the best day' do
-      expect(html).to include('+R$ 0,00').and include('−R$ 440,00')
+      expect(html).to include("+R$\u00A00,00").and include("−R$\u00A0440,00")
       expect(html).not_to include('Melhor dia')
       expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(2)
     end
@@ -77,7 +77,7 @@ RSpec.describe Chat::AnswerCards::SummaryComponent, type: :component do
     let(:card) { super().merge(month: nil, profit_change: nil, best_day_on: nil, best_day_amount: nil) }
 
     it 'tells the year profit without comparison or best day' do
-      expect(html).to include('Esse ano você lucrou <strong>R$ 1.240,00</strong>.')
+      expect(html).to include("Esse ano você lucrou <strong>R$\u00A01.240,00</strong>.")
       expect(html).not_to include('Melhor dia')
       expect(html.scan(Chat::AnswerCards::AnswerStatComponent::ROW).size).to eq(2)
     end

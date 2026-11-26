@@ -54,7 +54,7 @@ RSpec.describe 'Goal missed outcome', type: :system, js: true do
   it 'adjusts the next week goal to the recent average on a phone' do
     visit goal_outcome_path(goal, '2026-07-06')
 
-    click_on 'Ajustar para R$ 990'
+    click_on "Ajustar para R$\u00A0990"
 
     expect(page).to have_link('Ver meta de 13/jul a 19/jul')
     expect(Goal.find_by(user: current_user, kind: 'weekly', period_start: Date.new(2026, 7, 13)).target_amount).to eq(990)

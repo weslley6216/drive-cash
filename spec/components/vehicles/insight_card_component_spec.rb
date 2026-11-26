@@ -24,7 +24,7 @@ RSpec.describe Vehicles::InsightCardComponent, type: :component do
 
       expect(html).to include('11,5 km/L')
       expect(html).to include('11,0 do Posto Geladão')
-      expect(html).to include('Economia estimada: R$ 28/mês')
+      expect(html).to include("Economia estimada: R$\u00A028/mês")
     end
 
     it 'uses blue tones' do
@@ -43,7 +43,7 @@ RSpec.describe Vehicles::InsightCardComponent, type: :component do
     it 'adds the analysis link and the fuller body copy on the desktop card' do
       html = view_context.render(described_class.new(insight: insight, variant: :desktop))
 
-      expect(html).to include('Mantendo o Posto Orense, a economia estimada é de R$ 28/mês.')
+      expect(html).to include("Mantendo o Posto Orense, a economia estimada é de R$\u00A028/mês.")
       expect(html).to include("href=\"/analysis\">#{I18n.t('vehicle.insight.see_analysis')}")
     end
   end

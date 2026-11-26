@@ -11,7 +11,7 @@ RSpec.describe WeeklySummaries::GoalComponent, type: :component do
     html = Capybara.string(view_context.render(described_class.new(progress: progress)))
 
     expect(html).to have_text('Meta da semana')
-    expect(html).to have_text('R$ 987,40 de R$ 1.100,00')
+    expect(html).to have_text("R$\u00A0987,40 de R$\u00A01.100,00")
     expect(html).to have_css('span.text-amber-700', text: '89%')
     expect(html).to have_css('.bg-amber-500[style="width: 89%"]')
   end

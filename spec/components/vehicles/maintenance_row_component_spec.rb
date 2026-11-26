@@ -75,7 +75,7 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
 
       html = view_context.render(described_class.new(row: row))
 
-      expect(Capybara.string(html)).to have_css('p span.text-slate-400', text: '· est. R$ 280,00')
+      expect(Capybara.string(html)).to have_css('p span.text-slate-400', text: "· est. R$\u00A0280,00")
     end
 
     it 'omits the estimated cost when the maintenance has none' do
@@ -154,7 +154,7 @@ RSpec.describe Vehicles::MaintenanceRowComponent, type: :component do
 
         page = Capybara.string(view_context.render(described_class.new(row: row, variant: :desktop)))
 
-        expect(page).to have_css('p span.text-slate-400', text: '· custo est. R$ 280,00')
+        expect(page).to have_css('p span.text-slate-400', text: "· custo est. R$\u00A0280,00")
       end
     end
   end

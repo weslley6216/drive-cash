@@ -23,7 +23,7 @@ RSpec.describe Goals::Achievements do
 
       result = described_class.present(raw)
 
-      expect(result).to eq(type: :best_day, short: 'Melhor dia: R$ 3.001', long: 'Melhor dia: R$ 3.001 em 02/mai')
+      expect(result).to eq(type: :best_day, short: "Melhor dia: R$\u00A03.001", long: "Melhor dia: R$\u00A03.001 em 02/mai")
     end
   end
 

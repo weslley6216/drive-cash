@@ -22,17 +22,17 @@ RSpec.describe WeeklySummaries::HeroComponent, type: :component do
   it 'renders profit, trips, worked days and profit per km' do
     html = view_context.render(described_class.new(summary: summary))
 
-    expect(html).to include('R$ 987,40')
+    expect(html).to include("R$\u00A0987,40")
     expect(html).to include('32')
     expect(html).to include('5')
-    expect(html).to include('R$ 1,31')
+    expect(html).to include("R$\u00A01,31")
   end
 
   it 'shows earnings and expenses under the profit' do
     page_html = Capybara.string(view_context.render(described_class.new(summary: summary)))
 
-    expect(page_html).to have_css('span.text-emerald-700', text: '+R$ 1.512,40')
-    expect(page_html).to have_css('span.text-red-700', text: '−R$ 525,00')
+    expect(page_html).to have_css('span.text-emerald-700', text: "+R$\u00A01.512,40")
+    expect(page_html).to have_css('span.text-red-700', text: "−R$\u00A0525,00")
     expect(page_html).to have_text('receitas')
     expect(page_html).to have_text('despesas')
   end

@@ -12,7 +12,7 @@ RSpec.describe History::EntryRowComponent, type: :component do
     end
 
     it 'shows the amount with + prefix and emerald color' do
-      expect(html).to include('+R$ 200,00')
+      expect(html).to include("+R$\u00A0200,00")
       expect(html).to include('text-emerald-700')
     end
 
@@ -47,7 +47,7 @@ RSpec.describe History::EntryRowComponent, type: :component do
     end
 
     it 'shows the amount with − prefix and red color' do
-      expect(html).to include('−R$ 80,00')
+      expect(html).to include("−R$\u00A080,00")
       expect(html).to include('text-red-700')
     end
 

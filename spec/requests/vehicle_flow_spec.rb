@@ -27,7 +27,7 @@ RSpec.describe 'Vehicle flow', type: :request do
     get vehicle_path
 
     expect(response.body).to include(I18n.t('vehicle.tank.status.ok'))
-    expect(response.body).to include('R$ 260,00')
+    expect(response.body).to include("R$\u00A0260,00")
 
     create(:expense, user: current_user, category: 'fuel', amount: 300, date: Date.current)
     get vehicle_path

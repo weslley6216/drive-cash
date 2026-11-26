@@ -91,7 +91,7 @@ RSpec.describe 'Goal outcome', type: :system, js: true do
   it 'keeps the target for the next month from Manter on a phone' do
     visit goal_outcome_path(goal, '2026-06-01')
 
-    click_on 'Manter R$ 6.000'
+    click_on "Manter R$\u00A06.000"
 
     expect(page).to have_link('Ver meta de julho')
     expect(Goal.find_by(user: current_user, kind: 'monthly', period_start: Date.new(2026, 7, 1)).target_amount).to eq(6_000)

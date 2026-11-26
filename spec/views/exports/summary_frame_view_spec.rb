@@ -17,9 +17,9 @@ RSpec.describe Exports::SummaryFrameView, type: :view do
     expect(html).to include('Período')
     expect(html).to include('Jan–Jun 2026')
     expect(html).to include('328')
-    expect(html).to include('R$ 29.530,70')
-    expect(html).to include('R$ 12.975,43')
-    expect(html).to include('R$ 16.555,27')
+    expect(html).to include("R$\u00A029.530,70")
+    expect(html).to include("R$\u00A012.975,43")
+    expect(html).to include("R$\u00A016.555,27")
   end
 
   it 'applies the design colors to earnings, expenses and profit' do

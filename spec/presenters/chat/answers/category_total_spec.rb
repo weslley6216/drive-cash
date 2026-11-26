@@ -5,7 +5,7 @@ RSpec.describe Chat::Answers::CategoryTotal do
     it 'tells the total spent with the category label' do
       result = described_class.new({ category: 'fuel', total: 320.0 }).call
 
-      expect(result).to include('Combustível').and include('R$ 320,00')
+      expect(result).to include('Combustível').and include("R$\u00A0320,00")
     end
 
     it 'returns no_data when data is nil' do

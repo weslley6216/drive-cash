@@ -26,8 +26,8 @@ RSpec.describe 'Plans', type: :request do
       it 'renders both billing prices so the toggle works client-side' do
         get plan_path
 
-        expect(response.body).to include('R$ 11,92')
-        expect(response.body).to include('R$ 14,90')
+        expect(response.body).to include("R$\u00A011,92")
+        expect(response.body).to include("R$\u00A014,90")
         expect(response.body).to include('data-controller="plan-billing"')
       end
 
@@ -78,7 +78,7 @@ RSpec.describe 'Plans', type: :request do
           travel_to Date.new(2026, 7, 16) do
             get plan_path
 
-            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: 'R$ 143,00'))
+            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.yearly', price: "R$\u00A0143,00"))
             expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de março de 2027'))
           end
         end
@@ -91,7 +91,7 @@ RSpec.describe 'Plans', type: :request do
           travel_to Date.new(2026, 7, 16) do
             get plan_path
 
-            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.monthly', price: 'R$ 14,90'))
+            expect(response.body).to include(I18n.t('plans.subscription_view.billing_line.monthly', price: "R$\u00A014,90"))
             expect(response.body).to include(I18n.t('plans.subscription_view.next_charge', date: '03 de agosto de 2026'))
           end
         end

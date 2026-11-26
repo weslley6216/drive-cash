@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { normalizeVendor } from 'utils/normalize_vendor'
+import { formatCurrency } from 'utils/format_currency'
 
 const TOGGLE_ACTIVE_EARN = ['bg-white', 'shadow-sm', 'text-emerald-700']
 const TOGGLE_ACTIVE_EXPENSE = ['bg-white', 'shadow-sm', 'text-red-700']
@@ -117,8 +118,7 @@ export default class extends Controller {
     if (this.hasTankAfterTarget) {
       const amount = parseFloat(this.amountInputTarget?.value || 0)
       const after = this.tankBalanceValue - amount
-      const sign = after < 0 ? '-' : ''
-      this.tankAfterTarget.textContent = `${sign}R$ ${Math.abs(after).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      this.tankAfterTarget.textContent = formatCurrency(after)
     }
   }
 

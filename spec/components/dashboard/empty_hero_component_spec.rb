@@ -7,5 +7,6 @@ RSpec.describe Dashboard::EmptyHeroComponent, type: :component do
     expect(html).to include('border-dashed')
     expect(html).to include(I18n.t('empty_states.home.hero_label', year: 2026))
     expect(html).to include(I18n.t('empty_states.home.hero_placeholder'))
+    expect(html).to include("R$\u00A0--")
   end
 end

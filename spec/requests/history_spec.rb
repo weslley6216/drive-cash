@@ -40,8 +40,8 @@ RSpec.describe 'History', type: :request do
 
       get history_path(year: 2025)
 
-      expect(response.body).to include('+R$ 200<')
-      expect(response.body).to include('−R$ 80<')
+      expect(response.body).to include("+R$\u00A0200<")
+      expect(response.body).to include("−R$\u00A080<")
     end
 
     it 'filters by earnings only' do
