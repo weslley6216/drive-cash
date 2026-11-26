@@ -86,6 +86,18 @@ RSpec.describe 'Fuel', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'formats the after tank balance with a non-breaking space after the currency symbol on a phone' do
+    create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', total_amount: 260, full_tank: true, date: Date.current - 1)
+
+    visit new_record_path(type: 'expense')
+    find('label', text: I18n.t('activerecord.attributes.expense.categories.fuel')).click
+    find('[data-record-form-target="amountDisplay"]').set('8000')
+
+    expect(page).to have_css('[data-record-form-target="tankAfter"]', exact_text: 'R$ 180,00')
+    expect(page.evaluate_script(%(document.querySelector('[data-record-form-target="tankAfter"]').textContent))).to eq("R$\u00A0180,00")
+    expect(page).to fit_the_phone_width
+  end
+
   it 'hides the tank debit card for a non-fuel category on a phone' do
     create(:refueling, vehicle: vehicle, vendor: 'Posto Orense', total_amount: 260, full_tank: true, date: Date.current - 1)
 
