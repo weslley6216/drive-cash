@@ -88,6 +88,7 @@ module Dashboard
 
     def avatar_link
       a(href:  account_path,
+        data:  { turbo_frame: '_top' },
         class: 'w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-sm') do
         plain @first_name.to_s.first&.upcase || '?'
       end

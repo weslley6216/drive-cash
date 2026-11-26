@@ -51,6 +51,15 @@ RSpec.describe 'Home', type: :system, js: true do
     expect(page).to fit_the_phone_width
   end
 
+  it 'opens the account hub from the header avatar on a phone' do
+    visit root_path
+
+    find("a[href='#{account_path}']", text: 'W', exact_text: true).click
+
+    expect(page).to have_css('h1', text: I18n.t('account.show_view.heading'))
+    expect(page).to have_current_path(account_path)
+  end
+
   it 'gives the month chips a 44px tap area while keeping the prototype size in dark mode' do
     emulate_color_scheme('dark')
 
