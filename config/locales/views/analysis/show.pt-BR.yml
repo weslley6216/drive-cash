@@ -13,7 +13,7 @@ pt-BR:
         per_day: "R$ / dia"
         per_trip: "R$ / rota"
         per_km_hero: "Lucro por km rodado"
-        margin: "Sobra a cada R$ 100"
+        margin: "Sobra a cada R$\u00A0100"
       trend:
         best: "melhor: %{month}"
         not_enough: "A tendência aparece a partir de 3 meses com registros."

@@ -51,7 +51,7 @@ RSpec.describe Analysis::ShowView, type: :component do
 
     html = view_context.render(described_class.new(insights: insights_with_margin, filters: filters, unread_count: 0))
 
-    expect(html).to include('Sobra a cada R$ 100')
+    expect(html).to include("Sobra a cada R$\u00A0100")
     expect(html).to include("R$\u00A056,10")
     expect(html).not_to include('Margem')
   end

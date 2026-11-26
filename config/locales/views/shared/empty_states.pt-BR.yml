@@ -6,7 +6,7 @@ pt-BR:
       cta: "Registrar o primeiro"
       secondary: "Ou fale com o Caju: \"Fiz R$45 no Uber\""
       hero_label: "Lucro líquido — %{year}"
-      hero_placeholder: "R$ --"
+      hero_placeholder: "R$\u00A0--"
       hero_hint: "Aparece aqui assim que você registrar o primeiro dia"
     goals:
       title: "Nenhuma meta definida"
