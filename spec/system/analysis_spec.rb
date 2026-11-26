@@ -69,7 +69,7 @@ RSpec.describe 'Analysis', type: :system, js: true do
     visit analysis_path
 
     hero, per_day, per_trip, margin = %w[per_km_hero per_day per_trip margin].map do |metric|
-      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}"), exact_text: true)
+      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}").squish, exact_text: true)
         .evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
     end
 
@@ -88,7 +88,7 @@ RSpec.describe 'Analysis', type: :system, js: true do
     visit analysis_path
 
     hero, per_day, per_trip, margin = %w[per_km_hero per_day per_trip margin].map do |metric|
-      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}"), exact_text: true)
+      find('span', text: I18n.t("analysis.show_view.metrics.#{metric}").squish, exact_text: true)
         .evaluate_script("this.closest('div:has(> p)').getBoundingClientRect().toJSON()")
     end
 

@@ -230,7 +230,7 @@ RSpec.describe 'Weekly summary', type: :system, js: true do
     monday.execute_script('this.focus()')
 
     expect(page).to have_css('[data-bar-tooltip-target="tooltip"]', visible: true, text: /seg, 06\/jul/i)
-    expect(monday['aria-label']).to eq('Seg, 06/jul: líquido R$ 200,00, receitas R$ 200,00, despesas R$ 0,00, 8 corridas')
+    expect(monday['aria-label']).to eq("Seg, 06/jul: líquido R$\u00A0200,00, receitas R$\u00A0200,00, despesas R$\u00A00,00, 8 corridas")
   end
 
   it 'lays the hero and the goal on five columns beside the bars on a desktop screen' do
