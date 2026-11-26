@@ -62,9 +62,7 @@ module Analysis
     def center_label
       div(class: 'absolute inset-0 flex flex-col items-center justify-center pointer-events-none') do
         span(class: 'text-[10px] text-slate-500') { I18n.t('analysis.show_view.platforms.total_label') }
-        span(class: 'text-sm font-bold text-slate-800') do
-          helpers.number_to_currency(@total.round, unit: 'R$ ', format: '%u%n', separator: ',', delimiter: '.', precision: 0)
-        end
+        span(class: 'text-sm font-bold text-slate-800') { format_currency_short(@total) }
       end
     end
 

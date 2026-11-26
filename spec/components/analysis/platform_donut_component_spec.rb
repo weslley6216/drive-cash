@@ -51,7 +51,7 @@ RSpec.describe Analysis::PlatformDonutComponent, type: :component do
     html = view_context.render(Analysis::PlatformDonutComponent.new(platforms: platforms, total: 1000.0, month: nil))
 
     expect(html).to include(I18n.t('analysis.show_view.platforms.total_label'))
-    expect(html).to include('1.000')
+    expect(html).to include("R$\u00A01.000</span>")
   end
 
   it 'renders a side legend with label and percent only (no amount)' do

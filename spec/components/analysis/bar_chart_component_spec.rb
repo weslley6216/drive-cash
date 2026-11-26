@@ -154,8 +154,8 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
     expect(html.scan('data-bar-tooltip-target="column"').size).to eq(daily_bars.size)
     expect(html).to include('data-index="0"')
     expect(html).to include('data-index="1"')
-    expect(html).to include("data-earn=\"R$ 200,00\"")
-    expect(html).to include("data-exp=\"R$ 50,00\"")
+    expect(html).to include("data-earn=\"R$\u00A0200,00\"")
+    expect(html).to include("data-exp=\"R$\u00A050,00\"")
   end
 
   it 'wires stimulus actions for hover, focus, click and keyboard on each column' do
@@ -174,7 +174,7 @@ RSpec.describe Analysis::BarChartComponent, type: :component do
 
     expect(html.scan('role="button"').size).to eq(daily_bars.size)
     expect(html.scan('tabindex="0"').size).to eq(daily_bars.size)
-    expect(html).to include('aria-label="Dia 5: Receita R$ 200,00, Despesa R$ 0,00"')
+    expect(html).to include("aria-label=\"Dia 5: Receita R$\u00A0200,00, Despesa R$\u00A00,00\"")
   end
 
   it 'uses the "Dia N" tooltip label in daily mode' do
