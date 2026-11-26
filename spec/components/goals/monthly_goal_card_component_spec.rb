@@ -44,12 +44,12 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     end
 
     it 'shows current/target formatted in BRL' do
-      expect(html).to include('R$ 1.500,00')
-      expect(html).to include('R$ 6.000,00')
+      expect(html).to include("R$\u00A01.500,00")
+      expect(html).to include("R$\u00A06.000,00")
     end
 
     it 'shows at_risk projection badge without cents when on_track is false' do
-      expect(html).to include("#{I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000')}</span>")
+      expect(html).to include("#{I18n.t('goals.index.monthly.at_risk_projection', value: "R$\u00A03.000")}</span>")
       expect(html).to include('bg-amber-50')
     end
 
@@ -84,11 +84,11 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     end
 
     it 'spells out the target with the metric' do
-      expect(html).to include(I18n.t('goals.index.monthly.of_target_metric', target: 'R$ 6.000,00', metric: 'lucro líquido'))
+      expect(html).to include(I18n.t('goals.index.monthly.of_target_metric', target: "R$\u00A06.000,00", metric: 'lucro líquido'))
     end
 
     it 'keeps the cents in the projection' do
-      expect(html).to include(I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000,00'))
+      expect(html).to include(I18n.t('goals.index.monthly.at_risk_projection', value: "R$\u00A03.000,00"))
     end
   end
 
@@ -97,7 +97,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
       good = progress.merge(projection: 7000, on_track: true)
       html = view_context.render(described_class.new(progress: good))
 
-      expect(html).to include("#{I18n.t('goals.index.monthly.on_track_projection', value: 'R$ 7.000')}</span>")
+      expect(html).to include("#{I18n.t('goals.index.monthly.on_track_projection', value: "R$\u00A07.000")}</span>")
       expect(html).to include('bg-emerald-50')
     end
   end
@@ -111,7 +111,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     it 'shows the reached badge with surplus and emerald colors' do
       html = view_context.render(described_class.new(progress: reached_progress))
 
-      expect(html).to include(I18n.t('goals.index.monthly.reached', surplus: 'R$ 57,08'))
+      expect(html).to include(I18n.t('goals.index.monthly.reached', surplus: "R$\u00A057,08"))
       expect(html).to include('bg-emerald-50')
     end
 
@@ -138,7 +138,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
     it 'shows the missed badge with the shortfall instead of a projection' do
       html = view_context.render(described_class.new(progress: ended_progress))
 
-      expect(html).to include(I18n.t('goals.index.monthly.missed', shortfall: 'R$ 4.500,00'))
+      expect(html).to include(I18n.t('goals.index.monthly.missed', shortfall: "R$\u00A04.500,00"))
       expect(html).not_to include(I18n.t('goals.index.monthly.at_risk_projection', value: 'R$ 3.000,00'))
     end
 
@@ -152,7 +152,7 @@ RSpec.describe Goals::MonthlyGoalCardComponent, type: :component do
   it 'uses daily_pace for the current_pace metric' do
     html = view_context.render(described_class.new(progress: progress))
 
-    expect(html).to include('R$ 100,00')
+    expect(html).to include("R$\u00A0100,00")
   end
 
   context 'edit pencil' do

@@ -7,14 +7,14 @@ RSpec.describe Records::TankDebitCardComponent, type: :component do
     html = view_context.render(described_class.new(balance: BigDecimal('260'), expense: Expense.new(category: 'fuel', amount: 80)))
 
     expect(html).to include(I18n.t('records.new_view.tank_debit.title'))
-    expect(html).to include('R$ 260,00')
-    expect(html).to include('<span data-record-form-target="tankAfter">R$ 180,00</span>')
+    expect(html).to include("R$\u00A0260,00")
+    expect(html).to include("<span data-record-form-target=\"tankAfter\">R$\u00A0180,00</span>")
   end
 
   it 'keeps the after balance equal to the current balance without an amount' do
     html = view_context.render(described_class.new(balance: BigDecimal('260'), expense: Expense.new(category: 'fuel')))
 
-    expect(html).to include('<span data-record-form-target="tankAfter">R$ 260,00</span>')
+    expect(html).to include("<span data-record-form-target=\"tankAfter\">R$\u00A0260,00</span>")
   end
 
   it 'starts visible for a fuel expense' do

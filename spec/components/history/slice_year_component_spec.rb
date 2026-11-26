@@ -18,7 +18,7 @@ RSpec.describe History::SliceYearComponent, type: :component do
 
   it 'titles the card by the series and shows the window total in red' do
     expect(page).to have_text('Seguro · por mês')
-    expect(page.find('[data-twelve-months="total"]').text).to eq('R$ 2.400,80')
+    expect(page.find('[data-twelve-months="total"]').text).to eq("R$\u00A02.400,80")
     expect(page.find('[data-twelve-months="total"]')[:class]).to include('text-red-700')
   end
 
@@ -34,8 +34,8 @@ RSpec.describe History::SliceYearComponent, type: :component do
     badge = page.find('[data-twelve-months="adjustment"]')
 
     expect(badge[:class]).to include('text-amber-800 bg-amber-100 border border-amber-200')
-    expect(badge.text).to eq('Reajuste +12,8% em jan · R$ 189,90 → R$ 214,30')
-    expect(badge.find('.hidden.lg\:inline').text).to eq('· R$ 189,90 → R$ 214,30')
+    expect(badge.text).to eq("Reajuste +12,8% em jan · R$\u00A0189,90 → R$\u00A0214,30")
+    expect(badge.find('.hidden.lg\:inline').text).to eq("· R$\u00A0189,90 → R$\u00A0214,30")
   end
 
   it 'signs a fall with a minus' do

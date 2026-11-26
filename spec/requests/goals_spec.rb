@@ -37,7 +37,7 @@ RSpec.describe 'Goals', type: :request do
       get goals_path
 
       expect(response.body).to include(I18n.t('goals.index.monthly.label'))
-      expect(response.body).to include('R$ 1.500,00')
+      expect(response.body).to include("R$\u00A01.500,00")
     end
 
     it 'uses Date.current as reference so days_remaining reflects today, not end of month' do
@@ -82,7 +82,7 @@ RSpec.describe 'Goals', type: :request do
         get goals_path
 
         expect(response.body).to include(I18n.t('goals.index.suggestion.label'))
-        expect(response.body).to include('R$ 6.200,00')
+        expect(response.body).to include("R$\u00A06.200,00")
       end
     end
   end

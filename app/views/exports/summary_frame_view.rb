@@ -23,10 +23,10 @@ module Exports
       div(class: 'rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2.5 mb-4') do
         row(t('exports.summary.period'), @period_label, value_class: 'text-slate-800')
         row(t('exports.summary.entries'), @totals[:count].to_s, value_class: 'text-slate-800')
-        row(t('exports.summary.earnings'), helpers.number_to_currency(@totals[:earnings]), value_class: 'text-emerald-700')
-        row(t('exports.summary.expenses'), helpers.number_to_currency(@totals[:expenses]), value_class: 'text-red-700')
+        row(t('exports.summary.earnings'), format_currency(@totals[:earnings]), value_class: 'text-emerald-700')
+        row(t('exports.summary.expenses'), format_currency(@totals[:expenses]), value_class: 'text-red-700')
         div(class: 'h-px bg-slate-200')
-        row(t('exports.summary.profit'), helpers.number_to_currency(@totals[:profit]), label_class: 'text-slate-600 font-medium', value_class: 'font-bold text-blue-700')
+        row(t('exports.summary.profit'), format_currency(@totals[:profit]), label_class: 'text-slate-600 font-medium', value_class: 'font-bold text-blue-700')
       end
     end
 

@@ -17,13 +17,13 @@ RSpec.describe Goals::AchievementsRowComponent, type: :component do
   it 'renders the short label for the phone and hides it from the desktop breakpoint' do
     expect(html).to include('<span class="lg:hidden">Sequência 7 dias</span>')
     expect(html).to include('<span class="lg:hidden">Meta de Abril</span>')
-    expect(html).to include('<span class="lg:hidden">Melhor dia: R$ 3.001</span>')
+    expect(html).to include("<span class=\"lg:hidden\">Melhor dia: R$\u00A03.001</span>")
   end
 
   it 'renders the long label only from the desktop breakpoint' do
     expect(html).to include('<span class="hidden lg:inline">Sequência de 7 dias trabalhando</span>')
     expect(html).to include('<span class="hidden lg:inline">Meta de Abril batida (108%)</span>')
-    expect(html).to include('<span class="hidden lg:inline">Melhor dia: R$ 3.001 em 02/mai</span>')
+    expect(html).to include("<span class=\"hidden lg:inline\">Melhor dia: R$\u00A03.001 em 02/mai</span>")
   end
 
   it 'maps each badge type to its palette color via inline style' do

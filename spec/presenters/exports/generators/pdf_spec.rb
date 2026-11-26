@@ -30,6 +30,12 @@ RSpec.describe Exports::Generators::Pdf do
       expect(pdf_text).to include('endstream')
     end
 
+    it 'joins the currency symbol and the total with a non-breaking space' do
+      result = described_class.call(payload: payload)
+
+      expect(result.io.string).to include('<5224a03230302c3030>')
+    end
+
     it 'includes refuelings and maintenances in the pdf' do
       full_payload = Exports::Builder::Payload.new(
         earnings:     [{ date: Date.new(2026, 3, 1), amount: BigDecimal('200.00'), platform: 'uber', trips_count: 5, notes: nil }],

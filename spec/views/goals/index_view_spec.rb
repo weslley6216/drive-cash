@@ -39,7 +39,7 @@ RSpec.describe Goals::IndexView, type: :component do
       output = view_context.render(described_class.new(progress: progress, filters: filters, suggestion: BigDecimal('6200'), unread_count: 0))
 
       expect(output).to include(I18n.t('goals.index.suggestion.label'))
-      expect(output).to include('R$ 6.200,00')
+      expect(output).to include("R$\u00A06.200,00")
       expect(output.index(I18n.t('empty_states.goals.title'))).to be < output.index(I18n.t('goals.index.suggestion.label'))
     end
   end
@@ -120,14 +120,14 @@ RSpec.describe Goals::IndexView, type: :component do
     it 'renders the compact desktop period with rounded amounts' do
       start_day = weekly_goal.period_start.day
       end_label = I18n.l(weekly_goal.period_end, format: '%-d %B')
-      expected = I18n.t('goals.index.weekly.desktop_summary', start: start_day, end: end_label, value: 'R$ 500', target: 'R$ 1.400')
+      expected = I18n.t('goals.index.weekly.desktop_summary', start: start_day, end: end_label, value: "R$\u00A0500", target: "R$\u00A01.400")
 
       expect(html).to include(expected)
     end
 
     it 'renders weekly progress amounts side by side' do
-      expect(html).to include(I18n.t('goals.index.weekly.progress', value: 'R$ 500,00', target: 'R$ 1.400,00'))
-      expect(html).to include(I18n.t('goals.index.weekly.remaining', value: 'R$ 900,00'))
+      expect(html).to include(I18n.t('goals.index.weekly.progress', value: "R$\u00A0500,00", target: "R$\u00A01.400,00"))
+      expect(html).to include(I18n.t('goals.index.weekly.remaining', value: "R$\u00A0900,00"))
     end
 
     it 'renders annual bar section' do

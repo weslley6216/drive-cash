@@ -14,7 +14,7 @@ RSpec.describe Auth::BrandPanelComponent, type: :component do
     expect(html).to include(I18n.t('auth.brand_panel_component.headline_line2'))
     expect(html).to include(I18n.t('auth.brand_panel_component.subheadline'))
     expect(html).to include(I18n.t('auth.brand_panel_component.hero_profit_label'))
-    expect(html).to include('R$ 16.555,27')
+    expect(html).to include("R$\u00A016.555,27")
     expect(html).to include(I18n.t('auth.brand_panel_component.copyright'))
   end
 end

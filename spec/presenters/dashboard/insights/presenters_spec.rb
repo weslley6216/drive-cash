@@ -12,7 +12,7 @@ RSpec.describe Dashboard::Insights::Presenters do
 
       expect(result[:type]).to eq('category_share')
       expect(result[:title]).to eq('Combustível leva 52,7% dos seus gastos')
-      expect(result[:description]).to eq('Foram R$ 220,00 no mês. É a categoria que mais pesa no seu lucro por km.')
+      expect(result[:description]).to eq("Foram R$\u00A0220,00 no mês. É a categoria que mais pesa no seu lucro por km.")
       expect(result[:link]).to eq(label: 'Ver lançamentos →', params: { categories: ['fuel'], year: 2025, month: 6 })
     end
 

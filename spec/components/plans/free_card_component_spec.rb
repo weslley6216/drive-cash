@@ -7,7 +7,7 @@ RSpec.describe Plans::FreeCardComponent, type: :component do
     expect(html).to include(I18n.t('plans.names.free'))
     expect(html).to include(I18n.t('plans.free_card.badge'))
     expect(html).to include(I18n.t('plans.free_card.forever'))
-    expect(html).to include('R$ 0')
+    expect(html).to include("R$\u00A00")
     expect(html).to include(I18n.t('plans.features.records'))
     expect(html).to include('text-slate-400')
   end

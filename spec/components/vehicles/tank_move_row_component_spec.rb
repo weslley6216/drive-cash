@@ -10,7 +10,7 @@ RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
 
       expect(html).to include(I18n.t('vehicle.moves.full_tank'))
       expect(html).to include('Posto Orense')
-      expect(html).to include('+R$ 260,00')
+      expect(html).to include("+R$\u00A0260,00")
       expect(html).to include('text-blue-700')
     end
 
@@ -21,7 +21,7 @@ RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
 
       expect(html).to include('Rota Shopee')
       expect(html).to include(I18n.t('vehicle.moves.fuel_expense'))
-      expect(html).to include('−R$ 45,00')
+      expect(html).to include("−R$\u00A045,00")
       expect(html).to include('text-red-700')
     end
 
@@ -78,7 +78,7 @@ RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
 
         html = view_context.render(described_class.new(move: move, variant: :desktop))
 
-        expect(html).to include('07 jun · Posto Orense · 44,1 L · R$ 5,89/L')
+        expect(html).to include("07 jun · Posto Orense · 44,1 L · R$\u00A05,89/L")
         expect(html).not_to include(I18n.t('vehicle.moves.fuel_expense_desktop'))
       end
     end

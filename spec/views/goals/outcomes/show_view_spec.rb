@@ -29,8 +29,8 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
 
     expect(html).to include('Meta mensal · lucro líquido')
     expect(html).to include('Meta de junho batida!')
-    expect(html).to include('Você fez <strong class="text-slate-900">R$ 6.120,00</strong> de lucro líquido em junho.')
-    expect(html).to include('+R$ 120,00 acima da meta · 102%')
+    expect(html).to include("Você fez <strong class=\"text-slate-900\">R$\u00A06.120,00</strong> de lucro líquido em junho.")
+    expect(html).to include("+R$\u00A0120,00 acima da meta · 102%")
     expect(html).to include('Batida em').and include('27/jun').and include('3 dias antes do fim')
   end
 
@@ -62,8 +62,8 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
 
     expect(html).to include('Como você chegou lá')
     expect(html).to include('Dias rodados').and include('21')
-    expect(html).to include('Lucro / dia').and include('R$ 291,43')
-    expect(html).to include('Melhor dia').and include('R$ 412,00').and include('sáb, 13/jun')
+    expect(html).to include('Lucro / dia').and include("R$\u00A0291,43")
+    expect(html).to include('Melhor dia').and include("R$\u00A0412,00").and include('sáb, 13/jun')
   end
 
   it 'shows the streak line from two periods in a row' do
@@ -101,9 +101,9 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
   it 'suggests the next target with the per day pace in the same worked days' do
     html = view_context.render(described_class.new(outcome: outcome, confetti: false, unread_count: 0))
 
-    expect(html).to include('Que tal R$ 6.500,00 em julho?')
+    expect(html).to include("Que tal R$\u00A06.500,00 em julho?")
     expect(html).to include('É o seu resultado de junho com 5% a mais, arredondado. ' \
-                            'Dá R$ 309,52 por dia no mesmo ritmo de dias.')
+                            "Dá R$\u00A0309,52 por dia no mesmo ritmo de dias.")
   end
 
   it 'posts raise and keep to the goals create with the next period' do
@@ -111,7 +111,7 @@ RSpec.describe Goals::Outcomes::ShowView, type: :component do
 
     expect(page_html).to have_css('form[action="/goals"][method="post"]', count: 2)
     expect(page_html).to have_button('Subir a meta')
-    expect(page_html).to have_button('Manter R$ 6.000')
+    expect(page_html).to have_button("Manter R$\u00A06.000")
     expect(page_html).to have_css('input[type=hidden][name="goal[target_amount]"][value="6500"]', visible: :all)
     expect(page_html).to have_css('input[type=hidden][name="goal[target_amount]"][value="6000.0"]', visible: :all)
     expect(page_html).to have_css('input[type=hidden][name="goal[period_start]"][value="2026-07-01"]', count: 2, visible: :all)

@@ -50,7 +50,7 @@ RSpec.describe Analysis::MetricCardComponent, type: :component do
       described_class.new(label: label, icon: icon, value: value, series: series, variant: :hero)
     )
 
-    expect(rendered).to include('melhor: abr · R$ 30,00')
+    expect(rendered).to include("melhor: abr · R$\u00A030,00")
   end
 
   it 'shows the not-enough message on the hero with fewer than three months' do

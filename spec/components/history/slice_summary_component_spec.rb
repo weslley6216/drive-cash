@@ -10,7 +10,7 @@ RSpec.describe History::SliceSummaryComponent, type: :component do
 
     expect(tiles.map { |tile| tile.all('p').first.text })
       .to eq(%w[spent refuelings average].map { |key| I18n.t("history.index.slice_summary.#{key}") })
-    expect(tiles.map { |tile| tile.all('p').last.text }).to eq(['R$ 125,00', '2', 'R$ 62,50'])
+    expect(tiles.map { |tile| tile.all('p').last.text }).to eq(["R$\u00A0125,00", '2', "R$\u00A062,50"])
     expect(tiles.first[:class]).to include('bg-red-50 border-red-200 text-red-900')
   end
 
@@ -21,7 +21,7 @@ RSpec.describe History::SliceSummaryComponent, type: :component do
 
     expect(tiles.map { |tile| tile.all('p').first.text })
       .to eq(%w[spent records pending].map { |key| I18n.t("history.index.slice_summary.#{key}") })
-    expect(tiles.map { |tile| tile.all('p').last.text }.last).to eq('R$ 35,00')
+    expect(tiles.map { |tile| tile.all('p').last.text }.last).to eq("R$\u00A035,00")
   end
 
   it 'shows the received total in green for an earning slice' do

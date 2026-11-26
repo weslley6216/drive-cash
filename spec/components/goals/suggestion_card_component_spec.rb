@@ -9,7 +9,7 @@ RSpec.describe Goals::SuggestionCardComponent, type: :component do
 
   it 'highlights the formatted amount inside the sentence' do
     expect(html).to include(I18n.t('goals.index.suggestion.text_before'))
-    expect(html).to include('<span class="font-bold text-slate-800">R$ 6.200,00</span>')
+    expect(html).to include("<span class=\"font-bold text-slate-800\">R$\u00A06.200,00</span>")
   end
 
   it 'uses the padded card surface from the prototype' do

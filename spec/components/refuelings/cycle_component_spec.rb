@@ -24,7 +24,7 @@ RSpec.describe Refuelings::CycleComponent, type: :component do
     expect(header.at_css('h3').text).to eq('Tanque de 28 mai')
     expect(header.at_css('h3')['class']).to eq('text-sm font-semibold text-slate-700 truncate')
     expect(header.at_css('span.text-xs.text-slate-400.whitespace-nowrap').text).to eq('10,6 km/L')
-    expect(header.text).to include('−R$ 1,00 além')
+    expect(header.text).to include("−R$\u00A01,00 além")
   end
 
   it 'marks only the current cycle with the Atual chip' do

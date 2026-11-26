@@ -108,6 +108,14 @@ RSpec.describe 'Vehicle', type: :system, js: true do
       expect(page).to fit_the_phone_width
     end
 
+    it 'keeps the estimated cost glued to its currency symbol in the maintenance meta on a desktop screen' do
+      emulate_desktop_screen
+
+      visit vehicle_path
+
+      expect(find_by_id(dom_id(@oil)).evaluate_script('this.textContent')).to include("· custo est. R$\u00A0280,00")
+    end
+
     it 'heads the maintenances and the tank moves with a subtitle and inline links on a desktop screen' do
       emulate_desktop_screen
 

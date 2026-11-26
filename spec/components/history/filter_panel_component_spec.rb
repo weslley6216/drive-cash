@@ -47,7 +47,7 @@ RSpec.describe History::FilterPanelComponent, type: :component do
     toll = page.find('label', text: 'Pedágio')
 
     expect(page).to have_field('categories[]', count: Expense.categories.size)
-    expect(fuel).to have_text('R$ 195')
+    expect(fuel).to have_text("R$\u00A0195")
     expect(fuel[:class]).not_to include('opacity-40')
     expect(toll[:class]).to include('opacity-40')
   end
@@ -76,7 +76,7 @@ RSpec.describe History::FilterPanelComponent, type: :component do
 
     expect(fuel_total[:class]).to include('lg:hidden')
     expect(vendor_total[:class]).not_to include('lg:hidden')
-    expect(vendor_total).to have_text('R$ 125')
+    expect(vendor_total).to have_text("R$\u00A0125")
   end
 
   it 'labels each checkbox for the collapsed group summaries' do

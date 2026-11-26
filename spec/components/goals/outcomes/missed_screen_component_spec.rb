@@ -49,8 +49,8 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
     expect(html).to include('stroke="#f59e0b"').and include('>90<span').and include('da meta')
     expect(html).to include('Meta semanal · lucro líquido')
     expect(html).to include('Não foi dessa vez, mas foi perto')
-    expect(html).to include('Na semana de 06/jul a 12/jul você fez <strong class="text-slate-900">R$ 990,00</strong>. ' \
-                            'Faltaram <strong class="text-slate-900">R$ 110,00</strong> para os R$ 1.100,00.')
+    expect(html).to include("Na semana de 06/jul a 12/jul você fez <strong class=\"text-slate-900\">R$\u00A0990,00</strong>. " \
+                            "Faltaram <strong class=\"text-slate-900\">R$\u00A0110,00</strong> para os R$\u00A01.100,00.")
     expect(html).to include('Faltaram').and include('text-amber-700')
   end
 
@@ -73,8 +73,8 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
     html = view_context.render(described_class.new(outcome: outcome, unread_count: 0))
 
     expect(html).to include('O que foi bem')
-    expect(html).to include('Dias rodados').and include('Lucro / dia').and include('R$ 247,50')
-    expect(html).to include('Melhor dia').and include('R$ 270,00').and include('sex, 10/jul')
+    expect(html).to include('Dias rodados').and include('Lucro / dia').and include("R$\u00A0247,50")
+    expect(html).to include('Melhor dia').and include("R$\u00A0270,00").and include('sex, 10/jul')
     expect(html).to include('Você bateu 3 das últimas 4 metas semanais.')
   end
 
@@ -88,8 +88,8 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
   it 'keeps the target within reach for this week with the per day pace' do
     html = view_context.render(described_class.new(outcome: outcome, unread_count: 0))
 
-    expect(html).to include('R$ 1.100,00 continua ao seu alcance')
-    expect(html).to include('Para esta semana: R$ 275,00 por dia em 4 dias de trabalho. ' \
+    expect(html).to include("R$\u00A01.100,00 continua ao seu alcance")
+    expect(html).to include("Para esta semana: R$\u00A0275,00 por dia em 4 dias de trabalho. " \
                             'Se a semana for mais curta, ajuste a meta sem culpa.')
   end
 
@@ -104,7 +104,7 @@ RSpec.describe Goals::Outcomes::MissedScreenComponent, type: :component do
 
     expect(page_html).to have_css('form[action="/goals"][method="post"]', count: 2)
     expect(page_html).to have_button('Manter a meta')
-    expect(page_html).to have_button('Ajustar para R$ 1.050')
+    expect(page_html).to have_button("Ajustar para R$\u00A01.050")
     expect(page_html).to have_css('input[type=hidden][name="goal[target_amount]"][value="1100.0"]', visible: :all)
     expect(page_html).to have_css('input[type=hidden][name="goal[target_amount]"][value="1050"]', visible: :all)
     expect(page_html).to have_css('input[type=hidden][name="goal[period_start]"][value="2026-07-13"]', count: 2, visible: :all)

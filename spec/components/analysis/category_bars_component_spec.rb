@@ -11,14 +11,14 @@ RSpec.describe Analysis::CategoryBarsComponent, type: :component do
   it 'renders total_annual subtitle when month is nil' do
     html = view_context.render(Analysis::CategoryBarsComponent.new(categories: categories, month: nil))
 
-    expect(html).to include(I18n.t('analysis.show_view.categories.total_annual', value: 'R$ 500,00'))
+    expect(html).to include(I18n.t('analysis.show_view.categories.total_annual', value: "R$\u00A0500,00"))
     expect(html).not_to include('no mês')
   end
 
   it 'renders total_monthly subtitle when month is present' do
     html = view_context.render(Analysis::CategoryBarsComponent.new(categories: categories, month: 6))
 
-    expect(html).to include(I18n.t('analysis.show_view.categories.total_monthly', value: 'R$ 500,00'))
+    expect(html).to include(I18n.t('analysis.show_view.categories.total_monthly', value: "R$\u00A0500,00"))
     expect(html).not_to include('no ano')
   end
 

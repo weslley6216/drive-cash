@@ -281,7 +281,7 @@ RSpec.describe 'Dashboard', type: :request do
 
         get root_path, params: { year: 2026, month: 3 }
 
-        expect(response.body).to include(I18n.t('goals.index.monthly.missed', shortfall: 'R$ 5.000,00'))
+        expect(response.body).to include(I18n.t('goals.index.monthly.missed', shortfall: "R$\u00A05.000,00"))
         expect(response.body).not_to include('dias restantes')
       end
     end
@@ -405,7 +405,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include(%(<h2 class="text-lg font-bold tracking-tight text-blue-600 truncate">#{I18n.t('dashboard.earnings_detail_view.title')}</h2>))
       expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">2025</p>')
       expect(response.body).to include('w-[15px] h-[15px] text-slate-300')
-      expect(response.body).to include('class="text-green-700">R$ 100,00</span>')
+      expect(response.body).to include("class=\"text-green-700\">R$\u00A0100,00</span>")
       expect(response.body).to include('px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium')
     end
 
@@ -417,7 +417,7 @@ RSpec.describe 'Dashboard', type: :request do
       expect(response.body).to include('>15/01</td>')
       expect(response.body).to include('<p class="text-sm text-slate-500 mt-0.5">Janeiro · 2025</p>')
       expect(response.body).to include('overflow-y-auto px-5 py-3 max-h-[360px]')
-      expect(response.body).to match(/aria-label="#{I18n.t('dashboard.earnings_detail_view.edit')}".*R\$ 100,00/m)
+      expect(response.body).to match(/aria-label="#{I18n.t('dashboard.earnings_detail_view.edit')}".*R\$\u00A0100,00/m)
     end
 
     it 'groups the month expenses under a short day label in the red theme' do
@@ -427,7 +427,7 @@ RSpec.describe 'Dashboard', type: :request do
 
       expect(response.body).to include('>15 jan</p>')
       expect(response.body).to include('border-t-4 border-t-red-600')
-      expect(response.body).to include('class="text-red-700">R$ 80,00</span>')
+      expect(response.body).to include("class=\"text-red-700\">R$\u00A080,00</span>")
     end
 
     it 'renders the row actions as 32px-wide buttons in a gap-0.5 wrapper' do

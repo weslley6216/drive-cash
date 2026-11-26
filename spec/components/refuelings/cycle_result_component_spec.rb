@@ -9,18 +9,18 @@ RSpec.describe Refuelings::CycleResultComponent, type: :component do
   it 'shows what remains on the current tank' do
     html = view_context.render(described_class.new(cycle: cycle))
 
-    expect(html).to eq('<span class="text-xs font-semibold text-slate-700 tabular-nums">resta R$ 214,00</span>')
+    expect(html).to eq("<span class=\"text-xs font-semibold text-slate-700 tabular-nums\">resta R$\u00A0214,00</span>")
   end
 
   it 'shows the balance a closed tank ended on' do
     html = view_context.render(described_class.new(cycle: cycle.with(current: false, closing_balance: BigDecimal('149'))))
 
-    expect(html).to eq('<span class="text-xs font-medium text-slate-500 tabular-nums">fechou em R$ 149,00</span>')
+    expect(html).to eq("<span class=\"text-xs font-medium text-slate-500 tabular-nums\">fechou em R$\u00A0149,00</span>")
   end
 
   it 'shows in red how far a closed tank went beyond its balance' do
     html = view_context.render(described_class.new(cycle: cycle.with(current: false, closing_balance: BigDecimal('-1'))))
 
-    expect(html).to eq('<span class="text-xs font-semibold text-red-700 tabular-nums">−R$ 1,00 além</span>')
+    expect(html).to eq("<span class=\"text-xs font-semibold text-red-700 tabular-nums\">−R$\u00A01,00 além</span>")
   end
 end

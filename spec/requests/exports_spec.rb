@@ -148,7 +148,7 @@ RSpec.describe 'Exports', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('id="export-summary"')
         expect(response.body).to include(I18n.t('exports.cta_format.csv'))
-        expect(response.body).to include('R$ 150,00')
+        expect(response.body).to include("R$\u00A0150,00")
       end
     end
 

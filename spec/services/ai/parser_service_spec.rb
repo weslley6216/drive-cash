@@ -34,7 +34,7 @@ RSpec.describe Ai::ParserService do
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_expense')
         expect(result[:params]['amount']).to eq(45.0)
-        expect(result[:summary]).to include('R$ 45,00')
+        expect(result[:summary]).to include("R$\u00A045,00")
         expect(result[:summary]).to include(I18n.t('activerecord.attributes.expense.categories.fuel'))
         expect(result[:summary]).to include('21/04/2026')
       end
@@ -79,7 +79,7 @@ RSpec.describe Ai::ParserService do
         expect(result[:type]).to eq(:preview)
         expect(result[:action]).to eq('create_earning')
         expect(result[:params]['amount']).to eq(100.0)
-        expect(result[:summary]).to include('R$ 100,00')
+        expect(result[:summary]).to include("R$\u00A0100,00")
         expect(result[:summary]).to include(I18n.t('activerecord.attributes.earning.platforms.uber'))
         expect(result[:summary]).to include('21/04/2026')
       end
@@ -309,7 +309,7 @@ RSpec.describe Ai::ParserService do
         queued = service.call[:queued].first
 
         expect(queued[:type]).to eq(:preview)
-        expect(queued[:summary]).to include('R$ 60,00')
+        expect(queued[:summary]).to include("R$\u00A060,00")
         expect(queued[:content]).to include(queued[:summary])
       end
 

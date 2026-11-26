@@ -17,7 +17,7 @@ RSpec.describe History::MonthRowsComponent, type: :component do
   it 'names each month with the year and shows the debit in red on phones' do
     expect(phone_rows.size).to eq(4)
     expect(phone_rows.first).to have_text('Maio 2026')
-    expect(phone_rows.first.find('[data-month-amount]').text).to eq('−R$ 214,30')
+    expect(phone_rows.first.find('[data-month-amount]').text).to eq("−R$\u00A0214,30")
     expect(phone_rows.first.find('[data-month-amount]')[:class]).to include('text-red-700')
   end
 
@@ -66,7 +66,7 @@ RSpec.describe History::MonthRowsComponent, type: :component do
 
     amount = earning_page.find('[data-month-row="phone"] [data-month-amount]')
 
-    expect(amount.text).to eq('+R$ 32,50')
+    expect(amount.text).to eq("+R$\u00A032,50")
     expect(amount[:class]).to include('text-emerald-700')
   end
 end

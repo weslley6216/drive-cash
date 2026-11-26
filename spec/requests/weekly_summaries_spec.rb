@@ -21,7 +21,7 @@ RSpec.describe 'WeeklySummaries', type: :request do
 
         expect(response.body).to include('Sua semana')
         expect(response.body).to include('6 a 12 de julho')
-        expect(response.body).to include('R$ 987,40')
+        expect(response.body).to include("R$\u00A0987,40")
         expect(response.body).not_to include('R$ 5.987,40')
       end
 

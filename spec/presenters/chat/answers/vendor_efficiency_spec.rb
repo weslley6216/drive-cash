@@ -25,7 +25,7 @@ RSpec.describe Chat::Answers::VendorEfficiency do
 
       result = described_class.new(data).call
 
-      expect(result).to include('Shell').and include('12.46').and include('R$ 0,00')
+      expect(result).to include('Shell').and include('12.46').and include("R$\u00A00,00")
     end
   end
 end
