@@ -315,6 +315,10 @@ pt-BR:
       refuel_desktop: "Registrar abastecimento"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."
       last_fill: "Último tanque cheio · %{date} · %{vendor}"
+      last_full_desktop: "Último cheio · %{date}"
+      consumed:
+        one: "Consumido %{amount} em %{count} rota"
+        other: "Consumido %{amount} em %{count} rotas"
       status:
         ok: "Tanque cheio"
         mid: "Meio tanque"
@@ -385,6 +389,7 @@ pt-BR:
         route: "Consumo"
       route: "Rota"
       fuel_expense: "Combustível"
+      fuel_expense_desktop: "Despesa de combustível"
       today: "Hoje"
       yesterday: "Ontem"
       auto_debit: "Cada despesa de combustível debita o saldo automaticamente."

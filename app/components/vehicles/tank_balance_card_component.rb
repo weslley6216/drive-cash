@@ -9,10 +9,11 @@ module Vehicles
       ok:       { bar_class: 'bg-blue-500', num_class: 'text-slate-900', chip_class: 'text-blue-700 bg-blue-50 border-blue-200', border_class: 'border-slate-100' }
     }.freeze
 
-    def initialize(balance:, full:, last_fill:, variant: :mobile)
+    def initialize(balance:, full:, last_fill:, consumed: nil, variant: :mobile)
       @balance = balance
       @full = full
       @last_fill = last_fill
+      @consumed = consumed
       @variant = variant
       @status_key = Vehicles::TankStatus.for(balance, full)
       @style = STATUS_STYLES.fetch(@status_key)
@@ -93,7 +94,7 @@ module Vehicles
         end
         div(class: 'col-span-12 lg:col-span-5 flex flex-col gap-2.5') do
           refuel_button(desktop: true)
-          note_line
+          desktop_note
         end
       end
     end
@@ -141,6 +142,23 @@ module Vehicles
       elsif I18n.exists?("vehicle.tank.note.#{@status_key}")
         p(class: "text-xs mt-2.5 #{@style[:num_class]}") { t("vehicle.tank.note.#{@status_key}") }
       end
+    end
+
+    def desktop_note
+      return unless @last_fill
+
+      p(class: 'text-xs text-slate-500 leading-relaxed') do
+        plain t('vehicle.tank.last_full_desktop', date: helpers.l(@last_fill.date, format: '%d %b'))
+        plain " · #{@last_fill.vendor}" if @last_fill.vendor.present?
+        br
+        consumed_span
+      end
+    end
+
+    def consumed_span
+      return unless @consumed && @consumed[:routes].positive?
+
+      span(class: 'text-slate-400') { t('vehicle.tank.consumed', amount: format_currency(@consumed[:amount]), count: @consumed[:routes]) }
     end
 
     def last_fill_text

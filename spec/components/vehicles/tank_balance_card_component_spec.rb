@@ -91,5 +91,49 @@ RSpec.describe Vehicles::TankBalanceCardComponent, type: :component do
       expect(html).to include(I18n.t('vehicle.tank.of_full_desktop', value: 'R$ 260,00'))
       expect(html).to include('rounded-2xl border-2')
     end
+
+    context 'with the desktop variant' do
+      it 'summarizes the last full tank and the routes consumed since it' do
+        html = view_context.render(described_class.new(balance: 125, full: 260, last_fill: fill, consumed: { amount: 135, routes: 3 }, variant: :desktop))
+
+        expect(html).to include('<p class="text-xs text-slate-500 leading-relaxed">Último cheio · 07 jun · Posto Orense<br>')
+        expect(html).to include('<span class="text-slate-400">Consumido R$ 135,00 em 3 rotas</span>')
+      end
+
+      it 'keeps the summary instead of the level warning in a danger state' do
+        html = view_context.render(described_class.new(balance: 30, full: 260, last_fill: fill, consumed: { amount: 230, routes: 5 }, variant: :desktop))
+
+        expect(html).to include('Consumido R$ 230,00 em 5 rotas')
+        expect(html).not_to include(I18n.t('vehicle.tank.note.critical'))
+      end
+
+      it 'counts a single route in the singular' do
+        html = view_context.render(described_class.new(balance: 215, full: 260, last_fill: fill, consumed: { amount: 45, routes: 1 }, variant: :desktop))
+
+        expect(html).to include('Consumido R$ 45,00 em 1 rota</span>')
+      end
+
+      it 'drops the consumption line when no route ran since the fill' do
+        html = view_context.render(described_class.new(balance: 260, full: 260, last_fill: fill, consumed: { amount: 0, routes: 0 }, variant: :desktop))
+
+        expect(html).to include('Último cheio · 07 jun · Posto Orense')
+        expect(html).not_to include('Consumido')
+      end
+
+      it 'leaves the station out of the last full line when the fill has none' do
+        fill_without_vendor = create(:refueling, date: Date.new(2026, 6, 7), vendor: nil, total_amount: 260, full_tank: true)
+
+        html = view_context.render(described_class.new(balance: 260, full: 260, last_fill: fill_without_vendor, consumed: { amount: 0, routes: 0 }, variant: :desktop))
+
+        expect(html).to include('Último cheio · 07 jun<br>')
+      end
+
+      it 'renders no desktop summary without a full tank' do
+        html = view_context.render(described_class.new(balance: 50, full: nil, last_fill: nil, consumed: nil, variant: :desktop))
+
+        expect(html).not_to include('Último cheio')
+        expect(html).not_to include('Consumido')
+      end
+    end
   end
 end

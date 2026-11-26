@@ -162,6 +162,34 @@ RSpec.describe 'Vehicle', type: :system, js: true do
       expect(page).to have_text(I18n.t('vehicle.tank.refuel_desktop'))
     end
 
+    it 'sums the routes since the last full tank and lists them as fuel expenses in a divided card on a desktop screen' do
+      create(:refueling, vehicle: @vehicle, date: Date.new(2026, 11, 7), vendor: 'Posto Orense', liters: 44.1, total_amount: 260, full_tank: true)
+      3.times { |offset| create(:expense, user: current_user, category: 'fuel', amount: 45, description: 'Rota Shopee', date: Date.new(2026, 11, 8 + offset)) }
+      emulate_desktop_screen
+
+      visit vehicle_path
+
+      route = find('p', text: "#{I18n.t('vehicle.moves.today')} · #{I18n.t('vehicle.moves.fuel_expense_desktop')}")
+
+      expect(page).to have_text('Último cheio · 07 nov · Posto Orense')
+      expect(page).to have_text('Consumido R$ 135,00 em 3 rotas')
+      expect(route.find(:xpath, '../..')[:class].split).to include('py-3.5')
+      expect(route.find(:xpath, '../../..')[:class].split).to include('rounded-xl', 'border-slate-200', 'divide-y')
+    end
+
+    it 'keeps the Combustível sub and the bordered rows in the tank moves on a phone' do
+      create(:refueling, vehicle: @vehicle, date: Date.new(2026, 11, 7), vendor: 'Posto Orense', liters: 44.1, total_amount: 260, full_tank: true)
+      create(:expense, user: current_user, category: 'fuel', amount: 45, description: 'Rota Shopee', date: Date.current)
+
+      visit vehicle_path
+
+      route = find('p', text: "#{I18n.t('vehicle.moves.today')} · #{I18n.t('vehicle.moves.fuel_expense')}")
+
+      expect(route.find(:xpath, '../..')[:class].split).to include('py-3', 'border-b')
+      expect(page).to have_no_text('Consumido')
+      expect(page).to fit_the_phone_width
+    end
+
     it 'keeps the content scroll after marking a maintenance done on a phone' do
       emulate_short_phone
       visit vehicle_path

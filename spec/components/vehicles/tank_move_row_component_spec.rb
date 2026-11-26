@@ -51,5 +51,36 @@ RSpec.describe Vehicles::TankMoveRowComponent, type: :component do
       expect(credit).to include('data-tank-filter-target="row" data-tank-filter-kind="fill"')
       expect(debit).to include('data-tank-filter-target="row" data-tank-filter-kind="route"')
     end
+
+    it 'keeps the mobile row at py-3 in slate-800 with its own bottom border' do
+      move = { kind: :debit, date: Date.new(2026, 6, 9), amount: -45, description: 'Rota Shopee' }
+
+      html = view_context.render(described_class.new(move: move))
+
+      expect(html).to include('flex items-center gap-3 px-4 py-3 border-b border-slate-100')
+      expect(html).to include('text-sm font-semibold text-slate-800 truncate')
+    end
+
+    context 'with the desktop variant' do
+      it 'renders a debit as a taller borderless row titled in slate-900 with the fuel expense sub' do
+        move = { kind: :debit, date: Date.new(2026, 6, 9), amount: -45, description: 'Rota Shopee' }
+
+        html = view_context.render(described_class.new(move: move, variant: :desktop))
+
+        expect(html).to include('flex items-center gap-3 px-4 py-3.5"')
+        expect(html).to include('text-sm font-semibold text-slate-900 truncate')
+        expect(html).to include("09 jun · #{I18n.t('vehicle.moves.fuel_expense_desktop')}")
+      end
+
+      it 'keeps the station detail under a desktop refueling' do
+        move = { kind: :credit, date: Date.new(2026, 6, 7), amount: 260, full_tank: true,
+                 vendor: 'Posto Orense', liters: 44.1, price_per_liter: 5.89 }
+
+        html = view_context.render(described_class.new(move: move, variant: :desktop))
+
+        expect(html).to include('07 jun · Posto Orense · 44,1 L · R$ 5,89/L')
+        expect(html).not_to include(I18n.t('vehicle.moves.fuel_expense_desktop'))
+      end
+    end
   end
 end
